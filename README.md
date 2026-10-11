@@ -1,4 +1,4 @@
-# Amore
+# Tynitales
 
 Gift beautiful, personalized digital templates to the people you love.
 

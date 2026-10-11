@@ -25,7 +25,7 @@ export function Preloader() {
           transition={{ duration: 0.9, ease: EASE_IN_OUT }}
         >
           <div className="flex items-baseline font-serif text-[clamp(4.5rem,15vw,10rem)] italic leading-none">
-            {Array.from("amore").map((c, i) => (
+            {Array.from("tynitales").map((c, i) => (
               <span key={i} className="inline-block overflow-y-clip pr-[0.04em] pb-[0.12em]">
                 <motion.span
                   className="inline-block"

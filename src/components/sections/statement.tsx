@@ -13,7 +13,7 @@ export function Statement() {
         <div className="md:col-span-9">
           <ScrollRevealText
             className="text-[clamp(1.9rem,4.2vw,3.9rem)] font-medium leading-[1.08] tracking-[-0.035em]"
-            text="We believe the best gifts aren’t bought — they’re *written.* Amore turns the words you’ve been meaning to say into something they’ll *keep* *forever.*"
+            text="We believe the best gifts aren’t bought — they’re *written.* Tynitales turns the words you’ve been meaning to say into something they’ll *keep* *forever.*"
           />
           <ul className="mt-14 flex flex-wrap gap-x-10 gap-y-3 text-sm text-muted">
             {points.map((p) => (

@@ -112,7 +112,7 @@ export function Hero({ featured }: { featured: Template[] }) {
           transition={{ delay: INTRO_DELAY + 0.6, duration: 0.9, ease: EASE_OUT }}
           className="mt-8 max-w-xl text-balance text-base text-muted sm:text-lg"
         >
-          Amore turns your words, photos and favorite songs into a beautiful little page made for
+          Tynitales turns your words, photos and favorite songs into a beautiful little page made for
           one person — delivered exactly when it matters.
         </motion.p>
 

@@ -6,13 +6,13 @@ export function Logo({ className, onClick }: { className?: string; onClick?: () 
     <Link
       href="/"
       onClick={onClick}
-      aria-label="Amore home"
+      aria-label="Tynitales home"
       className={cn(
         "group inline-flex items-baseline font-serif text-[1.75rem] italic leading-none tracking-tight",
         className,
       )}
     >
-      amore
+      tynitales
       <span className="ml-0.5 inline-block size-[0.2em] rounded-full bg-rose transition-transform duration-500 ease-out-expo group-hover:scale-150" />
     </Link>
   );

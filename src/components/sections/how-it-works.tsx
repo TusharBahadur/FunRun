@@ -222,7 +222,7 @@ function SendVisual() {
 
       <div className="flex w-full max-w-sm items-center gap-2 rounded-full bg-paper p-1.5 pl-4 shadow-[0_14px_30px_-16px_rgba(27,18,21,0.35)]">
         <Link2 className="size-4 shrink-0 text-muted" />
-        <span className="truncate text-sm">amore.gift/for/maya</span>
+        <span className="truncate text-sm">tynitales.gift/for/maya</span>
         <span className="relative ml-auto h-9 w-[6.75rem] shrink-0 overflow-hidden rounded-full text-sm font-medium text-paper">
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.span

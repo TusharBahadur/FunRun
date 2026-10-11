@@ -1,9 +1,9 @@
 export const siteConfig = {
-  name: "Amore",
+  name: "Tynitales",
   tagline: "Gift a feeling.",
   description:
     "Beautiful digital templates you can personalize and gift to the people you love.",
-  url: "https://amore.gift",
+  url: "https://tynitales.gift",
   nav: [
     { label: "Templates", href: "/templates" },
     { label: "How it works", href: "/#how" },

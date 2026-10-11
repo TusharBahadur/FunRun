@@ -63,12 +63,12 @@ export function Footer() {
           aria-hidden
           className="mt-16 select-none text-center font-serif text-[clamp(6rem,30vw,28rem)] italic leading-[0.8] tracking-[-0.03em] text-cream"
         >
-          <SplitText text="amore" by="char" stagger={0.06} />
+          <SplitText text="tynitales" by="char" stagger={0.06} />
           <span className="text-rose">.</span>
         </p>
 
         <div className="flex flex-col gap-2 border-t border-cream/10 py-6 text-sm text-cream/45 md:flex-row md:justify-between">
-          <p>© Amore. All rights reserved.</p>
+          <p>© Tynitales. All rights reserved.</p>
           <p className="flex items-center gap-1.5">
             Made with <Heart className="size-3.5 fill-rose text-rose" /> for the ones we love.
           </p>
