@@ -8,7 +8,7 @@ import type { Template } from "@/lib/templates";
 export function TemplateGrid({ templates }: { templates: Template[] }) {
   if (templates.length === 0) {
     return (
-      <p className="py-24 text-center font-serif text-3xl italic text-muted">
+      <p className="type-display py-24 text-center text-3xl text-muted">
         New designs for this occasion are on their way.
       </p>
     );

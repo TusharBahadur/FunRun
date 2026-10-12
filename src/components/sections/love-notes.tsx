@@ -11,11 +11,11 @@ export function LoveNotes({ notes }: { notes: LoveNote[] }) {
     <section id="love-notes" className="scroll-mt-24 overflow-hidden py-28 md:py-36">
       <div className="mx-auto mb-16 flex max-w-7xl flex-col items-center px-5 text-center">
         <Eyebrow index="05">Love notes</Eyebrow>
-        <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] font-semibold leading-[0.95] tracking-[-0.04em]">
+        <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
           <SplitText text="Words that" />{" "}
           <SplitText
             text="landed."
-            className="font-serif font-normal italic tracking-[-0.01em] text-rose"
+            className="type-accent text-rose"
             delay={0.1}
           />
         </h2>
@@ -49,7 +49,7 @@ function NoteCard({ note, tilt }: { note: LoveNote; tilt: boolean }) {
           <Heart key={i} className="size-3.5 fill-current" />
         ))}
       </div>
-      <blockquote className="mt-4 font-serif text-[1.45rem] leading-snug">“{note.quote}”</blockquote>
+      <blockquote className="type-heading mt-4 text-[1.35rem] leading-[1.05]">“{note.quote}”</blockquote>
       <figcaption className="mt-6 flex items-center justify-between text-sm">
         <span className="font-medium">{note.name}</span>
         <span className="text-muted">{note.context}</span>

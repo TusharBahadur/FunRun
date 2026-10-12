@@ -1,17 +1,44 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import {
+  IBM_Plex_Mono,
+  Instrument_Serif,
+  Inter_Tight,
+  Fraunces,
+  Playfair_Display,
+} from "next/font/google";
 import { Cursor } from "@/components/motion/cursor";
 import { Providers } from "@/components/providers";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const interTight = Inter_Tight({
+  variable: "--font-inter-tight",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+});
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+});
 const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
   subsets: ["latin"],
   weight: "400",
-  style: ["normal", "italic"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  style: "italic",
+});
+
+// Logo wordmark: heaviest italic with the quirky "wonk" letterforms switched off in CSS.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  style: "italic",
+  axes: ["SOFT", "WONK"],
 });
 
 export const metadata: Metadata = {
@@ -31,12 +58,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} antialiased`}
+      className={`${interTight.variable} ${plexMono.variable} ${instrumentSerif.variable} ${playfair.variable} ${fraunces.variable} antialiased`}
     >
       <body className="min-h-svh bg-cream font-sans text-ink">
         <Providers>{children}</Providers>
         <Cursor />
-        <div aria-hidden className="grain pointer-events-none fixed inset-0 z-[70] opacity-[0.05]" />
+        <div
+          aria-hidden
+          className="grain pointer-events-none fixed inset-0 z-[70] opacity-[0.05]"
+        />
       </body>
     </html>
   );

@@ -147,6 +147,28 @@ function Motif({ template }: { template: Template }) {
           </g>
         </>
       );
+    case "cake":
+      return (
+        <>
+          {[30, 50, 70].map((x, i) => (
+            <g key={x}>
+              <rect x={x - 2.2} y={22 + (i % 2) * 3} width={4.4} height={20} rx={1.5} fill={fg} opacity={0.9} />
+              <path
+                d={`M${x} ${11 + (i % 2) * 3} C ${x + 4} ${16 + (i % 2) * 3}, ${x + 3} ${21 + (i % 2) * 3}, ${x} ${21 + (i % 2) * 3} C ${x - 3} ${21 + (i % 2) * 3}, ${x - 4} ${16 + (i % 2) * 3}, ${x} ${11 + (i % 2) * 3}Z`}
+                fill={accent}
+              />
+            </g>
+          ))}
+          <rect x={14} y={42} width={72} height={46} rx={7} fill={accent} />
+          <path
+            d="M14 52 V48 a6 6 0 0 1 6 -6 H80 a6 6 0 0 1 6 6 V52 q-4.5 7 -9 0 t-9 0 t-9 0 t-9 0 t-9 0 t-9 0 t-9 0 t-9 0z"
+            fill="#fff"
+            opacity={0.9}
+          />
+          <path d="M14 70 H86" stroke="#fff" strokeWidth={1.6} strokeDasharray="0.1 5" strokeLinecap="round" opacity={0.8} />
+          <rect x={6} y={88} width={88} height={4} rx={2} fill={fg} opacity={0.25} />
+        </>
+      );
     case "bloom":
       return (
         <>

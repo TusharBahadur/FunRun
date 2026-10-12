@@ -14,16 +14,16 @@ export function Features() {
       <div className="mb-14 grid gap-6 md:grid-cols-12 md:items-end">
         <div className="md:col-span-7">
           <Eyebrow index="04">Details</Eyebrow>
-          <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] font-semibold leading-[0.95] tracking-[-0.04em]">
+          <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
             <SplitText text="Every detail," />{" "}
             <SplitText
               text="considered."
-              className="font-serif font-normal italic tracking-[-0.01em] text-rose"
+              className="type-accent text-rose"
               delay={0.12}
             />
           </h2>
         </div>
-        <p className="text-muted md:col-span-4 md:col-start-9">
+        <p className="type-copy text-muted md:col-span-4 md:col-start-9">
           Little touches that turn a message into a moment they’ll come back to again and again.
         </p>
       </div>
@@ -99,8 +99,8 @@ function BentoCard({
       )}
     >
       <div className="relative mb-8 flex h-44 items-center justify-center">{children}</div>
-      <h3 className="mt-auto text-xl font-semibold tracking-[-0.02em]">{title}</h3>
-      <p className="mt-1.5 text-sm text-muted">{body}</p>
+      <h3 className="mt-auto type-heading text-xl">{title}</h3>
+      <p className="type-copy mt-2 text-[13px] text-muted">{body}</p>
     </motion.div>
   );
 }
@@ -135,7 +135,7 @@ function Countdown() {
 
   return (
     <div className="w-full">
-      <p className="mb-4 flex items-center gap-2 text-xs text-muted">
+      <p className="type-label mb-4 flex items-center gap-2 text-muted">
         <span className="size-1.5 animate-pulse rounded-full bg-rose" />
         Unlocks on Valentine’s Day, 9:00 AM
       </p>
@@ -156,7 +156,7 @@ function Countdown() {
                 </motion.span>
               </AnimatePresence>
             </div>
-            <p className="mt-2 text-[11px] uppercase tracking-[0.15em] text-muted">{u.label}</p>
+            <p className="mt-2 type-label text-[11px] text-muted">{u.label}</p>
           </div>
         ))}
       </div>
@@ -179,7 +179,7 @@ function Equalizer() {
           />
         ))}
       </div>
-      <p className="font-serif text-lg italic text-ink/70">“our song” — now playing</p>
+      <p className="type-label text-ink/70">“our song” — now playing</p>
     </div>
   );
 }

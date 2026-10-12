@@ -33,9 +33,63 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-italic: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-wordmark: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+/* ───────────── Type system ───────────── */
+/* Large sentence-case headlines, regular weight, set tight. */
+@utility type-display {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+/* High-contrast serif italic for accent words inside headlines. */
+@utility type-accent {
+  font-family: var(--font-italic);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+/* Heavy, plain serif italic wordmark. */
+@utility type-wordmark {
+  font-family: var(--font-wordmark);
+  font-style: italic;
+  font-weight: 900;
+  font-variation-settings: "SOFT" 0, "WONK" 0;
+  letter-spacing: -0.035em;
+}
+
+/* Card and step titles. */
+@utility type-heading {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+/* Running copy: uppercase mono. */
+@utility type-copy {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+/* Small labels, eyebrows, meta. */
+@utility type-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
 }
 
 @utility no-scrollbar {

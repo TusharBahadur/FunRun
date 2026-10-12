@@ -20,7 +20,7 @@ function Row() {
           <span
             className={cn(
               "px-[0.9em]",
-              i % 2 ? "font-serif italic text-ink/80" : "font-medium tracking-[-0.02em] text-ink/35",
+              i % 2 ? "font-bold text-ink/80" : "font-bold text-ink/30",
             )}
           >
             {word}
@@ -36,7 +36,7 @@ function Row() {
 export function MarqueeBand() {
   return (
     <section aria-label="Occasions" className="mx-auto max-w-7xl px-5">
-      <div className="border-y border-line py-7 text-[clamp(1.35rem,2.4vw,2rem)] leading-none [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
+      <div className="border-y border-line py-7 text-[clamp(1.35rem,2.4vw,2rem)] uppercase leading-none tracking-[-0.03em] [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
         <VelocityMarquee baseVelocity={1.2} skew={false}>
           <Row />
         </VelocityMarquee>

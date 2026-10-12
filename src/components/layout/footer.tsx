@@ -37,13 +37,13 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
             <Logo className="text-4xl" />
-            <p className="mt-5 max-w-xs text-cream/55">
+            <p className="type-copy mt-5 max-w-xs text-cream/55">
               Beautiful digital gifts for the people who matter most.
             </p>
           </div>
           {columns.map((col) => (
             <div key={col.title} className="md:col-span-2">
-              <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-cream/40">
+              <p className="type-label text-cream/40">
                 {col.title}
               </p>
               <ul className="mt-5 space-y-3">
@@ -61,13 +61,13 @@ export function Footer() {
 
         <p
           aria-hidden
-          className="mt-16 select-none text-center font-serif text-[clamp(6rem,30vw,28rem)] italic leading-[0.8] tracking-[-0.03em] text-cream"
+          className="mt-16 select-none text-center type-wordmark whitespace-nowrap pb-[0.12em] text-[clamp(3rem,19vw,26rem)] leading-[0.9] text-cream"
         >
-          <SplitText text="tynitales" by="char" stagger={0.06} />
+          <SplitText text="Tynitales" by="char" stagger={0.06} />
           <span className="text-rose">.</span>
         </p>
 
-        <div className="flex flex-col gap-2 border-t border-cream/10 py-6 text-sm text-cream/45 md:flex-row md:justify-between">
+        <div className="type-label flex flex-col gap-2 border-t border-cream/10 py-6 text-cream/45 md:flex-row md:justify-between">
           <p>© Tynitales. All rights reserved.</p>
           <p className="flex items-center gap-1.5">
             Made with <Heart className="size-3.5 fill-rose text-rose" /> for the ones we love.

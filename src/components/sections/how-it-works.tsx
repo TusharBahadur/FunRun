@@ -40,21 +40,21 @@ export function HowItWorks({ previews }: { previews: Template[] }) {
       <div className="grid gap-14 md:grid-cols-12">
         <div className="md:sticky md:top-32 md:col-span-5 md:self-start">
           <Eyebrow index="02">How it works</Eyebrow>
-          <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] font-semibold leading-[0.95] tracking-[-0.04em]">
+          <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
             <SplitText text="Three small steps to" />{" "}
             <SplitText
               text="someone’s whole heart."
-              className="font-serif font-normal italic tracking-[-0.01em] text-rose"
+              className="type-accent text-rose"
               delay={0.2}
             />
           </h2>
-          <p className="mt-6 max-w-sm text-muted">
+          <p className="type-copy mt-6 max-w-sm text-muted">
             No design skills, no apps to install. If you can write a text message, you can make
             something unforgettable.
           </p>
 
           <div className="mt-14 hidden items-end gap-5 md:flex">
-            <div className="relative h-[6rem] w-[8.5rem] overflow-hidden font-serif text-[6rem] italic leading-none">
+            <div className="relative h-[6rem] w-[8.5rem] overflow-hidden text-[6rem] font-bold leading-none tracking-[-0.06em]">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.span
                   key={active}
@@ -121,8 +121,8 @@ function StepCard({
       <div className="flex gap-5 p-5 pt-6">
         <span className="mt-2 font-mono text-xs text-rose">{step.n}</span>
         <div>
-          <h3 className="text-2xl font-semibold tracking-[-0.03em]">{step.title}</h3>
-          <p className="mt-2 text-muted">{step.body}</p>
+          <h3 className="type-heading text-2xl">{step.title}</h3>
+          <p className="type-copy mt-3 text-muted">{step.body}</p>
         </div>
       </div>
     </motion.article>
@@ -179,7 +179,7 @@ function WriteVisual() {
           </div>
           <span className="rounded-full bg-blush px-2.5 py-1 text-xs font-medium text-wine">To: Maya</span>
         </div>
-        <p className="mt-5 min-h-[5.5rem] font-serif text-[1.6rem] italic leading-[1.15]">
+        <p className="mt-5 min-h-[5.5rem] font-serif text-[1.6rem] leading-[1.15]">
           <Typewriter text="Dear Maya, you make ordinary Tuesdays feel like holidays." />
         </p>
         <div className="mt-4 flex items-center gap-2 border-t border-line pt-4 text-muted">

@@ -1,19 +1,27 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-export function Logo({ className, onClick }: { className?: string; onClick?: () => void }) {
+export function Logo({
+  className,
+  onClick,
+}: {
+  className?: string;
+  onClick?: () => void;
+}) {
   return (
     <Link
       href="/"
       onClick={onClick}
       aria-label="Tynitales home"
       className={cn(
-        "group inline-flex items-baseline font-serif text-[1.75rem] italic leading-none tracking-tight",
+        "type-wordmark group inline-flex items-baseline text-[1.9rem] leading-none",
         className,
       )}
     >
-      tynitales
-      <span className="ml-0.5 inline-block size-[0.2em] rounded-full bg-rose transition-transform duration-500 ease-out-expo group-hover:scale-150" />
+      Tynitales
+      <span className="text-rose transition-transform duration-500 ease-out-expo group-hover:-translate-y-1">
+        .
+      </span>
     </Link>
   );
 }

@@ -52,11 +52,11 @@ export function TemplateShowcase({ templates }: { templates: Template[] }) {
             <Eyebrow index="03" className="text-cream/50">
               The collection
             </Eyebrow>
-            <h2 className="mt-4 text-[clamp(2.2rem,5vw,4.75rem)] font-semibold leading-[0.95] tracking-[-0.04em]">
+            <h2 className="mt-4 text-[clamp(2.2rem,5vw,4.75rem)] type-display">
               <SplitText text="Templates for" />{" "}
               <SplitText
                 text="every kind of love."
-                className="font-serif font-normal italic tracking-[-0.01em] text-blush"
+                className="type-accent text-blush"
                 delay={0.15}
               />
             </h2>
@@ -80,7 +80,7 @@ export function TemplateShowcase({ templates }: { templates: Template[] }) {
               className="group grid aspect-[3/4] place-items-center rounded-[1.75rem] border border-dashed border-cream/20 p-8 text-center transition-colors hover:border-rose hover:bg-rose/10"
             >
               <span>
-                <span className="block font-serif text-4xl italic leading-tight">
+                <span className="type-display block text-4xl">
                   More arriving every week
                 </span>
                 <span className="mt-4 inline-block text-sm text-cream/60 transition-colors group-hover:text-cream">

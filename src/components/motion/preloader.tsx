@@ -24,9 +24,9 @@ export function Preloader() {
           exit={{ clipPath: "inset(0 0 100% 0)" }}
           transition={{ duration: 0.9, ease: EASE_IN_OUT }}
         >
-          <div className="flex items-baseline font-serif text-[clamp(4.5rem,15vw,10rem)] italic leading-none">
-            {Array.from("tynitales").map((c, i) => (
-              <span key={i} className="inline-block overflow-y-clip pr-[0.04em] pb-[0.12em]">
+          <div className="type-wordmark flex items-baseline text-[clamp(3.5rem,13vw,9rem)] leading-none">
+            {Array.from("Tynitales").map((c, i) => (
+              <span key={i} className="inline-block overflow-y-clip pr-[0.04em] pb-[0.22em]">
                 <motion.span
                   className="inline-block"
                   initial={{ y: "115%" }}

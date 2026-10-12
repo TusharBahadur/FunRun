@@ -10,8 +10,8 @@ export default function SignInPage() {
     <main className="grid min-h-svh place-items-center px-5">
       <div className="w-full max-w-md rounded-[2rem] border border-line bg-paper p-10 text-center">
         <Logo className="text-4xl" />
-        <h1 className="mt-8 font-serif text-4xl italic leading-tight">Accounts are almost here.</h1>
-        <p className="mt-4 text-muted">
+        <h1 className="type-display mt-8 text-5xl">Accounts are almost here.</h1>
+        <p className="type-copy mt-5 text-muted">
           Soon you’ll be able to save drafts, track who opened your gifts, and keep every note
           you’ve ever sent.
         </p>

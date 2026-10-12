@@ -33,18 +33,18 @@ export function CallToAction() {
         </div>
 
         <div className="relative">
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-paper/70">
+          <p className="type-label text-paper/70">
             Ready when you are
           </p>
-          <h2 className="mx-auto mt-6 max-w-4xl text-[clamp(2.8rem,8vw,7.5rem)] font-semibold leading-[0.9] tracking-[-0.05em]">
+          <h2 className="mx-auto mt-6 max-w-4xl text-[clamp(2.8rem,8vw,7.5rem)] type-display">
             <SplitText text="Someone’s waiting" />{" "}
             <SplitText
               text="to hear it."
-              className="font-serif font-normal italic tracking-[-0.02em]"
+              className="type-accent text-ink"
               delay={0.2}
             />
           </h2>
-          <p className="mx-auto mt-8 max-w-md text-paper/80">
+          <p className="type-copy mx-auto mt-8 max-w-md text-paper/80">
             Pick a template, pour your heart in, and send it in the next ten minutes.
           </p>
           <div className="mt-10">

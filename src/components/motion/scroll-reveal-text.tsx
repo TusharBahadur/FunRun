@@ -54,7 +54,7 @@ function Word({
       style={{ opacity }}
       className={cn(
         "mr-[0.25em]",
-        accent && "font-serif font-normal italic tracking-normal text-rose",
+        accent && "type-accent text-rose",
       )}
     >
       {children}

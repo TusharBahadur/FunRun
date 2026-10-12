@@ -39,7 +39,7 @@ export function SplitText({
               return (
                 <span
                   key={p}
-                  className="-mb-[0.12em] -mr-[0.06em] inline-block overflow-y-clip pr-[0.06em] pb-[0.12em]"
+                  className="-mb-[0.22em] -mr-[0.06em] inline-block overflow-y-clip pr-[0.06em] pb-[0.22em]"
                 >
                   <motion.span
                     className="inline-block origin-bottom-left will-change-transform"

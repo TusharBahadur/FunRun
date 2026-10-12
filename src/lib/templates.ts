@@ -1,7 +1,7 @@
 import type { OccasionId } from "@/config/site";
 import { templates } from "@/data/templates";
 
-export type { Motif, Template } from "@/data/templates";
+export type { Experience, Motif, Template } from "@/data/templates";
 
 /**
  * Data access layer for templates. Today it reads static seed data; later
