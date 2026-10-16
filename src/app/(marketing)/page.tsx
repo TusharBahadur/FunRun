@@ -21,11 +21,11 @@ export default async function HomePage() {
     <>
       <Preloader />
       <main>
-        <Hero featured={pick(["paper-hearts", "sunday-morning", "midnight-letter", "airmail"])} />
+        <Hero featured={pick(["sealed-with-love", "make-a-wish", "written-in-the-stars", "for-maa"])} />
         <MarqueeBand />
         <Statement />
         <HowItWorks previews={pick(["little-bloom", "paper-hearts", "midnight-letter"])} />
-        <TemplateShowcase templates={templates} />
+        <TemplateShowcase templates={templates.filter((t) => t.level === "classic")} />
         <Features />
         <LoveNotes notes={loveNotes} />
         <CallToAction />

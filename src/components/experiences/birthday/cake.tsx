@@ -6,8 +6,23 @@ import type { BirthdayPalette } from "./types";
 const DIGIT_GAP = 58;
 const CANDLE_TOP = 52;
 
-/** Two-tier cake with number candles; flames go out when `lit` turns false. */
-export function Cake({ age, lit, palette }: { age: number; lit: boolean; palette: BirthdayPalette }) {
+/**
+ * Two-tier cake with number candles; flames go out when `lit` turns false.
+ * Pass `litMask` + `onFlameTap` to blow candles out one at a time.
+ */
+export function Cake({
+  age,
+  lit,
+  palette,
+  litMask,
+  onFlameTap,
+}: {
+  age: number;
+  lit: boolean;
+  palette: BirthdayPalette;
+  litMask?: boolean[];
+  onFlameTap?: (index: number) => void;
+}) {
   const digits = String(age).split("");
   const startX = 150 - ((digits.length - 1) * DIGIT_GAP) / 2;
 
@@ -90,7 +105,20 @@ export function Cake({ age, lit, palette }: { age: number; lit: boolean; palette
               {d}
             </text>
             <line x1={x} y1={CANDLE_TOP} x2={x} y2={CANDLE_TOP - 9} stroke={palette.fg} strokeWidth={2} strokeLinecap="round" />
-            <Flame x={x} lit={lit} delay={i * 0.17} />
+            <Flame x={x} lit={litMask ? litMask[i] : lit} delay={i * 0.17} />
+            {onFlameTap && (litMask ? litMask[i] : lit) && (
+              <rect
+                x={x - 26}
+                y={CANDLE_TOP - 70}
+                width={52}
+                height={70}
+                fill="transparent"
+                className="cursor-pointer"
+                role="button"
+                aria-label={`Blow out candle ${i + 1}`}
+                onClick={() => onFlameTap(i)}
+              />
+            )}
           </g>
         );
       })}

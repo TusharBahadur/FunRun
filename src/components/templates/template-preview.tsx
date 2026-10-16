@@ -147,6 +147,17 @@ function Motif({ template }: { template: Template }) {
           </g>
         </>
       );
+    case "ring":
+      return (
+        <>
+          <circle cx={50} cy={58} r={24} fill="none" stroke={accent} strokeWidth={6} />
+          <circle cx={50} cy={58} r={24} fill="none" stroke="#fff" strokeOpacity={0.25} strokeWidth={2} />
+          <path d="M50 14 l12 12 -12 14 -12 -14z" fill="#eaf7ff" stroke={fg} strokeOpacity={0.25} strokeWidth={1.5} />
+          <path d="M38 26 h24" stroke={fg} strokeOpacity={0.2} strokeWidth={1.2} />
+          <path d="M80 18 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z" fill={accent} />
+          <path d="M18 70 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2z" fill={fg} opacity={0.5} />
+        </>
+      );
     case "cake":
       return (
         <>

@@ -1,0 +1,31 @@
+<!-- @dsCard group="Gifts" height=440 subtitle="Template card as seen in the gallery" -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap">
+<style>
+  body { margin: 0; background: var(--cream); padding: 24px; font-family: var(--font-sans); color: var(--ink); }
+  .wrap { display: flex; gap: 20px; flex-wrap: wrap; }
+  .item { width: 240px; }
+  .card { position: relative; aspect-ratio: 3/4; border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; }
+  .kicker { font: 400 10px/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: .18em; opacity: .7; }
+  .title { font: 400 26px/0.98 var(--font-serif); font-variation-settings: "SOFT" 30, "WONK" 0; text-wrap: balance; }
+  .meta { display: flex; justify-content: space-between; align-items: start; margin-top: 14px; gap: 8px; }
+  .name { font: 500 18px/1.05 var(--font-sans); letter-spacing: -.03em; }
+  .desc { font: 400 11px/1.35 var(--font-mono); text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  .price { font: 400 12px/1.5 var(--font-mono); }
+  .motif { position: absolute; inset: 22% 18% auto; }
+</style>
+<div class="wrap">
+  <div class="item">
+    <div class="card" style="background: var(--occasion-frosting); color: #43111f">
+      <span class="kicker">Happy birthday</span><img class="motif" src="/_blob/cfbc0300461821785a9eb757a166a4f1" alt="">
+      <span class="title">Make a wish. This one’s all yours.</span>
+    </div>
+    <div class="meta"><div><div class="name">Make a Wish</div><div class="desc">Unwrap it, blow out the candles</div></div><span class="price">₹149</span></div>
+  </div>
+  <div class="item">
+    <div class="card" style="background: var(--occasion-midnight); color: #fdeefe">
+      <span class="kicker">Surprise!</span><img class="motif" src="/_blob/43bd2a51f86f4ac0fa6d9f243406e6aa" alt="" style="inset: 18% 30% auto">
+      <span class="title">Everyone showed up for you.</span>
+    </div>
+    <div class="meta"><div><div class="name">The Party</div><div class="desc">Friends join in</div></div><span class="price">₹179</span></div>
+  </div>
+</div>

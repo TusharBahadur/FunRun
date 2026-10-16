@@ -44,7 +44,7 @@ export const demoBirthdayGift: BirthdayGift = {
   wishes: [
     { name: "Priya", kind: "text", message: "27 looks so good on you! Can't wait to celebrate this weekend 🎂" },
     { name: "Arjun", kind: "photo", tone: "sun", message: "Goa trip, part two? You're planning it." },
-    { name: "Mom", kind: "voice", message: "A little song from home." },
+    { name: "Maa", kind: "voice", message: "A little song from home." },
     { name: "Neha", kind: "text", message: "To the person who always remembers everyone else's birthday: today it's yours. Love you lots!" },
     { name: "Rohan", kind: "text", message: "Happy birthday! Still owe you that rematch." },
     { name: "Zoya", kind: "photo", tone: "rose", message: "Best plus-one at every wedding. Happy birthday!" },

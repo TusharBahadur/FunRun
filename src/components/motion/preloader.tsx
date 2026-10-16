@@ -25,7 +25,7 @@ export function Preloader() {
           transition={{ duration: 0.9, ease: EASE_IN_OUT }}
         >
           <div className="type-wordmark flex items-baseline text-[clamp(3.5rem,13vw,9rem)] leading-none">
-            {Array.from("Tynitales").map((c, i) => (
+            {Array.from("TyniTales").map((c, i) => (
               <span key={i} className="inline-block overflow-y-clip pr-[0.04em] pb-[0.22em]">
                 <motion.span
                   className="inline-block"

@@ -1,5 +1,7 @@
 import type { BirthdayTierId } from "@/components/experiences/birthday/tiers";
+import type { Story, StoryLevel } from "@/components/story/types";
 import type { OccasionId } from "@/config/site";
+import { storyTemplates } from "./stories";
 
 /**
  * Static seed data. The shape mirrors the future `templates` table so the
@@ -7,10 +9,10 @@ import type { OccasionId } from "@/config/site";
  * touching any UI.
  */
 
-export type Motif = "hearts" | "stars" | "sun" | "polaroid" | "stamp" | "bloom" | "cake";
+export type Motif = "hearts" | "stars" | "sun" | "polaroid" | "stamp" | "bloom" | "cake" | "ring";
 
-/** Full-screen gift experiences that exist so far. */
-export type Experience = "birthday";
+/** Full-screen gift experiences: the original birthday one, and scene-by-scene stories. */
+export type Experience = "birthday" | "story";
 
 export interface Template {
   slug: string;
@@ -29,62 +31,13 @@ export interface Template {
   tier?: BirthdayTierId;
   /** Extra colours the full experience needs beyond the card palette. */
   experiencePalette?: { cream: string; pink: string; gold: string; ink: string };
+  /** Story templates: which price level (₹99 / ₹149 / ₹179) and the scenes. */
+  level?: StoryLevel;
+  story?: Story;
 }
 
 export const templates: Template[] = [
-  {
-    slug: "make-a-wish",
-    name: "Make a Wish",
-    occasion: "birthday",
-    description: "Unwrap it, blow out the candles, relive the year.",
-    pricePaise: 14900,
-    isNew: true,
-    palette: { bg: "#ffd6dc", fg: "#43111f", accent: "#e8344e" },
-    motif: "cake",
-    preview: {
-      kicker: "Happy birthday",
-      title: "Make a wish. This one’s all yours.",
-      signoff: "Blow out the candles ↓",
-    },
-    experience: "birthday",
-    tier: "wish",
-    experiencePalette: { cream: "#fff4ef", pink: "#ffb3c1", gold: "#f6b73c", ink: "#43111f" },
-  },
-  {
-    slug: "candle",
-    name: "Candle",
-    occasion: "birthday",
-    description: "A sweet little birthday moment. Blow out the candles.",
-    pricePaise: 9900,
-    palette: { bg: "#fbe6b3", fg: "#3b2410", accent: "#e2683b" },
-    motif: "cake",
-    preview: {
-      kicker: "Happy birthday",
-      title: "Light the candles. It’s your day.",
-      signoff: "Tap to make a wish",
-    },
-    experience: "birthday",
-    tier: "candle",
-    experiencePalette: { cream: "#fff8e8", pink: "#ffc9a8", gold: "#f6b73c", ink: "#3b2410" },
-  },
-  {
-    slug: "the-party",
-    name: "The Party",
-    occasion: "birthday",
-    description: "Everyone who loves them, in one gift. Friends join in.",
-    pricePaise: 17900,
-    isNew: true,
-    palette: { bg: "#24113a", fg: "#fdeefe", accent: "#ff5c8a" },
-    motif: "cake",
-    preview: {
-      kicker: "Surprise!",
-      title: "Everyone showed up for you.",
-      signoff: "12 friends inside ↓",
-    },
-    experience: "birthday",
-    tier: "party",
-    experiencePalette: { cream: "#fff1f6", pink: "#ffb3d1", gold: "#ffd166", ink: "#24113a" },
-  },
+  ...storyTemplates,
   {
     slug: "paper-hearts",
     name: "Paper Hearts",

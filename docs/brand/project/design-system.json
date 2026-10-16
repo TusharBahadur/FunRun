@@ -1,0 +1,114 @@
+{
+  "v": 3,
+  "layout": "files",
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-15T14:58:27Z"
+  },
+  "title": "TyniTales",
+  "namespace": "TyniTales",
+  "libraries": [],
+  "sections": {},
+  "groups": [
+    "Logos",
+    "Motifs"
+  ],
+  "assetGroups": {
+    "Logos": {
+      "name": "Logos",
+      "tile": "l",
+      "order": [
+        "tynitales-wordmark.svg",
+        "tynitales-wordmark-cream.svg",
+        "tynitales-monogram.svg",
+        "tynitales-monogram-ink.svg"
+      ],
+      "files": {
+        "tynitales-wordmark.svg": {
+          "name": "tynitales-wordmark.svg",
+          "blob": "abdbe760a45af6e32999cdc082bcaae0",
+          "size": 11264,
+          "type": "image/svg+xml"
+        },
+        "tynitales-wordmark-cream.svg": {
+          "name": "tynitales-wordmark-cream.svg",
+          "blob": "0217af41d9edeacca456332ef949ca2f",
+          "size": 11264,
+          "type": "image/svg+xml"
+        },
+        "tynitales-monogram.svg": {
+          "name": "tynitales-monogram.svg",
+          "blob": "8e16eb1ba1d2b3c43d27f3a1041ffca5",
+          "size": 1817,
+          "type": "image/svg+xml"
+        },
+        "tynitales-monogram-ink.svg": {
+          "name": "tynitales-monogram-ink.svg",
+          "blob": "532027e4fc0a5866e9313e77cbf8c49a",
+          "size": 1817,
+          "type": "image/svg+xml"
+        }
+      }
+    },
+    "Motifs": {
+      "name": "Motifs",
+      "tile": "m",
+      "order": [
+        "wax-seal.svg",
+        "heart.svg",
+        "candle.svg",
+        "cake.svg",
+        "polaroid.svg",
+        "sparkle.svg"
+      ],
+      "files": {
+        "wax-seal.svg": {
+          "name": "wax-seal.svg",
+          "blob": "113147fa031b525b32302bee2125dd26",
+          "size": 768,
+          "type": "image/svg+xml"
+        },
+        "heart.svg": {
+          "name": "heart.svg",
+          "blob": "a18be066e183eb3b74258fce7521759d",
+          "size": 305,
+          "type": "image/svg+xml"
+        },
+        "candle.svg": {
+          "name": "candle.svg",
+          "blob": "9aba9fd4927a52a9ef80149ae661516c",
+          "size": 761,
+          "type": "image/svg+xml"
+        },
+        "cake.svg": {
+          "name": "cake.svg",
+          "blob": "cfbc0300461821785a9eb757a166a4f1",
+          "size": 1010,
+          "type": "image/svg+xml"
+        },
+        "polaroid.svg": {
+          "name": "polaroid.svg",
+          "blob": "1950819ea053c90d77f68f3458a79e81",
+          "size": 551,
+          "type": "image/svg+xml"
+        },
+        "sparkle.svg": {
+          "name": "sparkle.svg",
+          "blob": "43bd2a51f86f4ac0fa6d9f243406e6aa",
+          "size": 229,
+          "type": "image/svg+xml"
+        }
+      }
+    }
+  },
+  "blobs": {},
+  "docs": {
+    "sections": []
+  },
+  "lastChange": {
+    "by": "Tushar Bahadur",
+    "at": "2026-10-15T14:58:27Z",
+    "via": "Claude Code",
+    "note": "First brand system: tokens, brand book, logos, motifs, moodboard"
+  }
+}

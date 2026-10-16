@@ -12,13 +12,13 @@ export function Logo({
     <Link
       href="/"
       onClick={onClick}
-      aria-label="Tynitales home"
+      aria-label="TyniTales home"
       className={cn(
         "type-wordmark group inline-flex items-baseline text-[1.9rem] leading-none",
         className,
       )}
     >
-      Tynitales
+      TyniTales
       <span className="text-rose transition-transform duration-500 ease-out-expo group-hover:-translate-y-1">
         .
       </span>

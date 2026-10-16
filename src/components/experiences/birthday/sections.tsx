@@ -6,7 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { EASE_OUT } from "@/lib/motion";
 import { KeepsakeButton } from "./party";
 import type { BirthdayFeatures } from "./tiers";
-import { TONES } from "./tones";
+import { Accented } from "./accented";
+import { PhotoFill } from "./photo-fill";
 import type { BirthdayGift, BirthdayPalette } from "./types";
 
 const reveal = {
@@ -113,8 +114,6 @@ function Polaroid({
   depth: number;
   onDismiss: () => void;
 }) {
-  const tone = TONES[memory.tone];
-  const Icon = tone.icon;
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-18, 18]);
   const isTop = depth === 0;
@@ -134,16 +133,17 @@ function Polaroid({
       style={{ x, rotate: isTop ? rotate : undefined, zIndex: 10 - depth }}
       animate={{ scale: 1 - depth * 0.05, y: depth * 14, rotate: isTop ? 0 : tilt, opacity: depth > 3 ? 0 : 1 }}
       transition={{ type: "spring", stiffness: 260, damping: 24 }}
-      className="absolute inset-0 cursor-grab touch-pan-y rounded-md bg-white p-3 pb-16 text-left text-[#2a1f23] shadow-[0_24px_50px_-24px_rgba(0,0,0,0.5)] active:cursor-grabbing"
+      className="absolute inset-0 cursor-grab touch-pan-y rounded-md bg-white p-3 pb-16 text-left text-[#2a1f23] shadow-[0_24px_50px_-24px_rgba(27,18,21,0.5)] active:cursor-grabbing"
       aria-label={isTop ? `${memory.caption}. Next photo` : undefined}
       tabIndex={isTop ? 0 : -1}
     >
-      <div
-        className="grid h-full w-full place-items-center rounded-sm"
-        style={{ background: `linear-gradient(150deg, ${tone.from}, ${tone.to})` }}
-      >
-        <Icon className="size-16 text-white/85" strokeWidth={1.4} />
-      </div>
+      <PhotoFill
+        src={memory.src}
+        tone={memory.tone}
+        alt={memory.caption}
+        iconClassName="size-16"
+        className="h-full w-full rounded-sm"
+      />
       <div className="absolute inset-x-4 bottom-3">
         <p className="type-accent text-xl leading-tight">{memory.caption}</p>
         <p className="type-label text-[10px] opacity-50">{memory.date}</p>
@@ -237,7 +237,7 @@ export function Finale({
         One more thing
       </motion.p>
       <motion.h2 {...reveal} className="type-display mx-auto mt-5 max-w-3xl text-[clamp(2.8rem,11vw,6.5rem)]">
-        Here&rsquo;s to <span className="type-accent" style={{ color: highlight }}>year {gift.age + 1}.</span>
+        <Accented text={gift.copy?.finale || `Here’s to *year ${gift.age + 1}.*`} color={highlight} />
       </motion.h2>
 
       <motion.div {...reveal} className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
@@ -278,7 +278,7 @@ export function Finale({
 
       <div className="mt-20 border-t pt-8" style={{ borderColor: `${palette.bg}22` }}>
         <Link href={`/templates/${templateSlug}`} className="type-label opacity-60 hover:opacity-100">
-          Made with <span className="type-wordmark text-base normal-case">Tynitales.</span> Make one for someone →
+          Made with <span className="type-wordmark text-base normal-case">TyniTales.</span> Make one for someone →
         </Link>
       </div>
     </section>

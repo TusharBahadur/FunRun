@@ -1,9 +1,14 @@
 /**
- * A tiny Web Audio music box. Plays "Happy Birthday to You" (public domain)
- * with a soft, bell-like timbre — no audio files to ship.
+ * A tiny Web Audio music box with a soft, bell-like timbre — no audio files
+ * to ship. Plays "Happy Birthday to You" (public domain) by default, or any
+ * melody from `melodies.ts`.
  */
 
 const NOTE: Record<string, number> = {
+  C4: 261.63,
+  D4: 293.66,
+  E4: 329.63,
+  F4: 349.23,
   G4: 392.0,
   A4: 440.0,
   B4: 493.88,
@@ -12,7 +17,11 @@ const NOTE: Record<string, number> = {
   E5: 659.25,
   F5: 698.46,
   G5: 783.99,
+  A5: 880.0,
 };
+
+/** [note, beats]; "R" is a rest. */
+export type Melody = { notes: [string, number][]; beat: number };
 
 // [note, beats] in 3/4.
 const HAPPY_BIRTHDAY: [string, number][] = [
@@ -22,7 +31,7 @@ const HAPPY_BIRTHDAY: [string, number][] = [
   ["F5", 0.75], ["F5", 0.25], ["E5", 1], ["C5", 1], ["D5", 1], ["C5", 3],
 ];
 
-const BEAT = 0.46; // seconds
+export const HAPPY_BIRTHDAY_MELODY: Melody = { notes: HAPPY_BIRTHDAY, beat: 0.46 };
 
 export class MusicBox {
   private ctx: AudioContext | null = null;
@@ -30,7 +39,7 @@ export class MusicBox {
   private timer: ReturnType<typeof setTimeout> | null = null;
 
   /** Must be called from a user gesture (tap/click) so the browser allows audio. */
-  play(onEnd?: () => void) {
+  play(onEnd?: () => void, melody: Melody = HAPPY_BIRTHDAY_MELODY) {
     this.stop();
     this.ctx ??= new AudioContext();
     void this.ctx.resume();
@@ -41,9 +50,9 @@ export class MusicBox {
     this.master.connect(ctx.destination);
 
     let t = ctx.currentTime + 0.08;
-    for (const [name, beats] of HAPPY_BIRTHDAY) {
-      this.pluck(NOTE[name], t, beats * BEAT);
-      t += beats * BEAT;
+    for (const [name, beats] of melody.notes) {
+      if (name !== "R") this.pluck(NOTE[name], t, beats * melody.beat);
+      t += beats * melody.beat;
     }
     const total = (t - ctx.currentTime) * 1000;
     this.timer = setTimeout(() => {

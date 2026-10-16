@@ -2,19 +2,21 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { Mic, Volume2, VolumeX } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { EASE_OUT } from "@/lib/motion";
 import { Confetti, type ConfettiHandle } from "../confetti";
 import { MusicBox } from "../music-box";
+import { accentMoodVars } from "./accent-moods";
 import { Cake } from "./cake";
 import { GiftGate } from "./gift-gate";
 import { SongCard, Surprise, Timeline, VoiceNote, WishesWall } from "./party";
 import { Finale, Letter, Memories, Numbers, ShortNote } from "./sections";
-import { birthdayTiers, type BirthdayTierId } from "./tiers";
-import type { BirthdayGift, BirthdayPalette } from "./types";
+import { birthdayTiers, type BirthdayFeatures, type BirthdayTierId } from "./tiers";
+import type { AccentFont, BirthdayGift, BirthdayPalette } from "./types";
 import { useBlowDetector } from "./use-blow-detector";
 
 type Stage = "gate" | "surprise" | "wish" | "celebrate";
+
 
 /**
  * A birthday gift: (unwrap →) (surprise →) blow out the candles → the gift.
@@ -25,15 +27,26 @@ export function BirthdayExperience({
   palette,
   tier,
   templateSlug,
+  hidden,
+  accentFont = "classic",
+  startAt = "start",
 }: {
   gift: BirthdayGift;
   palette: BirthdayPalette;
   tier: BirthdayTierId;
   templateSlug: string;
+  /** Sections the sender switched off. Can only remove what the tier includes. */
+  hidden?: Partial<Record<keyof BirthdayFeatures, boolean>>;
+  accentFont?: AccentFont;
+  /** The editor can open the preview straight at the gift, skipping the intro. */
+  startAt?: "start" | "gift";
 }) {
-  const f = birthdayTiers[tier].features;
+  const tierFeatures = birthdayTiers[tier].features;
+  const f = Object.fromEntries(
+    Object.entries(tierFeatures).map(([k, v]) => [k, v && !hidden?.[k as keyof BirthdayFeatures]]),
+  ) as BirthdayFeatures;
   const firstStage: Stage = f.unwrap ? "gate" : "wish";
-  const [stage, setStage] = useState<Stage>(firstStage);
+  const [stage, setStage] = useState<Stage>(startAt === "gift" ? "celebrate" : firstStage);
   const [playing, setPlaying] = useState(false);
   const confetti = useRef<ConfettiHandle>(null);
   const music = useRef<MusicBox | null>(null);
@@ -86,7 +99,16 @@ export function BirthdayExperience({
   }
 
   return (
-    <div className="min-h-svh" style={{ backgroundColor: palette.bg, color: palette.fg }}>
+    <div
+      className="min-h-svh"
+      style={
+        {
+          backgroundColor: palette.bg,
+          color: palette.fg,
+          ...accentMoodVars(accentFont),
+        } as CSSProperties
+      }
+    >
       <Confetti ref={confetti} colors={colors} />
 
       {stage !== "gate" && stage !== "surprise" && (
@@ -109,6 +131,7 @@ export function BirthdayExperience({
             key="gate"
             recipient={gift.recipient}
             sender={gift.sender}
+            openingLine={gift.copy?.opening || undefined}
             palette={palette}
             onOpen={({ x, y }) => {
               playSong();
@@ -140,7 +163,7 @@ export function BirthdayExperience({
               transition={{ delay: 0.3, duration: 0.9, ease: EASE_OUT }}
               className="type-display mt-3 text-[clamp(2.8rem,12vw,6.5rem)]"
             >
-              <span className="font-semibold">Happy birthday,</span>
+              <span className="font-semibold">{gift.copy?.greeting || "Happy birthday,"}</span>
               <br />
               <span className="type-accent" style={{ color: palette.accent }}>
                 {gift.recipient}.

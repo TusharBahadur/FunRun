@@ -13,6 +13,13 @@
   --color-blush: #f6d3cf;
   --color-wine: #5a1a2b;
 
+  --color-gold: #f6b73c;
+
+  /* Elevation: long, soft and ink-tinted, never grey. */
+  --shadow-nav: 0 8px 30px -12px rgba(27, 18, 21, 0.25);
+  --shadow-card: 0 24px 50px -28px rgba(27, 18, 21, 0.45);
+  --shadow-float: 0 30px 60px -20px rgba(27, 18, 21, 0.35);
+
   --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 
   --animate-marquee: marquee var(--duration, 40s) linear infinite;
@@ -33,11 +40,13 @@
 }
 
 @theme inline {
+  /* Three families. Hindi falls back to the device's Devanagari font. */
   --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
-  --font-italic: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-italic: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-wordmark: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --font-hand: var(--font-kalam), "Segoe Print", "Bradley Hand", cursive;
 }
 
 /* ───────────── Type system ───────────── */
@@ -53,7 +62,9 @@
 @utility type-accent {
   font-family: var(--font-italic);
   font-style: italic;
-  font-weight: 400;
+  font-weight: var(--accent-weight, 400);
+  /* Fraunces "moods": gift senders can pick soft or playful via these axes. */
+  font-variation-settings: var(--accent-axes, "SOFT" 0, "WONK" 0);
   letter-spacing: -0.02em;
 }
 
@@ -83,6 +94,14 @@
   letter-spacing: 0;
 }
 
+/* Handwritten captions, notes and signatures (gifts only). */
+@utility type-hand {
+  font-family: var(--font-hand);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
 /* Small labels, eyebrows, meta. */
 @utility type-label {
   font-family: var(--font-mono);
@@ -90,6 +109,11 @@
   text-transform: uppercase;
   line-height: 1.5;
   letter-spacing: 0.02em;
+}
+
+/* Gift card text set in Fraunces: a touch of softness, no quirky letters. */
+.font-serif {
+  font-variation-settings: "SOFT" 30, "WONK" 0;
 }
 
 @utility no-scrollbar {

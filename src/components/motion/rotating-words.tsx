@@ -13,7 +13,7 @@ type RotatingWordsProps = {
   className?: string;
 };
 
-/** Cycles through phrases with a per-letter blur-in. */
+/** Cycles through phrases with a per-letter rise-in. */
 export function RotatingWords({
   words,
   interval = 2600,
@@ -59,7 +59,6 @@ export function RotatingWords({
             exit={{
               y: "-35%",
               opacity: 0,
-              filter: "blur(10px)",
               transition: { duration: 0.35, ease: EASE_IN },
             }}
           >
@@ -67,8 +66,8 @@ export function RotatingWords({
               <motion.span
                 key={i}
                 className="inline-block"
-                initial={{ y: "70%", opacity: 0, filter: "blur(12px)" }}
-                animate={{ y: "0%", opacity: 1, filter: "blur(0px)" }}
+                initial={{ y: "70%", opacity: 0 }}
+                animate={{ y: "0%", opacity: 1 }}
                 transition={{ duration: 0.75, ease: EASE_OUT, delay: i * 0.035 }}
               >
                 {char === " " ? " " : char}

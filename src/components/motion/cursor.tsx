@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useMotionValue, useSpring } from "motion/react";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
@@ -14,7 +15,9 @@ const variants = {
 
 /** Trailing dot that grows over links and becomes a "View" bubble on cards. */
 export function Cursor() {
-  const enabled = useMediaQuery("(pointer: fine)");
+  // The studio is a precise editing tool: keep the plain system cursor there.
+  const inStudio = usePathname().startsWith("/studio");
+  const enabled = useMediaQuery("(pointer: fine)") && !inStudio;
   const [variant, setVariant] = useState<Variant>("default");
   const x = useMotionValue(-200);
   const y = useMotionValue(-200);

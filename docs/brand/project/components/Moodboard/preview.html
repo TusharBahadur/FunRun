@@ -1,0 +1,102 @@
+<!-- @dsCard group="Brand" height=1340 width=960 page subtitle="The feeling of TyniTales, in one board" -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap">
+<style>
+  body { margin: 0; background: var(--cream); color: var(--ink); font-family: var(--font-sans); }
+  .board { width: 960px; box-sizing: border-box; padding: 24px; display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: 64px; gap: 12px; }
+  .t { border-radius: var(--radius-card); overflow: hidden; position: relative; padding: 22px; box-sizing: border-box; }
+  .lab { font: 400 11px/1.5 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; opacity: .7; }
+  .acc { font-family: var(--font-serif); font-style: italic; font-weight: 400; font-variation-settings: "SOFT" 0, "WONK" 0; letter-spacing: -.02em; }
+  .disp { font: 400 56px/.95 var(--font-sans); letter-spacing: -.04em; }
+  .grain::after { content: ""; position: absolute; inset: 0; opacity: .09; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  /* 1. hero */
+  .hero { grid-column: 1 / 8; grid-row: span 5; background: var(--ink); color: var(--cream); display: flex; flex-direction: column; justify-content: space-between; }
+  .hero .disp { font-size: 76px; }
+  .hero .acc { color: var(--blush); }
+  /* 2. palette as stationery */
+  .pal { grid-column: 8 / 13; grid-row: span 5; padding: 0; border: 1px solid var(--line); display: grid; grid-template-rows: 2fr 1.2fr 1fr .8fr .6fr; }
+  .pal div { display: flex; align-items: end; justify-content: space-between; padding: 10px 18px; font: 400 11px/1 var(--font-mono); text-transform: uppercase; }
+  /* 3. letter on paper */
+  .letter { grid-column: 1 / 6; grid-row: span 5; background: var(--paper); box-shadow: var(--shadow-float); }
+  .letter p.body { font: 400 17px/1.65 var(--font-sans); margin: 14px 0 0; }
+  .letter .sign { font-size: 34px; color: var(--rose); margin-top: 10px; }
+  /* 4. candlelight */
+  .candle { grid-column: 6 / 9; grid-row: span 5; background: radial-gradient(circle at 50% 30%, #3a1a14, #120a08 70%); color: #fff1c4; display: grid; place-items: center; text-align: center; }
+  .candle .num { font: 900 italic 120px/1 var(--font-serif); font-variation-settings: "SOFT" 0, "WONK" 0; color: var(--gold); text-shadow: 0 0 40px rgba(246,183,60,.55); }
+  /* 5. polaroids */
+  .pola { grid-column: 9 / 13; grid-row: span 5; background: var(--blush); }
+  .pc { position: absolute; width: 150px; background: #fff; padding: 9px 9px 34px; box-shadow: 0 18px 30px -16px rgba(27,18,21,.5); border-radius: 3px; }
+  .pc .ph { aspect-ratio: 1; border-radius: 2px; }
+  .pc span { position: absolute; left: 12px; bottom: 8px; font-size: 16px; color: var(--ink); }
+  /* 6. words */
+  .words { grid-column: 1 / 5; grid-row: span 4; background: var(--rose); color: var(--paper); display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+  .words .w { font: 400 33px/1.05 var(--font-sans); letter-spacing: -.03em; }
+  .words .w.acc { font: italic 400 38px/1.05 var(--font-serif); font-variation-settings: "SOFT" 0, "WONK" 0; letter-spacing: -.02em; }
+  /* 7. motifs */
+  .motifs { grid-column: 5 / 9; grid-row: span 4; background: var(--paper); }
+  .motifs img { position: absolute; }
+  /* 8. type */
+  .type { grid-column: 9 / 13; grid-row: span 4; background: var(--cream); border: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; align-content: center; }
+  .type .aa { font-size: 64px; line-height: .9; }
+  /* 9. occasions */
+  .occ { grid-column: 1 / 13; grid-row: span 3; background: var(--paper); display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; align-items: stretch; }
+  .occ .o { border-radius: 18px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
+  .occ .o b { width: 22px; height: 22px; border-radius: 50%; display: block; }
+  .occ .o span { font: 400 10px/1.3 var(--font-mono); text-transform: uppercase; }
+  .occ .o i { font-size: 26px; line-height: 1; }
+</style>
+<div class="board">
+  <section class="t hero grain">
+    <span class="lab">Voice · Inter Tight + Fraunces</span>
+    <p class="disp" style="margin:0"><b style="font-weight:600">Say</b><br><span class="acc">I miss you</span><br>beautifully.</p>
+    <img src="/_blob/0217af41d9edeacca456332ef949ca2f" alt="TyniTales" width="170">
+  </section>
+  <section class="t pal">
+    <div style="background:var(--cream);color:var(--ink)"><span>Cream · envelope</span><span>#F5EFE6</span></div>
+    <div style="background:var(--ink);color:var(--cream)"><span>Ink</span><span>#1B1215</span></div>
+    <div style="background:var(--rose);color:var(--paper)"><span>Rose · wax seal</span><span>#E23B54</span></div>
+    <div style="background:var(--blush);color:var(--wine)"><span>Blush</span><span>#F6D3CF</span></div>
+    <div style="background:var(--wine);color:var(--blush)"><span>Wine</span><span>#5A1A2B</span></div>
+  </section>
+  <section class="t letter grain">
+    <span class="lab" style="color:var(--muted);opacity:1">Handwritten, not printed</span>
+    <p class="body">Another year of you, and somehow you keep getting better at it. The laugh that fills a whole room, the way you remember everyone’s chai order…</p>
+    <p class="acc sign">— Sam</p>
+  </section>
+  <section class="t candle">
+    <div><div class="num">27</div><span class="lab" style="opacity:.75">Candlelit, not confetti cannon</span></div>
+  </section>
+  <section class="t pola">
+    <span class="lab" style="color:var(--wine);opacity:1">Kept forever</span>
+    <div class="pc" style="left:40px;top:58px;transform:rotate(-7deg)"><div class="ph" style="background:linear-gradient(150deg,#ffcf6e,#ff8a5c)"></div><span class="acc">Goa, finally</span></div>
+    <div class="pc" style="left:120px;top:92px;transform:rotate(6deg)"><div class="ph" style="background:linear-gradient(150deg,#8fd3e8,#3a7bd5)"></div><span class="acc">That lake day</span></div>
+  </section>
+  <section class="t words">
+    <span class="w">Small on purpose.</span>
+    <span class="w acc">Sealed with love.</span>
+    <span class="w">Opens at midnight.</span>
+    <span class="w acc">Kept forever.</span>
+  </section>
+  <section class="t motifs grain">
+    <span class="lab" style="color:var(--muted);opacity:1">Motifs</span>
+    <img src="/_blob/113147fa031b525b32302bee2125dd26" alt="" width="128" style="left:28px;top:66px;transform:rotate(-5deg)">
+    <img src="/_blob/cfbc0300461821785a9eb757a166a4f1" alt="" width="104" style="left:168px;top:40px">
+    <img src="/_blob/a18be066e183eb3b74258fce7521759d" alt="" width="56" style="left:190px;top:160px;transform:rotate(12deg)">
+    <img src="/_blob/43bd2a51f86f4ac0fa6d9f243406e6aa" alt="" width="38" style="left:140px;top:182px">
+    <img src="/_blob/9aba9fd4927a52a9ef80149ae661516c" alt="" width="46" style="left:262px;top:150px;transform:rotate(-8deg)">
+  </section>
+  <section class="t type">
+    <span class="aa acc" style="color:var(--rose)">Aa</span><span class="lab" style="align-self:end">Fraunces · the heart</span>
+    <span class="aa" style="font-weight:600;letter-spacing:-.04em">Aa</span><span class="lab" style="align-self:end">Inter Tight · the voice</span>
+    <span class="aa" style="font-family:var(--font-mono);font-size:44px">Aa</span><span class="lab" style="align-self:end">Plex Mono · the label</span>
+  </section>
+  <section class="t occ">
+    <div class="o" style="background:#fbe6b3;color:#3b2410"><b style="background:#e2683b"></b><i class="acc">Butter</i><span>Candle · ₹99</span></div>
+    <div class="o" style="background:#ffd6dc;color:#43111f"><b style="background:#e8344e"></b><i class="acc">Frosting</i><span>Make a Wish · ₹149</span></div>
+    <div class="o" style="background:#24113a;color:#fdeefe"><b style="background:#ff5c8a"></b><i class="acc">Midnight</i><span>The Party · ₹179</span></div>
+    <div class="o" style="background:#d9efe3;color:#12352a"><b style="background:#ff6b5b"></b><i class="acc">Mint</i><span>Editor theme</span></div>
+    <div class="o" style="background:#e6dcfb;color:#2b1a4a"><b style="background:#7c4dff"></b><i class="acc">Lavender</i><span>Editor theme</span></div>
+    <div class="o" style="background:#0f2a3d;color:#eaf6ff"><b style="background:#4cc9f0"></b><i class="acc">Ocean</i><span>Editor theme</span></div>
+    <div class="o" style="background:#141414;color:#f5f0e8"><b style="background:#e8c26b"></b><i class="acc">Noir</i><span>Editor theme</span></div>
+  </section>
+</div>

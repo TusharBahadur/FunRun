@@ -142,7 +142,7 @@ export function Hero({ featured }: { featured: Template[] }) {
           }}
           className="type-copy mt-8 max-w-xl text-balance text-muted"
         >
-          Tynitales turns your words, photos and favorite songs into a beautiful
+          TyniTales turns your words, photos and favorite songs into a beautiful
           little page made for one person — delivered exactly when it matters.
         </motion.p>
 

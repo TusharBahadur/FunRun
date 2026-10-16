@@ -1,0 +1,29 @@
+<!-- @dsCard height=300 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@1,9..144,900,0,0&display=swap">
+<style>
+  html, body { margin: 0; background: var(--cream); }
+  .cover { position: relative; width: 960px; height: 300px; overflow: hidden; }
+  svg { position: absolute; inset: 0; }
+  .rose { fill: var(--rose); } .ink { fill: var(--ink); } .blush { fill: var(--blush); } .wine { fill: var(--wine); } .cut { fill: var(--cream); }
+  .slab { rx: var(--radius-card); } .tile { rx: var(--radius-panel); }
+  .name { position: absolute; left: 40px; bottom: 70px; margin: 0; max-width: 440px; font-family: var(--font-serif); font-style: italic; font-weight: 900; font-variation-settings: "SOFT" 0, "WONK" 0; font-size: 88px; line-height: .95; letter-spacing: -0.035em; color: var(--ink); }
+  .tag { position: absolute; left: 42px; bottom: 34px; margin: 0; max-width: 440px; font-family: var(--font-mono); font-size: 14px; color: var(--muted); }
+</style>
+<div class="cover">
+  <svg viewBox="0 0 960 300" width="960" height="300" aria-hidden="true">
+    <!--
+      blocks: rose slab 200x332 (radius-card), ink tile 150x170 (radius-panel), blush disc r64, wine pill 128x48 (half-height rx)
+      arrangement: one tall rose slab bleeding top and bottom with satellites, the ink tile tucked low-left, disc and pill to the right
+      pattern: "a distinctive display face -> one oversized glyph clipped by a block": the Fraunces italic T of the monogram, cut out of the rose slab, because the italic T is the brand's mark
+      scales: radius-card 28, radius-panel 32, pill rx 24; gaps of space-gutter 20 between blocks
+    -->
+    <defs><clipPath id="slab"><rect x="620" y="-16" width="200" height="332" rx="28"/></clipPath></defs>
+    <rect class="ink tile" x="480" y="150" width="150" height="170"/>
+    <rect class="rose slab" x="620" y="-16" width="200" height="332"/>
+    <g clip-path="url(#slab)"><path class="cut" transform="translate(540 -40) scale(2.3) translate(36.39 17.53)" d="M41.16 39.58Q46.46 39.58 52.24 40.52Q58.01 41.45 63.73 42.80Q69.45 44.15 74.61 45.54Q79.76 46.92 83.92 47.86Q88.08 48.79 90.76 48.79Q92.70 48.79 93.85 47.86Q95.00 46.93 95.41 45.08Q95.62 43.74 95.50 42.05Q95.37 40.36 95.51 38.10Q96.07 33.57 98.92 30.55Q101.77 27.54 107.43 27.54Q112.05 27.54 115.15 30.94Q118.24 34.34 118.16 40.70Q118.01 49.73 112.46 55.00Q106.91 60.27 97.61 60.27Q93.86 60.27 88.30 59.13Q82.74 57.98 76.38 56.31Q70.02 54.64 63.72 52.97Q57.43 51.31 52.05 50.16Q46.67 49.01 43.09 49.01Q39.34 49.01 37.36 51.12Q35.39 53.23 35.31 57.50Q35.31 59.50 35.66 61.13Q36.01 62.76 36.35 64.47Q36.70 66.17 36.69 68.46Q36.62 72.96 33.53 76.01Q30.44 79.06 25.37 79.06Q19.53 79.06 15.99 75.15Q12.46 71.24 12.60 64.26Q12.75 57.55 16.15 51.94Q19.54 46.33 25.88 42.96Q32.22 39.58 41.16 39.58ZM62.82 130.65Q62.10 133.04 62.48 134.25Q62.87 135.46 64.03 135.89L67.71 137.19Q71.00 138.86 71.00 141.54Q71.00 144.11 69.18 145.41Q67.36 146.70 64.48 146.70L23.82 146.70Q20.81 146.70 19.55 145.51Q18.29 144.33 18.29 142.37Q18.29 140.34 19.41 139.02Q20.54 137.69 22.31 136.86L26.16 135.69Q27.15 135.33 28.15 133.68Q29.15 132.02 30.22 128.91Q31.01 126.71 32.51 121.60Q34.02 116.49 35.97 109.59Q37.92 102.69 40.12 94.84Q42.31 86.99 44.47 79.17Q46.62 71.35 48.54 64.53Q50.45 57.71 51.85 52.72Q53.24 47.73 53.88 45.68L84.76 51.65Q83.92 53.90 82.46 58.86Q81.01 63.82 79.18 70.47Q77.35 77.11 75.31 84.64Q73.28 92.16 71.28 99.54Q69.28 106.93 67.56 113.38Q65.83 119.82 64.61 124.38Q63.39 128.93 62.82 130.65Z"/></g>
+    <circle class="blush" cx="892" cy="78" r="64"/>
+    <rect class="wine" x="840" y="196" width="128" height="48" rx="24"/>
+  </svg>
+  <p class="name">TyniTales</p>
+  <p class="tag">Gift a feeling.</p>
+</div>

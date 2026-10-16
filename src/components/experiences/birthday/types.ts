@@ -22,10 +22,24 @@ export type BirthdayGift = {
   /** Used by the ₹99 tier instead of the full letter. */
   shortNote: string;
   message: string[];
-  memories: { caption: string; date: string; tone: PhotoTone }[];
+  memories: { caption: string; date: string; tone: PhotoTone; src?: string }[];
   /** Month-by-month strip for the ₹179 tier. */
-  timeline: { month: string; caption: string; tone: PhotoTone }[];
+  timeline: { month: string; caption: string; tone: PhotoTone; src?: string }[];
   voiceNote: { transcript: string; seconds: number };
   song: { title: string; artist: string };
-  wishes: { name: string; message: string; kind: "text" | "photo" | "voice"; tone?: PhotoTone }[];
+  wishes: { name: string; message: string; kind: "text" | "photo" | "voice"; tone?: PhotoTone; src?: string }[];
+  /** Optional headline overrides. Wrap words in *stars* to highlight them. */
+  copy?: BirthdayCopy;
 };
+
+export type BirthdayCopy = {
+  /** After the sender's name on the unwrap screen. Default: "sent you *something.*" */
+  opening?: string;
+  /** Above the recipient's name on the cake screen. Default: "Happy birthday," */
+  greeting?: string;
+  /** Finale headline. Default: "Here's to *year {age + 1}.*" */
+  finale?: string;
+};
+
+/** Font used for highlighted words. */
+export type AccentFont = "classic" | "soft" | "playful" | "modern";

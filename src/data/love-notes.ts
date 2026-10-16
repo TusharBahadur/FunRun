@@ -19,7 +19,7 @@ export const loveNotes: LoveNote[] = [
     context: "Long distance",
   },
   {
-    quote: "I’m terrible with words. Tynitales made me look like a poet.",
+    quote: "I’m terrible with words. TyniTales made me look like a poet.",
     name: "Marcus T.",
     context: "Birthday surprise",
   },

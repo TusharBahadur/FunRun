@@ -1,0 +1,21 @@
+<!-- @dsCard group="Actions" height=200 subtitle="Pill buttons with the rolling arrow" -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap">
+<style>
+  body { margin: 0; background: var(--cream); font-family: var(--font-sans); }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 24px; }
+  .btn { display: inline-flex; align-items: center; gap: 16px; height: 56px; padding: 0 8px 0 28px; border-radius: var(--radius-pill); font: 500 16px/1 var(--font-sans); letter-spacing: -0.02em; border: 0; cursor: pointer; }
+  .btn .i { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-pill); }
+  .primary { background: var(--ink); color: var(--paper); } .primary .i { background: rgba(251,248,243,.12); }
+  .primary:hover { background: var(--ink-soft); }
+  .rose { background: var(--rose-deep); color: var(--paper); } .rose .i { background: rgba(251,248,243,.15); }
+  .ghost { background: transparent; color: var(--ink); padding: 0 24px; }
+  .ghost:hover { background: rgba(27,18,21,.05); }
+  .btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .note { font: 12px/1.5 var(--font-mono); text-transform: uppercase; color: var(--muted); padding: 0 24px 20px; }
+</style>
+<div class="row">
+  <button class="btn primary">Browse templates <span class="i">↗</span></button>
+  <button class="btn rose">Make it yours · ₹179 <span class="i">↗</span></button>
+  <button class="btn ghost">See how it works</button>
+</div>
+<p class="note">Rose button shown with the recommended rose-deep fill (5.5:1)</p>

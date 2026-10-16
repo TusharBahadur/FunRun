@@ -1,0 +1,53 @@
+/* TyniTales — generated from tokens.json */
+:root, [data-theme="light"] {
+  --cream: #f5efe6;
+  --paper: #fbf8f3;
+  --ink: #1b1215;
+  --ink-soft: #2c2024;
+  --muted: #76696c;
+  --line: #e3d8ca;
+  --rose: #e23b54;
+  --rose-deep: #bf2840;
+  --blush: #f6d3cf;
+  --wine: #5a1a2b;
+  --gold: #f6b73c;
+  --occasion-frosting: #ffd6dc;
+  --occasion-butter: #fbe6b3;
+  --occasion-midnight: #24113a;
+  --occasion-mint: #d9efe3;
+  --occasion-lavender: #e6dcfb;
+  --occasion-ocean: #0f2a3d;
+  --occasion-noir: #141414;
+  --shadow-nav: 0 8px 30px -12px rgba(27,18,21,0.25);
+  --shadow-card: 0 24px 50px -28px rgba(27,18,21,0.45);
+  --shadow-float: 0 30px 60px -20px rgba(27,18,21,0.35);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-gutter: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-14: 56px;
+  --space-section: 96px;
+  --radius-input: 16px;
+  --radius-card: 28px;
+  --radius-panel: 32px;
+  --radius-cta: 40px;
+  --radius-pill: 9999px;
+  --font-sans: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: Fraunces, ui-serif, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+.display-hero { font-family: var(--font-sans); font-size: 152px; line-height: 0.95; font-weight: 400; letter-spacing: -0.04em; }
+.display-section { font-family: var(--font-sans); font-size: 72px; line-height: 0.95; font-weight: 400; letter-spacing: -0.04em; }
+.display-card { font-family: var(--font-sans); font-size: 40px; line-height: 0.95; font-weight: 400; letter-spacing: -0.04em; }
+.accent { font-family: var(--font-serif); font-size: 72px; line-height: 0.95; font-weight: 400; letter-spacing: -0.02em; font-style: italic; }
+.wordmark { font-family: var(--font-serif); font-size: 48px; line-height: 1; font-weight: 900; letter-spacing: -0.035em; font-style: italic; }
+.card-serif { font-family: var(--font-serif); font-size: 40px; line-height: 0.98; font-weight: 400; }
+.heading { font-family: var(--font-sans); font-size: 20px; line-height: 1.05; font-weight: 500; letter-spacing: -0.03em; }
+.body { font-family: var(--font-sans); font-size: 16px; line-height: 1.6; font-weight: 400; }
+.letter { font-family: var(--font-sans); font-size: 18px; line-height: 1.65; font-weight: 400; }
+.copy { font-family: var(--font-mono); font-size: 14px; line-height: 1.35; font-weight: 400; }
+.label { font-family: var(--font-mono); font-size: 12px; line-height: 1.5; font-weight: 400; letter-spacing: 0.02em; }

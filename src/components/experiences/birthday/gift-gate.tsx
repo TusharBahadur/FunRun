@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { useRef, useState } from "react";
 import { EASE_OUT } from "@/lib/motion";
+import { Accented } from "./accented";
 import type { BirthdayPalette } from "./types";
 
 /** Opening screen: a wrapped box the recipient taps to unwrap. */
@@ -10,10 +11,12 @@ export function GiftGate({
   recipient,
   sender,
   palette,
+  openingLine = "sent you *something.*",
   onOpen,
 }: {
   recipient: string;
   sender: string;
+  openingLine?: string;
   palette: BirthdayPalette;
   /** Called with the box's centre in viewport pixels, for the confetti. */
   onOpen: (origin: { x: number; y: number }) => void;
@@ -47,10 +50,8 @@ export function GiftGate({
         transition={{ delay: 0.35, duration: 0.9, ease: EASE_OUT }}
         className="type-display mt-4 max-w-md text-[clamp(2.4rem,9vw,4.2rem)]"
       >
-        <span className="font-semibold">{sender}</span> sent you{" "}
-        <span className="type-accent" style={{ color: palette.accent }}>
-          something.
-        </span>
+        <span className="font-semibold">{sender}</span>{" "}
+        <Accented text={openingLine} color={palette.accent} />
       </motion.h1>
 
       <motion.button

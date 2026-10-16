@@ -119,7 +119,7 @@ function StepCard({
     >
       <div className="relative h-72 overflow-hidden rounded-[1.5rem] bg-cream">{step.visual}</div>
       <div className="flex gap-5 p-5 pt-6">
-        <span className="mt-2 font-mono text-xs text-rose">{step.n}</span>
+        <span className="mt-2 font-mono text-xs text-rose-deep">{step.n}</span>
         <div>
           <h3 className="type-heading text-2xl">{step.title}</h3>
           <p className="type-copy mt-3 text-muted">{step.body}</p>
@@ -150,10 +150,10 @@ function PickVisual({ previews }: { previews: Template[] }) {
             }
             transition={{ type: "spring", stiffness: 120, damping: 16 }}
           >
-            <TemplatePreview template={t} className="rounded-2xl shadow-xl" />
+            <TemplatePreview template={t} className="rounded-2xl shadow-card" />
             {chosen && (
               <motion.span
-                className="absolute -right-2 -top-2 grid size-8 place-items-center rounded-full bg-rose text-paper shadow-lg"
+                className="absolute -right-2 -top-2 grid size-8 place-items-center rounded-full bg-rose-deep text-paper shadow-nav"
                 animate={{ scale: inView ? 1 : 0 }}
                 transition={{ delay: inView ? 0.45 : 0, type: "spring", stiffness: 300, damping: 15 }}
               >

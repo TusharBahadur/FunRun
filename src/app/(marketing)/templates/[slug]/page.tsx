@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { SplitText } from "@/components/motion/split-text";
 import { TiltCard } from "@/components/motion/tilt-card";
-import { BirthdayCompare } from "@/components/templates/birthday-compare";
+import { sceneLabels } from "@/components/story/labels";
+import { LevelCompare } from "@/components/templates/level-compare";
 import { TemplatePreview } from "@/components/templates/template-preview";
 import { birthdayTiers } from "@/components/experiences/birthday/tiers";
 import { ButtonLink } from "@/components/ui/button";
@@ -40,6 +41,8 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
   const occasion = occasions.find((o) => o.id === template.occasion);
   const price = formatInr(template.pricePaise);
   const tier = template.tier ? birthdayTiers[template.tier] : null;
+  const siblings = template.level ? await getTemplates({ occasion: template.occasion }) : [];
+  const steps = template.story ? template.story.scenes.map((s) => sceneLabels[s.type]) : (tier?.highlights ?? []);
 
   return (
     <main className="mx-auto max-w-7xl px-5 pb-32 pt-32 md:pt-40">
@@ -71,25 +74,34 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
                 Full preview coming soon
               </span>
             )}
-            <span className="type-label ml-2 text-muted">{price} · Personalizing opens soon</span>
+            {template.story ? (
+              <ButtonLink href={`/studio/${template.slug}`} variant="rose" size="lg">
+                Make it yours · {price}
+              </ButtonLink>
+            ) : (
+              <span className="type-label ml-2 text-muted">{price} · Personalizing opens soon</span>
+            )}
           </div>
 
-          {tier && (
-            <ol className="mt-16 border-t border-line">
-              {tier.highlights.map((line, i) => (
-                <li key={line} className="flex items-baseline gap-6 border-b border-line py-4">
-                  <span className="type-label text-rose">{String(i + 1).padStart(2, "0")}</span>
-                  <p className={i === 0 && tier.id !== "candle" ? "type-heading text-lg" : "text-[1.05rem]"}>
-                    {line}
-                  </p>
-                </li>
-              ))}
-            </ol>
+          {steps.length > 0 && (
+            <>
+              <p className="type-label mt-16 text-muted">
+                {template.story ? `${steps.length} pages, each unlocked by a little game` : "What’s inside"}
+              </p>
+              <ol className="mt-4 border-t border-line">
+                {steps.map((line, i) => (
+                  <li key={`${line}-${i}`} className="flex items-baseline gap-6 border-b border-line py-3.5">
+                    <span className="type-label text-rose-deep">{String(i + 1).padStart(2, "0")}</span>
+                    <p className="text-[1.02rem]">{line}</p>
+                  </li>
+                ))}
+              </ol>
+            </>
           )}
         </div>
       </div>
 
-      {tier && <BirthdayCompare current={tier.id} />}
+      {template.level && <LevelCompare current={template} siblings={siblings} />}
     </main>
   );
 }

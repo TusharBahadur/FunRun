@@ -106,7 +106,7 @@ function DockIcon({
         style={{ width: size, height: size }}
         className={cn(
           "grid place-items-center rounded-[30%] shadow-sm",
-          accent ? "bg-rose text-paper" : "border border-line/80 bg-paper text-ink",
+          accent ? "bg-rose-deep text-paper" : "border border-line/80 bg-paper text-ink",
         )}
       >
         <motion.div style={{ width: iconSize, height: iconSize }}>

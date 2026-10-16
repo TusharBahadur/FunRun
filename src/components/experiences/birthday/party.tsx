@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Camera, Disc3, Download, Mic, Pause, Play } from "lucide-react";
+import { Disc3, Download, Mic, Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { EASE_OUT } from "@/lib/motion";
-import { TONES } from "./tones";
+import { PhotoFill } from "./photo-fill";
 import type { BirthdayGift, BirthdayPalette } from "./types";
 
 const reveal = {
@@ -235,8 +235,6 @@ export function Timeline({ gift, palette }: { gift: BirthdayGift; palette: Birth
         className="no-scrollbar mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 md:px-[max(1.25rem,calc(50vw-36rem))]"
       >
         {gift.timeline.map((t, i) => {
-          const tone = TONES[t.tone];
-          const Icon = tone.icon;
           return (
             <motion.figure
               key={t.month}
@@ -246,12 +244,13 @@ export function Timeline({ gift, palette }: { gift: BirthdayGift; palette: Birth
               transition={{ delay: Math.min(i, 4) * 0.08, duration: 0.7, ease: EASE_OUT }}
               className="w-[min(58vw,220px)] shrink-0 snap-start"
             >
-              <div
-                className="grid aspect-[4/5] place-items-center rounded-2xl"
-                style={{ background: `linear-gradient(150deg, ${tone.from}, ${tone.to})` }}
-              >
-                <Icon className="size-12 text-white/80" strokeWidth={1.4} />
-              </div>
+              <PhotoFill
+                src={t.src}
+                tone={t.tone}
+                alt={t.caption}
+                iconClassName="size-12"
+                className="aspect-[4/5] w-full rounded-2xl"
+              />
               <figcaption className="mt-3">
                 <span className="type-label block opacity-50">{t.month}</span>
                 <span className="type-accent text-lg">{t.caption}</span>
@@ -281,7 +280,6 @@ export function WishesWall({ gift, palette }: { gift: BirthdayGift; palette: Bir
 
       <div className="mx-auto mt-14 max-w-5xl columns-1 gap-4 sm:columns-2 lg:columns-3">
         {gift.wishes.map((w, i) => {
-          const tone = w.tone ? TONES[w.tone] : null;
           const id = `wish-${i}`;
           return (
             <motion.article
@@ -293,13 +291,14 @@ export function WishesWall({ gift, palette }: { gift: BirthdayGift; palette: Bir
               className="mb-4 break-inside-avoid rounded-[1.5rem] p-5"
               style={{ backgroundColor: palette.cream, color: palette.ink }}
             >
-              {w.kind === "photo" && tone && (
-                <div
-                  className="mb-4 grid aspect-[4/3] place-items-center rounded-xl"
-                  style={{ background: `linear-gradient(150deg, ${tone.from}, ${tone.to})` }}
-                >
-                  <Camera className="size-9 text-white/80" strokeWidth={1.4} />
-                </div>
+              {w.kind === "photo" && (
+                <PhotoFill
+                  src={w.src}
+                  tone={w.tone ?? "sun"}
+                  alt={`From ${w.name}`}
+                  iconClassName="size-9"
+                  className="mb-4 aspect-[4/3] w-full rounded-xl"
+                />
               )}
               {w.kind === "voice" && (
                 <button
@@ -342,7 +341,7 @@ export function KeepsakeButton({ gift, palette }: { gift: BirthdayGift; palette:
     setBusy(true);
     await document.fonts.ready;
     const css = getComputedStyle(document.documentElement);
-    const serif = css.getPropertyValue("--font-playfair").trim() || "serif";
+    const serif = css.getPropertyValue("--font-fraunces").trim() || "serif";
     const sans = css.getPropertyValue("--font-inter-tight").trim() || "sans-serif";
     const mark = css.getPropertyValue("--font-fraunces").trim() || "serif";
 
@@ -395,7 +394,7 @@ export function KeepsakeButton({ gift, palette }: { gift: BirthdayGift; palette:
 
     ctx.fillStyle = palette.fg;
     ctx.font = `italic 900 54px ${mark}`;
-    ctx.fillText("Tynitales.", 80, H - 80);
+    ctx.fillText("TyniTales.", 80, H - 80);
 
     link.current!.href = canvas.toDataURL("image/png");
     link.current!.download = `${gift.recipient.toLowerCase()}-birthday-${gift.age}.png`;

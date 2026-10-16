@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 
 const variants = {
   primary: "bg-ink text-paper hover:bg-ink-soft",
-  rose: "bg-rose text-paper hover:bg-rose-deep",
+  // rose-deep keeps cream labels above 4.5:1 contrast (plain rose is 3.97:1).
+  rose: "bg-rose-deep text-paper hover:bg-wine",
   light: "bg-paper text-ink hover:bg-white",
   ghost: "text-ink hover:bg-ink/5",
 } as const;
