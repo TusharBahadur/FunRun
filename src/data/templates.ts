@@ -50,7 +50,7 @@ export const templates: Template[] = [
     preview: {
       kicker: "For my favorite person",
       title: "You make Tuesdays feel like holidays.",
-      signoff: "â always, J.",
+      signoff: "— always, J.",
     },
   },
   {
@@ -63,7 +63,7 @@ export const templates: Template[] = [
     motif: "stars",
     preview: {
       kicker: "Year three",
-      title: "365 nights, and still itâs you.",
+      title: "365 nights, and still it’s you.",
       signoff: "Happy anniversary",
     },
   },
@@ -78,7 +78,7 @@ export const templates: Template[] = [
     preview: {
       kicker: "Happy birthday",
       title: "Another lap around the sun, together.",
-      signoff: "Open your gift â",
+      signoff: "Open your gift ↓",
     },
   },
   {
@@ -134,7 +134,7 @@ export const templates: Template[] = [
     motif: "hearts",
     preview: {
       kicker: "Ten years",
-      title: "Iâd choose you in every lifetime.",
+      title: "I’d choose you in every lifetime.",
       signoff: "Forever yours",
     },
   },
@@ -147,7 +147,7 @@ export const templates: Template[] = [
     palette: { bg: "#dfe7c8", fg: "#2e3a1c", accent: "#e98aa0" },
     motif: "bloom",
     preview: {
-      kicker: "Itâs your day",
+      kicker: "It’s your day",
       title: "May this year bloom just for you.",
       signoff: "Make a wish",
     },

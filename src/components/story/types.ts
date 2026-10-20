@@ -30,6 +30,8 @@ type Heading = {
   stickers?: StickerPlacement[];
   /** A sticker that pops up once the page is finished. */
   reaction?: AnyStickerId;
+  /** Website gifts: the short name for this section in the menu. */
+  nav?: string;
 };
 
 export type Photo = {
@@ -51,6 +53,12 @@ export type Scene =
   // About them
   | ({ type: "spotlight" } & Heading & { photo?: string; tone?: PhotoTone; tags: string[] })
   | ({ type: "compliments" } & Heading & { bubbles: string[] })
+  // Website sections (work as pages too)
+  | ({ type: "hero" } & Heading & { subtitle?: string; photo?: string; tone?: PhotoTone })
+  | ({ type: "countdown" } & Heading & { /** YYYY-MM-DD. Counts down if ahead, counts up if past. */ date: string; caption?: string })
+  | ({ type: "noticed" } & Heading & { items: { title: string; text: string }[] })
+  | ({ type: "gallery" } & Heading & { photos: Photo[] })
+  | ({ type: "playlist" } & Heading & { songs: { title: string; note: string; link?: string; src?: string; tone: PhotoTone }[] })
   // Wishes and feelings
   | ({ type: "dandelion" } & Heading)
   | ({ type: "cake" } & Heading & { age: number })
@@ -75,11 +83,13 @@ export type Scene =
   | ({ type: "numbers" } & Heading & { stats: { value: number; suffix?: string; label: string }[] })
   | ({ type: "wishes" } & Heading & { wishes: { name: string; message: string }[] })
   | ({ type: "voice" } & Heading & { transcript: string; seconds: number })
-  | ({ type: "finale" } & Heading & { banner: string; keepsake?: boolean; thankYou?: boolean; /** A little collage above the buttons. */ photos?: Photo[] });
+  | ({ type: "finale" } & Heading & { keepsake?: boolean; thankYou?: boolean; /** A little collage above the buttons. */ photos?: Photo[] });
 
 export type SceneType = Scene["type"];
 
 export type Story = {
+  /** "pages": one game per page (default). "site": one long scrolling page. */
+  format?: "pages" | "site";
   recipient: string;
   sender: string;
   melody: MelodyId;
@@ -90,4 +100,4 @@ export type Story = {
 };
 
 /** Scenes that are read rather than played: the next page is open right away. */
-export const passiveScenes: SceneType[] = ["letter", "numbers", "wishes", "voice", "finale"];
+export const passiveScenes: SceneType[] = ["letter", "numbers", "wishes", "voice", "finale", "hero", "countdown", "noticed", "gallery", "playlist"];

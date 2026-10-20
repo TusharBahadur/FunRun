@@ -1,4 +1,4 @@
-import type { Scene, SceneType } from "./types";
+import { passiveScenes, type Scene, type SceneType } from "./types";
 
 /** How each scene is described to a buyer, in the order it plays. */
 export const sceneLabels: Record<SceneType, string> = {
@@ -9,6 +9,11 @@ export const sceneLabels: Record<SceneType, string> = {
   unwrap: "Tap to unwrap a gift",
   spotlight: "Their photo, covered in notes about them",
   compliments: "Pop bubbles to find compliments",
+  hero: "A full-screen photo with your title",
+  countdown: "A live countdown to your date",
+  noticed: "A few things you’ve noticed about them",
+  gallery: "A gallery of your photos",
+  playlist: "A playlist of your songs",
   dandelion: "Hold to make a wish on a dandelion",
   cake: "Blow out the candles, one by one",
   meter: "Tap to fill the meter past 100%",
@@ -36,7 +41,7 @@ export function storyFacts(scenes: Scene[]) {
   const finale = scenes.find((s) => s.type === "finale");
   return {
     pages: scenes.length,
-    games: scenes.filter((s) => !["letter", "numbers", "wishes", "voice", "finale"].includes(s.type)).length,
+    games: scenes.filter((s) => !passiveScenes.includes(s.type)).length,
     wishes: scenes.some((s) => s.type === "wishes"),
     voice: scenes.some((s) => s.type === "voice"),
     letter: scenes.some((s) => s.type === "letter"),

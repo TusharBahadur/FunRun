@@ -86,7 +86,11 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
           {steps.length > 0 && (
             <>
               <p className="type-label mt-16 text-muted">
-                {template.story ? `${steps.length} pages, each unlocked by a little game` : "What’s inside"}
+                {template.story?.format === "site"
+                  ? `One scrolling page, ${steps.length} sections`
+                  : template.story
+                    ? `${steps.length} pages, each unlocked by a little game`
+                    : "What’s inside"}
               </p>
               <ol className="mt-4 border-t border-line">
                 {steps.map((line, i) => (

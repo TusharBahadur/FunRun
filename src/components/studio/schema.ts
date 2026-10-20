@@ -1,5 +1,10 @@
 import {
   Award,
+  GalleryHorizontal,
+  ImageIcon,
+  ListOrdered,
+  Music,
+  Timer,
   Cake,
   Calculator,
   Candy,
@@ -41,7 +46,7 @@ export type FieldDef =
   | { key: string; label: string; kind: "strings"; itemLabel: string; max: number; placeholder?: string }
   | { key: string; label: string; kind: "list"; itemLabel: string; max: number; item: FieldDef[]; newItem: () => Record<string, unknown>; title: (item: Record<string, unknown>) => string };
 
-export type SceneCategory = "Openers" | "About them" | "Games" | "Paper & keepsakes" | "Feelings" | "Reading" | "Endings";
+export type SceneCategory = "Website" | "Openers" | "About them" | "Games" | "Paper & keepsakes" | "Feelings" | "Reading" | "Endings";
 
 type SceneSchema = {
   name: string;
@@ -102,6 +107,112 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     blurb: "Tap the box until the lid flies off.",
     fields: [...heading, { key: "taps", label: "Taps needed", kind: "number", min: 1, max: 6 }, { key: "inside", label: "What’s inside", kind: "text", max: 60 }, { key: "insideSub", label: "Small print", kind: "text", max: 40 }],
     create: () => ({ type: "unwrap", eyebrow: "For {to}", title: "{from} sent you *something.*", hint: "Tap the box three times", taps: 3, inside: "A little surprise", insideSub: "Keep going ↓" }),
+  },
+  hero: {
+    name: "Photo hero",
+    category: "Website",
+    icon: ImageIcon,
+    blurb: "A full-screen photo with a big title. Best as the first section.",
+    fields: [
+      { key: "eyebrow", label: "Small label", kind: "text", max: 40 },
+      { key: "title", label: "Big title", kind: "text", max: 40, help: "Wrap words in *stars* to highlight them." },
+      { key: "subtitle", label: "Line at the bottom", kind: "text", max: 40 },
+      { key: "photo", label: "Photo", kind: "image", help: "A photo of the two of you, or of them." },
+      { key: "nav", label: "Menu name", kind: "text", max: 14, placeholder: "Home" },
+    ],
+    create: () => ({ type: "hero", title: "Us, *lately.*", subtitle: "my favourite person", tone: "rose" }),
+  },
+  countdown: {
+    name: "Countdown",
+    category: "Website",
+    icon: Timer,
+    blurb: "Counts down to a date, live. If the date has passed, it counts up.",
+    fields: [
+      { key: "eyebrow", label: "Small label", kind: "text", max: 40, placeholder: "Counting down to" },
+      { key: "date", label: "Date (YYYY-MM-DD)", kind: "text", max: 10, placeholder: "2027-02-14" },
+      { key: "title", label: "Line under it", kind: "text", max: 60 },
+      { key: "caption", label: "Small print", kind: "text", max: 60 },
+      { key: "nav", label: "Menu name", kind: "text", max: 14, placeholder: "Countdown" },
+    ],
+    create: () => ({ type: "countdown", date: "2027-02-14", eyebrow: "Our next anniversary", title: "Not that I’m *counting.*" }),
+  },
+  noticed: {
+    name: "Things I’ve noticed",
+    category: "Website",
+    icon: ListOrdered,
+    blurb: "Numbered cards, each a small thing you’ve noticed about them.",
+    fields: [
+      { key: "eyebrow", label: "Small label", kind: "text", max: 40 },
+      { key: "title", label: "Headline", kind: "text", max: 90, help: "Wrap words in *stars* to highlight them." },
+      { key: "nav", label: "Menu name", kind: "text", max: 14, placeholder: "Notes" },
+      {
+        key: "items",
+        label: "Cards",
+        kind: "list",
+        itemLabel: "Card",
+        max: 6,
+        item: [
+          { key: "title", label: "Title", kind: "text", max: 40 },
+          { key: "text", label: "What you noticed", kind: "textarea", max: 240 },
+        ],
+        newItem: () => ({ title: "The little things", text: "Write something you’ve noticed." }),
+        title: (i) => String(i.title || "Card"),
+      },
+    ],
+    create: () => ({ type: "noticed", eyebrow: "A few things I’ve noticed", title: "Small things, *big deal.*", items: [{ title: "The laugh", text: "You laugh before the punchline. Every time." }] }),
+  },
+  gallery: {
+    name: "Photo gallery",
+    category: "Website",
+    icon: GalleryHorizontal,
+    blurb: "Photos that stack on top of each other as you scroll.",
+    fields: [
+      { key: "eyebrow", label: "Small label", kind: "text", max: 40 },
+      { key: "title", label: "Headline", kind: "text", max: 90, help: "Wrap words in *stars* to highlight them." },
+      { key: "nav", label: "Menu name", kind: "text", max: 14, placeholder: "Photos" },
+      {
+        key: "photos",
+        label: "Photos",
+        kind: "list",
+        itemLabel: "Photo",
+        max: 8,
+        item: [
+          { key: "caption", label: "Caption", kind: "text", max: 30 },
+          { key: "date", label: "Date", kind: "text", max: 16 },
+          { key: "tone", label: "Placeholder colour", kind: "select", options: tones },
+        ],
+        newItem: () => ({ caption: "A good day", tone: "sun" }),
+        title: (i) => String(i.caption || "Photo"),
+      },
+    ],
+    create: () => ({ type: "gallery", eyebrow: "Our little archive", title: "Too many good ones to *pick one.*", photos: [{ caption: "Us", tone: "rose" }, { caption: "That trip", tone: "sun" }] }),
+  },
+  playlist: {
+    name: "Playlist",
+    category: "Website",
+    icon: Music,
+    blurb: "Your songs, each with a cover photo and a play button.",
+    fields: [
+      { key: "eyebrow", label: "Small label", kind: "text", max: 40 },
+      { key: "title", label: "Headline", kind: "text", max: 90, help: "Wrap words in *stars* to highlight them." },
+      { key: "nav", label: "Menu name", kind: "text", max: 14, placeholder: "Playlist" },
+      {
+        key: "songs",
+        label: "Songs",
+        kind: "list",
+        itemLabel: "Song",
+        max: 6,
+        item: [
+          { key: "title", label: "Song", kind: "text", max: 40 },
+          { key: "note", label: "Why this one", kind: "text", max: 60 },
+          { key: "link", label: "Link (YouTube or Spotify)", kind: "text", max: 200, placeholder: "Optional" },
+          { key: "tone", label: "Placeholder colour", kind: "select", options: tones },
+        ],
+        newItem: () => ({ title: "Our song", note: "You know why", tone: "dusk" }),
+        title: (i) => String(i.title || "Song"),
+      },
+    ],
+    create: () => ({ type: "playlist", eyebrow: "Songs for tonight", title: "Play one. *Think of me.*", songs: [{ title: "Tum Se Hi", note: "the obvious one", tone: "dusk" }] }),
   },
   spotlight: {
     name: "Spotlight",
@@ -416,11 +527,10 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     name: "Finale",
     category: "Endings",
     icon: PartyPopper,
-    blurb: "The last page: a banner, replay and optional extras.",
+    blurb: "The last page: a photo collage, replay and optional extras.",
     fields: [
       { key: "eyebrow", label: "Small label", kind: "text", max: 40 },
       { key: "title", label: "Headline", kind: "text", max: 80, help: "Wrap words in *stars* to highlight them." },
-      { key: "banner", label: "Scrolling banner", kind: "text", max: 30 },
       { key: "thankYou", label: "Thank-you reply button", kind: "toggle" },
       { key: "keepsake", label: "Keepsake poster download", kind: "toggle" },
       {
@@ -437,11 +547,11 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
         title: (i) => String(i.caption || "Photo"),
       },
     ],
-    create: () => ({ type: "finale", eyebrow: "And finally", title: "With love, *{from}.*", banner: "With love" }),
+    create: () => ({ type: "finale", eyebrow: "And finally", title: "With love, *{from}.*" }),
   },
 };
 
-export const categoryOrder: SceneCategory[] = ["Openers", "About them", "Games", "Paper & keepsakes", "Feelings", "Reading", "Endings"];
+export const categoryOrder: SceneCategory[] = ["Website", "Openers", "About them", "Games", "Paper & keepsakes", "Feelings", "Reading", "Endings"];
 
 /** A short line describing a scene in the layers list. */
 export function sceneSubtitle(scene: Scene) {

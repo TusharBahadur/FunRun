@@ -177,7 +177,6 @@ export function VoiceScene({ scene, done }: SceneProps<S<"voice">>) {
 export function FinaleScene({ scene, done }: SceneProps<S<"finale">>) {
   const { palette, fill, playSong, restart, slug, to, from } = useStory();
   const [thanked, setThanked] = useState(false);
-  const banner = `${fill(scene.banner)} ✦ `.repeat(8);
 
   return (
     <div className="relative overflow-hidden">
@@ -203,13 +202,6 @@ export function FinaleScene({ scene, done }: SceneProps<S<"finale">>) {
           </Link>
         </div>
       </SceneShell>
-      {/* A ribbon of the headline, tilted across the bottom */}
-      <div className="pointer-events-none fixed inset-x-[-10%] bottom-24 -rotate-3 overflow-hidden py-2.5" style={{ backgroundColor: palette.accent, color: palette.cream }} aria-hidden>
-        <motion.div className="type-label flex whitespace-nowrap text-sm" animate={{ x: ["0%", "-50%"] }} transition={{ duration: 18, repeat: Infinity, ease: "linear" }}>
-          <span>{banner}</span>
-          <span>{banner}</span>
-        </motion.div>
-      </div>
     </div>
   );
 }

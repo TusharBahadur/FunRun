@@ -10,58 +10,14 @@ import { cn } from "@/lib/utils";
 import { accentMoodVars } from "@/components/experiences/birthday/accent-moods";
 import { melodies } from "./melodies";
 import { StoryContext, type SceneProps, type StoryApi } from "./scene-kit";
-import { CakeScene, DandelionScene, MeterScene } from "./scenes/feelings";
-import { AwardScene, BouquetScene, MapScene, MatchScene, QuestionScene, QuizScene, RingboxScene, StarsScene } from "./scenes/games";
-import { KnockScene, LightsScene, ScratchScene, SealScene, UnwrapScene } from "./scenes/openers";
-import { ComplimentsScene, SpotlightScene } from "./scenes/personal";
-import { CouponScene, DeckScene, JarScene, PolaroidsScene, ReceiptScene } from "./scenes/paper";
-import { FinaleScene, LetterScene, NumbersScene, VoiceScene, WishesScene } from "./scenes/reading";
+import { SCENES } from "./scene-registry";
+import { SitePlayer } from "./site-player";
 import { ReactionSticker, StickerLayer } from "./stickers";
 import { passiveScenes, type Scene, type SceneType, type Story } from "./types";
 
-// Each scene type renders with its own config; the map keeps the player generic.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const SCENES: Record<SceneType, ComponentType<SceneProps<any>>> = {
-  seal: SealScene,
-  scratch: ScratchScene,
-  lights: LightsScene,
-  knock: KnockScene,
-  unwrap: UnwrapScene,
-  spotlight: SpotlightScene,
-  compliments: ComplimentsScene,
-  dandelion: DandelionScene,
-  cake: CakeScene,
-  meter: MeterScene,
-  receipt: ReceiptScene,
-  deck: DeckScene,
-  coupon: CouponScene,
-  jar: JarScene,
-  polaroids: PolaroidsScene,
-  quiz: QuizScene,
-  match: MatchScene,
-  stars: StarsScene,
-  question: QuestionScene,
-  ringbox: RingboxScene,
-  bouquet: BouquetScene,
-  award: AwardScene,
-  map: MapScene,
-  letter: LetterScene,
-  numbers: NumbersScene,
-  wishes: WishesScene,
-  voice: VoiceScene,
-  finale: FinaleScene,
-};
-
 const initialDone = (scenes: Scene[]) => scenes.map((s) => passiveScenes.includes(s.type));
 
-/** Plays a story: one scene per page, each unlocked by finishing the last. */
-export function StoryPlayer({
-  story,
-  slug,
-  initialIndex = 0,
-  unlocked = false,
-  onIndexChange,
-}: {
+type PlayerProps = {
   story: Story;
   slug: string;
   /** Studio: open on a given scene (index into the visible scenes). */
@@ -69,7 +25,21 @@ export function StoryPlayer({
   /** Studio: every page can be visited without playing the one before. */
   unlocked?: boolean;
   onIndexChange?: (index: number) => void;
-}) {
+};
+
+/** Plays a gift: page by page (the games), or as one scrolling website. */
+export function StoryPlayer(props: PlayerProps) {
+  return props.story.format === "site" ? <SitePlayer {...props} /> : <PagesPlayer {...props} />;
+}
+
+/** One scene per page, each unlocked by finishing the last. */
+function PagesPlayer({
+  story,
+  slug,
+  initialIndex = 0,
+  unlocked = false,
+  onIndexChange,
+}: PlayerProps) {
   const scenes = useMemo(() => story.scenes.filter((s) => !s.hidden), [story.scenes]);
   const [index, setIndex] = useState(() => Math.min(initialIndex, Math.max(0, scenes.length - 1)));
   const [done, setDone] = useState<boolean[]>(() => initialDone(scenes));

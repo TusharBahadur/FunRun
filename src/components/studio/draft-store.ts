@@ -10,6 +10,8 @@ export type Draft = {
   templateSlug: string;
   name: string;
   story: Story;
+  /** Fingerprint of the template this draft started from; tells us when the template changed. */
+  base?: string;
   /** Uploaded images, reusable across scenes. */
   assets: { id: string; name: string; src: string }[];
   /** Set once "Make it live" is completed on this device. */
@@ -43,12 +45,21 @@ export function saveDraft(d: Draft) {
   }
 }
 
+/** A short fingerprint of a template's content (not for security, just change detection). */
+export function storyFingerprint(story: Story) {
+  const text = JSON.stringify(story);
+  let h = 5381;
+  for (let i = 0; i < text.length; i++) h = ((h << 5) + h + text.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+}
+
 export function freshDraft(slug: string, name: string, story: Story): Draft {
   return {
     v: 1,
     id: draftIdFor(slug),
     templateSlug: slug,
     name,
+    base: storyFingerprint(story),
     story: structuredClone(story),
     assets: [],
     updatedAt: new Date().toISOString(),

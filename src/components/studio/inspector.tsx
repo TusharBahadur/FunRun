@@ -653,7 +653,7 @@ function ItemInspector({
             />
           ))
         )}
-        {list.key === "photos" && (
+        {(list.key === "photos" || list.key === "songs") && (
           <PhotoPicker
             draft={draft}
             src={(item as Rec).src as string | undefined}

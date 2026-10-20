@@ -29,6 +29,8 @@ export function Studio({ template }: { template: StudioTemplate }) {
   const [checkout, setCheckout] = useState(false);
   const [preview, setPreview] = useState(false);
   const [mobilePane, setMobilePane] = useState<"layers" | "canvas" | "edit">("canvas");
+  // A draft saved before the template was rewritten would hide the new version.
+  const outdated = draft.base !== initial.base;
   const frames = useRef(new Map<string, HTMLIFrameElement>());
   const previewFrame = useRef<HTMLIFrameElement>(null);
 
@@ -166,6 +168,25 @@ export function Studio({ template }: { template: StudioTemplate }) {
           <span className="rounded-full bg-paper/20 px-2 py-0.5 text-xs">{formatInr(template.pricePaise)}</span>
         </button>
       </header>
+
+      {outdated && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line bg-paper px-4 py-2.5 text-sm">
+          <p className="flex-1">This template has new pages and words since you started editing.</p>
+          <button
+            type="button"
+            onClick={() => {
+              reset(freshDraft(template.slug, initial.name, template.story));
+              setSel({ scene: 0, item: null });
+            }}
+            className="h-8 rounded-full bg-ink px-4 text-paper"
+          >
+            Use the new version
+          </button>
+          <button type="button" onClick={() => edit({ ...draft, base: initial.base })} className="h-8 rounded-full border border-line px-4 hover:bg-cream">
+            Keep mine
+          </button>
+        </div>
+      )}
 
       {/* Small screens: one pane at a time */}
       <div className="flex border-b border-line p-1.5 lg:hidden">
