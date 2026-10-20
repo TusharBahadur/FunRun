@@ -1,12 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Check, Copy, ExternalLink, Lock, X } from "lucide-react";
+import { Check, Copy, ExternalLink, Lock, X, Clock } from "lucide-react";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import { storyFacts } from "@/components/story/labels";
 import { cn, formatInr } from "@/lib/utils";
 import type { Draft } from "./draft-store";
+import { ActivationTimer } from "./activation-timer";
 
 const slugify = (s: string) =>
   s
@@ -68,7 +69,7 @@ export function Checkout({
             aria-modal="true"
             aria-label="Make it live"
             data-lenis-prevent
-            className="max-h-[92vh] w-[min(96vw,520px)] overflow-y-auto rounded-[1.6rem] bg-cream shadow-float"
+            className="max-h-[92vh] w-[min(96vw,540px)] overflow-y-auto rounded-[1.6rem] bg-cream shadow-float"
             initial={{ y: 20, scale: 0.98 }}
             animate={{ y: 0, scale: 1 }}
             exit={{ y: 20, scale: 0.98 }}
@@ -112,20 +113,21 @@ export function Checkout({
                         key={w}
                         type="button"
                         onClick={() => setWhen(w)}
-                        className={cn("rounded-2xl border px-4 py-3 text-left text-sm", when === w ? "border-ink bg-paper font-medium" : "border-line")}
+                        className={cn("rounded-2xl border px-4 py-3 text-left text-sm transition-all", when === w ? "border-ink bg-paper font-medium shadow-xs" : "border-line hover:bg-paper/50")}
                       >
                         {w === "now" ? "Right away" : "At a set time"}
-                        <span className="block text-xs font-normal text-muted">{w === "now" ? "The link opens today" : "e.g. midnight on the day"}</span>
+                        <span className="block text-xs font-normal text-muted">{w === "now" ? "The link opens today" : "e.g. midnight on birthday"}</span>
                       </button>
                     ))}
                   </div>
+
+                  {/* Interactive Activation Countdown Timer */}
                   {when === "later" && (
-                    <input
-                      type="datetime-local"
+                    <ActivationTimer
                       value={unlockAt}
-                      onChange={(e) => setUnlockAt(e.target.value)}
-                      className="mt-2 w-full rounded-2xl border border-line bg-paper px-4 py-3 text-[15px] outline-none"
-                      aria-label="Unlock time"
+                      onChange={setUnlockAt}
+                      accentColor={draft.story.palette.accent}
+                      recipientName={draft.story.recipient}
                     />
                   )}
                 </section>
@@ -147,7 +149,7 @@ export function Checkout({
                   </ul>
                 </section>
 
-                <button type="button" onClick={publish} className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-ink font-medium text-paper hover:bg-ink-soft">
+                <button type="button" onClick={publish} className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-ink font-medium text-paper hover:bg-ink-soft transition-all active:scale-98 shadow-sm">
                   <Lock className="size-4" /> Pay {formatInr(pricePaise)} & make it live
                 </button>
                 <p className="text-center text-xs text-muted">You only pay now, after you’ve made it exactly how you want.</p>
@@ -163,10 +165,20 @@ export function Checkout({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     {qr ? <img src={qr} alt="QR code for the test link" className="size-full" /> : <span className="text-xs text-muted">Making QR…</span>}
                   </div>
-                  <div className="min-w-0 space-y-2 text-sm">
+                  <div className="min-w-0 space-y-2 text-sm flex-1">
                     <p className="break-all font-mono text-xs">{testUrl}</p>
-                    {draft.live?.unlockAt && <p className="text-xs text-muted">Opens {new Date(draft.live.unlockAt).toLocaleString("en-IN")}</p>}
-                    <div className="flex flex-wrap gap-2">
+                    {draft.live?.unlockAt && (
+                      <div className="rounded-xl bg-paper border border-line p-2 text-xs">
+                        <div className="flex items-center gap-1.5 font-semibold text-ink">
+                          <Clock className="size-3 text-rose" />
+                          <span>Scheduled Activation</span>
+                        </div>
+                        <p className="text-muted mt-0.5">
+                          Unlocks {new Date(draft.live.unlockAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                        </p>
+                      </div>
+                    )}
+                    <div className="flex flex-wrap gap-2 pt-1">
                       <button
                         type="button"
                         onClick={async () => {
@@ -177,11 +189,11 @@ export function Checkout({
                             setCopied(false);
                           }
                         }}
-                        className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5"
+                        className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 hover:bg-paper transition-colors"
                       >
                         <Copy className="size-3.5" /> {copied ? "Copied" : "Copy link"}
                       </button>
-                      <a href={testUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-paper">
+                      <a href={testUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-paper hover:bg-ink-soft transition-colors">
                         <ExternalLink className="size-3.5" /> Open gift
                       </a>
                     </div>

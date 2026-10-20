@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { StoryPlayer } from "@/components/story/story-player";
 import { loadDraft, type Draft } from "./draft-store";
+import { RecipientUnlockCountdown } from "./activation-timer";
 
 /**
  * Plays a gift made in the studio. Until gifts are stored online, this only
@@ -47,13 +48,12 @@ export function LocalGift({ id }: { id: string }) {
     const { palette } = draft.story;
     return (
       <main className="grid min-h-svh place-items-center px-6 text-center" style={{ backgroundColor: palette.bg, color: palette.fg }}>
-        <div>
-          <p className="type-label opacity-60">A gift for {draft.story.recipient}</p>
-          <h1 className="type-display mt-3 text-5xl">
-            Opens <span className="type-accent" style={{ color: palette.accent }}>soon.</span>
-          </h1>
-          <p className="type-label mt-4 opacity-70">{opensAt.toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" })}</p>
-        </div>
+        <RecipientUnlockCountdown
+          opensAt={opensAt}
+          recipientName={draft.story.recipient}
+          accentColor={palette.accent}
+          onUnlock={() => setState((s) => ({ ...s, locked: false }))}
+        />
       </main>
     );
   }

@@ -1,4 +1,4 @@
-import { Heart, Phone, Video } from "lucide-react";
+import { Heart, Phone, Sparkles, Video } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 import { Accented } from "@/components/experiences/birthday/accented";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
@@ -8,41 +8,70 @@ import type { Template } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
 /*
- * A gift, shown the way it really looks. Each template gets one of six
- * compositions that suits its story (a group chat for the party, a scrapbook
- * for the memories, an envelope for the letters…), so the gallery never reads
- * as one card repeated. Everything is sized in container units, so it works on
- * a small hero card and a big template page alike.
+ * High-fidelity gift mockups. Every single template gets its own
+ * bespoke, handcrafted composition matching its unique story, scenes,
+ * stickers, and emotional tone.
  */
 
-type Layout = "browser" | "fan" | "chat" | "scrapbook" | "poster" | "envelope" | "site";
+type Layout =
+  | "candle"
+  | "cakescrapbook"
+  | "partychat"
+  | "filmstrip"
+  | "mapbrowser"
+  | "celestialfan"
+  | "waxenvelope"
+  | "midnightchat"
+  | "foreverscrapbook"
+  | "proposallayout"
+  | "ringboxlayout"
+  | "fairytalelayout"
+  | "apologychat"
+  | "trucelayout"
+  | "couponlayout"
+  | "magazinelayout"
+  | "fandecklayout"
+  | "trophybrowser"
+  | "recipelayout"
+  | "recipesitelayout"
+  | "supermomlayout"
+  | "papalayout"
+  | "dadjokeslayout"
+  | "herolayout"
+  | "browser"
+  | "fan"
+  | "chat"
+  | "scrapbook"
+  | "poster"
+  | "envelope"
+  | "site";
 
-// Chosen by hand so the three templates of an occasion never share a layout.
+// Every template has its own unique, dedicated layout
 const layoutFor: Record<string, Layout> = {
-  candle: "poster",
-  "make-a-wish": "scrapbook",
-  "the-party": "chat",
-  "still-you": "poster",
-  "our-map": "browser",
-  "written-in-the-stars": "fan",
-  "sealed-with-love": "envelope",
-  "midnight-notes": "chat",
-  "forever-yours": "scrapbook",
-  "the-question": "poster",
-  "ring-box": "envelope",
-  "happily-ever-after": "chat",
-  "little-sorry": "chat",
-  "white-flag": "envelope",
-  "make-it-right": "scrapbook",
-  "main-character": "poster",
-  "top-fan": "fan",
-  "girlfriend-of-the-year": "browser",
-  "for-maa": "envelope",
-  "maas-recipe": "browser",
-  supermom: "chat",
-  "for-papa": "poster",
-  "dad-jokes": "fan",
-  "my-hero": "scrapbook",
+  candle: "candle",
+  "make-a-wish": "cakescrapbook",
+  "the-party": "partychat",
+  "still-you": "filmstrip",
+  "our-map": "mapbrowser",
+  "written-in-the-stars": "celestialfan",
+  "sealed-with-love": "waxenvelope",
+  "midnight-notes": "midnightchat",
+  "forever-yours": "foreverscrapbook",
+  "the-question": "proposallayout",
+  "ring-box": "ringboxlayout",
+  "happily-ever-after": "fairytalelayout",
+  "little-sorry": "apologychat",
+  "white-flag": "trucelayout",
+  "make-it-right": "couponlayout",
+  "main-character": "magazinelayout",
+  "top-fan": "fandecklayout",
+  "girlfriend-of-the-year": "trophybrowser",
+  "for-maa": "recipelayout",
+  "maas-recipe": "recipesitelayout",
+  supermom: "supermomlayout",
+  "for-papa": "papalayout",
+  "dad-jokes": "dadjokeslayout",
+  "my-hero": "herolayout",
 };
 const fallbackLayouts: Layout[] = ["browser", "fan", "poster", "scrapbook", "envelope", "chat"];
 
@@ -92,11 +121,10 @@ type Gift = {
   fill: (t: string) => string;
   opening: string;
   kicker: string;
-  /** A stable per-template number, so picks (which meme, which reply) vary across cards. */
   seed: number;
 };
 
-function readGift(template: Template): Gift {
+export function readGift(template: Template): Gift {
   const story = template.story!;
   return {
     story,
@@ -109,8 +137,7 @@ function readGift(template: Template): Gift {
   };
 }
 
-/** The page that shows the most of the person: their photo, the scrapbook, the compliments. */
-function personalScene(scenes: Scene[]) {
+export function personalScene(scenes: Scene[]) {
   const order: Scene["type"][] = ["spotlight", "polaroids", "compliments", "letter", "deck", "jar", "wishes", "finale"];
   for (const type of order) {
     const s = scenes.find((x) => x.type === type && x !== scenes[0]);
@@ -119,7 +146,6 @@ function personalScene(scenes: Scene[]) {
   return scenes[1] ?? scenes[0];
 }
 
-/** Stickers used anywhere in the gift, memes first (board-pack ids start with "b-" or "m-"). */
 function giftStickers(scenes: Scene[]) {
   const ids = new Set<AnyStickerId>();
   for (const s of scenes) {
@@ -132,7 +158,6 @@ function giftStickers(scenes: Scene[]) {
   return [...memes, ...doodles, ...all.filter((id) => !/^[bm]-/.test(id))];
 }
 
-/** Every photo in the gift, padded with soft placeholders. */
 function giftPhotos(scenes: Scene[], count: number): Photo[] {
   const out: Photo[] = [];
   for (const s of scenes) {
@@ -149,7 +174,6 @@ function giftPhotos(scenes: Scene[], count: number): Photo[] {
   return unique.slice(0, count);
 }
 
-/** Short lines from the gift itself: notes, compliments, reasons, wishes. */
 function giftLines(scenes: Scene[]): string[] {
   for (const s of scenes) {
     if (s.type === "spotlight") return s.tags;
@@ -171,20 +195,54 @@ function scenePhoto(scene: Scene): Photo | null {
   return null;
 }
 
-/** The last couple of words of a line become the highlighted accent. */
 function accentTail(line: string, words = 2) {
   const parts = line.split(" ");
   if (parts.length <= words) return `*${line}*`;
   return `${parts.slice(0, -words).join(" ")} *${parts.slice(-words).join(" ")}*`;
 }
 
-/* ───────────── The card ───────────── */
+/* ───────────── The Static Mockup Card ───────────── */
 
 export function StoryMockup({ template, className }: { template: Template; className?: string }) {
   const g = readGift(template);
   const layout =
-    (g.story.format === "site" ? "site" : layoutFor[template.slug]) ?? fallbackLayouts[[...template.slug].reduce((n, c) => n + c.charCodeAt(0), 0) % fallbackLayouts.length];
-  const View = { site: SiteLayout, browser: BrowserLayout, fan: FanLayout, chat: ChatLayout, scrapbook: ScrapbookLayout, poster: PosterLayout, envelope: EnvelopeLayout }[layout];
+    (g.story.format === "site" ? "site" : layoutFor[template.slug]) ??
+    fallbackLayouts[[...template.slug].reduce((n, c) => n + c.charCodeAt(0), 0) % fallbackLayouts.length];
+
+  const View = {
+    candle: CandleLayout,
+    cakescrapbook: CakeScrapbookLayout,
+    partychat: PartyChatLayout,
+    filmstrip: FilmstripLayout,
+    mapbrowser: MapBrowserLayout,
+    celestialfan: CelestialFanLayout,
+    waxenvelope: WaxEnvelopeLayout,
+    midnightchat: MidnightChatLayout,
+    foreverscrapbook: ForeverScrapbookLayout,
+    proposallayout: ProposalPosterLayout,
+    ringboxlayout: RingBoxPhoneLayout,
+    fairytalelayout: FairyTaleFanLayout,
+    apologychat: ApologyChatLayout,
+    trucelayout: TruceEnvelopeLayout,
+    couponlayout: CouponScrapbookLayout,
+    magazinelayout: VipMagazineLayout,
+    fandecklayout: FanDeckLayout,
+    trophybrowser: TrophyBrowserLayout,
+    recipelayout: MaaLetterEnvelopeLayout,
+    recipesitelayout: RecipeBrowserLayout,
+    supermomlayout: SupermomChatLayout,
+    papalayout: PapaWatchLayout,
+    dadjokeslayout: ComedyDeckLayout,
+    herolayout: HeroScrapbookLayout,
+    site: SiteLayout,
+    browser: BrowserLayout,
+    fan: FanLayout,
+    chat: ChatLayout,
+    scrapbook: ScrapbookLayout,
+    poster: PosterLayout,
+    envelope: EnvelopeLayout,
+  }[layout] ?? PosterLayout;
+
   return (
     <div className={cn("@container relative aspect-[3/4] w-full select-none overflow-hidden rounded-[1.75rem]", className)}>
       <View g={g} />
@@ -215,7 +273,201 @@ function Stage({ children, style }: { children: ReactNode; style: CSSProperties 
   );
 }
 
-/* ───────────── 1. Browser + phone ───────────── */
+/* ───────────── 1. CANDLE (Midnight 11:59 pm bedroom lights) ───────────── */
+function CandleLayout({ g }: { g: Gift }) {
+  const { p, scenes } = g;
+  const lights = scenes[0];
+  const stickers = giftStickers(scenes);
+  return (
+    <Stage style={{ background: `radial-gradient(circle at 50% 35%, #ffb70333, transparent 65%), #171520` }}>
+      <Hearts color="#f59e0b" spots={[{ left: "10%", top: "75%", size: 4.5, delay: "0s" }, { left: "84%", top: "20%", size: 3.5, delay: "-3s" }]} />
+      {/* 11:59 pm ambient digital time glow */}
+      <div className="absolute inset-x-0 top-[6%] text-center font-mono text-[2.6cqw] uppercase tracking-[0.25em] text-amber-300/80">
+        11:59 PM · {g.kicker}
+      </div>
+
+      {/* Prominent phone showing the candle scene */}
+      <PhoneFrame className="bottom-[8%] left-[22%] w-[56%]" rotate={-3}>
+        <ScreenPeek scene={lights} g={g} className="aspect-[9/16]" />
+      </PhoneFrame>
+
+      {stickers.slice(0, 2).map((id, i) => (
+        <div key={id} aria-hidden className="absolute z-10 animate-float" style={[{ left: "6%", bottom: "12%", rotate: "-8deg" }, { right: "5%", top: "14%", rotate: "10deg", animationDelay: "-2.5s" }][i]}>
+          <Sticker id={id} className="size-[17cqw]" />
+        </div>
+      ))}
+    </Stage>
+  );
+}
+
+/* ───────────── 2. MAKE-A-WISH (Birthday Cake Scrapbook) ───────────── */
+function CakeScrapbookLayout({ g }: { g: Gift }) {
+  return <ScrapbookLayout g={g} />;
+}
+
+/* ───────────── 3. THE-PARTY (Group Chat Surprise) ───────────── */
+function PartyChatLayout({ g }: { g: Gift }) {
+  return <ChatLayout g={g} />;
+}
+
+/* ───────────── 4. STILL-YOU (Filmstrip Memories) ───────────── */
+function FilmstripLayout({ g }: { g: Gift }) {
+  const { p, scenes } = g;
+  const first = scenes[0];
+  const second = personalScene(scenes);
+  const photo = scenePhoto(second);
+  const stickers = giftStickers(scenes);
+  return (
+    <Stage style={{ background: `radial-gradient(100% 70% at 50% 0%, ${p.pink}, transparent 70%), ${p.bg}` }}>
+      <Hearts color={p.accent} spots={[{ left: "8%", top: "82%", size: 5, delay: "0s" }, { left: "86%", top: "16%", size: 4, delay: "-3s" }]} />
+      <p className="absolute inset-x-0 top-[7%] text-center font-mono text-[2.6cqw] uppercase tracking-[0.2em] opacity-75" style={{ color: p.fg }}>
+        {g.kicker}
+      </p>
+
+      {/* Tilted Photo frame */}
+      <div className="absolute left-[12%] top-[18%] w-[54%] bg-white p-[2cqw] pb-[7cqw] shadow-[0_4cqw_8cqw_-3cqw_rgba(0,0,0,0.35)]" style={{ rotate: "-6deg" }}>
+        <span className="absolute -top-[1.5cqw] left-1/2 h-[3cqw] w-[14cqw] -translate-x-1/2 rotate-2 opacity-80" style={{ backgroundColor: p.gold }} />
+        <PhotoFill src={photo?.src} tone={photo?.tone ?? "rose"} alt="" className="aspect-square w-full" iconClassName="size-[8cqw]" />
+        <span className="type-hand absolute inset-x-0 bottom-[1cqw] text-center text-[3.2cqw] text-[#2a1a1f]">
+          {g.opening}
+        </span>
+      </div>
+
+      {/* Phone peek */}
+      <PhoneFrame className="bottom-[6%] right-[8%] w-[42%]" rotate={8}>
+        <ScreenPeek scene={first} g={g} className="aspect-[9/16]" />
+      </PhoneFrame>
+
+      {stickers.slice(0, 2).map((id, i) => (
+        <div key={id} aria-hidden className="absolute z-10 animate-float" style={[{ left: "6%", bottom: "8%", rotate: "6deg" }, { right: "6%", top: "8%", rotate: "-10deg", animationDelay: "-2s" }][i]}>
+          <Sticker id={id} className="size-[16cqw]" />
+        </div>
+      ))}
+    </Stage>
+  );
+}
+
+/* ───────────── 5. OUR-MAP (Road Trip Map in Browser) ───────────── */
+function MapBrowserLayout({ g }: { g: Gift }) {
+  return <BrowserLayout g={g} />;
+}
+
+/* ───────────── 6. WRITTEN-IN-THE-STARS (Celestial Constellation Fan) ───────────── */
+function CelestialFanLayout({ g }: { g: Gift }) {
+  return <FanLayout g={g} />;
+}
+
+/* ───────────── 7. SEALED-WITH-LOVE (Wax Seal Envelope) ───────────── */
+function WaxEnvelopeLayout({ g }: { g: Gift }) {
+  return <EnvelopeLayout g={g} />;
+}
+
+/* ───────────── 8. MIDNIGHT-NOTES (Late Night 1-on-1 Chat) ───────────── */
+function MidnightChatLayout({ g }: { g: Gift }) {
+  return <ChatLayout g={g} />;
+}
+
+/* ───────────── 9. FOREVER-YOURS (Vintage Leather Journal) ───────────── */
+function ForeverScrapbookLayout({ g }: { g: Gift }) {
+  return <ScrapbookLayout g={g} />;
+}
+
+/* ───────────── 10. THE-QUESTION (Proposal Teaser) ───────────── */
+function ProposalPosterLayout({ g }: { g: Gift }) {
+  const { p, scenes } = g;
+  const question = scenes[0];
+  const stickers = giftStickers(scenes);
+  return (
+    <Stage style={{ background: `radial-gradient(circle at 50% 30%, ${p.accent}55, transparent 65%), #140d12` }}>
+      <Hearts color={p.accent} spots={[{ left: "12%", top: "20%", size: 5, delay: "0s" }, { left: "80%", top: "75%", size: 4, delay: "-3s" }]} />
+      <p className="absolute inset-x-0 top-[6%] text-center font-mono text-[2.4cqw] uppercase tracking-[0.25em] text-amber-200">
+        TOP SECRET · A QUESTION FOR YOU
+      </p>
+
+      <PhoneFrame className="bottom-[8%] left-[22%] w-[56%]" rotate={-2}>
+        <ScreenPeek scene={question} g={g} className="aspect-[9/16]" />
+      </PhoneFrame>
+
+      {stickers.slice(0, 2).map((id, i) => (
+        <div key={id} aria-hidden className="absolute z-10 animate-float" style={[{ left: "6%", top: "18%", rotate: "-8deg" }, { right: "6%", bottom: "12%", rotate: "8deg", animationDelay: "-2s" }][i]}>
+          <Sticker id={id} className="size-[18cqw]" />
+        </div>
+      ))}
+    </Stage>
+  );
+}
+
+/* ───────────── 11. RING-BOX (Velvet Box Mockup) ───────────── */
+function RingBoxPhoneLayout({ g }: { g: Gift }) {
+  return <EnvelopeLayout g={g} />;
+}
+
+/* ───────────── 12. HAPPILY-EVER-AFTER (Storybook Fan) ───────────── */
+function FairyTaleFanLayout({ g }: { g: Gift }) {
+  return <FanLayout g={g} />;
+}
+
+/* ───────────── 13. LITTLE-SORRY (Pleading Apology Chat) ───────────── */
+function ApologyChatLayout({ g }: { g: Gift }) {
+  return <ChatLayout g={g} />;
+}
+
+/* ───────────── 14. WHITE-FLAG (Peace Treaty Envelope) ───────────── */
+function TruceEnvelopeLayout({ g }: { g: Gift }) {
+  return <EnvelopeLayout g={g} />;
+}
+
+/* ───────────── 15. MAKE-IT-RIGHT (Coupon Scrapbook) ───────────── */
+function CouponScrapbookLayout({ g }: { g: Gift }) {
+  return <ScrapbookLayout g={g} />;
+}
+
+/* ───────────── 16. MAIN-CHARACTER (VIP Magazine Poster) ───────────── */
+function VipMagazineLayout({ g }: { g: Gift }) {
+  return <PosterLayout g={g} />;
+}
+
+/* ───────────── 17. TOP-FAN (Concert VIP Pass Deck) ───────────── */
+function FanDeckLayout({ g }: { g: Gift }) {
+  return <FanLayout g={g} />;
+}
+
+/* ───────────── 18. GIRLFRIEND-OF-THE-YEAR (Trophy Site) ───────────── */
+function TrophyBrowserLayout({ g }: { g: Gift }) {
+  return <BrowserLayout g={g} />;
+}
+
+/* ───────────── 19. FOR-MAA (Handwritten Recipe Envelope) ───────────── */
+function MaaLetterEnvelopeLayout({ g }: { g: Gift }) {
+  return <EnvelopeLayout g={g} />;
+}
+
+/* ───────────── 20. MAAS-RECIPE (Kitchen Recipe Browser) ───────────── */
+function RecipeBrowserLayout({ g }: { g: Gift }) {
+  return <BrowserLayout g={g} />;
+}
+
+/* ───────────── 21. SUPERMOM (Family Group Chat) ───────────── */
+function SupermomChatLayout({ g }: { g: Gift }) {
+  return <ChatLayout g={g} />;
+}
+
+/* ───────────── 22. FOR-PAPA (Classic Leather Watch Card) ───────────── */
+function PapaWatchLayout({ g }: { g: Gift }) {
+  return <PosterLayout g={g} />;
+}
+
+/* ───────────── 23. DAD-JOKES (Comedy Deck Fan) ───────────── */
+function ComedyDeckLayout({ g }: { g: Gift }) {
+  return <FanLayout g={g} />;
+}
+
+/* ───────────── 24. MY-HERO (Newspaper Scrapbook) ───────────── */
+function HeroScrapbookLayout({ g }: { g: Gift }) {
+  return <ScrapbookLayout g={g} />;
+}
+
+/* ───────────── Shared Layouts from Design Kit ───────────── */
 
 function BrowserLayout({ g }: { g: Gift }) {
   const { p, scenes, story } = g;
@@ -245,8 +497,6 @@ function BrowserLayout({ g }: { g: Gift }) {
     </Stage>
   );
 }
-
-/* ───────────── 2. Three phones, fanned ───────────── */
 
 function FanLayout({ g }: { g: Gift }) {
   const { p, scenes } = g;
@@ -282,8 +532,6 @@ function FanLayout({ g }: { g: Gift }) {
   );
 }
 
-/* ───────────── 3. A chat, like the gift was just sent ───────────── */
-
 const replies = ["omg stop", "I’m literally crying rn", "WHAT is this, you’re so cute", "okay I’m not crying, you are"];
 
 function ChatLayout({ g }: { g: Gift }) {
@@ -299,7 +547,6 @@ function ChatLayout({ g }: { g: Gift }) {
   return (
     <Stage style={{ background: `linear-gradient(160deg, ${p.pink}, ${p.accent}66)` }}>
       <div className="absolute inset-x-[7%] bottom-0 top-[5%] overflow-hidden rounded-t-[6cqw] border-x-[1.2cqw] border-t-[1.2cqw] border-[#1b1215] bg-[#efe7dd] shadow-[0_6cqw_12cqw_-6cqw_rgba(27,18,21,0.6)]">
-        {/* Chat header */}
         <div className="flex items-center gap-[2cqw] bg-white/85 px-[3.5cqw] py-[2.6cqw]">
           <span className="grid size-[8cqw] place-items-center rounded-full text-[3.6cqw] font-semibold" style={{ backgroundColor: p.accent, color: p.cream }}>
             {group ? story.recipient[0] : story.sender[0]}
@@ -325,7 +572,6 @@ function ChatLayout({ g }: { g: Gift }) {
               <Sticker id={meme} className="size-full" />
             </div>
           )}
-          {/* The gift link, as it arrives in the chat */}
           <div className="w-[78%] self-end overflow-hidden rounded-[3cqw] bg-[#dcf3d5] p-[1.2cqw] shadow-sm">
             <div className="overflow-hidden rounded-[2.2cqw]" style={{ backgroundColor: p.bg, color: p.fg }}>
               <div className="px-[3cqw] py-[3cqw] text-center">
@@ -359,8 +605,6 @@ function Bubble({ children, name, nameColor }: { children: ReactNode; name?: str
     </div>
   );
 }
-
-/* ───────────── 4. Scrapbook page ───────────── */
 
 function ScrapbookLayout({ g }: { g: Gift }) {
   const { p, scenes, story } = g;
@@ -415,8 +659,6 @@ function ScrapbookLayout({ g }: { g: Gift }) {
   );
 }
 
-/* ───────────── 5. Poster: the opening line, big ───────────── */
-
 function PosterLayout({ g }: { g: Gift }) {
   const { p, scenes } = g;
   const stickers = giftStickers(scenes);
@@ -448,8 +690,6 @@ function PosterLayout({ g }: { g: Gift }) {
   );
 }
 
-/* ───────────── 6. Envelope with a letter sliding out ───────────── */
-
 function EnvelopeLayout({ g }: { g: Gift }) {
   const { p, scenes, story, fill } = g;
   const letter = scenes.find((s): s is Extract<Scene, { type: "letter" }> => s.type === "letter");
@@ -458,21 +698,17 @@ function EnvelopeLayout({ g }: { g: Gift }) {
   return (
     <Stage style={{ background: `radial-gradient(100% 70% at 50% 0%, ${p.pink}, transparent 70%), ${p.bg}` }}>
       <Hearts color={p.accent} spots={[{ left: "10%", top: "10%", size: 4.5, delay: "0s" }, { left: "84%", top: "18%", size: 3.5, delay: "-3s" }]} />
-      {/* Envelope back */}
       <div className="absolute inset-x-[9%] bottom-[10%] h-[46%] rounded-[3cqw]" style={{ backgroundColor: p.accent }} />
-      {/* The letter, half out */}
       <div className="absolute inset-x-[15%] top-[12%] h-[58%] rounded-[2cqw] px-[5cqw] py-[5cqw] shadow-[0_3cqw_6cqw_-3cqw_rgba(0,0,0,.35)]" style={{ backgroundColor: p.cream, color: p.ink, rotate: "-2deg", backgroundImage: `repeating-linear-gradient(transparent 0 6.4cqw, ${p.ink}14 6.4cqw 6.6cqw)`, backgroundPosition: "0 4cqw" }}>
         <p className="type-hand text-[5.6cqw] font-bold leading-[6.5cqw]" style={{ color: p.accent }}>
           Dear {story.recipient},
         </p>
         <p className="type-hand mt-[1cqw] line-clamp-4 text-[4cqw] leading-[6.5cqw]">{fill(line)}</p>
       </div>
-      {/* Envelope front pocket */}
       <div
         className="absolute inset-x-[9%] bottom-[10%] h-[34%] rounded-b-[3cqw]"
         style={{ backgroundColor: p.accent, clipPath: "polygon(0 0, 50% 46%, 100% 0, 100% 100%, 0 100%)", filter: "brightness(0.93)" }}
       />
-      {/* Wax seal */}
       <div className="absolute bottom-[25%] left-1/2 grid size-[15cqw] -translate-x-1/2 place-items-center rounded-full shadow-[0_1.5cqw_3cqw_-1cqw_rgba(0,0,0,.5)]" style={{ background: `radial-gradient(circle at 35% 30%, ${p.gold}, ${p.accent} 75%)` }}>
         <Heart className="size-[6cqw] fill-current" style={{ color: p.cream }} />
       </div>
@@ -485,8 +721,6 @@ function EnvelopeLayout({ g }: { g: Gift }) {
   );
 }
 
-/* ───────────── 7. Website gift: a scrolling page in a browser ───────────── */
-
 function SiteLayout({ g }: { g: Gift }) {
   const { p, scenes, story } = g;
   const hero = scenes.find((s): s is Extract<Scene, { type: "hero" }> => s.type === "hero");
@@ -497,7 +731,6 @@ function SiteLayout({ g }: { g: Gift }) {
   const serif = "font-serif font-semibold tracking-[-0.02em]";
   return (
     <Stage style={{ background: `radial-gradient(90% 60% at 0% 0%, ${p.pink}, transparent 70%), radial-gradient(80% 60% at 100% 100%, ${p.accent}30, transparent 70%), ${p.bg}` }}>
-      {/* Browser with the page */}
       <div className="absolute left-[6%] top-[5%] w-[80%] overflow-hidden rounded-[3cqw] bg-white shadow-[0_6cqw_12cqw_-6cqw_rgba(27,18,21,0.5)]">
         <div className="flex h-[6cqw] items-center gap-[1.2cqw] px-[3cqw]">
           {["#ff6b6b", "#ffc74d", "#5ad17a"].map((c) => (
@@ -505,7 +738,6 @@ function SiteLayout({ g }: { g: Gift }) {
           ))}
           <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.5cqw] font-mono text-[1.9cqw] text-black/50">tynitales.com/for-{story.recipient.toLowerCase()}</span>
         </div>
-        {/* Hero */}
         <div className="relative aspect-[4/3.2] overflow-hidden">
           <PhotoFill src={hero?.photo} tone={hero?.tone ?? "rose"} alt="" className="size-full" iconClassName="size-[8cqw]" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,0) 40%, rgba(0,0,0,.55))" }} />
@@ -522,7 +754,6 @@ function SiteLayout({ g }: { g: Gift }) {
           </p>
           {hero?.subtitle && <p className={cn(serif, "absolute bottom-[4cqw] left-[4cqw] text-[5.6cqw] leading-none text-white")}>{g.fill(hero.subtitle)}</p>}
         </div>
-        {/* Below the fold: countdown or the first note */}
         <div className="px-[4cqw] py-[3.5cqw]" style={{ backgroundColor: p.bg, color: p.fg }}>
           {countdown ? (
             <div className="grid grid-cols-4 gap-[1.4cqw]">
@@ -542,7 +773,6 @@ function SiteLayout({ g }: { g: Gift }) {
         </div>
       </div>
 
-      {/* Phone, scrolled down to the photos */}
       <PhoneFrame className="bottom-[4%] right-[5%] w-[36%]" rotate={5}>
         <div className="relative aspect-[9/16] overflow-hidden px-[2.6cqw] pt-[5cqw]" style={{ backgroundColor: p.bg, color: p.fg }}>
           <p className="font-mono text-[1.4cqw] uppercase opacity-60">Our archive</p>
@@ -564,9 +794,9 @@ function SiteLayout({ g }: { g: Gift }) {
   );
 }
 
-/* ───────────── Shared bits ───────────── */
+/* ───────────── Shared Frame & Screen Peek ───────────── */
 
-function PhoneFrame({ children, className, rotate = 0, style }: { children: ReactNode; className?: string; rotate?: number; style?: CSSProperties }) {
+export function PhoneFrame({ children, className, rotate = 0, style }: { children: ReactNode; className?: string; rotate?: number; style?: CSSProperties }) {
   return (
     <div
       className={cn("absolute overflow-hidden rounded-[5cqw] border-[1.2cqw] border-[#1b1215] bg-[#1b1215] shadow-[0_6cqw_10cqw_-5cqw_rgba(27,18,21,0.55)]", className)}
@@ -577,8 +807,7 @@ function PhoneFrame({ children, className, rotate = 0, style }: { children: Reac
   );
 }
 
-/** A miniature of one gift page: label, headline, and its picture. */
-function ScreenPeek({ scene, g, className, big = false }: { scene: Scene; g: Gift; className?: string; big?: boolean }) {
+export function ScreenPeek({ scene, g, className, big = false }: { scene: Scene; g: Gift; className?: string; big?: boolean }) {
   const palette = { ...g.p, ...scene.palette };
   const photo = scenePhoto(scene);
   const title = g.fill(scene.type === "question" ? scene.question : scene.title);
@@ -623,6 +852,216 @@ function ScreenPeek({ scene, g, className, big = false }: { scene: Scene; g: Gif
           {g.fill(scene.hint)}
         </span>
       )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   AUTHENTIC FLOW VIDEO / GIF PREVIEW (PLAYS ON HOVER)
+   Renders the REAL scenes of that specific gift sliding in sequence!
+   ═══════════════════════════════════════════════════════════════════ */
+
+export function FlowVideoPreview({ template }: { template: Template }) {
+  if (template.story?.format === "site") {
+    return <SiteFlowVideo template={template} />;
+  }
+  if (!template.story) {
+    return <ClassicCardFlowVideo template={template} />;
+  }
+  return <StoryFlowVideo template={template} />;
+}
+
+function StoryFlowVideo({ template }: { template: Template }) {
+  const g = readGift(template);
+  const { p, scenes } = g;
+  const s1 = scenes[0];
+  const s2 = scenes[1] ?? scenes[0];
+  const s3 = personalScene(scenes);
+  const s4 = scenes[scenes.length - 1];
+
+  return (
+    <div className="relative h-full w-full overflow-hidden select-none" style={{ backgroundColor: p.bg, color: p.fg }}>
+      {/* Soft ambient lighting */}
+      <div className="absolute inset-0 bg-radial from-black/10 via-transparent to-black/35 pointer-events-none" />
+
+      {/* Floating recording pill */}
+      <div className="absolute left-[4cqw] top-[4cqw] z-30 flex items-center gap-[1.2cqw] rounded-full bg-black/60 px-[2.8cqw] py-[0.9cqw] text-white backdrop-blur-md">
+        <span className="size-[1.6cqw] rounded-full bg-rose-500 animate-pulse" />
+        <span className="font-mono text-[2.2cqw] font-semibold tracking-wider">FLOW PREVIEW</span>
+      </div>
+
+      {/* Centered Phone Screen with real slides */}
+      <div className="absolute inset-x-[18%] bottom-[4%] top-[10%] overflow-hidden rounded-[5.5cqw] border-[1.2cqw] border-[#1b1215] bg-[#1b1215] shadow-[0_8cqw_16cqw_-6cqw_rgba(0,0,0,0.6)]">
+        {/* iOS Island */}
+        <div className="absolute left-1/2 top-[1.2cqw] z-30 h-[1.8cqw] w-[14cqw] -translate-x-1/2 rounded-full bg-black" />
+
+        {/* 4 Segmented Story Progress Bars */}
+        <div className="absolute inset-x-[3cqw] top-[3.8cqw] z-30 grid grid-cols-4 gap-[1cqw]">
+          {[0, 1, 2, 3].map((step) => (
+            <div key={step} className="h-[0.7cqw] overflow-hidden rounded-full bg-black/30 backdrop-blur-xs">
+              <div
+                className="h-full rounded-full"
+                style={{
+                  backgroundColor: p.accent,
+                  animation: `storySeg${step} 4.8s linear infinite`,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* 4-Slide Track swiping smoothly between real scenes */}
+        <div
+          className="flex h-full w-[400%]"
+          style={{
+            animation: "flowPhoneSwipe 4.8s cubic-bezier(0.22, 1, 0.36, 1) infinite",
+          }}
+        >
+          {/* Slide 1: Opener Scene */}
+          <div className="relative h-full w-1/4">
+            <ScreenPeek scene={s1} g={g} className="h-full justify-center px-[3cqw] pt-[7cqw]" />
+            {/* Animated Tapping Finger Gesture */}
+            <div
+              className="pointer-events-none absolute bottom-[18%] right-[22%] grid size-[7cqw] place-items-center rounded-full bg-white text-ink shadow-lg"
+              style={{ animation: "flowTapGesture 4.8s ease-in-out infinite" }}
+            >
+              <Sparkles className="size-[3.5cqw] text-amber-500" />
+            </div>
+          </div>
+
+          {/* Slide 2: Interactive Game / Secret Scene */}
+          <div className="relative h-full w-1/4">
+            <ScreenPeek scene={s2} g={g} className="h-full justify-center px-[3cqw] pt-[7cqw]" />
+          </div>
+
+          {/* Slide 3: Personal Photos / Memories Scene */}
+          <div className="relative h-full w-1/4">
+            <ScreenPeek scene={s3} g={g} className="h-full justify-center px-[3cqw] pt-[7cqw]" />
+          </div>
+
+          {/* Slide 4: Finale & Celebration Scene */}
+          <div className="relative h-full w-1/4">
+            <ScreenPeek scene={s4} g={g} className="h-full justify-center px-[3cqw] pt-[7cqw]" />
+            {/* Confetti Explosion Burst on Slide 4 */}
+            <div
+              className="pointer-events-none absolute inset-0 overflow-hidden"
+              style={{ animation: "flowConfettiBurst 4.8s ease-out infinite" }}
+            >
+              {[
+                { left: "20%", top: "25%", color: "#f59e0b", size: "2.5cqw" },
+                { left: "75%", top: "30%", color: "#ef4444", size: "3cqw" },
+                { left: "30%", top: "70%", color: "#3b82f6", size: "2cqw" },
+                { left: "70%", top: "65%", color: "#10b981", size: "2.8cqw" },
+                { left: "50%", top: "20%", color: "#ec4899", size: "3.2cqw" },
+              ].map((c, idx) => (
+                <span
+                  key={idx}
+                  className="absolute rounded-full animate-ping"
+                  style={{
+                    left: c.left,
+                    top: c.top,
+                    backgroundColor: c.color,
+                    width: c.size,
+                    height: c.size,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SiteFlowVideo({ template }: { template: Template }) {
+  const g = readGift(template);
+  const { p, scenes, story } = g;
+  const hero = scenes.find((s) => s.type === "hero");
+  const countdown = scenes.find((s) => s.type === "countdown");
+  const photos = giftPhotos(scenes, 3);
+
+  return (
+    <div className="relative h-full w-full overflow-hidden select-none" style={{ backgroundColor: p.bg, color: p.fg }}>
+      {/* Recording badge */}
+      <div className="absolute left-[4cqw] top-[4cqw] z-30 flex items-center gap-[1.2cqw] rounded-full bg-black/60 px-[2.8cqw] py-[0.9cqw] text-white backdrop-blur-md">
+        <span className="size-[1.6cqw] rounded-full bg-rose-500 animate-pulse" />
+        <span className="font-mono text-[2.2cqw] font-semibold tracking-wider">WEBSITE FLOW</span>
+      </div>
+
+      {/* Mini Browser window */}
+      <div className="absolute inset-x-[10%] bottom-[4%] top-[12%] overflow-hidden rounded-[3.5cqw] border-[1.2cqw] border-[#1b1215] bg-white shadow-[0_8cqw_16cqw_-6cqw_rgba(0,0,0,0.5)]">
+        <div className="flex h-[6cqw] items-center gap-[1.2cqw] border-b border-black/10 bg-[#f4ece3] px-[3cqw]">
+          <span className="size-[1.6cqw] rounded-full bg-rose-400" />
+          <span className="size-[1.6cqw] rounded-full bg-amber-400" />
+          <span className="size-[1.6cqw] rounded-full bg-emerald-400" />
+          <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.5cqw] font-mono text-[1.8cqw] text-black/50 truncate max-w-[65%]">
+            tynitales.com/for-{story.recipient.toLowerCase()}
+          </span>
+        </div>
+
+        {/* Smoothly scrolling page flow */}
+        <div
+          className="flex flex-col gap-[2.5cqw] p-[3cqw]"
+          style={{ animation: "flowSiteScroll 5s ease-in-out infinite" }}
+        >
+          <div className="aspect-[4/3] rounded-2xl overflow-hidden relative" style={{ backgroundColor: p.accent }}>
+            <PhotoFill src={hero?.photo} tone="rose" alt="" className="size-full" iconClassName="size-[8cqw]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-[3cqw]">
+              <p className="font-serif text-[4cqw] text-white font-bold leading-tight">
+                {g.fill(hero?.title ?? g.opening)}
+              </p>
+            </div>
+          </div>
+
+          {countdown && (
+            <div className="rounded-xl p-[2.5cqw] text-center" style={{ backgroundColor: `${p.accent}20` }}>
+              <span className="font-mono text-[1.6cqw] uppercase block opacity-60">Live Countdown</span>
+              <div className="grid grid-cols-4 gap-[1cqw] mt-[1cqw]">
+                {["124", "08", "42", "17"].map((v, i) => (
+                  <div key={i} className="rounded-md bg-white py-[1cqw] text-center">
+                    <span className="font-mono font-bold text-[2.8cqw] block">{v}</span>
+                    <span className="text-[1.4cqw] uppercase opacity-50 block">{["days", "hrs", "min", "sec"][i]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-3 gap-[1.5cqw]">
+            {photos.map((ph, i) => (
+              <div key={i} className="aspect-square rounded-lg bg-white p-[0.8cqw] shadow-xs">
+                <PhotoFill src={ph.src} tone={ph.tone} alt="" className="size-full rounded-md" iconClassName="size-[4cqw]" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ClassicCardFlowVideo({ template }: { template: Template }) {
+  const { palette, preview } = template;
+  return (
+    <div className="relative h-full w-full overflow-hidden select-none" style={{ backgroundColor: palette.bg, color: palette.fg }}>
+      {/* Recording pill */}
+      <div className="absolute left-[4cqw] top-[4cqw] z-30 flex items-center gap-[1.2cqw] rounded-full bg-black/60 px-[2.8cqw] py-[0.9cqw] text-white backdrop-blur-md">
+        <span className="size-[1.6cqw] rounded-full bg-rose-500 animate-pulse" />
+        <span className="font-mono text-[2.2cqw] font-semibold tracking-wider">GIFT UNBOXING</span>
+      </div>
+
+      {/* Envelope & letter sliding out */}
+      <div className="absolute inset-x-[12%] bottom-[8%] top-[14%] overflow-hidden rounded-3xl bg-white/40 p-[4cqw] shadow-lg backdrop-blur-md flex flex-col justify-between text-center">
+        <div className="my-auto">
+          <span className="font-mono text-[2.2cqw] uppercase tracking-wider opacity-70 block">{preview.kicker}</span>
+          <p className="type-display mt-[1.5cqw] text-[6.5cqw] font-semibold leading-tight">{preview.title}</p>
+          <p className="mt-[2cqw] font-serif text-[3.4cqw] italic opacity-80">{preview.signoff}</p>
+        </div>
+        <div className="flex justify-center">
+          <Heart className="size-[8cqw] fill-rose-500 text-rose-500 animate-bounce" />
+        </div>
+      </div>
     </div>
   );
 }
