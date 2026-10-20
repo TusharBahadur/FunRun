@@ -1,12 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, Check, Eye, Loader2, Redo2, RotateCcw, Undo2, X } from "lucide-react";
+import { ArrowLeft, Check, Eye, Loader2, Redo2, RotateCcw, Undo2, X, Laptop, Smartphone, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { StudioFrameMessage } from "@/app/studio/frame/page";
 import type { SceneType, Story } from "@/components/story/types";
-import { formatInr } from "@/lib/utils";
+import { cn, formatInr } from "@/lib/utils";
 import { AddSection } from "./add-section";
 import { Canvas, type DeviceMode } from "./canvas";
 import { Checkout } from "./checkout";
@@ -32,6 +32,17 @@ export function Studio({ template }: { template: StudioTemplate }) {
   const [preview, setPreview] = useState(false);
   const [mobilePane, setMobilePane] = useState<MobilePane>("edit");
   const wide = useMinLg();
+  const [userScreen, setUserScreen] = useState<"desktop" | "phone">("desktop");
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "phone" | "auto">("auto");
+
+  useEffect(() => {
+    const detect = () => {
+      setUserScreen(window.innerWidth >= 1024 ? "desktop" : "phone");
+    };
+    detect();
+    window.addEventListener("resize", detect);
+    return () => window.removeEventListener("resize", detect);
+  }, []);
   // A draft saved before the template was rewritten would hide the new version.
   const outdated = draft.base !== initial.base;
   const frames = useRef(new Map<string, HTMLIFrameElement>());
@@ -117,11 +128,11 @@ export function Studio({ template }: { template: StudioTemplate }) {
         <Link href={`/templates/${template.slug}`} aria-label="Back to the template" className="grid size-9 place-items-center rounded-lg hover:bg-paper">
           <ArrowLeft className="size-4" />
         </Link>
-        <TopButton label="Undo (⌘Z)" onClick={undo} disabled={!canUndo}>
+        <TopButton label="Undo (ÃƒÂ¢Ã…â€™Ã‹Å“Z)" onClick={undo} disabled={!canUndo}>
           <Undo2 className="size-4" />
         </TopButton>
         <span className="hidden items-center sm:flex">
-          <TopButton label="Redo (⇧⌘Z)" onClick={redo} disabled={!canRedo}>
+          <TopButton label="Redo (ÃƒÂ¢Ã¢â‚¬Â¡Ã‚Â§ÃƒÂ¢Ã…â€™Ã‹Å“Z)" onClick={redo} disabled={!canRedo}>
             <Redo2 className="size-4" />
           </TopButton>
           <TopButton
@@ -150,7 +161,7 @@ export function Studio({ template }: { template: StudioTemplate }) {
                 <Loader2 className="size-3 animate-spin" /> Saving
               </>
             ) : saved === "failed" ? (
-              <span className="text-rose-deep">Couldn’t save · try fewer photos</span>
+              <span className="text-rose-deep">CouldnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t save Ãƒâ€šÃ‚Â· try fewer photos</span>
             ) : (
               <>
                 <Check className="size-3" /> Saved on this device
@@ -255,21 +266,101 @@ export function Studio({ template }: { template: StudioTemplate }) {
         onPublished={(live) => edit({ ...draft, live })}
       />
 
-      {/* Full-screen preview: plays exactly like the real gift */}
+      {/* Full-screen preview: automatically matches user's screen (phone vs desktop) */}
       <AnimatePresence>
         {preview && (
-          <motion.div className="fixed inset-0 z-[90] flex flex-col items-center justify-center bg-ink/80 p-4 backdrop-blur" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <button
-              type="button"
-              onClick={() => setPreview(false)}
-              className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-paper px-4 py-2 text-sm font-medium"
-            >
-              <X className="size-4" /> Close preview
-            </button>
-            <div className="h-[min(88vh,844px)] w-[min(92vw,calc(min(88vh,844px)*390/844))] overflow-hidden rounded-[2rem] border-[8px] border-ink bg-paper">
-              <iframe ref={previewFrame} src="/studio/frame" title="Preview of your gift" className="size-full border-0" onLoad={postPreview} />
+          <motion.div
+            className="fixed inset-0 z-[90] flex flex-col items-center justify-center bg-ink/85 p-3 sm:p-5 backdrop-blur-md"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {/* Top Toolbar: Screen size switcher + Close button */}
+            <div className="mb-3 flex w-full max-w-5xl items-center justify-between gap-3">
+              {/* Device Selector */}
+              <div className="flex items-center gap-1 rounded-full bg-cream/95 p-1 backdrop-blur-sm border border-line/60 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice("phone")}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all",
+                    (previewDevice === "phone" || (previewDevice === "auto" && userScreen === "phone"))
+                      ? "bg-ink text-paper shadow-xs"
+                      : "text-muted hover:text-ink",
+                  )}
+                >
+                  <Smartphone className="size-3.5" />
+                  <span>Phone (390px)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice("desktop")}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all",
+                    (previewDevice === "desktop" || (previewDevice === "auto" && userScreen === "desktop"))
+                      ? "bg-ink text-paper shadow-xs"
+                      : "text-muted hover:text-ink",
+                  )}
+                >
+                  <Laptop className="size-3.5" />
+                  <span>Desktop (1240px)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice("auto")}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all",
+                    previewDevice === "auto"
+                      ? "bg-rose-deep text-paper shadow-xs"
+                      : "text-muted hover:text-ink",
+                  )}
+                >
+                  <Sparkles className="size-3" />
+                  <span>Auto: {userScreen === "desktop" ? "Desktop" : "Phone"}</span>
+                </button>
+              </div>
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setPreview(false)}
+                className="flex items-center gap-1.5 rounded-full bg-paper px-4 py-2 text-sm font-medium text-ink shadow-sm hover:bg-cream transition-colors"
+              >
+                <X className="size-4" /> Close preview
+              </button>
             </div>
-            <p className="type-label mt-3 text-[10px] text-paper/70">This is exactly what they’ll see</p>
+
+            {/* Viewport container adapted to user's screen */}
+            {(previewDevice === "desktop" || (previewDevice === "auto" && userScreen === "desktop")) ? (
+              /* Desktop Widescreen Mockup */
+              <div className="flex h-[min(84vh,800px)] w-[min(94vw,1240px)] flex-col overflow-hidden rounded-2xl border-[8px] border-ink bg-paper shadow-2xl transition-all duration-300">
+                <div className="flex h-9 items-center gap-2 border-b border-line bg-cream px-4 shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="size-2.5 rounded-full bg-rose-400" />
+                    <span className="size-2.5 rounded-full bg-amber-400" />
+                    <span className="size-2.5 rounded-full bg-emerald-400" />
+                  </div>
+                  <div className="mx-auto rounded-full bg-paper px-4 py-0.5 font-mono text-[11px] text-muted border border-line truncate max-w-[60%]">
+                    tynitales.gift/for/{draft.story.recipient.toLowerCase()}
+                  </div>
+                </div>
+                <div className="flex-1 w-full min-h-0 bg-paper">
+                  <iframe ref={previewFrame} src="/studio/frame" title="Preview of your gift" className="size-full border-0" onLoad={postPreview} />
+                </div>
+              </div>
+            ) : (
+              /* Mobile Phone Mockup */
+              <div className="relative flex h-[min(88vh,844px)] w-[min(92vw,390px)] flex-col overflow-hidden rounded-[2.5rem] border-[8px] border-ink bg-paper shadow-2xl transition-all duration-300">
+                <div className="absolute left-1/2 top-2 z-20 h-4 w-24 -translate-x-1/2 rounded-full bg-ink pointer-events-none" />
+                <div className="flex-1 w-full min-h-0 bg-paper">
+                  <iframe ref={previewFrame} src="/studio/frame" title="Preview of your gift" className="size-full border-0" onLoad={postPreview} />
+                </div>
+              </div>
+            )}
+
+            <p className="type-label mt-2.5 text-[10px] text-paper/70">
+              Showing {(previewDevice === "desktop" || (previewDevice === "auto" && userScreen === "desktop")) ? "Desktop Widescreen Preview" : "Phone Preview"} Â· Matches your screen size
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
