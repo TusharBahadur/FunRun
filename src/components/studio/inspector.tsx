@@ -21,15 +21,11 @@ import {
   TextInput,
   Toggle,
 } from "@/components/editor/fields";
-import {
-  accentMoodOrder,
-  accentMoods,
-  accentMoodStyle,
-} from "@/components/experiences/birthday/accent-moods";
 import type { StoryPalette } from "@/components/story/types";
 import { palettes } from "@/data/stories/shared";
 import { cn } from "@/lib/utils";
 import { imageToDataUrl, type Draft } from "./draft-store";
+import { FontChoices } from "./font-choices";
 import {
   addItem,
   deleteItem,
@@ -57,7 +53,7 @@ export type Selection = { scene: number | null; item: number | null };
 type Edit = (next: Draft, tag?: string) => void;
 type Rec = Record<string, unknown>;
 
-const paletteFields: { key: keyof StoryPalette; label: string }[] = [
+export const paletteFields: { key: keyof StoryPalette; label: string }[] = [
   { key: "bg", label: "Background" },
   { key: "fg", label: "Text" },
   { key: "accent", label: "Highlight & buttons" },
@@ -191,33 +187,13 @@ function PageSettings({ draft, edit }: { draft: Draft; edit: Edit }) {
         </div>
       </Group>
 
-      <Group title="Highlight style">
-        <div className="grid grid-cols-2 gap-2">
-          {accentMoodOrder.map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setStory({ accentFont: m })}
-              className={cn(
-                "rounded-xl border px-3 py-2 text-left",
-                (story.accentFont ?? "classic") === m
-                  ? "border-ink bg-paper"
-                  : "border-line hover:border-ink/30",
-              )}
-            >
-              <span
-                className="block text-xl leading-tight"
-                style={{ ...accentMoodStyle(m), color: "var(--color-rose)" }}
-              >
-                {story.recipient || "Maya"}
-              </span>
-              <span className="type-label text-[9px] text-muted">
-                {accentMoods[m].name}
-              </span>
-            </button>
-          ))}
-        </div>
-      </Group>
+      <FontChoices
+        font={story.font ?? "classic"}
+        accent={story.accentFont ?? "classic"}
+        sample={story.recipient || "Maya"}
+        onFont={(font) => setStory({ font })}
+        onAccent={(accentFont) => setStory({ accentFont })}
+      />
 
       <Group title="Music">
         <select
@@ -403,7 +379,7 @@ const STICKER_SPOTS: StickerSpot[] = ["tr", "bl", "tl", "br", "mr", "ml"];
 const MAX_STICKERS = 3;
 
 /** Pick up to three stickers; each takes the next free corner. */
-function SceneStickers({
+export function SceneStickers({
   stickers,
   onChange,
 }: {
@@ -431,7 +407,7 @@ function SceneStickers({
 }
 
 /** The sticker that pops up once the page is finished. */
-function SceneReaction({
+export function SceneReaction({
   value,
   onChange,
 }: {
@@ -503,7 +479,7 @@ function StickerGrid({
   );
 }
 
-function SceneColours({
+export function SceneColours({
   draft,
   i,
   edit,
@@ -665,23 +641,25 @@ function ItemInspector({
   );
 }
 
-function PhotoPicker({
+export function PhotoPicker({
   draft,
   src,
   onChange,
   label = "Photo",
   hint,
+  roomy,
 }: {
   draft: Draft;
   src?: string;
   onChange: (src: string | undefined) => void;
   label?: string;
   hint?: string;
+  roomy?: boolean;
 }) {
   return (
-    <Field label={label} hint={hint}>
+    <Field label={label} hint={hint} roomy={roomy}>
       <div className="flex items-center gap-3">
-        <label className="relative grid size-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-xl bg-line/60 text-muted">
+        <label className={cn("relative grid shrink-0 cursor-pointer place-items-center overflow-hidden rounded-xl bg-line/60 text-muted", roomy ? "size-24" : "size-20")}>
           {src ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={src} alt="" className="size-full object-cover" />
@@ -739,17 +717,20 @@ function PhotoPicker({
 
 /* ───────────── Field rendering ───────────── */
 
-function FieldEditor({
+export function FieldEditor({
   field,
   value,
   onChange,
   draft,
+  roomy,
 }: {
   field: FieldDef;
   value: unknown;
   onChange: (v: unknown) => void;
   draft: Draft;
+  roomy?: boolean;
 }) {
+  const input = roomy ? "min-h-12 text-base" : undefined;
   switch (field.kind) {
     case "image":
       return (
@@ -759,32 +740,35 @@ function FieldEditor({
           hint={field.help}
           src={value as string | undefined}
           onChange={onChange}
+          roomy={roomy}
         />
       );
     case "text":
       return (
-        <Field label={field.label} hint={field.help}>
+        <Field label={field.label} hint={field.help} roomy={roomy}>
           <TextInput
             value={String(value ?? "")}
             maxLength={field.max}
             placeholder={field.placeholder}
             onChange={(e) => onChange(e.target.value)}
+            className={input}
           />
         </Field>
       );
     case "textarea":
       return (
-        <Field label={field.label} hint={field.help}>
+        <Field label={field.label} hint={field.help} roomy={roomy}>
           <TextArea
             value={String(value ?? "")}
             maxLength={field.max}
             onChange={(e) => onChange(e.target.value)}
+            className={input}
           />
         </Field>
       );
     case "number":
       return (
-        <Field label={field.label}>
+        <Field label={field.label} roomy={roomy}>
           <TextInput
             type="number"
             min={field.min}
@@ -798,16 +782,17 @@ function FieldEditor({
                 ),
               )
             }
+            className={input}
           />
         </Field>
       );
     case "select":
       return (
-        <Field label={field.label}>
+        <Field label={field.label} roomy={roomy}>
           <select
             value={String(value ?? "")}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full rounded-2xl border border-line bg-paper px-4 py-3 text-[15px] outline-none focus:border-ink/40"
+            className={cn("w-full rounded-2xl border border-line bg-paper px-4 py-3 text-[15px] outline-none focus:border-ink/40", input)}
           >
             {field.options.map((o) => (
               <option key={o.value} value={o.value}>
@@ -824,7 +809,7 @@ function FieldEditor({
     case "multi": {
       const chosen = (value as string[]) ?? [];
       return (
-        <Field label={`${field.label} (${field.min}–${field.max})`}>
+        <Field label={`${field.label} (${field.min}–${field.max})`} roomy={roomy}>
           <div className="flex flex-wrap gap-2">
             {field.options.map((o) => {
               const on = chosen.includes(o.value);
@@ -839,7 +824,8 @@ function FieldEditor({
                       onChange([...chosen, o.value]);
                   }}
                   className={cn(
-                    "rounded-full border px-3 py-1.5 text-sm",
+                    "rounded-full border px-3 text-sm",
+                    roomy ? "min-h-11 px-4 text-base" : "py-1.5",
                     on ? "border-ink bg-ink text-paper" : "border-line",
                   )}
                 >
@@ -855,13 +841,13 @@ function FieldEditor({
       // Nested lists (e.g. a quiz question's answers) are edited inline.
       const items = (value as string[]) ?? [];
       return (
-        <Field label={field.label}>
+        <Field label={field.label} roomy={roomy}>
           <div className="space-y-2">
             {items.map((s, k) => (
               <div key={k} className="flex items-center gap-2">
                 <TextInput
                   value={s}
-                  className="py-2"
+                  className={roomy ? "min-h-12 text-base" : "py-2"}
                   onChange={(e) =>
                     onChange(
                       items.map((x, m) => (m === k ? e.target.value : x)),
@@ -881,7 +867,7 @@ function FieldEditor({
               <button
                 type="button"
                 onClick={() => onChange([...items, ""])}
-                className="flex items-center gap-1.5 text-sm text-muted hover:text-ink"
+                className={cn("flex items-center gap-1.5 text-muted hover:text-ink", roomy ? "min-h-11 text-base" : "text-sm")}
               >
                 <Plus className="size-3.5" /> Add{" "}
                 {field.itemLabel.toLowerCase()}

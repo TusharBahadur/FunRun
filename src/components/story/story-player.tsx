@@ -8,6 +8,7 @@ import { MusicBox } from "@/components/experiences/music-box";
 import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { accentMoodVars } from "@/components/experiences/birthday/accent-moods";
+import { giftFontVars } from "./gift-fonts";
 import { melodies } from "./melodies";
 import { StoryContext, type SceneProps, type StoryApi } from "./scene-kit";
 import { SCENES } from "./scene-registry";
@@ -148,8 +149,9 @@ function PagesPlayer({
   return (
     <StoryContext.Provider value={api}>
       <div
+        data-gift-font={story.font ?? "classic"}
         className="relative isolate min-h-svh overflow-x-hidden transition-colors duration-700"
-        style={{ backgroundColor: palette.bg, color: palette.fg, ...accentMoodVars(story.accentFont ?? "classic") }}
+        style={{ backgroundColor: palette.bg, color: palette.fg, ...accentMoodVars(story.accentFont ?? "classic"), ...giftFontVars(story.font) }}
       >
         <Confetti ref={confetti} colors={[palette.accent, palette.gold, palette.pink, palette.cream, palette.fg]} />
 

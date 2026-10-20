@@ -6,13 +6,15 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { StudioFrameMessage } from "@/app/studio/frame/page";
 import type { SceneType, Story } from "@/components/story/types";
-import { cn, formatInr } from "@/lib/utils";
+import { formatInr } from "@/lib/utils";
 import { AddSection } from "./add-section";
 import { Canvas, type DeviceMode } from "./canvas";
 import { Checkout } from "./checkout";
 import { freshDraft, useDraft } from "./draft-store";
 import { Inspector, type Selection } from "./inspector";
 import { LeftPanel } from "./layers";
+import { MobileEditor, MobileNav, type MobilePane } from "./mobile-editor";
+import { MobilePreview } from "./mobile-preview";
 import { insertScene } from "./ops";
 import { sceneSchemas } from "./schema";
 
@@ -28,7 +30,8 @@ export function Studio({ template }: { template: StudioTemplate }) {
   const [adding, setAdding] = useState(false);
   const [checkout, setCheckout] = useState(false);
   const [preview, setPreview] = useState(false);
-  const [mobilePane, setMobilePane] = useState<"layers" | "canvas" | "edit">("canvas");
+  const [mobilePane, setMobilePane] = useState<MobilePane>("edit");
+  const wide = useMinLg();
   // A draft saved before the template was rewritten would hide the new version.
   const outdated = draft.base !== initial.base;
   const frames = useRef(new Map<string, HTMLIFrameElement>());
@@ -101,6 +104,7 @@ export function Studio({ template }: { template: StudioTemplate }) {
     const after = sel.scene ?? scenes.length - 1;
     edit(insertScene(draft, after, sceneSchemas[type].create()));
     setSel({ scene: after + 1, item: null });
+    setMobilePane("edit");
     setAdding(false);
   }
 
@@ -116,27 +120,29 @@ export function Studio({ template }: { template: StudioTemplate }) {
         <TopButton label="Undo (⌘Z)" onClick={undo} disabled={!canUndo}>
           <Undo2 className="size-4" />
         </TopButton>
-        <TopButton label="Redo (⇧⌘Z)" onClick={redo} disabled={!canRedo}>
-          <Redo2 className="size-4" />
-        </TopButton>
-        <TopButton
-          label="Start over from the template"
-          onClick={() => {
-            if (window.confirm("Start over? This clears your changes and goes back to the original template.")) {
-              reset(freshDraft(template.slug, initial.name, template.story));
-              setSel({ scene: 0, item: null });
-            }
-          }}
-        >
-          <RotateCcw className="size-4" />
-        </TopButton>
+        <span className="hidden items-center sm:flex">
+          <TopButton label="Redo (⇧⌘Z)" onClick={redo} disabled={!canRedo}>
+            <Redo2 className="size-4" />
+          </TopButton>
+          <TopButton
+            label="Start over from the template"
+            onClick={() => {
+              if (window.confirm("Start over? This clears your changes and goes back to the original template.")) {
+                reset(freshDraft(template.slug, initial.name, template.story));
+                setSel({ scene: 0, item: null });
+              }
+            }}
+          >
+            <RotateCcw className="size-4" />
+          </TopButton>
+        </span>
 
-        <div className="mx-auto flex min-w-0 items-center gap-2">
+        <div className="mx-auto flex min-w-0 flex-1 items-center justify-center gap-2">
           <input
             value={draft.name}
             onChange={(e) => edit({ ...draft, name: e.target.value }, "name")}
             aria-label="Gift name"
-            className="w-[min(40vw,280px)] truncate rounded-lg bg-transparent px-2 py-1 text-center text-sm font-medium outline-none hover:bg-paper focus:bg-paper"
+            className="w-full max-w-[9rem] truncate rounded-lg bg-transparent px-2 py-1 text-center text-sm font-medium outline-none hover:bg-paper focus:bg-paper sm:max-w-[280px]"
           />
           <span className="type-label hidden shrink-0 items-center gap-1 text-[10px] text-muted md:flex">
             {saved === "saving" ? (
@@ -159,12 +165,24 @@ export function Studio({ template }: { template: StudioTemplate }) {
             setPreview(true);
             setRun((r) => r + 1);
           }}
+          aria-label="Preview"
+          className="grid size-9 place-items-center rounded-full border border-line hover:bg-paper sm:hidden"
+        >
+          <Eye className="size-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setPreview(true);
+            setRun((r) => r + 1);
+          }}
           className="hidden h-9 items-center gap-1.5 rounded-full border border-line px-4 text-sm hover:bg-paper sm:flex"
         >
           <Eye className="size-4" /> Preview
         </button>
-        <button type="button" onClick={() => setCheckout(true)} className="flex h-9 items-center gap-2 rounded-full bg-rose-deep pl-4 pr-1.5 text-sm font-medium text-paper hover:bg-rose">
-          {draft.live ? "Live" : "Make it live"}
+        <button type="button" onClick={() => setCheckout(true)} className="flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-rose-deep pl-3 pr-1.5 text-sm font-medium text-paper hover:bg-rose sm:pl-4">
+          <span className="sm:hidden">{draft.live ? "Live" : "Publish"}</span>
+          <span className="hidden sm:inline">{draft.live ? "Live" : "Make it live"}</span>
           <span className="rounded-full bg-paper/20 px-2 py-0.5 text-xs">{formatInr(template.pricePaise)}</span>
         </button>
       </header>
@@ -188,39 +206,36 @@ export function Studio({ template }: { template: StudioTemplate }) {
         </div>
       )}
 
-      {/* Small screens: one pane at a time */}
-      <div className="flex border-b border-line p-1.5 lg:hidden">
-        {(["layers", "canvas", "edit"] as const).map((p) => (
-          <button
-            key={p}
-            type="button"
-            onClick={() => setMobilePane(p)}
-            className={cn("flex-1 rounded-lg py-1.5 text-sm capitalize", mobilePane === p ? "bg-paper font-medium shadow-sm" : "text-muted")}
-          >
-            {p}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex min-h-0 flex-1">
-        <div className={cn("lg:flex", mobilePane === "layers" ? "flex w-full lg:w-auto" : "hidden")}>
-          <LeftPanel
-            draft={draft}
-            sel={sel}
-            setSel={(s) => {
-              setSel(s);
-              if (s.scene !== null) setMobilePane("canvas");
-            }}
-            edit={edit}
-            onAddSection={() => setAdding(true)}
-          />
-        </div>
-        <div className={cn("min-w-0 flex-1 flex-col lg:flex", mobilePane === "canvas" ? "flex" : "hidden")}>
-          <Canvas frames={frames} device={device} setDevice={setDevice} sceneLabel={sceneLabel} hidden={!!scenes[sceneIdx]?.hidden} onReplay={() => setRun((r) => r + 1)} />
-        </div>
-        <aside data-lenis-prevent className={cn("shrink-0 overflow-y-auto border-l border-line bg-cream lg:block lg:w-[340px]", mobilePane === "edit" ? "block w-full" : "hidden")}>
-          <Inspector draft={draft} sel={sel} setSel={setSel} edit={edit} />
-        </aside>
+      <div className="flex min-h-0 flex-1 flex-col">
+        {wide === true ? (
+          <div className="flex min-h-0 flex-1">
+            <LeftPanel draft={draft} sel={sel} setSel={setSel} edit={edit} onAddSection={() => setAdding(true)} />
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+              <Canvas frames={frames} device={device} setDevice={setDevice} sceneLabel={sceneLabel} hidden={!!scenes[sceneIdx]?.hidden} onReplay={() => setRun((r) => r + 1)} />
+            </div>
+            <aside data-lenis-prevent className="hidden w-[340px] shrink-0 overflow-y-auto border-l border-line bg-cream lg:block">
+              <Inspector draft={draft} sel={sel} setSel={setSel} edit={edit} />
+            </aside>
+          </div>
+        ) : (
+          <div className="flex min-h-0 flex-1 flex-col lg:hidden">
+            <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto">
+              <MobilePreview frames={frames} sceneLabel={sceneLabel} hidden={!!scenes[sceneIdx]?.hidden} />
+              <MobileEditor
+                draft={draft}
+                edit={edit}
+                sel={sel}
+                setSel={(s) => {
+                  setSel(s);
+                  setMobilePane("edit");
+                }}
+                pane={mobilePane}
+                onAddSection={() => setAdding(true)}
+              />
+            </div>
+            <MobileNav pane={mobilePane} onChange={setMobilePane} />
+          </div>
+        )}
       </div>
 
       <AddSection
@@ -260,6 +275,19 @@ export function Studio({ template }: { template: StudioTemplate }) {
       </AnimatePresence>
     </div>
   );
+}
+
+/** null until measured, so the first paint can follow the CSS breakpoint. */
+function useMinLg() {
+  const [wide, setWide] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const apply = () => setWide(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+  return wide;
 }
 
 function TopButton({ label, onClick, disabled, children }: { label: string; onClick: () => void; disabled?: boolean; children: React.ReactNode }) {

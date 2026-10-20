@@ -50,9 +50,17 @@ export function Canvas({
     setZoom(Math.max(0.15, Math.min(1, (el.clientWidth - pad) / totalW, (el.clientHeight - pad - 40) / maxH)));
   }, [shown]);
 
-  // Re-fit whenever the set of artboards changes.
+  // Re-fit when the artboards change, and when the canvas first gets a size
+  // (on a phone it is hidden until the Gift tab opens, so the first measure is 0).
   useEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
     fit();
+    const ro = new ResizeObserver(() => {
+      if (el.clientWidth > 0 && el.clientHeight > 0) fit();
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
   }, [device, fit]);
 
   // Ctrl/⌘ + scroll zooms, like design tools.

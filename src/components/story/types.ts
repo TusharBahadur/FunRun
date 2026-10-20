@@ -1,4 +1,5 @@
 import type { AccentFont, BirthdayPalette, PhotoTone } from "@/components/experiences/birthday/types";
+import type { GiftFont } from "./gift-fonts";
 import type { AnyStickerId, StickerPlacement } from "./stickers";
 
 /**
@@ -96,6 +97,8 @@ export type Story = {
   palette: StoryPalette;
   /** Highlight-font mood (see accent-moods.ts). Defaults to classic. */
   accentFont?: AccentFont;
+  /** Headline, letter and caption font (see gift-fonts.ts). Defaults to classic. */
+  font?: GiftFont;
   scenes: Scene[];
 };
 

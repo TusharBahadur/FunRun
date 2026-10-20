@@ -65,20 +65,23 @@ export function Field({
   hint,
   children,
   counter,
+  roomy,
 }: {
   label: string;
   hint?: ReactNode;
   children: ReactNode;
   counter?: string;
+  /** Phone editor: sentence-case labels you can actually read. */
+  roomy?: boolean;
 }) {
   return (
     <label className="block">
-      <span className="type-label flex items-baseline justify-between text-muted">
+      <span className={roomy ? "flex items-baseline justify-between text-base font-medium text-ink" : "type-label flex items-baseline justify-between text-muted"}>
         {label}
-        {counter && <span className="text-[10px]">{counter}</span>}
+        {counter && <span className={roomy ? "text-sm font-normal text-muted" : "text-[10px]"}>{counter}</span>}
       </span>
       <span className="mt-2 block">{children}</span>
-      {hint && <span className="mt-1.5 block text-xs text-muted">{hint}</span>}
+      {hint && <span className={roomy ? "mt-2 block text-sm leading-snug text-muted" : "mt-1.5 block text-xs text-muted"}>{hint}</span>}
     </label>
   );
 }

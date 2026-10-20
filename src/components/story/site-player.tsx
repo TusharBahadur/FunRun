@@ -4,6 +4,7 @@ import { Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { accentMoodVars } from "@/components/experiences/birthday/accent-moods";
+import { giftFontVars } from "./gift-fonts";
 import { Confetti, type ConfettiHandle } from "@/components/experiences/confetti";
 import { MusicBox } from "@/components/experiences/music-box";
 import { cn } from "@/lib/utils";
@@ -119,11 +120,13 @@ export function SitePlayer({
   return (
     <StoryContext.Provider value={api}>
       <div
+        data-gift-font={story.font ?? "classic"}
         className="relative isolate min-h-svh overflow-x-clip"
         style={{
           color: palette.fg,
           background: `radial-gradient(80% 50% at 0% 30%, ${palette.pink}55, transparent 70%), radial-gradient(70% 50% at 100% 70%, ${palette.accent}22, transparent 70%), ${palette.bg}`,
           ...accentMoodVars(story.accentFont ?? "classic"),
+          ...giftFontVars(story.font),
         }}
         onPointerDown={() => {
           if (!playing && !music.current) playSong();

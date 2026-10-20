@@ -116,6 +116,30 @@
   font-variation-settings: "SOFT" 30, "WONK" 0;
 }
 
+/*
+ * Sender-chosen gift font. Set on the gift root only — never the studio UI.
+ * These rules beat the inlined `font-serif` / `type-hand` families.
+ */
+[data-gift-font="hand"] .font-serif,
+[data-gift-font="hand"] .type-display {
+  font-family: var(--font-kalam), "Segoe Print", "Bradley Hand", cursive;
+  font-variation-settings: normal;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+[data-gift-font="clean"] .font-serif {
+  font-family: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  font-variation-settings: normal;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+[data-gift-font="clean"] .type-hand {
+  font-family: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  font-variation-settings: normal;
+  letter-spacing: -0.02em;
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
