@@ -49,7 +49,7 @@ export function TemplateShowcase({ templates }: { templates: Template[] }) {
       <div className="sticky top-0 flex h-svh flex-col justify-center overflow-hidden">
         <div className="mx-auto mb-10 flex w-full max-w-7xl items-end justify-between gap-6 px-5">
           <div>
-            <Eyebrow index="03" className="text-cream/50">
+            <Eyebrow index="02" className="text-cream/50">
               The collection
             </Eyebrow>
             <h2 className="mt-4 text-[clamp(2.2rem,5vw,4.75rem)] type-display">

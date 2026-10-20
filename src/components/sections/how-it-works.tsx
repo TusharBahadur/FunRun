@@ -36,10 +36,10 @@ export function HowItWorks({ previews }: { previews: Template[] }) {
   ];
 
   return (
-    <section id="how" className="mx-auto max-w-7xl scroll-mt-24 px-5 pb-28 md:pb-44">
+    <section id="how" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-28 md:py-44">
       <div className="grid gap-14 md:grid-cols-12">
         <div className="md:sticky md:top-32 md:col-span-5 md:self-start">
-          <Eyebrow index="02">How it works</Eyebrow>
+          <Eyebrow index="03">How it works</Eyebrow>
           <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
             <SplitText text="Three small steps to" />{" "}
             <SplitText
