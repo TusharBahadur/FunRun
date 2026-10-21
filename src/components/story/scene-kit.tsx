@@ -300,7 +300,7 @@ export function SceneShell({
           )}
           {doneText && (
             <StudioHit field="done" className="mx-auto w-fit">
-              <p className="type-hand text-2xl" style={{ color: accent }}>
+              <p className="type-display text-2xl font-semibold" style={{ color: accent }}>
                 {fill(doneText)}
               </p>
             </StudioHit>
@@ -315,7 +315,7 @@ export function SceneShell({
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="type-hand text-2xl"
+                className="type-display text-2xl font-semibold"
                 style={{ color: accent }}
               >
                 {fill(doneText)}

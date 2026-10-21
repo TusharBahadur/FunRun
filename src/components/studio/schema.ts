@@ -1,5 +1,4 @@
 import {
-  Award,
   GalleryHorizontal,
   ImageIcon,
   ListOrdered,
@@ -432,16 +431,16 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     create: () => ({ type: "bouquet", eyebrow: "Fresh flowers", title: "A bouquet, *picked by me.*", hint: "Add five flowers", flowers: 5, card: "For you ♥" }),
   },
   award: {
-    name: "Award",
+    name: "Winner",
     category: "Games",
-    icon: Award,
-    blurb: "Polish a dusty trophy or medal until the engraving shows.",
+    icon: Heart,
+    blurb: "A polaroid of them. Tap to cover it in hearts.",
     fields: [
       ...heading,
-      { key: "trophy", label: "Type", kind: "select", options: [{ value: "cup", label: "Trophy" }, { value: "medal", label: "Medal" }] },
-      { key: "engraving", label: "Engraving", kind: "text", max: 40 },
+      { key: "photo", label: "Photo of them", kind: "image", help: "A photo of the winner. That’s the whole point.", optional: true },
+      { key: "engraving", label: "Caption", kind: "text", max: 80 },
     ],
-    create: () => ({ type: "award", eyebrow: "Award ceremony", title: "And the award *goes to…*", hint: "Tap to polish it", trophy: "cup", engraving: "World’s best {to}" }),
+    create: () => ({ type: "award", eyebrow: "Look at you", title: "You won *something.*", hint: "Tap the photo", engraving: "World’s best {to}" }),
   },
   map: {
     name: "Memory map",

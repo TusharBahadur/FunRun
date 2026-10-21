@@ -89,7 +89,7 @@ export type Scene =
   | ({ type: "question" } & Heading & { question: string; yes: string; no: string; after: string })
   | ({ type: "ringbox" } & Heading & { question: string })
   | ({ type: "bouquet" } & Heading & { flowers: number; card: string })
-  | ({ type: "award" } & Heading & { trophy: "cup" | "medal"; engraving: string })
+  | ({ type: "award" } & Heading & { photo?: string; engraving: string })
   | ({ type: "map" } & Heading & { pins: { place: string; when: string; memory: string }[] })
   // Reading and endings
   | ({ type: "letter" } & Heading & { paragraphs: string[]; signoff: string; /** A photo pinned to the corner of the letter. */ photo?: string })

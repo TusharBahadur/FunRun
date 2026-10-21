@@ -155,7 +155,7 @@ export function MeterScene({ scene, done, onDone }: SceneProps<S<"meter">>) {
               {scene.levels.map((l, i) => (
                 <li key={i}>
                   <StudioHit field="levels" item={i} className="w-fit">
-                    <span className="type-hand block text-xl leading-tight" style={{ color: palette.accent, opacity: 0.45 + (0.55 * (i + 1)) / scene.levels.length }}>
+                    <span className="type-display block text-xl font-semibold leading-tight" style={{ color: palette.accent, opacity: 0.45 + (0.55 * (i + 1)) / scene.levels.length }}>
                       {fill(l)}
                     </span>
                   </StudioHit>
@@ -164,7 +164,7 @@ export function MeterScene({ scene, done, onDone }: SceneProps<S<"meter">>) {
             </ol>
           ) : (
             <>
-              <motion.p key={label} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="type-hand mt-1 text-[1.7rem] leading-tight" style={{ color: palette.accent }}>
+              <motion.p key={label} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="type-display mt-1 text-[1.5rem] font-semibold leading-tight" style={{ color: palette.accent }}>
                 {fill(label)}
               </motion.p>
               <p className="type-display mt-2 text-4xl font-semibold tabular-nums">{Math.round(level * 100)}%</p>

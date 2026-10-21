@@ -5,14 +5,14 @@ import { catalogFont, type FontId } from "./font-catalog";
  * The font a sender picks for their whole gift: one of three mixed presets
  * built from the brand families, or any single font from the catalog.
  *
- * Classic keeps Inter Tight headlines and Kalam for notes.
- * Handwritten sets the whole gift in Kalam. Clean sets it in Inter Tight.
+ * Classic and Clean keep Inter Tight on headlines and notes — gift previews
+ * never default to the handwriting face. Handwritten sets the whole gift in Kalam.
  */
 export type GiftFont = "classic" | "hand" | "clean";
 export type StoryFont = GiftFont | FontId;
 
 export const giftFonts: Record<GiftFont, { name: string; note: string; family: string; weight: number; axes: string }> = {
-  classic: { name: "Classic", note: "Clean headlines, handwritten notes", family: "var(--font-inter-tight)", weight: 560, axes: "normal" },
+  classic: { name: "Classic", note: "Clean headlines and notes", family: "var(--font-inter-tight)", weight: 560, axes: "normal" },
   hand: { name: "Handwritten", note: "The whole gift, like a real note", family: "var(--font-kalam)", weight: 700, axes: "normal" },
   clean: { name: "Clean", note: "Plain and modern", family: "var(--font-inter-tight)", weight: 500, axes: "normal" },
 };
@@ -43,8 +43,9 @@ export function giftFontRoot(font?: StoryFont): { "data-gift-font": string; styl
     };
   }
   const preset = isGiftPreset(font) ? font : "classic";
+  const sansHand = { "--font-hand": "var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif" } as CSSProperties;
   return {
     "data-gift-font": preset,
-    style: preset === "clean" ? ({ "--font-hand": "var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif" } as CSSProperties) : {},
+    style: preset === "hand" ? {} : sansHand,
   };
 }

@@ -33,7 +33,7 @@ export function SealScene({ scene, done, onDone }: SceneProps<S<"seal">>) {
           transition={{ delay: done ? 0.45 : 0, duration: 0.9, ease: EASE_OUT }}
         >
           <StudioHit field="note">
-            <p className="type-hand text-[1.65rem] leading-tight" style={{ color: palette.accent }}>
+            <p className="type-display text-[1.5rem] font-semibold leading-snug" style={{ color: palette.accent }}>
               {fill(scene.note)}
             </p>
           </StudioHit>
@@ -145,7 +145,7 @@ export function ScratchScene({ scene, done, onDone }: SceneProps<S<"scratch">>) 
       >
         <div>
           <StudioHit field="reveal">
-            <p className="type-hand text-[2rem] leading-tight" style={{ color: palette.accent }}>
+            <p className="type-display text-[1.7rem] font-semibold leading-snug" style={{ color: palette.accent }}>
               {fill(scene.reveal)}
             </p>
           </StudioHit>
@@ -290,7 +290,7 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
           stickers={scene.stickers}
           reveal={
             <StudioHit field="reveal">
-              <p className="type-hand text-[1.15rem] font-bold leading-tight">{fill(scene.reveal)}</p>
+              <p className="type-display text-[1.15rem] font-semibold leading-snug">{fill(scene.reveal)}</p>
             </StudioHit>
           }
         />
@@ -352,7 +352,7 @@ export function UnwrapScene({ scene, done, onDone }: SceneProps<S<"unwrap">>) {
         >
           <p className="type-label text-[10px] opacity-60">Inside</p>
           <StudioHit field="inside">
-            <p className="type-hand mt-1 text-[1.7rem] leading-tight" style={{ color: palette.accent }}>
+            <p className="type-display mt-1 text-[1.5rem] font-semibold leading-snug" style={{ color: palette.accent }}>
               {fill(scene.inside)}
             </p>
           </StudioHit>

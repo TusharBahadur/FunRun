@@ -5,7 +5,9 @@ import { Cake, Check, Flower2, Gem, Heart, Star, Sun, type LucideIcon } from "lu
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Accented } from "@/components/experiences/birthday/accented";
 import { EASE_OUT } from "@/lib/motion";
-import { Backdrop, Paper, SceneShell, StoryButton, StudioAlso, StudioHit, StudioPager, usePickedItem, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
+import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
+import { Backdrop, Paper, SceneShell, StoryButton, StudioAlso, StudioHit, StudioPager, Tape, usePickedItem, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
+import { Sticker } from "../stickers";
 import type { Scene } from "../types";
 
 type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
@@ -326,7 +328,7 @@ export function QuestionScene({ scene, done, onDone }: SceneProps<S<"question">>
           </StudioHit>
         </div>
         <StudioAlso label="After they say yes" field="after">
-          <p className="type-hand text-[2rem] leading-tight" style={{ color: palette.accent }}>
+          <p className="type-display text-[1.7rem] font-semibold leading-tight" style={{ color: palette.accent }}>
             {fill(scene.after)}
           </p>
         </StudioAlso>
@@ -337,7 +339,7 @@ export function QuestionScene({ scene, done, onDone }: SceneProps<S<"question">>
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
       {done ? (
-        <motion.p initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="type-hand text-[2.4rem] leading-tight" style={{ color: palette.accent }}>
+        <motion.p initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="type-display text-[1.8rem] font-semibold leading-tight" style={{ color: palette.accent }}>
           {fill(scene.after)}
         </motion.p>
       ) : (
@@ -424,7 +426,7 @@ export function RingboxScene({ scene, done, onDone }: SceneProps<S<"ringbox">>) 
       </motion.button>
       {done && (
         <StudioHit field="question" className="mt-6">
-          <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="type-hand text-[2rem] leading-tight" style={{ color: palette.accent }}>
+          <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="type-display text-[1.7rem] font-semibold leading-tight" style={{ color: palette.accent }}>
             {fill(scene.question)}
           </motion.p>
         </StudioHit>
@@ -509,79 +511,74 @@ export function BouquetScene({ scene, done, onDone }: SceneProps<S<"bouquet">>) 
   );
 }
 
-/* ───────────── Award: polish it until the engraving shows ───────────── */
+/* ───────────── Winner: a polaroid of them, tap to cover it in hearts ───────────── */
 
-const POLISH = 6;
+const HEARTS = 3;
+const HEART_SPOTS = [
+  { left: "12%", top: "14%", rotate: -16, size: 28 },
+  { left: "68%", top: "20%", rotate: 12, size: 22 },
+  { left: "48%", top: "66%", rotate: -8, size: 32 },
+] as const;
 
 export function AwardScene({ scene, done, onDone }: SceneProps<S<"award">>) {
-  const { palette, fill } = useStory();
-  const [rubs, setRubs] = useState(done ? POLISH : 0);
-  const prize = useRef<HTMLButtonElement>(null);
-  const shine = rubs / POLISH;
+  const { palette, fill, celebrate, to } = useStory();
+  const studio = useStudioEdit();
+  const card = useRef<HTMLButtonElement>(null);
+  const [taps, setTaps] = useState(done ? HEARTS : 0);
+  const shown = studio ? HEARTS : taps;
 
-  function rub() {
-    if (rubs >= POLISH) return;
-    const n = rubs + 1;
-    setRubs(n);
-    if (n === POLISH) {
+  function tap() {
+    if (taps >= HEARTS) return;
+    const n = taps + 1;
+    setTaps(n);
+    if (n === HEARTS) {
+      celebrate(card.current);
       onDone();
     }
   }
 
-  const metal = `linear-gradient(135deg, #8a6a1f, ${palette.gold} 45%, #fff3c4 55%, ${palette.gold} 65%, #8a6a1f)`;
   return (
-    <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
-      <StudioHit field="trophy">
-      <motion.button
-        ref={prize}
-        type="button"
-        onClick={rub}
-        whileTap={{ scale: 0.96, rotate: -2 }}
-        className="relative flex flex-col items-center outline-none"
-        aria-label={shine < 1 ? "Polish the award" : "Polished"}
-      >
-        {scene.trophy === "cup" ? (
-          <>
-            <div className="relative h-36 w-40 rounded-b-[80px] rounded-t-xl" style={{ background: metal, filter: `grayscale(${1 - shine}) brightness(${0.7 + shine * 0.3})` }}>
-              <span className="absolute -left-8 top-4 h-16 w-10 rounded-l-full border-[7px] border-r-0" style={{ borderColor: palette.gold, opacity: 0.4 + shine * 0.6 }} />
-              <span className="absolute -right-8 top-4 h-16 w-10 rounded-r-full border-[7px] border-l-0" style={{ borderColor: palette.gold, opacity: 0.4 + shine * 0.6 }} />
-            </div>
-            <div className="h-6 w-8" style={{ background: metal, filter: `grayscale(${1 - shine})` }} />
-            <div className="h-6 w-28 rounded-md" style={{ backgroundColor: palette.fg }} />
-          </>
-        ) : (
-          <>
-            <div className="flex gap-2">
-              <span className="h-20 w-8 skew-x-12" style={{ backgroundColor: palette.accent }} />
-              <span className="h-20 w-8 -skew-x-12" style={{ backgroundColor: palette.pink }} />
-            </div>
-            <div className="-mt-3 grid size-36 place-items-center rounded-full" style={{ background: metal, filter: `grayscale(${1 - shine}) brightness(${0.7 + shine * 0.3})` }}>
-              <span className="grid size-24 place-items-center rounded-full border-4 border-white/40 text-4xl">★</span>
-            </div>
-          </>
-        )}
-        {shine > 0 && shine < 1 && (
-          <motion.span key={rubs} className="absolute left-1/2 top-8 text-2xl" initial={{ opacity: 1, scale: 0.4 }} animate={{ opacity: 0, scale: 1.6, x: (rubs % 2 ? 1 : -1) * 40 }}>
-            ✦
-          </motion.span>
-        )}
-      </motion.button>
-      </StudioHit>
-      <StudioHit field="engraving" className="mt-6">
-        <motion.p
-          className="type-hand text-[1.8rem] leading-tight"
-          style={{ color: palette.accent }}
-          initial={false}
-          animate={{ opacity: shine >= 1 ? 1 : 0, y: shine >= 1 ? 0 : 10 }}
+    <SceneShell layout="stack" eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
+      <StudioHit field="photo" className="relative">
+        <motion.button
+          ref={card}
+          type="button"
+          onClick={tap}
+          aria-label={shown < HEARTS ? "Tap the photo" : fill("{to}")}
+          initial={{ rotate: 8, scale: 0.86, opacity: 0 }}
+          animate={{ rotate: -2.5, scale: 1, opacity: 1 }}
+          whileTap={{ scale: 0.97, rotate: 0 }}
+          transition={{ type: "spring", bounce: 0.42 }}
+          className="relative w-[min(68vw,260px)] bg-white p-3 pb-[4.25rem] text-left shadow-[0_28px_48px_-24px_rgba(27,18,21,.5)] outline-none"
         >
-          {fill(scene.engraving)}
-        </motion.p>
-      </StudioHit>
-      {shine < 1 && (
-        <div className="mt-2 h-1.5 w-40 overflow-hidden rounded-full" style={{ backgroundColor: `${palette.fg}18` }}>
-          <motion.div className="h-full" style={{ backgroundColor: palette.accent }} animate={{ width: `${shine * 100}%` }} />
+          <Tape className="-top-3 left-1/2 w-16 -translate-x-1/2 rotate-2" />
+          <div className="relative aspect-[4/5] overflow-hidden">
+            <PhotoFill src={scene.photo} tone="rose" alt={to} iconClassName="size-12" className="size-full" />
+            {HEART_SPOTS.map((spot, i) =>
+              i < shown ? (
+                <motion.span
+                  key={i}
+                  className="absolute"
+                  style={{ left: spot.left, top: spot.top }}
+                  initial={{ scale: 0, rotate: 0, opacity: 0 }}
+                  animate={{ scale: 1, rotate: spot.rotate, opacity: 1 }}
+                  transition={{ type: "spring", bounce: 0.55 }}
+                >
+                  <Heart className="fill-current drop-shadow-[0_4px_8px_rgba(27,18,21,.25)]" style={{ color: palette.accent, width: spot.size, height: spot.size }} />
+                </motion.span>
+              ) : null,
+            )}
+          </div>
+          <StudioHit field="engraving" as="span" className="absolute inset-x-3 bottom-3">
+            <span className="type-display block text-center text-[0.95rem] font-semibold leading-snug" style={{ color: palette.ink }}>
+              {fill(scene.engraving)}
+            </span>
+          </StudioHit>
+        </motion.button>
+        <div className="pointer-events-none absolute -right-5 -top-6 size-16 rotate-12">
+          <Sticker id="crown" className="size-16" />
         </div>
-      )}
+      </StudioHit>
     </SceneShell>
   );
 }

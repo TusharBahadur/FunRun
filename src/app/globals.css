@@ -134,10 +134,15 @@
   line-height: 1.08;
   letter-spacing: -0.03em;
 }
+/* Default gift previews never use the handwriting face. Senders who pick
+ * Handwritten (or Kalam on a line) still get it. */
+[data-gift-font="classic"] .type-hand,
 [data-gift-font="clean"] .type-hand {
   font-family: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  font-style: normal;
+  font-weight: 600;
   font-variation-settings: normal;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 /* One catalog font for the whole gift. Labels stay mono and highlights keep their mood. */

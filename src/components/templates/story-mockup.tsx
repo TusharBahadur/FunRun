@@ -195,6 +195,7 @@ function scenePhoto(scene: Scene): Photo | null {
   if (scene.type === "spotlight") return { caption: "", tone: scene.tone ?? "rose", src: scene.photo };
   if (scene.type === "polaroids") return scene.photos[0] ?? null;
   if (scene.type === "letter" && scene.photo) return { caption: "", tone: "rose", src: scene.photo };
+  if (scene.type === "award" && scene.photo) return { caption: scene.engraving, tone: "rose", src: scene.photo };
   if (scene.type === "finale" && scene.photos?.length) return scene.photos[0];
   return null;
 }
@@ -246,7 +247,7 @@ export function StoryMockup({ template, className }: { template: Template; class
   }[layout] ?? PosterLayout;
 
   return (
-    <div className={cn("@container relative aspect-[3/4] w-full select-none overflow-hidden rounded-[1.75rem]", className)}>
+    <div data-gift-font="classic" className={cn("@container relative aspect-[3/4] w-full select-none overflow-hidden rounded-[1.75rem]", className)}>
       <View g={g} />
     </div>
   );
@@ -630,7 +631,7 @@ function ScrapbookLayout({ g }: { g: Gift }) {
         backgroundSize: "5cqw 5cqw",
       }}
     >
-      <p className="type-hand absolute left-[7%] top-[5%] text-[7.5cqw] font-bold leading-none" style={{ color: p.accent }}>
+      <p className="type-display absolute left-[7%] top-[5%] text-[7.5cqw] font-semibold leading-none" style={{ color: p.accent }}>
         for {story.recipient}
         <Heart className="ml-[1.5cqw] inline size-[5cqw] fill-current align-baseline" />
       </p>
@@ -1066,7 +1067,7 @@ function ClassicCardFlowVideo({ template }: { template: Template }) {
         <div className="my-auto">
           <span className="font-mono text-[2.2cqw] uppercase tracking-wider opacity-70 block">{preview.kicker}</span>
           <p className="type-display mt-[1.5cqw] text-[6.5cqw] font-semibold leading-tight">{preview.title}</p>
-          <p className="type-hand mt-[2cqw] text-[3.4cqw] opacity-80">{preview.signoff}</p>
+          <p className="type-display mt-[2cqw] text-[3.4cqw] font-semibold opacity-80">{preview.signoff}</p>
         </div>
         <div className="flex justify-center">
           <Heart className="size-[8cqw] fill-rose-500 text-rose-500 animate-bounce" />
