@@ -8,7 +8,7 @@ import {
   Cake,
   Calculator,
   Candy,
-  DoorOpen,
+  PhoneCall,
   Feather,
   Flag,
   Flower2,
@@ -42,6 +42,7 @@ export type FieldDef =
   | { key: string; label: string; kind: "select"; options: { value: string; label: string }[] }
   | { key: string; label: string; kind: "toggle"; help?: string }
   | { key: string; label: string; kind: "image"; help?: string; optional?: boolean }
+  | { key: string; label: string; kind: "sticker"; help?: string; optional?: boolean }
   | { key: string; label: string; kind: "multi"; options: { value: string; label: string }[]; min: number; max: number }
   | { key: string; label: string; kind: "strings"; itemLabel: string; max: number; placeholder?: string }
   | { key: string; label: string; kind: "list"; itemLabel: string; max: number; item: FieldDef[]; newItem: () => Record<string, unknown>; title: (item: Record<string, unknown>) => string };
@@ -93,12 +94,32 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     create: () => ({ type: "lights", eyebrow: "Shh…", title: "It’s a little *dark* in here.", hint: "Tap each candle", candles: 3, reveal: "Hi, *{to}.*" }),
   },
   knock: {
-    name: "Knock knock",
+    name: "Incoming call",
     category: "Openers",
-    icon: DoorOpen,
-    blurb: "Knock on the door until it swings open.",
-    fields: [...heading, { key: "reveal", label: "Behind the door", kind: "text", max: 60 }],
-    create: () => ({ type: "knock", eyebrow: "Who’s there?", title: "Someone’s at the *door.*", hint: "Knock three times", knocks: 3, reveal: "It’s me, with a surprise." }),
+    icon: PhoneCall,
+    blurb: "Answer the call. It takes a few rings — then the surprise picks up.",
+    fields: [
+      ...heading,
+      { key: "reveal", label: "What they say", kind: "text", max: 60 },
+      { key: "caller", label: "Who’s calling", kind: "sticker", help: "Fills the phone before they pick up." },
+      { key: "party", label: "After they pick up", kind: "sticker", help: "Fills the phone once the call connects." },
+    ],
+    create: () => ({
+      type: "knock",
+      eyebrow: "Incoming",
+      title: "Someone’s *calling.*",
+      hint: "Pick up 3 times",
+      knocks: 3,
+      reveal: "SURPRISE!! It’s me.",
+      caller: "m-scream-cat",
+      party: "m-dance-cat",
+      stickers: [
+        { id: "sparkles", at: "tl" },
+        { id: "heart", at: "tr" },
+        { id: "popper", at: "bl" },
+        { id: "yay", at: "br" },
+      ],
+    }),
   },
   unwrap: {
     name: "Gift box",

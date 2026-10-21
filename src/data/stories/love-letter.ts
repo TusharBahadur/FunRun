@@ -209,7 +209,7 @@ export const loveLetterStories = [
         eyebrow: "Chapter 3",
         title: "Everything you’ve *given me.*",
         hint: "Tap to print",
-        store: "Meher’s Gift Shop",
+        store: "{to}’s Gift Shop",
         items: [
           { name: "Your laugh", qty: "1 (rare)" },
           { name: "Your patience with me", qty: "∞" },

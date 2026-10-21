@@ -274,7 +274,7 @@ export function PlaylistSection({ scene }: SceneProps<S<"playlist">>) {
 /* ───────────── The letter, website style ───────────── */
 
 export function SiteLetter({ scene }: SceneProps<S<"letter">>) {
-  const { palette, fill, to } = useStory();
+  const { palette, fill, to, from } = useStory();
   return (
     <section className="mx-auto w-full max-w-3xl px-5 pb-32 pt-20 md:py-32">
       <motion.div {...rise}>
@@ -283,7 +283,7 @@ export function SiteLetter({ scene }: SceneProps<S<"letter">>) {
         >
           <div className="type-label flex justify-between text-[10px] opacity-55">
             <StudioHit as="span" field="eyebrow">{fill(scene.eyebrow ?? "And finally")}</StudioHit>
-            <span>For {to}</span>
+            <span>For {to} · from {from}</span>
           </div>
           <StudioHit field="title" className="mt-6">
             <h2 className="type-display text-[clamp(2.6rem,9vw,4.4rem)] font-semibold" style={{ color: `${palette.accent}66` }}>

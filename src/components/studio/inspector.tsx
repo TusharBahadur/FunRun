@@ -26,6 +26,7 @@ import {
 } from "@/components/editor/fields";
 import type { FontId } from "@/components/story/font-catalog";
 import type { Scene, StoryPalette } from "@/components/story/types";
+import { keepNames, showNames } from "@/lib/gift-names";
 import { cn } from "@/lib/utils";
 import { type Draft } from "./draft-store";
 import { FileCropInput } from "./image-crop";
@@ -304,6 +305,7 @@ function SceneInspector({
       <SceneStickers
         draft={draft}
         stickers={scene.stickers ?? []}
+        max={stickerCap(scene)}
         onChange={(next) =>
           edit(updateScene(draft, i, { stickers: next.length ? next : undefined }))
         }
@@ -324,6 +326,11 @@ function SceneInspector({
 
 const STICKER_SPOTS: StickerSpot[] = ["tr", "bl", "tl", "br", "mr", "ml"];
 const MAX_STICKERS = 3;
+const CALL_STICKERS = 4;
+
+export function stickerCap(scene: Scene) {
+  return scene.type === "knock" ? CALL_STICKERS : MAX_STICKERS;
+}
 
 /** Uploads already in this gift, so one picture can be reused as a sticker elsewhere. */
 function uploadedStickers(draft: Draft): AnyStickerId[] {
@@ -332,6 +339,10 @@ function uploadedStickers(draft: Draft): AnyStickerId[] {
     for (const st of s.stickers ?? []) if (isUploadedSticker(st.id)) ids.add(st.id);
     if (s.reaction && isUploadedSticker(s.reaction)) ids.add(s.reaction);
     if (s.type === "spotlight" && s.stamp && isUploadedSticker(s.stamp)) ids.add(s.stamp);
+    if (s.type === "knock") {
+      if (s.caller && isUploadedSticker(s.caller)) ids.add(s.caller);
+      if (s.party && isUploadedSticker(s.party)) ids.add(s.party);
+    }
   }
   for (const a of draft.assets) if (a.src.startsWith("data:")) ids.add(a.src as AnyStickerId);
   return [...ids];
@@ -375,6 +386,22 @@ function stickerSlot(scene: Scene, field: string | null | undefined): StickerSlo
       value: scene.stamp ?? "yay",
       replace: (id) => ({ stamp: id }) as Partial<Scene>,
       remove: () => ({ stamp: null }) as Partial<Scene>,
+    };
+  }
+  if (scene.type === "knock" && field === "caller") {
+    return {
+      title: "Who’s calling",
+      value: scene.caller ?? "m-scream-cat",
+      replace: (id) => ({ caller: id }),
+      remove: () => ({ caller: undefined }),
+    };
+  }
+  if (scene.type === "knock" && field === "party") {
+    return {
+      title: "After they pick up",
+      value: scene.party ?? "m-dance-cat",
+      replace: (id) => ({ party: id }),
+      remove: () => ({ party: undefined }),
     };
   }
   return null;
@@ -451,34 +478,36 @@ function UploadButton({ onUpload }: { onUpload: (id: AnyStickerId) => void }) {
 
 const STICKER_SIDE = 360;
 
-/** Pick up to three stickers; each takes the next free corner. */
+/** Pick stickers for the page (or around the incoming-call phone). */
 export function SceneStickers({
   draft,
   stickers,
   onChange,
+  max = MAX_STICKERS,
 }: {
   draft: Draft;
   stickers: StickerPlacement[];
   onChange: (next: StickerPlacement[]) => void;
+  max?: number;
 }) {
   const toggle = (id: AnyStickerId) => {
     if (stickers.some((s) => s.id === id)) {
       onChange(stickers.filter((s) => s.id !== id));
       return;
     }
-    if (stickers.length >= MAX_STICKERS) return;
+    if (stickers.length >= max) return;
     const at = STICKER_SPOTS.find((spot) => !stickers.some((s) => s.at === spot))!;
     onChange([...stickers, { id, at }]);
   };
   return (
-    <Group title={`Stickers ${stickers.length} / ${MAX_STICKERS}`}>
-      {stickers.length >= MAX_STICKERS && (
-        <p className="mb-2 text-sm text-muted">All three used. Tap the ✕ on one to swap it for another.</p>
+    <Group title={`Stickers ${stickers.length} / ${max}`}>
+      {stickers.length >= max && (
+        <p className="mb-2 text-sm text-muted">All {max} used. Tap the ✕ on one to swap it for another.</p>
       )}
       <StickerGrid
         selected={stickers.map((s) => s.id)}
         yours={uploadedStickers(draft)}
-        full={stickers.length >= MAX_STICKERS}
+        full={stickers.length >= max}
         onPick={toggle}
         onUpload={toggle}
       />
@@ -492,12 +521,24 @@ export function SceneReaction({
   value,
   onChange,
   title = "Reaction when finished",
+  bare,
 }: {
   draft: Draft;
   value?: AnyStickerId;
   onChange: (next: AnyStickerId | undefined) => void;
   title?: string;
+  /** Skip the group chrome when a Fold / Field already labelled this. */
+  bare?: boolean;
 }) {
+  const grid = (
+    <StickerGrid
+      selected={value ? [value] : []}
+      yours={uploadedStickers(draft)}
+      onPick={(id) => onChange(id === value ? undefined : id)}
+      onUpload={onChange}
+    />
+  );
+  if (bare) return grid;
   return (
     <Group
       title={title}
@@ -509,12 +550,7 @@ export function SceneReaction({
         )
       }
     >
-      <StickerGrid
-        selected={value ? [value] : []}
-        yours={uploadedStickers(draft)}
-        onPick={(id) => onChange(id === value ? undefined : id)}
-        onUpload={onChange}
-      />
+      {grid}
     </Group>
   );
 }
@@ -918,26 +954,7 @@ export function PhotoPicker({
 
 /* ───────────── Field rendering ───────────── */
 
-type Names = Pick<Draft["story"], "recipient" | "sender">;
-
-/** Copy as the sender will read it: real names instead of {to} / {from}. */
-export function showNames(text: string, names: Names) {
-  return text.replaceAll("{to}", names.recipient).replaceAll("{from}", names.sender);
-}
-
-/** Typed names go back to placeholders, so renaming someone later updates every line. */
-export function keepNames(text: string, names: Names) {
-  const swaps = [
-    { name: names.recipient.trim(), token: "{to}" },
-    { name: names.sender.trim(), token: "{from}" },
-  ]
-    .filter((s) => s.name)
-    .sort((a, b) => b.name.length - a.name.length);
-  return swaps.reduce((out, { name, token }) => {
-    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    return out.replace(new RegExp(`(?<![\\p{L}\\p{N}{])${escaped}(?![\\p{L}\\p{N}}])`, "gu"), token);
-  }, text);
-}
+export { keepNames, showNames } from "@/lib/gift-names";
 
 export function FieldEditor({
   field,
@@ -965,6 +982,16 @@ export function FieldEditor({
   const input = roomy ? "min-h-12 text-base" : undefined;
   const names = draft.story;
   switch (field.kind) {
+    case "sticker":
+      return (
+        <SceneReaction
+          draft={draft}
+          value={value as AnyStickerId | undefined}
+          onChange={(id) => onChange(id)}
+          title={field.label}
+          bare={hideLabel}
+        />
+      );
     case "image":
       return (
         <div>

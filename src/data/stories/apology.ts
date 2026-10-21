@@ -3,27 +3,34 @@ import { demoPhoto as photo, palettes, storyTemplate } from "./shared";
 const people = { recipient: "Ananya", sender: "Rohan", melody: "lullaby" as const };
 
 export const apologyStories = [
-  /* ── Little Sorry: at your door, with snacks. ── */
+  /* ── Little Sorry: calling, with snacks. ── */
   storyTemplate({
     slug: "little-sorry",
     name: "Little Sorry",
     occasion: "apology",
     level: "little",
-    description: "Knock first, fill the sorry-meter, take a peace-offering coupon, read the real apology.",
+    description: "Pick up first, fill the sorry-meter, take a peace-offering coupon, read the real apology.",
     palette: palettes.matcha,
     motif: "hearts",
-    preview: { kicker: "I messed up", title: "I’m outside. I brought momos. Can I come in?", signoff: "5 little pages" },
+    preview: { kicker: "I messed up", title: "Pick up. I brought momos.", signoff: "5 little pages" },
     ...people,
     scenes: [
       {
         type: "knock",
-        eyebrow: "Knock knock",
-        title: "Can I *come in?*",
-        hint: "Knock 3 times",
+        eyebrow: "Incoming",
+        title: "Can we *talk?*",
+        hint: "Pick up 3 times",
         knocks: 3,
         reveal: "It’s me. I brought momos.",
-        done: "Thanks for opening. Seriously.",
-        stickers: [{ id: "m-please-monkey", at: "bl" }],
+        done: "Thanks for picking up. Seriously.",
+        caller: "m-please-monkey",
+        party: "m-dance-cat",
+        stickers: [
+          { id: "sparkles", at: "tl" },
+          { id: "heart", at: "tr" },
+          { id: "popper", at: "bl" },
+          { id: "yay", at: "br" },
+        ],
         reaction: "m-pleading",
       },
       {
@@ -79,7 +86,7 @@ export const apologyStories = [
         eyebrow: "Very official",
         title: "I *surrender.*",
         hint: "Press and hold the seal",
-        note: "I, Rohan, was wrong. This cat is my witness.",
+        note: "I, {from}, was wrong. This cat is my witness.",
         stickers: [{ id: "m-bow-cat", at: "tr" }],
         reaction: "m-bow-down",
       },
@@ -171,7 +178,7 @@ export const apologyStories = [
         title: "I got you *something.*",
         hint: "Tap the box 3 times",
         taps: 3,
-        inside: "One very sorry Rohan",
+        inside: "One very sorry {from}",
         insideSub: "No returns, sorry",
         stickers: [{ id: "m-pleading", at: "tr" }],
         reaction: "m-bow-down",
@@ -182,7 +189,7 @@ export const apologyStories = [
         title: "One flower per *mistake.*",
         hint: "Add five flowers",
         flowers: 5,
-        card: "Sorry, Ananya. Really.",
+        card: "Sorry, {to}. Really.",
         done: "Yeah, it’s a big bouquet. I know.",
         stickers: [{ id: "m-flower-kitten", at: "bl" }],
         reaction: "m-flower-cat",
@@ -257,6 +264,18 @@ export const apologyStories = [
         done: "Friends again!!",
         stickers: [{ id: "m-please-monkey", at: "bl" }],
         reaction: "m-dance-cat",
+      },
+      {
+        type: "letter",
+        eyebrow: "Okay, for real",
+        title: "I’m *sorry.*",
+        paragraphs: [
+          "The games were me stalling. This is the actual apology.",
+          "{to}, I was wrong. You mattered the whole time. I’ll do better — starting with listening.",
+        ],
+        signoff: "Sorry, really, {from}",
+        photo: photo("chai-hands"),
+        stickers: [{ id: "b-heart-peek", at: "bl" }],
       },
     ],
   }),

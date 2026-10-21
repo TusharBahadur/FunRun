@@ -73,6 +73,18 @@ export const anniversaryStories = [
         stickers: [{ id: "b-flowers", at: "tr" }],
         reaction: "m-kuchu-puchu",
       },
+      {
+        type: "letter",
+        eyebrow: "Okay, the sappy part",
+        title: "Three years. *Still you.*",
+        paragraphs: [
+          "I still get a little stupid when you text. That’s the whole review of year three.",
+          "Happy anniversary, {to}. Let’s keep the date nights and the tiny things. Especially the tiny things.",
+        ],
+        signoff: "Still yours, {from}",
+        photo: photo("chai-hands"),
+        stickers: [{ id: "b-couple", at: "bl" }],
+      },
     ],
   }),
 
@@ -201,7 +213,7 @@ export const anniversaryStories = [
         eyebrow: "Year three, the bill",
         title: "What this year *cost us.*",
         hint: "Tap to print",
-        store: "Aditi & Kabir Pvt. Ltd.",
+        store: "{to} & {from} Pvt. Ltd.",
         items: [
           { name: "Movies you slept through", qty: "148" },
           { name: "AC temperature fights", qty: "302" },
@@ -236,7 +248,7 @@ export const anniversaryStories = [
         wishes: [
           { name: "Maa", message: "Three years! You two make it look easy. Dinner on Sunday, both of you." },
           { name: "Ishita", message: "Still the couple everyone secretly wants to be. Gross. Love you." },
-          { name: "Raghav", message: "Kabir, you’re punching way above your weight. Happy anniversary!" },
+          { name: "Raghav", message: "{from}, you’re punching way above your weight. Happy anniversary!" },
           { name: "Nani", message: "Stay happy, stay together. Lots of blessings, bachcho." },
         ],
         stickers: [{ id: "m-cat-kiss", at: "br" }],
@@ -257,6 +269,18 @@ export const anniversaryStories = [
         done: "Same wish as mine, I bet.",
         stickers: [{ id: "sparkles", at: "tl", size: "s" }],
         reaction: "m-heart-eyes",
+      },
+      {
+        type: "letter",
+        eyebrow: "Before year four",
+        title: "This part is *just us.*",
+        paragraphs: [
+          "8 billion people and I got you. I know I already said that. I’m saying it again.",
+          "Happy anniversary, {to}. I don’t know what year four looks like. I just know I want you in it.",
+        ],
+        signoff: "Your co-pilot, {from}",
+        photo: photo("night-sky"),
+        stickers: [{ id: "b-couple", at: "bl" }],
       },
     ],
   }),

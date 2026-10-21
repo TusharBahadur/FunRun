@@ -110,7 +110,7 @@ export const friendshipStories = [
         eyebrow: "Invoice",
         title: "Services *rendered.*",
         hint: "Tap to print",
-        store: "Ananya Systems",
+        store: "{from} Systems",
         items: [
           { name: "Voice-note hosting", qty: "412" },
           { name: "‘I’m 5 min away’ bug (unfixed)", qty: "1" },
@@ -145,7 +145,7 @@ export const friendshipStories = [
         questions: [
           {
             q: "Who still says ‘I’m 5 minutes away’?",
-            options: ["Riya", "Ananya", "Both, every time"],
+            options: ["{to}", "{from}", "Both, every time"],
             reply: "Both. The patch did not take. We ship it anyway.",
           },
           {
@@ -179,7 +179,7 @@ export const friendshipStories = [
       {
         type: "letter",
         eyebrow: "From engineering",
-        title: "Dear *Riya.*",
+        title: "Dear *{to}.*",
         paragraphs: [
           "I could have sent a sticker. I wrote you a whole changelog instead, which is more embarrassing, honestly.",
           "Happy Friendship Day. Don’t uninstall me. The rollback is ugly.",

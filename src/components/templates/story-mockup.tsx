@@ -1,7 +1,7 @@
 import { Heart, Phone, Sparkles, Video } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
-import { DoorArt } from "@/components/story/gift-door";
+import { CallArt } from "@/components/story/gift-call";
 import { Sticker, type AnyStickerId, type StickerId } from "@/components/story/stickers";
 import type { Photo, Scene, Story, StoryPalette } from "@/components/story/types";
 import type { Template } from "@/lib/templates";
@@ -832,8 +832,8 @@ export function ScreenPeek({ scene, g, className, big = false }: { scene: Scene;
       <p className={cn("type-display mt-[1.6cqw] text-balance", big ? "text-[5.6cqw]" : "text-[3.4cqw]")}>{unstar(title)}</p>
 
       {scene.type === "knock" ? (
-        <div className={cn("mt-[2cqw]", big ? "w-[38%]" : "w-[52%]")}>
-          <DoorArt palette={palette} />
+        <div className={cn("mt-[2cqw]", big ? "w-[34%]" : "w-[46%]")}>
+          <CallArt palette={palette} caller={scene.caller} />
         </div>
       ) : photo ? (
         <div className={cn("relative mt-[3cqw] bg-white p-[1cqw] pb-[3.5cqw] shadow-[0_2cqw_3cqw_-2cqw_rgba(0,0,0,.4)]", big ? "w-[34%]" : "w-[78%]")} style={{ rotate: "-3deg" }}>

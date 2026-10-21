@@ -189,7 +189,7 @@ function PagesPlayer({
             data-studio-scene={safeIndex}
             className="relative"
           >
-            <StickerLayer stickers={scene.stickers} />
+            {scene.type !== "knock" && <StickerLayer stickers={scene.stickers} />}
             {/* The studio shows every page finished, so what you edit is on screen without playing for it. */}
             <SceneFontsContext.Provider value={scene.fonts}>
               <SceneView scene={scene} done={pageDone} onDone={studio ? noop : () => complete(safeIndex)} />

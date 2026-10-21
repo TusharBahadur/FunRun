@@ -18,10 +18,10 @@ export const familyStories = [
       {
         type: "bouquet",
         eyebrow: "For you",
-        title: "Flowers for you, *Maa.*",
+        title: "Flowers for you, *{to}.*",
         hint: "Add five flowers",
         flowers: 5,
-        card: "For Maa, love Riya",
+        card: "For {to}, love {from}",
         done: "Your favourite colours. I remembered.",
         stickers: [{ id: "m-flower-kitten", at: "bl" }],
         reaction: "m-flower-cat",
@@ -55,12 +55,12 @@ export const familyStories = [
       {
         type: "letter",
         eyebrow: "From me",
-        title: "Maa, *read this.*",
+        title: "{to}, *read this.*",
         paragraphs: [
           "You remember everything. My exam dates, my favourite sabzi, the girl I fought with in Class 6.",
-          "Today let me do the remembering for once. I love you, Maa. I don’t say it enough.",
+          "Today let me do the remembering for once. I love you, {to}. I don’t say it enough.",
         ],
-        signoff: "Your Riya",
+        signoff: "Your {from}",
         photo: photo("chai-hands"),
       },
     ],
@@ -82,12 +82,12 @@ export const familyStories = [
     scenes: [
       {
         type: "meter",
-        eyebrow: "For Papa",
-        title: "How *cool* is Papa?",
+        eyebrow: "For {to}",
+        title: "How *cool* is {to}?",
         hint: "Tap fast to measure",
         label: "Cool-o-meter",
         levels: ["Sandals with socks", "Decent", "Pretty cool", "Coolest dad on the street", "Broke the meter"],
-        done: "Results are in. Coolest Papa.",
+        done: "Results are in. Coolest {to}.",
         stickers: [{ id: "m-side-eye", at: "br" }],
         reaction: "m-ahhh",
       },
@@ -96,7 +96,7 @@ export const familyStories = [
         eyebrow: "The actual bill",
         title: "Who *paid* for all this?",
         hint: "Tap to print",
-        store: "Papa’s Wallet",
+        store: "{to}’s Wallet",
         items: [
           { name: "Lights we never switched off", qty: "habitual" },
           { name: "School, then college", qty: "∞" },
@@ -137,7 +137,7 @@ export const familyStories = [
       {
         type: "letter",
         eyebrow: "Okay, serious bit",
-        title: "Papa, *thank you.*",
+        title: "{to}, *thank you.*",
         paragraphs: [
           "For every early morning, every school pickup, every “I’ll handle it”.",
           "I don’t say it enough. I’m really proud to be your kid.",
@@ -203,7 +203,7 @@ export const familyStories = [
       {
         type: "letter",
         eyebrow: "The sincere page",
-        title: "Didi, *thanks.*",
+        title: "{to}, *thanks.*",
         paragraphs: [
           "You were the first person who felt like mine. Before friends, before anyone.",
           "I know I still steal your stuff. I’ll keep doing that. Love you anyway.",
@@ -232,9 +232,9 @@ export const familyStories = [
       {
         type: "meter",
         eyebrow: "Honest review",
-        title: "How *annoying* is Bhai?",
+        title: "How *annoying* is {to}?",
         hint: "Tap fast",
-        label: "Bhai-meter",
+        label: "{to}-meter",
         levels: ["Mild", "Regular", "Professional", "National-level", "Broke the meter (love him though)"],
         done: "Certified menace. Favourite menace.",
         stickers: [{ id: "m-side-eye", at: "br" }],
@@ -270,7 +270,7 @@ export const familyStories = [
       {
         type: "letter",
         eyebrow: "Okay, one sincere bit",
-        title: "Bhai, *listen.*",
+        title: "{to}, *listen.*",
         paragraphs: [
           "You act like you don’t care and then you show up with food. That’s the whole personality and I like it.",
           "Thanks for being my brother. Even the annoying years. Especially those.",

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Studio } from "@/components/studio/studio";
+import { bindStoryNames } from "@/lib/gift-names";
 import { getTemplateBySlug, getTemplates } from "@/lib/templates";
 
 export async function generateStaticParams() {
@@ -30,10 +31,11 @@ async function StudioLoader({ params, searchParams }: Pick<PageProps<"/studio/[s
   const template = await getTemplateBySlug(slug);
   if (!template?.story) notFound();
 
+  const seedNames = { recipient: template.story.recipient, sender: template.story.sender };
   const story = {
-    ...template.story,
-    recipient: toName || template.story.recipient,
-    sender: fromName || template.story.sender,
+    ...bindStoryNames(template.story, seedNames),
+    recipient: toName || seedNames.recipient,
+    sender: fromName || seedNames.sender,
   };
 
   const designs = await getTemplates({ occasion: template.occasion });
@@ -42,6 +44,7 @@ async function StudioLoader({ params, searchParams }: Pick<PageProps<"/studio/[s
     <Studio
       template={{ slug: template.slug, name: template.name, pricePaise: template.pricePaise, story }}
       designs={designs}
+      seedNames={seedNames}
       askNames={!toName && !fromName}
     />
   );

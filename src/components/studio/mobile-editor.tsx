@@ -25,6 +25,7 @@ import {
   SceneReaction,
   SceneStamp,
   SceneStickers,
+  stickerCap,
   type Selection,
 } from "./inspector";
 import { FieldFontPicker, FontPickerScope } from "./font-choices";
@@ -42,7 +43,7 @@ import {
   updateItem,
   updateScene,
 } from "./ops";
-import { stickerName } from "@/components/story/stickers";
+import { stickerName, type AnyStickerId } from "@/components/story/stickers";
 import { childField, sceneSchemas, sceneSubtitle, type FieldDef } from "./schema";
 
 type Edit = (next: Draft, tag?: string) => void;
@@ -219,6 +220,7 @@ function PageSettings({
   const stickerOn = !!field?.startsWith("sticker-");
 
   const stickers = scene.stickers ?? [];
+  const cap = stickerCap(scene);
   return (
     <>
       <p className="text-sm leading-snug text-muted">{schema.blurb}</p>
@@ -305,10 +307,11 @@ function PageSettings({
       )}
 
       <StudioField id={stickerOn ? field! : "stickers"} on={stickerOn}>
-        <Fold title="Stickers" preview={`${stickers.length} / 3`} open={stickerOn}>
+        <Fold title="Stickers" preview={`${stickers.length} / ${cap}`} open={stickerOn}>
           <SceneStickers
             draft={draft}
             stickers={stickers}
+            max={cap}
             onChange={(next) => edit(updateScene(draft, i, { stickers: next.length ? next : undefined }))}
           />
         </Fold>
@@ -577,6 +580,8 @@ function fieldPreview(field: FieldDef, value: unknown, names: Draft["story"]) {
       return String(value ?? field.min);
     case "image":
       return value ? "Photo added" : "No photo yet";
+    case "sticker":
+      return value ? stickerName(value as AnyStickerId) : "None";
     case "toggle":
       return value ? "On" : "Off";
     case "select":

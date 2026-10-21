@@ -15,9 +15,9 @@ type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
 /* ───────────── The letter ───────────── */
 
 export function LetterScene({ scene, done }: SceneProps<S<"letter">>) {
-  const { palette, fill } = useStory();
+  const { palette, fill, to, from } = useStory();
   return (
-    <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} done={done}>
+    <SceneShell layout="stack" eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} done={done}>
       <Paper
         className="relative w-[min(92vw,540px)] rotate-[-0.6deg] px-7 py-8 text-left md:px-10"
         style={{
@@ -39,8 +39,11 @@ export function LetterScene({ scene, done }: SceneProps<S<"letter">>) {
           </motion.div>
           </StudioHit>
         )}
+        <p className="type-hand pl-6 text-[1.05rem] leading-[34px] opacity-55">
+          For {to} · from {from}
+        </p>
         <p className="type-hand pl-6 text-[2rem] font-bold leading-[34px]" style={{ color: palette.accent }}>
-          Dear {fill("{to}")},
+          Dear {to},
         </p>
         <div className="type-hand mt-[34px] space-y-[34px] pl-6 text-[1.28rem] leading-[34px]">
           {scene.paragraphs.map((p, i) => (

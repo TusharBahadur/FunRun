@@ -61,7 +61,7 @@ export type Scene =
   | ({ type: "seal" } & Heading & { note: string })
   | ({ type: "scratch" } & Heading & { reveal: string; sub?: string })
   | ({ type: "lights" } & Heading & { candles: number; reveal: string })
-  | ({ type: "knock" } & Heading & { knocks: number; reveal: string })
+  | ({ type: "knock" } & Heading & { knocks: number; reveal: string; /** Sticker or gif filling the phone before they pick up. */ caller?: AnyStickerId; /** Sticker or gif after the call connects. */ party?: AnyStickerId })
   | ({ type: "unwrap" } & Heading & { taps: number; inside: string; insideSub?: string })
   // About them
   | ({ type: "spotlight" } & Heading & { photo?: string; tone?: PhotoTone; tags: string[]; /** Joins the notes at the end; defaults to the "yay!" stamp, null for none. */ stamp?: AnyStickerId | null })

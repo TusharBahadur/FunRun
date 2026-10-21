@@ -7,12 +7,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { StudioFrameMessage } from "@/app/studio/frame/page";
 import type { SceneType, Story } from "@/components/story/types";
 import type { Template } from "@/lib/templates";
+import { bindStoryNames, storyWithNames, type GiftNames } from "@/lib/gift-names";
 import { formatInr } from "@/lib/utils";
 import { AddSection } from "./add-section";
 import { Canvas, type DeviceMode } from "./canvas";
 import { ChangeDesign } from "./change-design";
 import { Checkout } from "./checkout";
-import { freshDraft, loadDraft, useDraft } from "./draft-store";
+import { freshDraft, loadDraft, useDraft, type Draft } from "./draft-store";
 import { ImageCropProvider } from "./image-crop";
 import { Inspector, type Selection } from "./inspector";
 import { isLook, LOOK } from "./look";
@@ -29,14 +30,42 @@ export type StudioTemplate = { slug: string; name: string; pricePaise: number; s
 export function Studio({
   template,
   designs,
+  seedNames,
   askNames = false,
 }: {
   template: StudioTemplate;
   designs: Template[];
+  /** Demo To / From from the catalog recipe, so leftover names in copy can be retokenized. */
+  seedNames: GiftNames;
   askNames?: boolean;
 }) {
   const initial = useMemo(() => freshDraft(template.slug, `${template.name} for ${template.story.recipient}`, template.story), [template]);
   const { draft, edit, undo, redo, reset, canUndo, canRedo, saved } = useDraft(initial);
+
+  const save = useCallback(
+    (next: Draft, tag?: string) => {
+      if (tag === "names" || tag === "names-to" || tag === "names-from") {
+        next = {
+          ...next,
+          story: storyWithNames(
+            draft.story,
+            { recipient: next.story.recipient, sender: next.story.sender },
+            seedNames,
+          ),
+        };
+      }
+      edit(next, tag);
+    },
+    [draft.story, edit, seedNames],
+  );
+
+  // Old drafts still have demo names written into lines. Turn those into {to} / {from}.
+  useEffect(() => {
+    const bound = bindStoryNames(draft.story, seedNames);
+    if (JSON.stringify(bound.scenes) === JSON.stringify(draft.story.scenes)) return;
+    edit({ ...draft, story: { ...draft.story, scenes: bound.scenes } }, "bind-names");
+    // Only when the people change: copy is retokenized, then fill() picks up the new names.
+  }, [draft.story.recipient, draft.story.sender, seedNames, edit, draft]);
   const [sel, setSel] = useState<Selection>({ scene: LOOK, item: null });
   const [device, setDevice] = useState<DeviceMode>("phone");
   const [run, setRun] = useState(0);
@@ -59,7 +88,7 @@ export function Studio({
     const recipient = to || story.recipient;
     const sender = from || story.sender;
     const autoName = draft.name === `${template.name} for ${story.recipient}`;
-    edit({ ...draft, name: autoName ? `${template.name} for ${recipient}` : draft.name, story: { ...story, recipient, sender } }, "names");
+    save({ ...draft, name: autoName ? `${template.name} for ${recipient}` : draft.name, story: { ...story, recipient, sender } }, "names");
     setNames(null);
   }
   // A draft saved before the template was rewritten would hide the new version.
@@ -290,12 +319,12 @@ export function Studio({
       <div className="flex min-h-0 flex-1 flex-col">
         {wide === true ? (
           <div className="flex min-h-0 flex-1">
-            <LeftPanel draft={draft} sel={sel} setSel={setSel} edit={edit} onAddSection={() => setAdding(true)} />
+            <LeftPanel draft={draft} sel={sel} setSel={setSel} edit={save} onAddSection={() => setAdding(true)} />
             <div className="flex min-h-0 min-w-0 flex-1 flex-col">
               <Canvas frames={frames} device={device} setDevice={setDevice} sceneLabel={sceneLabel} hidden={!!scenes[sceneIdx]?.hidden} onReplay={() => setRun((r) => r + 1)} />
             </div>
             <aside data-lenis-prevent className="hidden w-[340px] shrink-0 overflow-y-auto border-l border-line bg-cream lg:block">
-              <Inspector draft={draft} sel={sel} setSel={setSel} edit={edit} />
+              <Inspector draft={draft} sel={sel} setSel={setSel} edit={save} />
             </aside>
           </div>
         ) : (
@@ -313,7 +342,7 @@ export function Studio({
               <div className="sticky top-0 z-20">
                 <PageSwitcher draft={draft} sel={sel} setSel={setSel} onAddSection={() => setAdding(true)} />
               </div>
-              <MobileEditor draft={draft} edit={edit} sel={sel} setSel={setSel} />
+              <MobileEditor draft={draft} edit={save} sel={sel} setSel={setSel} />
             </div>
           </div>
         )}

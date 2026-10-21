@@ -24,7 +24,7 @@ export const ourCorner = siteTemplate({
   scenes: [
     {
       type: "hero",
-      eyebrow: "Aditi & Kabir",
+      eyebrow: "{to} & {from}",
       title: "Three years, *still us.*",
       subtitle: "my favourite person",
       photo: photo("chai-hands"),
@@ -78,7 +78,7 @@ export const ourCorner = siteTemplate({
         "Thank you for the laughs, the long calls, the random voice notes, and every moment that made me think, okay, yeah, this is a good thing. I don’t say it out loud enough, so I put it on a website. Very normal.",
         "I don’t know exactly what comes next. I’m just really glad we’re figuring it out together.",
       ],
-      signoff: "Happy anniversary. — Kabir",
+      signoff: "Happy anniversary. — {from}",
     },
   ],
 });
@@ -99,7 +99,7 @@ export const justForYou = siteTemplate({
   scenes: [
     {
       type: "hero",
-      eyebrow: "For Meher",
+      eyebrow: "For {to}",
       title: "I made you *a website.*",
       subtitle: "very normal behaviour",
       photo: photo("night-sky"),
@@ -143,7 +143,7 @@ export const justForYou = siteTemplate({
         "I’m bad at saying this stuff out loud. It always comes out wrong, or too much. So here it is, written down properly.",
         "You’re the calmest place I know. You make ordinary days feel like they matter. I love you, and I wanted you to have somewhere to come back to when you need reminding.",
       ],
-      signoff: "Yours, Arjun",
+      signoff: "Yours, {from}",
       photo: photo("chai-hands"),
     },
   ],
@@ -166,7 +166,7 @@ export const birthdayPage = siteTemplate({
     {
       type: "hero",
       eyebrow: "Happy birthday",
-      title: "It’s *Maya’s* day.",
+      title: "It’s *{to}’s* day.",
       subtitle: "officially 27",
       photo: photo("maya-portrait"),
       tone: "rose",
@@ -218,7 +218,7 @@ export const birthdayPage = siteTemplate({
         "I didn’t know what to get you, so you’re getting a website. You’re welcome.",
         "You make everyone around you feel like they matter. I hope 27 gives some of that back to you. Say yes to the trip. Finish the painting. Let people spoil you a bit.",
       ],
-      signoff: "Love you lots, Sam",
+      signoff: "Love you lots, {from}",
     },
   ],
 });
@@ -240,7 +240,7 @@ export const fanPage = siteTemplate({
     {
       type: "hero",
       eyebrow: "The official fan page",
-      title: "Zoya: *the website.*",
+      title: "{to}: *the website.*",
       subtitle: "main character, obviously",
       photo: photo("saree-laughs"),
       tone: "rose",
@@ -248,7 +248,7 @@ export const fanPage = siteTemplate({
     {
       type: "noticed",
       eyebrow: "Verified facts",
-      title: "Things about Zoya that are *simply true.*",
+      title: "Things about {to} that are *simply true.*",
       items: [
         { title: "Best taste in music", text: "Not up for debate. Every playlist she makes is better than mine. I’ve stopped trying." },
         { title: "Notices everything", text: "New haircut, bad day, the one quiet moment in a loud room. She clocks it all." },
@@ -269,7 +269,7 @@ export const fanPage = siteTemplate({
     {
       type: "playlist",
       eyebrow: "Her playlist",
-      title: "Approved by Zoya. *Mostly.*",
+      title: "Approved by {to}. *Mostly.*",
       songs: [
         { title: "Ilahi", note: "her road trip song, no skipping", tone: "sun", src: photo("road-trip") },
         { title: "Tera Ban Jaunga", note: "this one’s from me", tone: "rose", src: board("44.jpg") },
@@ -278,12 +278,12 @@ export const fanPage = siteTemplate({
     {
       type: "letter",
       eyebrow: "A letter from your #1 fan",
-      title: "Dear Zoya",
+      title: "Dear {to}",
       paragraphs: [
         "I’ve been your fan since the first time you laughed at my bad joke. And it was a really bad joke.",
         "Happy Girlfriend’s Day. Thanks for being exactly you, loudly. The fan club meets daily. Membership: me.",
       ],
-      signoff: "Your #1 fan, Ishaan",
+      signoff: "Your #1 fan, {from}",
     },
   ],
 });
@@ -305,7 +305,7 @@ export const hisPage = siteTemplate({
     {
       type: "hero",
       eyebrow: "The official fan page",
-      title: "Kabir: *the website.*",
+      title: "{to}: *the website.*",
       subtitle: "leading man, obviously",
       photo: photo("chai-cheers"),
       tone: "sun",
@@ -313,7 +313,7 @@ export const hisPage = siteTemplate({
     {
       type: "noticed",
       eyebrow: "Verified facts",
-      title: "Things about Kabir that are *simply true.*",
+      title: "Things about {to} that are *simply true.*",
       items: [
         { title: "Makes a plan and actually does it", text: "Rare in this economy. He says ‘Saturday’ and then Saturday happens." },
         { title: "Calm in a crisis", text: "I spiral. He brings water. It’s embarrassing how well it works." },
@@ -334,7 +334,7 @@ export const hisPage = siteTemplate({
     {
       type: "playlist",
       eyebrow: "His playlist",
-      title: "Approved by Kabir. *Mostly.*",
+      title: "Approved by {to}. *Mostly.*",
       songs: [
         { title: "Ilahi", note: "his road trip song, no skipping", tone: "sun", src: photo("road-trip") },
         { title: "Tum Se Hi", note: "this one’s from me", tone: "rose", src: photo("chai-hands") },
@@ -343,12 +343,12 @@ export const hisPage = siteTemplate({
     {
       type: "letter",
       eyebrow: "A letter from your #1 fan",
-      title: "Dear Kabir",
+      title: "Dear {to}",
       paragraphs: [
         "I could post you. I didn’t. I made you a website instead, which is worse, honestly.",
         "Happy Boyfriend’s Day. You’re my favourite person to come home to. The fan club meets daily. Membership: me.",
       ],
-      signoff: "Your #1 fan, Meher",
+      signoff: "Your #1 fan, {from}",
     },
   ],
 });

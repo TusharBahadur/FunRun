@@ -374,6 +374,13 @@ export function isUploadedSticker(id: AnyStickerId): id is UploadedSticker {
   return id.startsWith("data:");
 }
 
+/** Bitmap for a board sticker or upload; drawn stickers have none. */
+export function stickerImage(id: AnyStickerId) {
+  if (isUploadedSticker(id)) return id;
+  if (id in board) return `/stickers/board/${board[id as BoardStickerId].file}`;
+  return null;
+}
+
 export function stickerName(id: AnyStickerId) {
   if (isUploadedSticker(id)) return "Your sticker";
   return id in board ? board[id as BoardStickerId].name : stickerNames[id as StickerId];

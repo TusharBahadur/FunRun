@@ -121,7 +121,7 @@ export const bestFriendsStories = [
         eyebrow: "The tab",
         title: "What we *got away with.*",
         hint: "Tap to print",
-        store: "Dev & Arjun, unofficial",
+        store: "{to} & {from}, unofficial",
         items: [
           { name: "Drives with no playlist", qty: "habitual" },
           { name: "‘We were studying’", qty: "classified" },
@@ -149,7 +149,7 @@ export const bestFriendsStories = [
       {
         type: "letter",
         eyebrow: "The sincere bit",
-        title: "Dev, *listen.*",
+        title: "{to}, *listen.*",
         paragraphs: [
           "You’re the person I call when I don’t want advice. Just company. That’s a bigger deal than it sounds.",
           "Happy Best Friends Day. If anyone asks, we were studying.",
@@ -233,7 +233,7 @@ export const bestFriendsStories = [
         title: "People who *already knew.*",
         wishes: [
           { name: "Kabir", message: "You two have been married in a friendship way for years. Congrats I guess." },
-          { name: "Sana", message: "Arjun talks about Dev like it’s a podcast. Happy Best Friends Day." },
+          { name: "Sana", message: "{from} talks about {to} like it’s a podcast. Happy Best Friends Day." },
           { name: "His Didi", message: "Finally someone said it. He’s your person. We all see it." },
           { name: "Coach", message: "Best doubles team I’ve ever had. Off the court too." },
         ],
@@ -246,6 +246,18 @@ export const bestFriendsStories = [
         transcript: "{to}, you’re my person. That’s the whole speech. Happy Best Friends Day. Come over.",
         seconds: 6,
         stickers: [{ id: "m-penguin", at: "bl" }],
+      },
+      {
+        type: "letter",
+        eyebrow: "The sincere paragraph",
+        title: "Okay, *read this.*",
+        paragraphs: [
+          "Not my brother. Not my roommate. My person. I meant that.",
+          "{to}, thanks for getting me. Come over. I’ll make maggi. That’s the speech.",
+        ],
+        signoff: "Your person, {from}",
+        photo: photo("road-trip"),
+        stickers: [{ id: "b-besties", at: "bl" }],
       },
     ],
   }),

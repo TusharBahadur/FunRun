@@ -4,8 +4,9 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Accented } from "@/components/experiences/birthday/accented";
 import { EASE_OUT } from "@/lib/motion";
-import { GiftDoor } from "../gift-door";
+import { DEFAULT_CALLER, DEFAULT_PARTY, GiftCall } from "../gift-call";
 import { Backdrop, capturePointer, HoldRing, SceneShell, StudioAlso, StudioHit, useHold, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
+import { Sticker, stickerImage } from "../stickers";
 import type { Scene } from "../types";
 
 type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
@@ -253,12 +254,15 @@ export function LightsScene({ scene, done, onDone }: SceneProps<S<"lights">>) {
   );
 }
 
-/* ───────────── Knock on the door ───────────── */
+/* ───────────── Incoming call: pick up until it connects ───────────── */
 
 export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
-  const { palette, fill } = useStory();
+  const { fill, palette } = useStory();
   const [knocks, setKnocks] = useState(done ? scene.knocks : 0);
   const [shake, setShake] = useState(0);
+  const caller = scene.caller ?? DEFAULT_CALLER;
+  const party = scene.party ?? DEFAULT_PARTY;
+  const callerSrc = stickerImage(caller);
 
   function knock() {
     if (done) return;
@@ -275,31 +279,45 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done} layout="stack">
       <div className="relative">
-        <GiftDoor
+        <GiftCall
           open={done}
           shake={shake}
           onKnock={knock}
           knocks={knocks}
           total={scene.knocks}
+          caller={caller}
+          party={party}
+          stickers={scene.stickers}
           reveal={
             <StudioHit field="reveal">
-              <p className="type-display text-[1.35rem] font-semibold leading-[1.15] sm:text-[1.5rem]">{fill(scene.reveal)}</p>
+              <p className="type-hand text-[1.15rem] font-bold leading-tight">{fill(scene.reveal)}</p>
             </StudioHit>
           }
         />
         {!done && knocks > 0 && (
-          <motion.span
+          <motion.div
             key={`t${knocks}`}
-            className="type-display pointer-events-none absolute -right-8 top-8 text-xl font-semibold"
-            style={{ color: palette.accent }}
-            initial={{ opacity: 0, y: 10, rotate: -8 }}
-            animate={{ opacity: [0, 1, 0], y: -20 }}
-            transition={{ duration: 0.9 }}
+            className="pointer-events-none absolute -right-4 top-6 size-14"
+            initial={{ opacity: 0, y: 12, scale: 0.4, rotate: -20 }}
+            animate={{ opacity: [0, 1, 1, 0], y: -28, scale: 1, rotate: 12 }}
+            transition={{ duration: 0.85 }}
           >
-            knock!
-          </motion.span>
+            <Sticker id="heart" className="size-14" />
+          </motion.div>
         )}
       </div>
+      <StudioAlso label="Who’s calling — before they pick up" field="caller">
+        <div className="relative w-24 overflow-hidden rounded-[1.6rem]" style={{ backgroundColor: palette.cream }}>
+          <span className="relative block aspect-[9/15] w-full">
+            {callerSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={callerSrc} alt="" className="size-full object-cover" />
+            ) : (
+              <Sticker id={caller} className="size-full shadow-none" />
+            )}
+          </span>
+        </div>
+      </StudioAlso>
     </SceneShell>
   );
 }

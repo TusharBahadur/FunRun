@@ -199,7 +199,7 @@ function SiteBlock({ scene, index, studio, refCb }: { scene: Scene; index: numbe
   const Game = SCENES[scene.type];
   return (
     <div ref={refCb} data-studio-scene={index} className="relative scroll-mt-0 lg:scroll-mt-24">
-      <StickerLayer stickers={scene.stickers} />
+      {scene.type !== "knock" && <StickerLayer stickers={scene.stickers} />}
       <SceneFontsContext.Provider value={scene.fonts}>
         {Section ? (
           <Section scene={scene} done={done} onDone={() => setDone(true)} />

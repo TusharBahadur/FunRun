@@ -238,7 +238,7 @@ export function SceneShell({
   tone?: "light" | "dark";
   /** Studio: which field the headline maps to (e.g. "reveal" after a game). */
   titleField?: string;
-  /** "stack" sits the playfield under a smaller title — quizzes, doors. */
+  /** "stack" sits the playfield under a smaller title — quizzes, calls. */
   layout?: "stage" | "stack";
 }) {
   const { palette, fill } = useStory();
