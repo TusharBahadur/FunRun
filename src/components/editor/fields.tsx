@@ -66,6 +66,7 @@ export function Field({
   children,
   counter,
   roomy,
+  highlight,
 }: {
   label: string;
   hint?: ReactNode;
@@ -73,10 +74,18 @@ export function Field({
   counter?: string;
   /** Phone editor: sentence-case labels you can actually read. */
   roomy?: boolean;
+  /** Studio: this field is the one tapped in the preview. */
+  highlight?: boolean;
 }) {
   return (
     <label className="block">
-      <span className={roomy ? "flex items-baseline justify-between text-base font-medium text-ink" : "type-label flex items-baseline justify-between text-muted"}>
+      <span
+        className={cn(
+          "flex items-baseline justify-between",
+          roomy ? "text-base font-medium" : "type-label",
+          highlight ? "text-rose-deep" : roomy ? "text-ink" : "text-muted",
+        )}
+      >
         {label}
         {counter && <span className={roomy ? "text-sm font-normal text-muted" : "text-[10px]"}>{counter}</span>}
       </span>

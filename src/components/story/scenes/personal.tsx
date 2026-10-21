@@ -5,7 +5,8 @@ import { Heart } from "lucide-react";
 import { useRef, useState } from "react";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
 import { EASE_OUT } from "@/lib/motion";
-import { SceneShell, Tape, useStory, type SceneProps } from "../scene-kit";
+import { cn } from "@/lib/utils";
+import { SceneShell, StudioHit, Tape, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
 import { Sticker } from "../stickers";
 import type { Scene } from "../types";
 
@@ -26,7 +27,9 @@ const NOTE_COLORS = ["#fff4a8", "#ffd3da", "#cdeccf", "#d6e6ff", "#ffe0b8", "#e7
 
 export function SpotlightScene({ scene, done, onDone }: SceneProps<S<"spotlight">>) {
   const { palette, fill } = useStory();
+  const studio = useStudioEdit();
   const tags = scene.tags.slice(0, NOTE_SPOTS.length);
+  const stamp = scene.stamp === undefined ? "yay" : scene.stamp;
   const [shown, setShown] = useState(done ? tags.length : 0);
 
   function reveal() {
@@ -39,6 +42,7 @@ export function SpotlightScene({ scene, done, onDone }: SceneProps<S<"spotlight"
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
       <div className="relative mb-10 mt-2 w-[min(62vw,280px)]">
+        <StudioHit field="photo" className="relative block w-full">
         <motion.button
           type="button"
           onClick={reveal}
@@ -65,33 +69,40 @@ export function SpotlightScene({ scene, done, onDone }: SceneProps<S<"spotlight"
             <Heart className="size-4 fill-current" style={{ color: palette.accent }} />
           </span>
         </motion.button>
+        </StudioHit>
 
         {tags.map((t, i) => (
           <AnimatePresence key={i}>
             {i < shown && (
-              <motion.p
-                initial={{ scale: 0, opacity: 0, rotate: 0 }}
-                animate={{ scale: 1, opacity: 1, rotate: NOTE_SPOTS[i].rotate }}
-                transition={{ type: "spring", bounce: 0.5 }}
-                className="type-hand pointer-events-none absolute z-10 w-[min(36vw,150px)] px-3 py-2.5 text-left text-[15px] leading-tight shadow-[0_10px_18px_-10px_rgba(27,18,21,.45)] md:text-base"
-                style={{ left: NOTE_SPOTS[i].left, top: NOTE_SPOTS[i].top, backgroundColor: NOTE_COLORS[i], color: "#2a1a1f" }}
-              >
-                {fill(t)}
-              </motion.p>
+              <div className="absolute z-10" style={{ left: NOTE_SPOTS[i].left, top: NOTE_SPOTS[i].top }}>
+                <StudioHit field="tags" item={i}>
+                  <motion.p
+                    initial={{ scale: 0, opacity: 0, rotate: 0 }}
+                    animate={{ scale: 1, opacity: 1, rotate: NOTE_SPOTS[i].rotate }}
+                    transition={{ type: "spring", bounce: 0.5 }}
+                    className="type-hand w-[min(36vw,150px)] px-3 py-2.5 text-left text-[15px] leading-tight shadow-[0_10px_18px_-10px_rgba(27,18,21,.45)] md:text-base"
+                    style={{ backgroundColor: NOTE_COLORS[i], color: "#2a1a1f" }}
+                  >
+                    {fill(t)}
+                  </motion.p>
+                </StudioHit>
+              </div>
             )}
           </AnimatePresence>
         ))}
 
         <AnimatePresence>
           {/* The stamp sits where the 5th and 6th notes go, so it only joins shorter lists. */}
-          {shown >= tags.length && tags.length <= 4 && (
+          {stamp && (shown >= tags.length || studio) && tags.length <= 4 && (
             <motion.div
               className="pointer-events-none absolute -bottom-10 -right-12 z-20"
               initial={{ scale: 0, rotate: -30 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", bounce: 0.6, delay: 0.3 }}
             >
-              <Sticker id="yay" className="size-24" />
+              <StudioHit field="stamp">
+                <Sticker id={stamp} className="size-24" />
+              </StudioHit>
             </motion.div>
           )}
         </AnimatePresence>
@@ -119,9 +130,17 @@ export function ComplimentsScene({ scene, done, onDone }: SceneProps<S<"complime
 
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
-      <div className="grid w-full max-w-xl grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-3">
+      <div className="mx-auto grid w-fit grid-cols-2 justify-items-center gap-x-5 gap-y-5 sm:grid-cols-3">
         {scene.bubbles.map((b, i) => (
-          <div key={i} className="relative grid min-h-32 place-items-center">
+          <StudioHit
+            key={i}
+            field="bubbles"
+            item={i}
+            className={cn(
+              "relative grid place-items-center",
+              popped[i] ? "w-[9.75rem] rounded-2xl" : "size-28 sm:size-32",
+            )}
+          >
             <AnimatePresence mode="popLayout" initial={false}>
               {popped[i] ? (
                 <motion.p
@@ -169,7 +188,7 @@ export function ComplimentsScene({ scene, done, onDone }: SceneProps<S<"complime
                 ))}
               </span>
             )}
-          </div>
+          </StudioHit>
         ))}
       </div>
     </SceneShell>

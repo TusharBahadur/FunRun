@@ -36,5 +36,10 @@ async function StudioLoader({ params, searchParams }: Pick<PageProps<"/studio/[s
     sender: fromName || template.story.sender,
   };
 
-  return <Studio template={{ slug: template.slug, name: template.name, pricePaise: template.pricePaise, story }} />;
+  return (
+    <Studio
+      template={{ slug: template.slug, name: template.name, pricePaise: template.pricePaise, story }}
+      askNames={!toName && !fromName}
+    />
+  );
 }

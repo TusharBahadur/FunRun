@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useMotionValue, useTransform, type PanInfo } from "motion/react";
 import { useRef, useState } from "react";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
-import { Paper, SceneShell, StoryButton, Tape, useStory, type SceneProps } from "../scene-kit";
+import { Paper, SceneShell, StoryButton, StudioHit, StudioPager, Tape, usePickedItem, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
 import type { Scene } from "../types";
 
 type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
@@ -46,26 +46,27 @@ export function ReceiptScene({ scene, done, onDone }: SceneProps<S<"receipt">>) 
             clipPath: totalShown ? "polygon(0 0,100% 0,100% calc(100% - 8px),95% 100%,90% calc(100% - 8px),85% 100%,80% calc(100% - 8px),75% 100%,70% calc(100% - 8px),65% 100%,60% calc(100% - 8px),55% 100%,50% calc(100% - 8px),45% 100%,40% calc(100% - 8px),35% 100%,30% calc(100% - 8px),25% 100%,20% calc(100% - 8px),15% 100%,10% calc(100% - 8px),5% 100%,0 calc(100% - 8px))" : undefined,
           }}
         >
-          <p className="text-center font-semibold">{fill(scene.store)}</p>
+          <StudioHit field="store">
+            <p className="text-center font-semibold">{fill(scene.store)}</p>
+          </StudioHit>
           <p className="mb-3 text-center opacity-50">{new Date().toLocaleDateString("en-IN")} · counter 01</p>
           {scene.items.slice(0, printed).map((it, i) => (
-            <motion.p
-              key={i}
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex gap-2 py-0.5"
-            >
-              <span className="truncate">{fill(it.name)}</span>
-              <span className="flex-1 border-b border-dotted border-current opacity-30" />
-              <span>{fill(it.qty)}</span>
-            </motion.p>
+            <StudioHit key={i} field="items" item={i}>
+              <motion.p initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex gap-2 py-0.5">
+                <span className="truncate">{fill(it.name)}</span>
+                <span className="flex-1 border-b border-dotted border-current opacity-30" />
+                <span>{fill(it.qty)}</span>
+              </motion.p>
+            </StudioHit>
           ))}
           {totalShown && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p className="mt-3 flex justify-between border-t border-dashed border-current pt-2 font-semibold">
-                <span>Total</span>
-                <span>{fill(scene.total)}</span>
-              </p>
+              <StudioHit field="total">
+                <p className="mt-3 flex justify-between border-t border-dashed border-current pt-2 font-semibold">
+                  <span>Total</span>
+                  <span>{fill(scene.total)}</span>
+                </p>
+              </StudioHit>
               <p className="mt-3 text-center opacity-50">No refunds. No returns. Keep forever.</p>
               <p className="mt-2 text-center tracking-[0.3em] opacity-70">||| || ||| | || |||</p>
             </motion.div>
@@ -85,12 +86,16 @@ export function ReceiptScene({ scene, done, onDone }: SceneProps<S<"receipt">>) 
 
 export function DeckScene({ scene, done, onDone }: SceneProps<S<"deck">>) {
   const { palette, fill } = useStory();
-  const [gone, setGone] = useState(done ? scene.cards.length : 0);
+  const studio = useStudioEdit();
+  const picked = usePickedItem(["cards"]);
+  const [thrown, setThrown] = useState(done ? scene.cards.length : 0);
+  // Studio: the card being edited sits on top, so changes show as you type.
+  const gone = studio ? Math.min(picked ?? 0, scene.cards.length - 1) : thrown;
   const left = scene.cards.length - gone;
 
   function next() {
-    const n = gone + 1;
-    setGone(n);
+    const n = thrown + 1;
+    setThrown(n);
     if (n >= scene.cards.length) onDone();
   }
 
@@ -110,18 +115,21 @@ export function DeckScene({ scene, done, onDone }: SceneProps<S<"deck">>) {
             const depth = i - gone;
             if (depth > 3) return null;
             return (
-              <DeckCard key={i} index={i} total={scene.cards.length} depth={depth} onThrow={next}>
-                {fill(text)}
-              </DeckCard>
+              <StudioHit key={i} field="cards" item={i} className="absolute inset-0">
+                <DeckCard index={i} total={scene.cards.length} depth={depth} onThrow={next}>
+                  {fill(text)}
+                </DeckCard>
+              </StudioHit>
             );
           })}
         </AnimatePresence>
       </div>
-      {left > 0 && (
+      {left > 0 && !studio && (
         <p className="type-label mt-6 tabular-nums opacity-60">
           {gone + 1} / {scene.cards.length}
         </p>
       )}
+      <StudioPager count={scene.cards.length} field="cards" current={gone} />
     </SceneShell>
   );
 }
@@ -144,6 +152,7 @@ function DeckCard({
   const rotate = useTransform(x, [-200, 200], [-16, 16]);
   const top = depth === 0;
   const tint = [palette.cream, palette.pink, palette.gold, palette.cream][index % 4];
+  const dragged = useRef(false);
 
   return (
     <motion.button
@@ -155,10 +164,21 @@ function DeckCard({
       exit={{ x: x.get() < 0 ? -420 : 420, rotate: x.get() < 0 ? -30 : 30, opacity: 0, transition: { duration: 0.4 } }}
       drag={top ? "x" : false}
       dragSnapToOrigin
+      onDragStart={() => {
+        dragged.current = true;
+      }}
       onDragEnd={(_: unknown, info: PanInfo) => {
+        window.setTimeout(() => (dragged.current = false), 0);
         if (Math.abs(info.offset.x) > 80 || Math.abs(info.velocity.x) > 500) onThrow();
       }}
-      onClick={top ? onThrow : undefined}
+      onClick={() => {
+        // The click that ends a swipe isn't a tap: don't throw a second card.
+        if (dragged.current) {
+          dragged.current = false;
+          return;
+        }
+        if (top) onThrow();
+      }}
       tabIndex={top ? 0 : -1}
       aria-label={top ? `${children}. Next` : undefined}
     >
@@ -191,10 +211,14 @@ export function CouponScene({ scene, done, onDone }: SceneProps<S<"coupon">>) {
           style={{ backgroundColor: palette.cream, color: palette.ink }}
         >
           <p className="type-label text-[10px] opacity-60">Admit one · valid forever</p>
-          <p className="type-accent mt-2 text-[1.9rem] leading-tight" style={{ color: palette.accent }}>
-            {fill(scene.offer)}
-          </p>
-          <p className="type-label mt-3 text-[10px] opacity-60">{fill(scene.terms)}</p>
+          <StudioHit field="offer" className="mx-auto w-fit">
+            <p className="type-accent mt-2 text-[1.9rem] leading-tight" style={{ color: palette.accent }}>
+              {fill(scene.offer)}
+            </p>
+          </StudioHit>
+          <StudioHit field="terms" className="mx-auto w-fit">
+            <p className="type-label mt-3 text-[10px] opacity-60">{fill(scene.terms)}</p>
+          </StudioHit>
         </motion.div>
         {/* The perforation and the stub you drag */}
         <div className="relative">
@@ -253,15 +277,19 @@ export function CouponScene({ scene, done, onDone }: SceneProps<S<"coupon">>) {
 
 export function JarScene({ scene, done, onDone }: SceneProps<S<"jar">>) {
   const { palette, fill } = useStory();
-  const [opened, setOpened] = useState(done ? scene.notes.length : 0);
+  const studio = useStudioEdit();
+  const picked = usePickedItem(["notes"]);
+  const [drawn, setOpened] = useState(done ? scene.notes.length : 0);
   const [shakeKey, setShakeKey] = useState(0);
+  // Studio: show the note being edited instead of the last one drawn.
+  const opened = studio ? Math.min(picked ?? 0, scene.notes.length - 1) + 1 : drawn;
   const current = opened > 0 ? scene.notes[opened - 1] : null;
-  const left = scene.notes.length - opened;
+  const left = scene.notes.length - drawn;
 
   function draw() {
     if (left === 0) return;
     setShakeKey((k) => k + 1);
-    const n = opened + 1;
+    const n = drawn + 1;
     setOpened(n);
     if (n >= scene.notes.length) onDone();
   }
@@ -278,12 +306,14 @@ export function JarScene({ scene, done, onDone }: SceneProps<S<"jar">>) {
               exit={{ opacity: 0, y: -20 }}
               transition={{ type: "spring", bounce: 0.35 }}
             >
-              <Paper className="w-[min(80vw,300px)] -rotate-2 px-6 py-5 text-left">
-                <p className="type-label text-[10px] opacity-50">
-                  Note {opened} of {scene.notes.length}
-                </p>
-                <p className="mt-2 text-[1.1rem] leading-snug">{fill(current)}</p>
-              </Paper>
+              <StudioHit field="notes" item={opened - 1}>
+                <Paper className="w-[min(80vw,300px)] -rotate-2 px-6 py-5 text-left">
+                  <p className="type-label text-[10px] opacity-50">
+                    Note {opened} of {scene.notes.length}
+                  </p>
+                  <p className="mt-2 text-[1.1rem] leading-snug">{fill(current)}</p>
+                </Paper>
+              </StudioHit>
             </motion.div>
           )}
         </AnimatePresence>
@@ -315,6 +345,7 @@ export function JarScene({ scene, done, onDone }: SceneProps<S<"jar">>) {
           </svg>
         </motion.button>
       </div>
+      <StudioPager count={scene.notes.length} field="notes" current={opened - 1} />
     </SceneShell>
   );
 }
@@ -346,8 +377,8 @@ export function PolaroidsScene({ scene, done, onDone }: SceneProps<S<"polaroids"
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
       <div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3">
         {scene.photos.map((ph, i) => (
+          <StudioHit key={i} field="photos" item={i}>
           <motion.button
-            key={i}
             type="button"
             onClick={() => develop(i)}
             className="relative w-[min(40vw,180px)] bg-white p-2 pb-12 text-left shadow-[0_18px_30px_-18px_rgba(27,18,21,.5)]"
@@ -387,6 +418,7 @@ export function PolaroidsScene({ scene, done, onDone }: SceneProps<S<"polaroids"
               {ph.date && <span className="type-hand block text-xs opacity-55">{ph.date}</span>}
             </span>
           </motion.button>
+          </StudioHit>
         ))}
       </div>
     </SceneShell>

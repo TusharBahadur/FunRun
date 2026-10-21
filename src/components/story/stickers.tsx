@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useId, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { StudioHit, useStudioEdit } from "./scene-kit";
 
 /**
  * Original animated stickers: little characters and doodles with a white
@@ -361,18 +362,33 @@ const board = {
 } as const satisfies Record<string, { file: string; name: string; kind: "doodle" | "meme" }>;
 
 export type BoardStickerId = keyof typeof board;
-/** Any sticker: our drawn ones or the board pack. */
-export type AnyStickerId = StickerId | BoardStickerId;
+/** A picture the sender uploaded, stored inline in the draft. */
+export type UploadedSticker = `data:${string}`;
+/** Any sticker: our drawn ones, the board pack, or an upload. */
+export type AnyStickerId = StickerId | BoardStickerId | UploadedSticker;
 
 export const boardStickerIds = Object.keys(board) as BoardStickerId[];
 export const drawnStickerIds = Object.keys(stickerNames) as StickerId[];
 
+export function isUploadedSticker(id: AnyStickerId): id is UploadedSticker {
+  return id.startsWith("data:");
+}
+
 export function stickerName(id: AnyStickerId) {
+  if (isUploadedSticker(id)) return "Your sticker";
   return id in board ? board[id as BoardStickerId].name : stickerNames[id as StickerId];
 }
 
 /** One sticker. Size it with the className (e.g. `size-24`). Unknown ids render nothing. */
 export function Sticker({ id, className }: { id: AnyStickerId; className?: string }) {
+  if (isUploadedSticker(id)) {
+    return (
+      <div className={cn("size-24 overflow-hidden rounded-[22%] bg-white p-[6%] shadow-[0_8px_16px_-8px_rgba(42,26,31,0.45)]", className)}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={id} alt="" draggable={false} className="size-full rounded-[16%] object-cover" />
+      </div>
+    );
+  }
   if (id in board) {
     const b = board[id as BoardStickerId];
     return (
@@ -428,15 +444,17 @@ export function StickerLayer({ stickers }: { stickers?: StickerPlacement[] }) {
     <div aria-hidden className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
       {stickers.map((s, i) => (
         <motion.div
-          key={`${s.id}-${s.at}`}
+          key={s.at}
           className={cn("absolute", spots[s.at])}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", bounce: 0.55, delay: 0.5 + i * 0.15 }}
         >
-          <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 3 + i * 0.4, repeat: Infinity, ease: "easeInOut" }}>
-            <Sticker id={s.id} className={sizes[s.size ?? "m"]} />
-          </motion.div>
+          <StudioHit field={`sticker-${i}`}>
+            <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 3 + i * 0.4, repeat: Infinity, ease: "easeInOut" }}>
+              <Sticker id={s.id} className={sizes[s.size ?? "m"]} />
+            </motion.div>
+          </StudioHit>
         </motion.div>
       ))}
     </div>
@@ -445,6 +463,17 @@ export function StickerLayer({ stickers }: { stickers?: StickerPlacement[] }) {
 
 /** A reaction that pops up once a page is finished, like a meme sent in the chat. */
 export function ReactionSticker({ id, show }: { id?: AnyStickerId; show: boolean }) {
+  const studio = useStudioEdit();
+  // In the studio it waits in its corner, so it can be tapped and changed like any other sticker.
+  if (studio && id) {
+    return (
+      <div className="fixed bottom-4 right-3 z-30 md:right-8">
+        <StudioHit field="reaction">
+          <Sticker id={id} className="size-20 md:size-24" />
+        </StudioHit>
+      </div>
+    );
+  }
   return (
     <AnimatePresence>
       {id && show && (

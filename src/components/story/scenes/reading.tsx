@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSpeaker } from "@/components/experiences/birthday/party";
 import { EASE_OUT } from "@/lib/motion";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
-import { Paper, SceneShell, StoryButton, Tape, useStory, type SceneProps } from "../scene-kit";
+import { Paper, SceneShell, StoryButton, StudioAlso, StudioHit, Tape, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
 import type { Scene } from "../types";
 
 type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
@@ -27,26 +27,31 @@ export function LetterScene({ scene, done }: SceneProps<S<"letter">>) {
         }}
       >
         {scene.photo && (
+          <StudioHit field="photo" className="absolute -right-5 -top-8 z-10 w-28 md:-right-10 md:w-36">
           <motion.div
             initial={{ opacity: 0, scale: 0.7, rotate: 14 }}
             animate={{ opacity: 1, scale: 1, rotate: 6 }}
             transition={{ delay: 0.5, type: "spring", bounce: 0.4 }}
-            className="absolute -right-5 -top-8 w-28 bg-white p-1.5 pb-5 shadow-[0_14px_24px_-14px_rgba(27,18,21,.5)] md:-right-10 md:w-36"
+            className="w-full bg-white p-1.5 pb-5 shadow-[0_14px_24px_-14px_rgba(27,18,21,.5)]"
           >
             <Tape className="-top-3 left-1/2 w-14 -translate-x-1/2 rotate-2" />
             <PhotoFill src={scene.photo} tone="rose" alt="" className="aspect-square w-full" iconClassName="size-8" />
           </motion.div>
+          </StudioHit>
         )}
         <p className="type-hand pl-6 text-[2rem] font-bold leading-[34px]" style={{ color: palette.accent }}>
           Dear {fill("{to}")},
         </p>
         <div className="type-hand mt-[34px] space-y-[34px] pl-6 text-[1.28rem] leading-[34px]">
           {scene.paragraphs.map((p, i) => (
-            <motion.p key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.35, duration: 0.7, ease: EASE_OUT }}>
-              {fill(p)}
-            </motion.p>
+            <StudioHit key={i} field="paragraphs" item={i}>
+              <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.35, duration: 0.7, ease: EASE_OUT }}>
+                {fill(p)}
+              </motion.p>
+            </StudioHit>
           ))}
         </div>
+        <StudioHit field="signoff">
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -56,6 +61,7 @@ export function LetterScene({ scene, done }: SceneProps<S<"letter">>) {
         >
           {fill(scene.signoff)}
         </motion.p>
+        </StudioHit>
       </Paper>
     </SceneShell>
   );
@@ -70,10 +76,12 @@ export function NumbersScene({ scene, done }: SceneProps<S<"numbers">>) {
       <div className="grid w-full max-w-lg gap-3 sm:grid-cols-2">
         {scene.stats.map((s, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.12 }}>
-            <Paper className="px-5 py-6">
-              <CountUp to={s.value} suffix={s.suffix} />
-              <span className="type-label mt-2 block opacity-60">{fill(s.label)}</span>
-            </Paper>
+            <StudioHit field="stats" item={i}>
+              <Paper className="px-5 py-6">
+                <CountUp to={s.value} suffix={s.suffix} />
+                <span className="type-label mt-2 block opacity-60">{fill(s.label)}</span>
+              </Paper>
+            </StudioHit>
           </motion.div>
         ))}
       </div>
@@ -84,12 +92,15 @@ export function NumbersScene({ scene, done }: SceneProps<S<"numbers">>) {
 function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
-  const [v, setV] = useState(0);
+  const studio = useStudioEdit();
+  const [counted, setV] = useState(0);
+  // Studio: the real number straight away, so typing a new one doesn't replay the count.
+  const v = studio ? to : counted;
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || studio) return;
     const c = animate(0, to, { duration: 1.6, ease: EASE_OUT, onUpdate: (x) => setV(Math.round(x)) });
     return () => c.stop();
-  }, [inView, to]);
+  }, [inView, to, studio]);
   return (
     <span ref={ref} className="type-display block text-[clamp(2.4rem,9vw,3.4rem)] font-semibold tabular-nums">
       {v.toLocaleString("en-IN")}
@@ -113,6 +124,7 @@ export function WishesScene({ scene, done }: SceneProps<S<"wishes">>) {
             transition={{ delay: 0.1 + i * 0.08, duration: 0.6, ease: EASE_OUT }}
             className="mb-3 break-inside-avoid"
           >
+            <StudioHit field="wishes" item={i}>
             <Paper className="p-5">
               <p className="text-[1.02rem] leading-snug">{fill(w.message)}</p>
               <p className="type-label mt-3 flex items-center gap-2 opacity-70">
@@ -122,6 +134,7 @@ export function WishesScene({ scene, done }: SceneProps<S<"wishes">>) {
                 {w.name}
               </p>
             </Paper>
+            </StudioHit>
           </motion.div>
         ))}
       </div>
@@ -164,10 +177,15 @@ export function VoiceScene({ scene, done }: SceneProps<S<"voice">>) {
               />
             ))}
           </div>
-          <span className="type-label shrink-0 opacity-60">0:{String(scene.seconds).padStart(2, "0")}</span>
+          <StudioHit as="span" field="seconds" className="shrink-0">
+            <span className="type-label opacity-60">0:{String(scene.seconds).padStart(2, "0")}</span>
+          </StudioHit>
         </div>
         <p className="type-label mt-4 text-[10px] opacity-45">Preview uses a computer voice. Your gift plays your real recording.</p>
       </Paper>
+      <StudioAlso label="What you’ll say" field="transcript">
+        <p className="text-[1.05rem] leading-snug opacity-80">{fill(scene.transcript)}</p>
+      </StudioAlso>
     </SceneShell>
   );
 }
@@ -184,10 +202,16 @@ export function FinaleScene({ scene, done }: SceneProps<S<"finale">>) {
         <div className="flex flex-col items-center gap-3">
           {!!scene.photos?.length && <Collage photos={scene.photos} />}
           {scene.thankYou && (
-            <StoryButton onClick={() => setThanked(true)}>{thanked ? `Sent with love to ${from}` : `Send ${from} a thank-you`}</StoryButton>
+            <StudioHit field="thankYou">
+              <StoryButton onClick={() => setThanked(true)}>{thanked ? `Sent with love to ${from}` : `Send ${from} a thank-you`}</StoryButton>
+            </StudioHit>
           )}
           {thanked && <p className="type-label opacity-60">Preview only. In a real gift this sends {from} your reply.</p>}
-          {scene.keepsake && <KeepsakeButton to={to} from={from} title={fill(scene.title)} />}
+          {scene.keepsake && (
+            <StudioHit field="keepsake">
+              <KeepsakeButton to={to} from={from} title={fill(scene.title)} />
+            </StudioHit>
+          )}
           <div className="mt-2 flex flex-wrap justify-center gap-2">
             <StoryButton variant="outline" onClick={playSong}>
               Play the song again
@@ -213,12 +237,12 @@ function Collage({ photos }: { photos: NonNullable<S<"finale">["photos"]> }) {
   return (
     <div className="mb-6 flex justify-center pt-3">
       {photos.slice(0, 5).map((ph, i) => (
+        <StudioHit key={i} field="photos" item={i} className="relative -mx-2.5 w-[min(26vw,130px)]">
         <motion.figure
-          key={i}
           initial={{ opacity: 0, y: -60, rotate: tilts[i] * 3 }}
           animate={{ opacity: 1, y: 0, rotate: tilts[i] }}
           transition={{ delay: 0.3 + i * 0.15, type: "spring", bounce: 0.4 }}
-          className="relative -mx-2.5 w-[min(26vw,130px)] bg-white p-1.5 pb-7 shadow-[0_16px_26px_-16px_rgba(27,18,21,.55)]"
+          className="relative w-full bg-white p-1.5 pb-7 shadow-[0_16px_26px_-16px_rgba(27,18,21,.55)]"
           style={{ zIndex: i % 2 ? 2 : 1 }}
         >
           <Tape className="-top-2.5 left-1/2 w-12 -translate-x-1/2" color={[palette.pink, palette.gold][i % 2]} />
@@ -227,6 +251,7 @@ function Collage({ photos }: { photos: NonNullable<S<"finale">["photos"]> }) {
             {fill(ph.caption)}
           </figcaption>
         </motion.figure>
+        </StudioHit>
       ))}
     </div>
   );

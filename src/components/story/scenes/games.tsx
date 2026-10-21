@@ -3,8 +3,9 @@
 import { AnimatePresence, motion } from "motion/react";
 import { Cake, Flower2, Gem, Heart, Star, Sun, type LucideIcon } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
+import { Accented } from "@/components/experiences/birthday/accented";
 import { EASE_OUT } from "@/lib/motion";
-import { Backdrop, Paper, SceneShell, StoryButton, useStory, type SceneProps } from "../scene-kit";
+import { Backdrop, Paper, SceneShell, StoryButton, StudioAlso, StudioHit, StudioPager, usePickedItem, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
 import type { Scene } from "../types";
 
 type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
@@ -13,8 +14,13 @@ type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
 
 export function QuizScene({ scene, done, onDone }: SceneProps<S<"quiz">>) {
   const { palette, fill } = useStory();
-  const [index, setIndex] = useState(done ? scene.questions.length - 1 : 0);
-  const [picked, setPicked] = useState<number | null>(done ? 0 : null);
+  const studio = useStudioEdit();
+  const pickedQuestion = usePickedItem(["questions", "q", "options", "reply"]);
+  const [played, setIndex] = useState(done ? scene.questions.length - 1 : 0);
+  const [answer, setPicked] = useState<number | null>(done ? 0 : null);
+  // Studio: the question being edited, with its reply showing and no answer chosen.
+  const index = studio ? Math.min(pickedQuestion ?? 0, scene.questions.length - 1) : played;
+  const picked = studio ? null : answer;
   const q = scene.questions[index];
   const last = index === scene.questions.length - 1;
 
@@ -38,8 +44,11 @@ export function QuizScene({ scene, done, onDone }: SceneProps<S<"quiz">>) {
           <p className="type-label opacity-60">
             Question {index + 1} of {scene.questions.length}
           </p>
-          <p className="mt-2 text-xl font-medium leading-snug">{fill(q.q)}</p>
-          <div className="mt-5 grid gap-2.5">
+          <StudioHit field="q" item={index}>
+            <p className="mt-2 text-xl font-medium leading-snug">{fill(q.q)}</p>
+          </StudioHit>
+          <StudioHit field="options" item={index} className="mt-5">
+          <div className="grid gap-2.5">
             {q.options.map((opt, i) => {
               const chosen = picked === i;
               return (
@@ -61,10 +70,13 @@ export function QuizScene({ scene, done, onDone }: SceneProps<S<"quiz">>) {
               );
             })}
           </div>
-          {picked !== null && (
-            <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="type-accent mt-5 text-2xl" style={{ color: palette.accent }}>
-              {fill(q.reply)}
-            </motion.p>
+          </StudioHit>
+          {(picked !== null || studio) && (
+            <StudioHit field="reply" item={index} className="mt-5">
+              <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="type-accent text-2xl" style={{ color: palette.accent }}>
+                {fill(q.reply)}
+              </motion.p>
+            </StudioHit>
           )}
           {picked !== null && !last && (
             <div className="mt-5">
@@ -80,6 +92,7 @@ export function QuizScene({ scene, done, onDone }: SceneProps<S<"quiz">>) {
           )}
         </motion.div>
       </AnimatePresence>
+      <StudioPager count={scene.questions.length} field="questions" current={index} />
     </SceneShell>
   );
 }
@@ -127,6 +140,7 @@ export function MatchScene({ scene, done, onDone }: SceneProps<S<"match">>) {
 
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
+      <StudioHit field="symbols">
       <div ref={board} className="grid grid-cols-3 gap-3 [perspective:800px]">
         {cards.map((s, i) => {
           const Icon = ICONS[s];
@@ -158,6 +172,7 @@ export function MatchScene({ scene, done, onDone }: SceneProps<S<"match">>) {
           );
         })}
       </div>
+      </StudioHit>
     </SceneShell>
   );
 }
@@ -169,7 +184,8 @@ const HEART_STARS: [number, number][] = [
 ];
 
 export function StarsScene({ scene, done, onDone }: SceneProps<S<"stars">>) {
-  const { palette } = useStory();
+  const { palette, fill } = useStory();
+  const studio = useStudioEdit();
   const [count, setCount] = useState(done ? HEART_STARS.length : 0);
   const sky = useRef<HTMLDivElement>(null);
   const complete = count >= HEART_STARS.length;
@@ -197,7 +213,7 @@ export function StarsScene({ scene, done, onDone }: SceneProps<S<"stars">>) {
           />
         ))}
       </Backdrop>
-      <SceneShell eyebrow={scene.eyebrow} title={complete ? scene.reveal : scene.title} hint={scene.hint} doneText={scene.done} done={done} tone="dark">
+      <SceneShell eyebrow={scene.eyebrow} title={complete && !studio ? scene.reveal : scene.title} hint={scene.hint} doneText={scene.done} done={done} tone="dark">
         <div ref={sky} className="relative w-[min(86vw,300px)]">
           <svg viewBox="0 0 300 300" className="h-auto w-full overflow-visible">
             <motion.path
@@ -229,6 +245,11 @@ export function StarsScene({ scene, done, onDone }: SceneProps<S<"stars">>) {
             })}
           </svg>
         </div>
+        <StudioAlso label="Headline once the heart is drawn" field="reveal">
+          <p className="type-display text-balance text-3xl">
+            <Accented text={fill(scene.reveal)} color={palette.pink} />
+          </p>
+        </StudioAlso>
       </SceneShell>
     </div>
   );
@@ -238,6 +259,7 @@ export function StarsScene({ scene, done, onDone }: SceneProps<S<"stars">>) {
 
 export function QuestionScene({ scene, done, onDone }: SceneProps<S<"question">>) {
   const { palette, fill, celebrate } = useStory();
+  const studio = useStudioEdit();
   const [dodges, setDodges] = useState(0);
   const [pos, setPos] = useState({ x: 70, y: 0 });
   const yes = useRef<HTMLButtonElement>(null);
@@ -250,6 +272,33 @@ export function QuestionScene({ scene, done, onDone }: SceneProps<S<"question">>
   }
 
   const noLabels = [scene.no, "Are you sure?", "Really sure?", "Think again", "Okay, try Yes", "Yes is right there"];
+
+  if (studio) {
+    return (
+      <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
+        <StudioHit field="question">
+          <p className="max-w-sm text-2xl font-medium leading-snug">{fill(scene.question)}</p>
+        </StudioHit>
+        <div className="mt-10 flex items-center justify-center gap-4">
+          <StudioHit field="yes">
+            <span className="flex h-14 items-center rounded-full px-10 text-lg font-semibold" style={{ backgroundColor: palette.accent, color: palette.cream }}>
+              {fill(scene.yes)}
+            </span>
+          </StudioHit>
+          <StudioHit field="no">
+            <span className="flex h-11 items-center rounded-full border px-5 text-sm" style={{ borderColor: `${palette.fg}40` }}>
+              {fill(scene.no)}
+            </span>
+          </StudioHit>
+        </div>
+        <StudioAlso label="After they say yes" field="after">
+          <p className="type-accent text-[2rem] leading-tight" style={{ color: palette.accent }}>
+            {fill(scene.after)}
+          </p>
+        </StudioAlso>
+      </SceneShell>
+    );
+  }
 
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
@@ -340,9 +389,11 @@ export function RingboxScene({ scene, done, onDone }: SceneProps<S<"ringbox">>) 
         />
       </motion.button>
       {done && (
-        <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="type-accent mt-6 text-[2rem] leading-tight" style={{ color: palette.accent }}>
-          {fill(scene.question)}
-        </motion.p>
+        <StudioHit field="question" className="mt-6">
+          <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="type-accent text-[2rem] leading-tight" style={{ color: palette.accent }}>
+            {fill(scene.question)}
+          </motion.p>
+        </StudioHit>
       )}
     </SceneShell>
   );
@@ -372,6 +423,7 @@ export function BouquetScene({ scene, done, onDone }: SceneProps<S<"bouquet">>) 
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
       <div ref={vase} className="relative w-[240px]">
+        <StudioHit field="flowers">
         <svg viewBox="0 0 240 280" className="h-auto w-full overflow-visible" aria-hidden>
           {FLOWER_SPOTS.slice(0, count).map(([x, y, r], i) => (
             <motion.g key={i} initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", bounce: 0.5 }} style={{ originX: `${x}px`, originY: `${y}px` }}>
@@ -385,13 +437,16 @@ export function BouquetScene({ scene, done, onDone }: SceneProps<S<"bouquet">>) 
           <path d="M80 180 h80 l-10 90 h-60z" fill={palette.cream} stroke={palette.fg} strokeOpacity={0.2} strokeWidth={2} />
           <path d="M84 206 h72" stroke={palette.accent} strokeWidth={4} opacity={0.6} />
         </svg>
+        </StudioHit>
         {done && (
           <motion.div initial={{ opacity: 0, rotate: 0, y: 10 }} animate={{ opacity: 1, rotate: -6, y: 0 }} className="absolute -right-10 bottom-10">
-            <Paper className="px-3 py-2">
-              <p className="type-accent text-lg leading-tight" style={{ color: palette.accent }}>
-                {fill(scene.card)}
-              </p>
-            </Paper>
+            <StudioHit field="card">
+              <Paper className="px-3 py-2">
+                <p className="type-accent text-lg leading-tight" style={{ color: palette.accent }}>
+                  {fill(scene.card)}
+                </p>
+              </Paper>
+            </StudioHit>
           </motion.div>
         )}
       </div>
@@ -429,6 +484,7 @@ export function AwardScene({ scene, done, onDone }: SceneProps<S<"award">>) {
   const metal = `linear-gradient(135deg, #8a6a1f, ${palette.gold} 45%, #fff3c4 55%, ${palette.gold} 65%, #8a6a1f)`;
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
+      <StudioHit field="trophy">
       <motion.button
         ref={prize}
         type="button"
@@ -463,14 +519,17 @@ export function AwardScene({ scene, done, onDone }: SceneProps<S<"award">>) {
           </motion.span>
         )}
       </motion.button>
-      <motion.p
-        className="type-accent mt-6 text-[1.8rem] leading-tight"
-        style={{ color: palette.accent }}
-        initial={false}
-        animate={{ opacity: shine >= 1 ? 1 : 0, y: shine >= 1 ? 0 : 10 }}
-      >
-        {fill(scene.engraving)}
-      </motion.p>
+      </StudioHit>
+      <StudioHit field="engraving" className="mt-6">
+        <motion.p
+          className="type-accent text-[1.8rem] leading-tight"
+          style={{ color: palette.accent }}
+          initial={false}
+          animate={{ opacity: shine >= 1 ? 1 : 0, y: shine >= 1 ? 0 : 10 }}
+        >
+          {fill(scene.engraving)}
+        </motion.p>
+      </StudioHit>
       {shine < 1 && (
         <div className="mt-2 h-1.5 w-40 overflow-hidden rounded-full" style={{ backgroundColor: `${palette.fg}18` }}>
           <motion.div className="h-full" style={{ backgroundColor: palette.accent }} animate={{ width: `${shine * 100}%` }} />
@@ -484,9 +543,13 @@ export function AwardScene({ scene, done, onDone }: SceneProps<S<"award">>) {
 
 export function MapScene({ scene, done, onDone }: SceneProps<S<"map">>) {
   const { palette, fill } = useStory();
+  const studio = useStudioEdit();
+  const pickedPin = usePickedItem(["pins", "place", "when", "memory"]);
   const n = scene.pins.length;
   const [visited, setVisited] = useState(done ? n : 0);
-  const [active, setActive] = useState<number | null>(done ? n - 1 : null);
+  const [opened, setActive] = useState<number | null>(done ? n - 1 : null);
+  // Studio: the place being edited is the one open.
+  const active = studio ? Math.min(pickedPin ?? 0, n - 1) : opened;
 
   const spots = scene.pins.map((_, i) => {
     const t = n === 1 ? 0.5 : i / (n - 1);
@@ -514,7 +577,15 @@ export function MapScene({ scene, done, onDone }: SceneProps<S<"map">>) {
             const seen = i < visited;
             const next = i === visited;
             return (
-              <g key={i} onClick={() => visit(i)} className={seen || next ? "cursor-pointer" : ""} role="button" aria-label={seen || next ? scene.pins[i].place : "Locked"}>
+              <g
+                key={i}
+                onClick={() => visit(i)}
+                className={seen || next || studio ? "cursor-pointer" : ""}
+                role="button"
+                aria-label={seen || next ? scene.pins[i].place : "Locked"}
+                data-studio-field={studio ? "pins" : undefined}
+                data-studio-item={studio ? i : undefined}
+              >
                 <circle cx={p.x} cy={p.y} r={22} fill="transparent" />
                 {next && <motion.circle cx={p.x} cy={p.y} r={16} fill={palette.accent} opacity={0.25} animate={{ r: [10, 20, 10] }} transition={{ duration: 1.4, repeat: Infinity }} />}
                 <path
@@ -530,10 +601,14 @@ export function MapScene({ scene, done, onDone }: SceneProps<S<"map">>) {
           {pin && (
             <motion.div key={active} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-4">
               <Paper className="px-5 py-4 text-left">
-                <p className="type-label text-[10px] opacity-60">
-                  {fill(pin.when)} · {fill(pin.place)}
+                <p className="type-label flex flex-wrap gap-1 text-[10px] opacity-60">
+                  <StudioHit as="span" field="when" item={active ?? undefined}>{fill(pin.when)}</StudioHit>
+                  <span>·</span>
+                  <StudioHit as="span" field="place" item={active ?? undefined}>{fill(pin.place)}</StudioHit>
                 </p>
-                <p className="mt-1.5 text-[1.05rem] leading-snug">{fill(pin.memory)}</p>
+                <StudioHit field="memory" item={active ?? undefined} className="mt-1.5">
+                  <p className="text-[1.05rem] leading-snug">{fill(pin.memory)}</p>
+                </StudioHit>
               </Paper>
             </motion.div>
           )}

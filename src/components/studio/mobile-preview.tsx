@@ -1,59 +1,78 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
+import { Play } from "lucide-react";
 
 const W = 390;
 const H = 844;
 
-/** A live phone in the page flow, so it scrolls with the fields instead of sitting in its own pane. */
+/** A live phone in the page flow, so it scrolls with the fields. Taps inside select the matching field below. */
 export function MobilePreview({
   frames,
   sceneLabel,
   hidden,
+  onPreview,
 }: {
   frames: RefObject<Map<string, HTMLIFrameElement>>;
   sceneLabel: string;
   hidden: boolean;
+  onPreview: () => void;
 }) {
   const box = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.85);
+  const [scale, setScale] = useState(0.7);
 
   useEffect(() => {
     const el = box.current;
     if (!el) return;
     const fit = () => {
-      const next = el.clientWidth / W;
-      if (next > 0) setScale(Math.min(next, 1));
+      // Leave room under the phone for the page switcher and the first field.
+      const byW = el.clientWidth / W;
+      const byH = (window.innerHeight * 0.72) / H;
+      const next = Math.min(byW, byH, 1);
+      if (next > 0) setScale(next);
     };
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
-    return () => ro.disconnect();
+    window.addEventListener("resize", fit);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", fit);
+    };
   }, []);
 
   return (
-    <div className="border-b border-line bg-[#efe8dc] px-3 py-4">
+    <div className="bg-[#efe8dc] px-3 pb-2 pt-3">
       <div ref={box} className="mx-auto w-full">
         <div
           className="relative mx-auto overflow-hidden rounded-[1.35rem] bg-paper shadow-[0_18px_40px_-24px_rgba(27,18,21,.55)] ring-2 ring-ink/80"
           style={{ width: W * scale, height: H * scale, opacity: hidden ? 0.55 : 1 }}
         >
-          {/* Touches pass through so the page scroll moves the phone with the fields. */}
           <iframe
             ref={(el) => {
               if (el) frames.current.set("mobile", el);
               else frames.current.delete("mobile");
             }}
             src="/studio/frame"
-            title={`Live preview, ${sceneLabel}`}
+            title={`Live preview, ${sceneLabel}. Tap anything to edit it.`}
             scrolling="no"
-            className="pointer-events-none absolute left-0 top-0 origin-top-left border-0"
+            className="absolute left-0 top-0 origin-top-left border-0"
             style={{ width: W, height: H, transform: `scale(${scale})` }}
           />
           {hidden && (
             <p className="pointer-events-none absolute inset-x-0 top-3 text-center text-sm font-medium text-ink">Hidden</p>
           )}
         </div>
+      </div>
+      <div className="mt-2 flex items-center justify-center gap-3">
+        <p className="type-label text-[10px] text-muted">Tap anything to edit it</p>
+        <button
+          type="button"
+          onClick={onPreview}
+          className="flex h-7 items-center gap-1.5 rounded-full bg-ink px-3 text-xs font-medium text-paper hover:bg-ink/85"
+        >
+          <Play className="size-3 fill-current" /> Preview
+        </button>
       </div>
     </div>
   );

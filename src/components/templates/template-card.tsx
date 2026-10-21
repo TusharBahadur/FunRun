@@ -1,11 +1,9 @@
 "use client";
 
 import { ArrowRight, Camera, Gamepad2, Globe, Layers, Mic, Music, Timer, Users, type LucideIcon } from "lucide-react";
-import { useCallback, useState } from "react";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { storyFacts } from "@/components/story/labels";
 import { TemplatePreview } from "@/components/templates/template-preview";
-import { NamePrompt } from "@/components/templates/name-prompt";
 import { occasions } from "@/config/site";
 import type { Template } from "@/lib/templates";
 import { cn, formatInr } from "@/lib/utils";
@@ -37,21 +35,12 @@ function features(template: Template): { icon: LucideIcon; label: string }[] {
 export function TemplateCard({ template, className }: { template: Template; className?: string }) {
   const occasion = occasions.find((o) => o.id === template.occasion);
   const chips = features(template);
-  const [promptOpen, setPromptOpen] = useState(false);
-
-  const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      setPromptOpen(true);
-    },
-    [],
-  );
+  // Story gifts open straight in the studio, which asks for the names there.
+  const href = template.story ? `/studio/${template.slug}` : `/templates/${template.slug}`;
 
   return (
-    <>
       <a
-        href={`/templates/${template.slug}`}
-        onClick={handleClick}
+        href={href}
         data-cursor="view"
         className={cn("group block", className)}
       >
@@ -100,14 +89,5 @@ export function TemplateCard({ template, className }: { template: Template; clas
           </span>
         </div>
       </a>
-
-      <NamePrompt
-        slug={template.slug}
-        open={promptOpen}
-        onClose={() => setPromptOpen(false)}
-        accent={template.palette.accent}
-        bg={template.palette.bg}
-      />
-    </>
   );
 }

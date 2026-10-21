@@ -37,11 +37,11 @@ import type { Scene, SceneType } from "@/components/story/types";
 
 /** One editable field in the inspector. */
 export type FieldDef =
-  | { key: string; label: string; kind: "text" | "textarea"; placeholder?: string; max?: number; help?: string }
+  | { key: string; label: string; kind: "text" | "textarea"; placeholder?: string; max?: number; help?: string; optional?: boolean }
   | { key: string; label: string; kind: "number"; min: number; max: number }
   | { key: string; label: string; kind: "select"; options: { value: string; label: string }[] }
   | { key: string; label: string; kind: "toggle"; help?: string }
-  | { key: string; label: string; kind: "image"; help?: string }
+  | { key: string; label: string; kind: "image"; help?: string; optional?: boolean }
   | { key: string; label: string; kind: "multi"; options: { value: string; label: string }[]; min: number; max: number }
   | { key: string; label: string; kind: "strings"; itemLabel: string; max: number; placeholder?: string }
   | { key: string; label: string; kind: "list"; itemLabel: string; max: number; item: FieldDef[]; newItem: () => Record<string, unknown>; title: (item: Record<string, unknown>) => string };
@@ -59,10 +59,10 @@ type SceneSchema = {
 };
 
 const heading: FieldDef[] = [
-  { key: "eyebrow", label: "Small label", kind: "text", max: 40, placeholder: "e.g. For you" },
+  { key: "eyebrow", label: "Small label", kind: "text", max: 40, placeholder: "e.g. For you", optional: true },
   { key: "title", label: "Headline", kind: "text", max: 80, help: "Wrap words in *stars* to highlight them." },
-  { key: "hint", label: "Instruction", kind: "text", max: 60, placeholder: "What to do" },
-  { key: "done", label: "When finished", kind: "text", max: 60, placeholder: "Shown after the game" },
+  { key: "hint", label: "Instruction", kind: "text", max: 60, placeholder: "What to do", optional: true },
+  { key: "done", label: "When finished", kind: "text", max: 60, placeholder: "Shown after the game", optional: true },
 ];
 
 const tones = ["sun", "sea", "night", "rose", "leaf", "dusk"].map((t) => ({ value: t, label: t[0].toUpperCase() + t.slice(1) }));
@@ -97,7 +97,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Openers",
     icon: DoorOpen,
     blurb: "Knock on the door until it swings open.",
-    fields: [...heading, { key: "knocks", label: "Knocks needed", kind: "number", min: 1, max: 6 }, { key: "reveal", label: "Behind the door", kind: "text", max: 60 }],
+    fields: [...heading, { key: "reveal", label: "Behind the door", kind: "text", max: 60 }],
     create: () => ({ type: "knock", eyebrow: "Who’s there?", title: "Someone’s at the *door.*", hint: "Knock three times", knocks: 3, reveal: "It’s me, with a surprise." }),
   },
   unwrap: {
@@ -105,7 +105,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Openers",
     icon: Gift,
     blurb: "Tap the box until the lid flies off.",
-    fields: [...heading, { key: "taps", label: "Taps needed", kind: "number", min: 1, max: 6 }, { key: "inside", label: "What’s inside", kind: "text", max: 60 }, { key: "insideSub", label: "Small print", kind: "text", max: 40 }],
+    fields: [...heading, { key: "inside", label: "What’s inside", kind: "text", max: 60 }, { key: "insideSub", label: "Small print", kind: "text", max: 40 }],
     create: () => ({ type: "unwrap", eyebrow: "For {to}", title: "{from} sent you *something.*", hint: "Tap the box three times", taps: 3, inside: "A little surprise", insideSub: "Keep going ↓" }),
   },
   hero: {
@@ -117,7 +117,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
       { key: "eyebrow", label: "Small label", kind: "text", max: 40 },
       { key: "title", label: "Big title", kind: "text", max: 40, help: "Wrap words in *stars* to highlight them." },
       { key: "subtitle", label: "Line at the bottom", kind: "text", max: 40 },
-      { key: "photo", label: "Photo", kind: "image", help: "A photo of the two of you, or of them." },
+      { key: "photo", label: "Photo", kind: "image", help: "A photo of the two of you, or of them.", optional: true },
       { key: "nav", label: "Menu name", kind: "text", max: 14, placeholder: "Home" },
     ],
     create: () => ({ type: "hero", title: "Us, *lately.*", subtitle: "my favourite person", tone: "rose" }),
@@ -221,7 +221,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     blurb: "Their photo, taped to the page. Each tap sticks on a note about them.",
     fields: [
       ...heading,
-      { key: "photo", label: "Their photo", kind: "image", help: "A favourite photo of them, smiling." },
+      { key: "photo", label: "Their photo", kind: "image", help: "A favourite photo of them, smiling.", optional: true },
       { key: "tags", label: "Notes", kind: "strings", itemLabel: "Note", max: 6 },
     ],
     create: () => ({ type: "spotlight", eyebrow: "Look who it is", title: "The *star* of the day.", hint: "Tap the photo", tone: "rose", tags: ["Best laugh in any room", "Gives the best hugs", "Secretly hilarious"] }),
@@ -457,7 +457,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
       { key: "title", label: "Headline", kind: "text", max: 80, help: "Wrap words in *stars* to highlight them." },
       { key: "paragraphs", label: "Paragraphs", kind: "strings", itemLabel: "Paragraph", max: 6 },
       { key: "signoff", label: "Sign-off", kind: "text", max: 40 },
-      { key: "photo", label: "Pinned photo", kind: "image", help: "Optional: a photo of you two, pinned to the corner." },
+      { key: "photo", label: "Pinned photo", kind: "image", help: "Optional: a photo of you two, pinned to the corner.", optional: true },
     ],
     create: () => ({ type: "letter", eyebrow: "A letter", title: "Just so you *know.*", paragraphs: ["Write something from the heart."], signoff: "— {from}" }),
   },

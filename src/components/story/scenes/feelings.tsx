@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Cake } from "@/components/experiences/birthday/cake";
-import { HoldRing, SceneShell, useHold, useStory, type SceneProps } from "../scene-kit";
+import { HoldRing, SceneShell, StudioHit, useHold, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
 import type { Scene } from "../types";
 
 type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
@@ -94,9 +94,11 @@ export function CakeScene({ scene, done, onDone }: SceneProps<S<"cake">>) {
 
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
-      <div ref={cake} className="w-[min(78vw,340px)]">
-        <Cake age={scene.age} lit={!done} palette={palette} litMask={done ? lit.map(() => false) : lit} onFlameTap={blow} />
-      </div>
+      <StudioHit field="age">
+        <div ref={cake} className="w-[min(78vw,340px)]">
+          <Cake age={scene.age} lit={!done} palette={palette} litMask={done ? lit.map(() => false) : lit} onFlameTap={blow} />
+        </div>
+      </StudioHit>
     </SceneShell>
   );
 }
@@ -105,6 +107,7 @@ export function CakeScene({ scene, done, onDone }: SceneProps<S<"cake">>) {
 
 export function MeterScene({ scene, done, onDone }: SceneProps<S<"meter">>) {
   const { palette, fill } = useStory();
+  const studio = useStudioEdit();
   const [level, setLevel] = useState(done ? 1 : 0);
   const tube = useRef<HTMLDivElement>(null);
   const finished = useRef(done);
@@ -143,11 +146,30 @@ export function MeterScene({ scene, done, onDone }: SceneProps<S<"meter">>) {
           ))}
         </div>
         <div className="w-40 text-left">
-          <p className="type-label opacity-60">{fill(scene.label)}</p>
-          <motion.p key={label} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="type-accent mt-1 text-[1.7rem] leading-tight" style={{ color: palette.accent }}>
-            {fill(label)}
-          </motion.p>
-          <p className="type-display mt-2 text-4xl font-semibold tabular-nums">{Math.round(level * 100)}%</p>
+          <StudioHit field="label" className="w-fit">
+            <p className="type-label opacity-60">{fill(scene.label)}</p>
+          </StudioHit>
+          {studio ? (
+            // Every level, top first, as the meter climbs through them.
+            <ol className="mt-2 flex flex-col-reverse gap-1">
+              {scene.levels.map((l, i) => (
+                <li key={i}>
+                  <StudioHit field="levels" item={i} className="w-fit">
+                    <span className="type-accent block text-xl leading-tight" style={{ color: palette.accent, opacity: 0.45 + (0.55 * (i + 1)) / scene.levels.length }}>
+                      {fill(l)}
+                    </span>
+                  </StudioHit>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <>
+              <motion.p key={label} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="type-accent mt-1 text-[1.7rem] leading-tight" style={{ color: palette.accent }}>
+                {fill(label)}
+              </motion.p>
+              <p className="type-display mt-2 text-4xl font-semibold tabular-nums">{Math.round(level * 100)}%</p>
+            </>
+          )}
         </div>
       </div>
       {!done && (

@@ -11,6 +11,7 @@ import {
   Plus,
   RotateCcw,
   Trash2,
+  Upload,
   X,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -21,15 +22,14 @@ import {
   TextInput,
   Toggle,
 } from "@/components/editor/fields";
-import type { StoryPalette } from "@/components/story/types";
-import { palettes } from "@/data/stories/shared";
+import type { FontId } from "@/components/story/font-catalog";
+import type { Scene, StoryPalette } from "@/components/story/types";
 import { cn } from "@/lib/utils";
 import { imageToDataUrl, type Draft } from "./draft-store";
-import { FontChoices } from "./font-choices";
 import {
   addItem,
-  deleteItem,
   deleteScene,
+  deleteSelected,
   duplicateItem,
   duplicateScene,
   moveItem,
@@ -38,10 +38,13 @@ import {
   updateItem,
   updateScene,
 } from "./ops";
+import { FieldFontPicker } from "./font-choices";
+import { isLook, LookSettings, setFieldFont } from "./look";
 import { childField, sceneSchemas, type FieldDef } from "./schema";
 import {
   boardStickerIds,
   drawnStickerIds,
+  isUploadedSticker,
   Sticker,
   stickerName,
   type AnyStickerId,
@@ -49,7 +52,8 @@ import {
   type StickerSpot,
 } from "@/components/story/stickers";
 
-export type Selection = { scene: number | null; item: number | null };
+export type Selection = { scene: number | null; item: number | null; field?: string | null };
+export { LOOK, isLook } from "./look";
 type Edit = (next: Draft, tag?: string) => void;
 type Rec = Record<string, unknown>;
 
@@ -63,13 +67,6 @@ export const paletteFields: { key: keyof StoryPalette; label: string }[] = [
   { key: "gold", label: "Sparkle & flames" },
 ];
 
-const melodyOptions = [
-  { value: "birthday", label: "Happy Birthday (music box)" },
-  { value: "lullaby", label: "Lullaby: slow and tender" },
-  { value: "waltz", label: "Waltz: romantic" },
-  { value: "sunny", label: "Sunny: bright and bouncy" },
-];
-
 export function Inspector({
   draft,
   sel,
@@ -81,9 +78,14 @@ export function Inspector({
   setSel: (s: Selection) => void;
   edit: Edit;
 }) {
-  if (sel.scene === null || !draft.story.scenes[sel.scene])
-    return <PageSettings draft={draft} edit={edit} />;
-  const i = sel.scene;
+  if (isLook(sel.scene)) {
+    return (
+      <Panel crumbs={[{ label: "Look" }]}>
+        <LookSettings draft={draft} edit={edit} />
+      </Panel>
+    );
+  }
+  const i = sel.scene !== null && draft.story.scenes[sel.scene] ? sel.scene : 0;
   const scene = draft.story.scenes[i];
   const list = childField(scene.type);
   if (
@@ -102,116 +104,15 @@ export function Inspector({
       />
     );
   }
+  if (isStickerSlot(scene, sel.field)) {
+    const back = () => setSel({ scene: i, item: null, field: null });
+    return (
+      <Panel crumbs={[{ label: sceneSchemas[scene.type].name, onClick: back }, { label: "Sticker" }]}>
+        <StickerSlotEditor draft={draft} i={i} field={sel.field} edit={edit} onRemoved={back} />
+      </Panel>
+    );
+  }
   return <SceneInspector draft={draft} i={i} setSel={setSel} edit={edit} />;
-}
-
-/* ───────────── Whole-gift settings ───────────── */
-
-function PageSettings({ draft, edit }: { draft: Draft; edit: Edit }) {
-  const { story } = draft;
-  const setStory = (patch: Partial<Draft["story"]>, tag?: string) =>
-    edit({ ...draft, story: { ...story, ...patch } }, tag);
-
-  return (
-    <Panel title="Page" subtitle="Settings for the whole gift">
-      <Group title="Names">
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="For">
-            <TextInput
-              value={story.recipient}
-              maxLength={30}
-              onChange={(e) => setStory({ recipient: e.target.value }, "to")}
-            />
-          </Field>
-          <Field label="From">
-            <TextInput
-              value={story.sender}
-              maxLength={30}
-              onChange={(e) => setStory({ sender: e.target.value }, "from")}
-            />
-          </Field>
-        </div>
-        <p className="text-xs text-muted">
-          Anywhere you type <b className="text-ink">{"{to}"}</b> or{" "}
-          <b className="text-ink">{"{from}"}</b>, these names appear.
-        </p>
-      </Group>
-
-      <Group title="Colour theme">
-        <div className="grid grid-cols-4 gap-2">
-          {Object.entries(palettes).map(([id, p]) => (
-            <button
-              key={id}
-              type="button"
-              title={id}
-              onClick={() => setStory({ palette: { ...p } })}
-              className={cn(
-                "flex flex-col items-center gap-1 rounded-xl border-2 p-1.5",
-                story.palette.bg === p.bg && story.palette.accent === p.accent
-                  ? "border-ink"
-                  : "border-transparent hover:border-line",
-              )}
-            >
-              <span
-                className="grid size-10 place-items-center rounded-lg"
-                style={{ backgroundColor: p.bg }}
-              >
-                <span
-                  className="size-4 rounded-full"
-                  style={{ backgroundColor: p.accent }}
-                />
-              </span>
-              <span className="type-label text-[9px] capitalize text-muted">
-                {id}
-              </span>
-            </button>
-          ))}
-        </div>
-      </Group>
-
-      <Group title="Colours">
-        <div className="grid gap-2">
-          {paletteFields.map((f) => (
-            <ColorInput
-              key={f.key}
-              label={f.label}
-              value={story.palette[f.key]}
-              onChange={(v) =>
-                setStory(
-                  { palette: { ...story.palette, [f.key]: v } },
-                  `pal-${f.key}`,
-                )
-              }
-            />
-          ))}
-        </div>
-      </Group>
-
-      <FontChoices
-        font={story.font ?? "classic"}
-        accent={story.accentFont ?? "classic"}
-        sample={story.recipient || "Maya"}
-        onFont={(font) => setStory({ font })}
-        onAccent={(accentFont) => setStory({ accentFont })}
-      />
-
-      <Group title="Music">
-        <select
-          value={story.melody}
-          onChange={(e) =>
-            setStory({ melody: e.target.value as Draft["story"]["melody"] })
-          }
-          className="w-full rounded-2xl border border-line bg-paper px-4 py-3 text-[15px] outline-none focus:border-ink/40"
-        >
-          {melodyOptions.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-      </Group>
-    </Panel>
-  );
 }
 
 /* ───────────── One scene ───────────── */
@@ -237,7 +138,6 @@ function SceneInspector({
   return (
     <Panel
       crumbs={[
-        { label: "Page", onClick: () => setSel({ scene: null, item: null }) },
         { label: schema.name },
       ]}
       actions={
@@ -309,6 +209,13 @@ function SceneInspector({
               draft={draft}
               value={(scene as unknown as Rec)[f.key]}
               onChange={(v) => set(f.key, v)}
+              font={scene.fonts?.[f.key]}
+              onFont={(id) => edit(setFieldFont(draft, i, f.key, id), `${i}-font-${f.key}`)}
+              onRemove={
+                "optional" in f && f.optional
+                  ? () => set(f.key, f.kind === "image" ? undefined : "")
+                  : undefined
+              }
             />
           ))}
       </Group>
@@ -336,22 +243,36 @@ function SceneInspector({
         >
           <ul className="-mx-2">
             {readItems(scene, list.key).map((item, j) => (
-              <li key={j}>
+              <li key={j} className="group/item flex items-center">
                 <button
                   type="button"
                   onClick={() => setSel({ scene: i, item: j })}
-                  className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left text-sm hover:bg-cream"
+                  className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-2 py-2 text-left text-sm hover:bg-cream"
                 >
                   <span className="type-label w-5 text-[10px] text-muted">
                     {j + 1}
                   </span>
                   <span className="flex-1 truncate">
-                    {list.kind === "list"
-                      ? list.title(item as Rec)
-                      : String(item)}
+                    {showNames(
+                      list.kind === "list" ? list.title(item as Rec) : String(item),
+                      draft.story,
+                    )}
                   </span>
                   <ChevronRight className="size-4 text-muted" />
                 </button>
+                <IconAction
+                  label={`Remove this ${list.itemLabel.toLowerCase()}`}
+                  danger
+                  disabled={readItems(scene, list.key).length <= 1}
+                  onClick={() => {
+                    const next = deleteSelected(draft, { scene: i, item: j, field: list.key });
+                    if (!next) return;
+                    edit(next.draft);
+                    setSel(next.sel);
+                  }}
+                >
+                  <Trash2 className="size-4" />
+                </IconAction>
               </li>
             ))}
           </ul>
@@ -359,6 +280,7 @@ function SceneInspector({
       )}
 
       <SceneStickers
+        draft={draft}
         stickers={scene.stickers ?? []}
         onChange={(next) =>
           edit(updateScene(draft, i, { stickers: next.length ? next : undefined }))
@@ -366,9 +288,12 @@ function SceneInspector({
       />
 
       <SceneReaction
+        draft={draft}
         value={scene.reaction}
         onChange={(reaction) => edit(updateScene(draft, i, { reaction }))}
       />
+
+      <SceneStamp draft={draft} i={i} edit={edit} />
 
       <SceneColours draft={draft} i={i} edit={edit} />
     </Panel>
@@ -378,11 +303,143 @@ function SceneInspector({
 const STICKER_SPOTS: StickerSpot[] = ["tr", "bl", "tl", "br", "mr", "ml"];
 const MAX_STICKERS = 3;
 
+/** Uploads already in this gift, so one picture can be reused as a sticker elsewhere. */
+function uploadedStickers(draft: Draft): AnyStickerId[] {
+  const ids = new Set<AnyStickerId>();
+  for (const s of draft.story.scenes) {
+    for (const st of s.stickers ?? []) if (isUploadedSticker(st.id)) ids.add(st.id);
+    if (s.reaction && isUploadedSticker(s.reaction)) ids.add(s.reaction);
+    if (s.type === "spotlight" && s.stamp && isUploadedSticker(s.stamp)) ids.add(s.stamp);
+  }
+  for (const a of draft.assets) if (a.src.startsWith("data:")) ids.add(a.src as AnyStickerId);
+  return [...ids];
+}
+
+type StickerSlot = {
+  title: string;
+  value: AnyStickerId;
+  replace: (id: AnyStickerId) => Partial<Scene>;
+  remove: () => Partial<Scene>;
+};
+
+/** The one sticker a tap in the preview points at: a page sticker, the reaction, or the notes stamp. */
+function stickerSlot(scene: Scene, field: string | null | undefined): StickerSlot | null {
+  const k = field?.match(/^sticker-(\d+)$/)?.[1];
+  if (k !== undefined) {
+    const list = scene.stickers ?? [];
+    const st = list[Number(k)];
+    if (!st) return null;
+    return {
+      title: "Sticker",
+      value: st.id,
+      replace: (id) => ({ stickers: list.map((s, n) => (n === Number(k) ? { ...s, id } : s)) }),
+      remove: () => {
+        const next = list.filter((_, n) => n !== Number(k));
+        return { stickers: next.length ? next : undefined };
+      },
+    };
+  }
+  if (field === "reaction" && scene.reaction) {
+    return {
+      title: "Reaction when finished",
+      value: scene.reaction,
+      replace: (id) => ({ reaction: id }),
+      remove: () => ({ reaction: undefined }),
+    };
+  }
+  if (field === "stamp" && scene.type === "spotlight" && scene.stamp !== null) {
+    return {
+      title: "Stamp after the last note",
+      value: scene.stamp ?? "yay",
+      replace: (id) => ({ stamp: id }) as Partial<Scene>,
+      remove: () => ({ stamp: null }) as Partial<Scene>,
+    };
+  }
+  return null;
+}
+
+export function isStickerSlot(scene: Scene, field: string | null | undefined) {
+  return stickerSlot(scene, field) !== null;
+}
+
+/** Swap, upload over, or remove the one sticker picked in the preview. */
+export function StickerSlotEditor({
+  draft,
+  i,
+  field,
+  edit,
+  onRemoved,
+}: {
+  draft: Draft;
+  i: number;
+  field: string | null | undefined;
+  edit: Edit;
+  onRemoved: () => void;
+}) {
+  const slot = stickerSlot(draft.story.scenes[i], field);
+  if (!slot) return null;
+  const replace = (id: AnyStickerId) => edit(updateScene(draft, i, slot.replace(id)));
+  const remove = () => {
+    edit(updateScene(draft, i, slot.remove()));
+    onRemoved();
+  };
+  return (
+    <Group title={slot.title}>
+      <div className="flex items-center gap-3">
+        <div className="grid size-20 shrink-0 place-items-center rounded-2xl border border-line bg-paper p-2">
+          <Sticker id={slot.value} className="size-full shadow-none" />
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <p className="truncate text-sm font-medium">{stickerName(slot.value)}</p>
+          <div className="flex flex-wrap gap-2">
+            <UploadButton onUpload={replace} />
+            <button
+              type="button"
+              onClick={remove}
+              className="flex h-9 items-center gap-1.5 rounded-full border border-rose/30 px-3 text-sm font-medium text-rose-deep"
+            >
+              <Trash2 className="size-3.5" /> Remove
+            </button>
+          </div>
+        </div>
+      </div>
+      <p className="text-sm text-muted">Or tap another sticker to put it here.</p>
+      <StickerGrid
+        selected={[slot.value]}
+        yours={uploadedStickers(draft)}
+        onPick={(id) => (id === slot.value ? remove() : replace(id))}
+      />
+    </Group>
+  );
+}
+
+function UploadButton({ onUpload }: { onUpload: (id: AnyStickerId) => void }) {
+  return (
+    <label className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-ink px-3 text-sm font-medium text-paper">
+      <Upload className="size-3.5" /> Upload your own
+      <input
+        type="file"
+        accept="image/*"
+        className="sr-only"
+        onChange={async (e) => {
+          const f = e.target.files?.[0];
+          e.target.value = "";
+          if (f) onUpload((await imageToDataUrl(f, STICKER_SIDE, "image/webp")) as AnyStickerId);
+        }}
+      />
+    </label>
+  );
+}
+
+const STICKER_SIDE = 360;
+
 /** Pick up to three stickers; each takes the next free corner. */
 export function SceneStickers({
+  draft,
   stickers,
   onChange,
 }: {
+  draft: Draft;
   stickers: StickerPlacement[];
   onChange: (next: StickerPlacement[]) => void;
 }) {
@@ -397,10 +454,15 @@ export function SceneStickers({
   };
   return (
     <Group title={`Stickers ${stickers.length} / ${MAX_STICKERS}`}>
+      {stickers.length >= MAX_STICKERS && (
+        <p className="mb-2 text-sm text-muted">All three used. Tap the ✕ on one to swap it for another.</p>
+      )}
       <StickerGrid
         selected={stickers.map((s) => s.id)}
+        yours={uploadedStickers(draft)}
         full={stickers.length >= MAX_STICKERS}
         onPick={toggle}
+        onUpload={toggle}
       />
     </Group>
   );
@@ -408,18 +470,22 @@ export function SceneStickers({
 
 /** The sticker that pops up once the page is finished. */
 export function SceneReaction({
+  draft,
   value,
   onChange,
+  title = "Reaction when finished",
 }: {
+  draft: Draft;
   value?: AnyStickerId;
   onChange: (next: AnyStickerId | undefined) => void;
+  title?: string;
 }) {
   return (
     <Group
-      title="Reaction when finished"
+      title={title}
       action={
         value && (
-          <IconAction label="No reaction" onClick={() => onChange(undefined)}>
+          <IconAction label={`No ${title.toLowerCase()}`} onClick={() => onChange(undefined)}>
             <X className="size-4" />
           </IconAction>
         )
@@ -427,7 +493,9 @@ export function SceneReaction({
     >
       <StickerGrid
         selected={value ? [value] : []}
+        yours={uploadedStickers(draft)}
         onPick={(id) => onChange(id === value ? undefined : id)}
+        onUpload={onChange}
       />
     </Group>
   );
@@ -435,23 +503,55 @@ export function SceneReaction({
 
 function StickerGrid({
   selected,
+  yours = [],
   full = false,
   onPick,
+  onUpload,
 }: {
   selected: AnyStickerId[];
+  /** Pictures uploaded in this gift, shown first. */
+  yours?: AnyStickerId[];
   full?: boolean;
   onPick: (id: AnyStickerId) => void;
+  /** Adds an "upload" tile to the "Yours" row. */
+  onUpload?: (id: AnyStickerId) => void;
 }) {
-  const groups: { title: string; ids: AnyStickerId[] }[] = [
+  const groups: { title: string; ids: AnyStickerId[]; upload?: boolean }[] = [
+    { title: "Yours", ids: yours, upload: !!onUpload },
     { title: "Memes & doodles", ids: boardStickerIds },
     { title: "Animated", ids: drawnStickerIds },
   ];
   return (
     <div className="space-y-3">
-      {groups.map((g) => (
+      {groups.filter((g) => g.ids.length || g.upload).map((g) => (
         <div key={g.title}>
           <p className="type-label mb-1.5 text-[10px] text-muted">{g.title}</p>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(56px,1fr))] gap-1.5">
+            {g.upload && onUpload && (
+              <label
+                title="Upload your own"
+                className={cn(
+                  "grid aspect-square max-w-20 cursor-pointer place-items-center rounded-xl border border-dashed border-ink/30 text-center text-muted",
+                  full && "pointer-events-none opacity-35",
+                )}
+              >
+                <span className="flex flex-col items-center gap-0.5 text-[10px] font-medium leading-tight">
+                  <Upload className="size-4" />
+                  Upload
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  disabled={full}
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0];
+                    e.target.value = "";
+                    if (f) onUpload((await imageToDataUrl(f, STICKER_SIDE, "image/webp")) as AnyStickerId);
+                  }}
+                />
+              </label>
+            )}
             {g.ids.map((id) => {
               const on = selected.includes(id);
               return (
@@ -459,16 +559,24 @@ function StickerGrid({
                   key={id}
                   type="button"
                   title={stickerName(id)}
-                  aria-label={stickerName(id)}
+                  aria-label={on ? `Remove ${stickerName(id)}` : stickerName(id)}
                   aria-pressed={on}
                   onClick={() => onPick(id)}
                   disabled={!on && full}
                   className={cn(
-                    "grid aspect-square max-w-20 place-items-center rounded-xl border p-1.5 transition-colors disabled:opacity-35",
+                    "relative grid aspect-square max-w-20 place-items-center rounded-xl border p-1.5 transition-colors disabled:opacity-35",
                     on ? "border-ink bg-paper" : "border-line hover:border-ink/30",
                   )}
                 >
                   <Sticker id={id} className="size-full shadow-none" />
+                  {on && (
+                    <span
+                      aria-hidden
+                      className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-rose-deep text-paper shadow ring-2 ring-paper"
+                    >
+                      <X className="size-3" strokeWidth={3} />
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -476,6 +584,20 @@ function StickerGrid({
         </div>
       ))}
     </div>
+  );
+}
+
+/** Spotlight pages: the sticker that lands after the last note. */
+export function SceneStamp({ draft, i, edit }: { draft: Draft; i: number; edit: Edit }) {
+  const scene = draft.story.scenes[i];
+  if (scene.type !== "spotlight") return null;
+  return (
+    <SceneReaction
+      draft={draft}
+      title="Stamp after the last note"
+      value={scene.stamp === undefined ? "yay" : (scene.stamp ?? undefined)}
+      onChange={(stamp) => edit(updateScene(draft, i, { stamp: stamp ?? null } as Partial<Scene>))}
+    />
   );
 }
 
@@ -497,7 +619,7 @@ export function SceneColours({
       action={
         overridden && (
           <IconAction
-            label="Use the page colours"
+            label="Back to the template colours"
             onClick={() => edit(updateScene(draft, i, { palette: undefined }))}
           >
             <RotateCcw className="size-4" />
@@ -506,7 +628,7 @@ export function SceneColours({
       }
     >
       <p className="text-xs text-muted">
-        Only this page changes. Whole-gift colours are under Page.
+        Only this page changes.
       </p>
       <div className="grid gap-2">
         {paletteFields.slice(0, 4).map((f) => (
@@ -555,7 +677,6 @@ function ItemInspector({
   return (
     <Panel
       crumbs={[
-        { label: "Page", onClick: () => setSel({ scene: null, item: null }) },
         {
           label: sceneSchemas[scene.type].name,
           onClick: () => setSel({ scene: i, item: null }),
@@ -596,12 +717,14 @@ function ItemInspector({
           </IconAction>
           <span className="flex-1" />
           <IconAction
-            label="Delete"
+            label={`Remove this ${list.itemLabel.toLowerCase()}`}
             danger
             disabled={items.length <= 1}
             onClick={() => {
-              edit(deleteItem(draft, i, list.key, j));
-              setSel({ scene: i, item: Math.max(0, j - 1) });
+              const next = deleteSelected(draft, { scene: i, item: j, field: list.key });
+              if (!next) return;
+              edit(next.draft);
+              setSel(next.sel);
             }}
           >
             <Trash2 className="size-4" />
@@ -613,9 +736,14 @@ function ItemInspector({
         {list.kind === "strings" ? (
           <Field label={list.itemLabel}>
             <TextArea
-              value={String(item ?? "")}
+              value={showNames(String(item ?? ""), draft.story)}
               maxLength={400}
-              onChange={(e) => set(e.target.value)}
+              onChange={(e) => set(keepNames(e.target.value, draft.story))}
+            />
+            <FieldFontPicker
+              value={scene.fonts?.[`${list.key}:${j}`]}
+              sample={String(item ?? "")}
+              onChange={(id) => edit(setFieldFont(draft, i, `${list.key}:${j}`, id), `${i}-font-${list.key}-${j}`)}
             />
           </Field>
         ) : (
@@ -626,6 +754,8 @@ function ItemInspector({
               draft={draft}
               value={(item as Rec)[f.key]}
               onChange={(v) => set({ ...(item as Rec), [f.key]: v })}
+              font={scene.fonts?.[`${f.key}:${j}`]}
+              onFont={(id) => edit(setFieldFont(draft, i, `${f.key}:${j}`, id), `${i}-font-${f.key}-${j}`)}
             />
           ))
         )}
@@ -637,6 +767,19 @@ function ItemInspector({
           />
         )}
       </Group>
+      <button
+        type="button"
+        disabled={items.length <= 1}
+        onClick={() => {
+          const next = deleteSelected(draft, { scene: i, item: j, field: list.key });
+          if (!next) return;
+          edit(next.draft);
+          setSel(next.sel);
+        }}
+        className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-rose/30 text-sm font-medium text-rose-deep disabled:opacity-40"
+      >
+        <Trash2 className="size-4" /> Remove this {list.itemLabel.toLowerCase()}
+      </button>
     </Panel>
   );
 }
@@ -648,6 +791,7 @@ export function PhotoPicker({
   label = "Photo",
   hint,
   roomy,
+  highlight,
 }: {
   draft: Draft;
   src?: string;
@@ -655,9 +799,10 @@ export function PhotoPicker({
   label?: string;
   hint?: string;
   roomy?: boolean;
+  highlight?: boolean;
 }) {
   return (
-    <Field label={label} hint={hint} roomy={roomy}>
+    <Field label={label} hint={hint} roomy={roomy} highlight={highlight}>
       <div className="flex items-center gap-3">
         <label className={cn("relative grid shrink-0 cursor-pointer place-items-center overflow-hidden rounded-xl bg-line/60 text-muted", roomy ? "size-24" : "size-20")}>
           {src ? (
@@ -717,58 +862,112 @@ export function PhotoPicker({
 
 /* ───────────── Field rendering ───────────── */
 
+type Names = Pick<Draft["story"], "recipient" | "sender">;
+
+/** Copy as the sender will read it: real names instead of {to} / {from}. */
+export function showNames(text: string, names: Names) {
+  return text.replaceAll("{to}", names.recipient).replaceAll("{from}", names.sender);
+}
+
+/** Typed names go back to placeholders, so renaming someone later updates every line. */
+export function keepNames(text: string, names: Names) {
+  const swaps = [
+    { name: names.recipient.trim(), token: "{to}" },
+    { name: names.sender.trim(), token: "{from}" },
+  ]
+    .filter((s) => s.name)
+    .sort((a, b) => b.name.length - a.name.length);
+  return swaps.reduce((out, { name, token }) => {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return out.replace(new RegExp(`(?<![\\p{L}\\p{N}{])${escaped}(?![\\p{L}\\p{N}}])`, "gu"), token);
+  }, text);
+}
+
 export function FieldEditor({
   field,
   value,
   onChange,
   draft,
   roomy,
+  highlight,
+  font,
+  onFont,
+  onRemove,
 }: {
   field: FieldDef;
   value: unknown;
   onChange: (v: unknown) => void;
   draft: Draft;
   roomy?: boolean;
+  highlight?: boolean;
+  font?: FontId;
+  onFont?: (id?: FontId) => void;
+  onRemove?: () => void;
 }) {
   const input = roomy ? "min-h-12 text-base" : undefined;
+  const names = draft.story;
   switch (field.kind) {
     case "image":
       return (
-        <PhotoPicker
-          draft={draft}
-          label={field.label}
-          hint={field.help}
-          src={value as string | undefined}
-          onChange={onChange}
-          roomy={roomy}
-        />
+        <div>
+          <PhotoPicker
+            draft={draft}
+            label={field.label}
+            hint={field.help}
+            src={value as string | undefined}
+            onChange={onChange}
+            roomy={roomy}
+            highlight={highlight}
+          />
+          {onRemove && String(value ?? "") && (
+            <button type="button" onClick={onRemove} className="mt-1.5 text-sm text-rose-deep">
+              Remove from this page
+            </button>
+          )}
+        </div>
       );
     case "text":
       return (
-        <Field label={field.label} hint={field.help} roomy={roomy}>
-          <TextInput
-            value={String(value ?? "")}
-            maxLength={field.max}
-            placeholder={field.placeholder}
-            onChange={(e) => onChange(e.target.value)}
-            className={input}
-          />
-        </Field>
+        <div>
+          <Field label={field.label} hint={field.help} roomy={roomy} highlight={highlight}>
+            <TextInput
+              value={showNames(String(value ?? ""), names)}
+              maxLength={field.max}
+              placeholder={field.placeholder}
+              onChange={(e) => onChange(keepNames(e.target.value, names))}
+              className={input}
+            />
+            {onFont && <FieldFontPicker value={font} sample={String(value ?? "")} onChange={onFont} />}
+          </Field>
+          {onRemove && String(value ?? "") ? (
+            <button type="button" onClick={onRemove} className="mt-1.5 text-sm text-rose-deep">
+              Remove from this page
+            </button>
+          ) : null}
+        </div>
       );
     case "textarea":
       return (
-        <Field label={field.label} hint={field.help} roomy={roomy}>
-          <TextArea
-            value={String(value ?? "")}
-            maxLength={field.max}
-            onChange={(e) => onChange(e.target.value)}
-            className={input}
-          />
-        </Field>
+        <div>
+          <Field label={field.label} hint={field.help} roomy={roomy} highlight={highlight}>
+            <TextArea
+              value={showNames(String(value ?? ""), names)}
+              maxLength={field.max}
+              onChange={(e) => onChange(keepNames(e.target.value, names))}
+              className={input}
+            />
+            {onFont && <FieldFontPicker value={font} sample={String(value ?? "")} onChange={onFont} />}
+          </Field>
+          {onRemove && String(value ?? "") ? (
+            <button type="button" onClick={onRemove} className="mt-1.5 text-sm text-rose-deep">
+              Remove from this page
+            </button>
+          ) : null}
+        </div>
       );
     case "number":
       return (
-        <Field label={field.label} roomy={roomy}>
+        <Field label={field.label} roomy={roomy} highlight={highlight}>
           <TextInput
             type="number"
             min={field.min}
@@ -788,7 +987,7 @@ export function FieldEditor({
       );
     case "select":
       return (
-        <Field label={field.label} roomy={roomy}>
+        <Field label={field.label} roomy={roomy} highlight={highlight}>
           <select
             value={String(value ?? "")}
             onChange={(e) => onChange(e.target.value)}
@@ -809,7 +1008,7 @@ export function FieldEditor({
     case "multi": {
       const chosen = (value as string[]) ?? [];
       return (
-        <Field label={`${field.label} (${field.min}–${field.max})`} roomy={roomy}>
+        <Field label={`${field.label} (${field.min}–${field.max})`} roomy={roomy} highlight={highlight}>
           <div className="flex flex-wrap gap-2">
             {field.options.map((o) => {
               const on = chosen.includes(o.value);
@@ -841,16 +1040,16 @@ export function FieldEditor({
       // Nested lists (e.g. a quiz question's answers) are edited inline.
       const items = (value as string[]) ?? [];
       return (
-        <Field label={field.label} roomy={roomy}>
+        <Field label={field.label} roomy={roomy} highlight={highlight}>
           <div className="space-y-2">
             {items.map((s, k) => (
               <div key={k} className="flex items-center gap-2">
                 <TextInput
-                  value={s}
+                  value={showNames(s, names)}
                   className={roomy ? "min-h-12 text-base" : "py-2"}
                   onChange={(e) =>
                     onChange(
-                      items.map((x, m) => (m === k ? e.target.value : x)),
+                      items.map((x, m) => (m === k ? keepNames(e.target.value, names) : x)),
                     )
                   }
                 />

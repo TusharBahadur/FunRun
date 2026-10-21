@@ -37,6 +37,50 @@ export const sceneLabels: Record<SceneType, string> = {
   finale: "The finale",
 };
 
+/** The in-page button that turns to this scene, named for what’s waiting. */
+const turnInto: Record<SceneType, string> = {
+  seal: "Break the seal",
+  scratch: "Scratch the card",
+  lights: "Light the candles",
+  knock: "Knock on the door",
+  unwrap: "Open your gift",
+  spotlight: "Look at you",
+  compliments: "Pop the compliments",
+  hero: "Come in",
+  countdown: "See the date",
+  noticed: "Things I noticed",
+  gallery: "See the photos",
+  playlist: "Play our songs",
+  dandelion: "Make a wish",
+  cake: "Blow out the candles",
+  meter: "Fill it up",
+  receipt: "Print the receipt",
+  deck: "Flip the cards",
+  coupon: "Tear this off",
+  jar: "Open the jar",
+  polaroids: "Develop the photos",
+  quiz: "Take the quiz",
+  match: "Find the pairs",
+  stars: "Connect the stars",
+  question: "One question",
+  ringbox: "Open the box",
+  bouquet: "Build the bouquet",
+  award: "See your trophy",
+  map: "Walk our map",
+  letter: "Read my letter",
+  numbers: "By the numbers",
+  wishes: "Read the wishes",
+  voice: "Hear this",
+  finale: "One last thing",
+};
+
+export function turnLabel(next: Scene, fill: (text: string) => string) {
+  return fill(turnInto[next.type]);
+}
+
+/** Short gesture pages: after the payoff, turn the page for them. */
+export const autoTurn: SceneType[] = ["dandelion", "stars", "match"];
+
 export function storyFacts(scenes: Scene[]) {
   const finale = scenes.find((s) => s.type === "finale");
   return {

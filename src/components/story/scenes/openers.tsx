@@ -1,9 +1,10 @@
 "use client";
 
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { Accented } from "@/components/experiences/birthday/accented";
 import { EASE_OUT } from "@/lib/motion";
-import { Backdrop, capturePointer, HoldRing, SceneShell, useHold, useStory, type SceneProps } from "../scene-kit";
+import { Backdrop, capturePointer, HoldRing, SceneShell, StudioAlso, StudioHit, useHold, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
 import type { Scene } from "../types";
 
 type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
@@ -29,9 +30,11 @@ export function SealScene({ scene, done, onDone }: SceneProps<S<"seal">>) {
           animate={done ? { y: -120, zIndex: 3 } : { y: 0, zIndex: 0 }}
           transition={{ delay: done ? 0.45 : 0, duration: 0.9, ease: EASE_OUT }}
         >
-          <p className="type-accent text-[1.65rem] leading-tight" style={{ color: palette.accent }}>
-            {fill(scene.note)}
-          </p>
+          <StudioHit field="note">
+            <p className="type-accent text-[1.65rem] leading-tight" style={{ color: palette.accent }}>
+              {fill(scene.note)}
+            </p>
+          </StudioHit>
         </motion.div>
         {/* Envelope body */}
         <div
@@ -139,10 +142,16 @@ export function ScratchScene({ scene, done, onDone }: SceneProps<S<"scratch">>) 
         style={{ backgroundColor: palette.cream, color: palette.ink }}
       >
         <div>
-          <p className="type-accent text-[2rem] leading-tight" style={{ color: palette.accent }}>
-            {fill(scene.reveal)}
-          </p>
-          {scene.sub && <p className="type-label mt-3 opacity-60">{fill(scene.sub)}</p>}
+          <StudioHit field="reveal">
+            <p className="type-accent text-[2rem] leading-tight" style={{ color: palette.accent }}>
+              {fill(scene.reveal)}
+            </p>
+          </StudioHit>
+          {scene.sub && (
+            <StudioHit field="sub">
+              <p className="type-label mt-3 opacity-60">{fill(scene.sub)}</p>
+            </StudioHit>
+          )}
         </div>
         <motion.canvas
           ref={canvas}
@@ -173,7 +182,8 @@ export function ScratchScene({ scene, done, onDone }: SceneProps<S<"scratch">>) 
 /* ───────────── A dark room: light every candle ───────────── */
 
 export function LightsScene({ scene, done, onDone }: SceneProps<S<"lights">>) {
-  const { palette } = useStory();
+  const { palette, fill } = useStory();
+  const studio = useStudioEdit();
   const [lit, setLit] = useState<boolean[]>(() => Array(scene.candles).fill(done));
   const row = useRef<HTMLDivElement>(null);
   const count = lit.filter(Boolean).length;
@@ -200,12 +210,13 @@ export function LightsScene({ scene, done, onDone }: SceneProps<S<"lights">>) {
       </Backdrop>
       <SceneShell
         eyebrow={scene.eyebrow}
-        title={done ? scene.reveal : scene.title}
+        title={done && !studio ? scene.reveal : scene.title}
         hint={scene.hint}
         doneText={scene.done}
         done={done}
         tone={warmth > 0.6 ? "light" : "dark"}
       >
+        <StudioHit field="candles">
         <div ref={row} className="flex items-end gap-5">
           {lit.map((on, i) => (
             <button
@@ -230,6 +241,12 @@ export function LightsScene({ scene, done, onDone }: SceneProps<S<"lights">>) {
             </button>
           ))}
         </div>
+        </StudioHit>
+        <StudioAlso label="Headline once every candle is lit" field="reveal">
+          <p className="type-display text-balance text-3xl">
+            <Accented text={fill(scene.reveal)} color={palette.accent} />
+          </p>
+        </StudioAlso>
       </SceneShell>
     </div>
   );
@@ -263,14 +280,16 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
           className="absolute inset-0 grid place-items-center rounded-t-[100px] px-4 text-center"
           style={{ background: `radial-gradient(circle at 50% 40%, #fff6dc, ${palette.gold})`, color: palette.ink }}
         >
-          <p className="type-accent text-2xl leading-tight">{fill(scene.reveal)}</p>
+          <StudioHit field="reveal">
+            <p className="type-accent text-2xl leading-tight">{fill(scene.reveal)}</p>
+          </StudioHit>
         </div>
         <motion.button
           type="button"
           onClick={knock}
           aria-label={`Knock (${knocks} of ${scene.knocks})`}
           className="absolute inset-0 origin-left rounded-t-[100px] outline-none"
-          style={{ backgroundColor: palette.accent, transformStyle: "preserve-3d", boxShadow: "inset 0 0 0 10px rgba(27,18,21,.08)" }}
+          style={{ backgroundColor: palette.accent, transformStyle: "preserve-3d", boxShadow: "inset 0 0 0 10px rgba(27,18,21,.08)", pointerEvents: done ? "none" : undefined }}
           animate={done ? { rotateY: -105 } : { rotateY: 0, x: shake ? [0, -6, 6, -3, 0] : 0 }}
           transition={done ? { duration: 1, ease: EASE_OUT } : { duration: 0.3 }}
           key={done ? "open" : `k${shake}`}
@@ -292,7 +311,7 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
           </motion.span>
         )}
       </div>
-      <div className="mt-6 flex gap-2" aria-hidden>
+      <div className="mt-6 flex gap-2 p-1.5" aria-hidden>
         {Array.from({ length: scene.knocks }).map((_, i) => (
           <span key={i} className="size-2.5 rounded-full" style={{ backgroundColor: i < knocks ? palette.accent : `${palette.fg}25` }} />
         ))}
@@ -320,45 +339,53 @@ export function UnwrapScene({ scene, done, onDone }: SceneProps<S<"unwrap">>) {
   const wobble = 4 + taps * 4;
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
-      <div ref={box} className="relative grid h-[300px] w-[min(80vw,300px)] place-items-end justify-center">
-        {/* Surprise card rises when the lid flies */}
+      <div ref={box} className="relative grid h-[300px] w-[min(80vw,300px)] place-items-center">
+        {/* Surprise card rises as the box leaves */}
         <motion.div
-          className="absolute left-1/2 top-4 w-[250px] -translate-x-1/2 rounded-2xl border-2 border-dashed px-5 py-5 text-center"
+          className="w-[250px] rounded-2xl border-2 border-dashed px-5 py-5 text-center"
           style={{ backgroundColor: palette.cream, color: palette.ink, borderColor: `${palette.accent}66` }}
           initial={false}
-          animate={done ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 120, scale: 0.6 }}
-          transition={{ delay: done ? 0.35 : 0, type: "spring", bounce: 0.4 }}
+          animate={done ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 80, scale: 0.6 }}
+          transition={{ delay: done ? 0.2 : 0, type: "spring", bounce: 0.4 }}
         >
           <p className="type-label text-[10px] opacity-60">Inside</p>
-          <p className="type-accent mt-1 text-[1.7rem] leading-tight" style={{ color: palette.accent }}>
-            {fill(scene.inside)}
-          </p>
-          {scene.insideSub && <p className="type-label mt-2 text-[10px] opacity-60">{fill(scene.insideSub)}</p>}
+          <StudioHit field="inside">
+            <p className="type-accent mt-1 text-[1.7rem] leading-tight" style={{ color: palette.accent }}>
+              {fill(scene.inside)}
+            </p>
+          </StudioHit>
+          {scene.insideSub && (
+            <StudioHit field="insideSub">
+              <p className="type-label mt-2 text-[10px] opacity-60">{fill(scene.insideSub)}</p>
+            </StudioHit>
+          )}
         </motion.div>
-        <motion.button
-          type="button"
-          onClick={tap}
-          aria-label={`Tap the gift (${taps} of ${scene.taps})`}
-          className="relative w-[200px] outline-none"
-          animate={done ? { y: 60, opacity: 0.25, scale: 0.85 } : { rotate: taps ? [0, -wobble, wobble, -wobble / 2, 0] : 0 }}
-          transition={{ duration: done ? 0.8 : 0.45 }}
-          key={done ? "open" : `t${taps}`}
-        >
-          <svg viewBox="0 0 200 190" className="h-auto w-full overflow-visible" aria-hidden>
-            <rect x="20" y="70" width="160" height="115" rx="10" fill={palette.accent} />
-            <rect x="88" y="70" width="24" height="115" fill={palette.gold} />
-            <motion.g
-              animate={done ? { y: -150, x: 60, rotate: 25, opacity: 0 } : { y: 0 }}
-              transition={{ duration: 0.7, ease: EASE_OUT }}
-              style={{ originX: "100px", originY: "60px" }}
+        <AnimatePresence>
+          {!done && (
+            <motion.button
+              key="gift"
+              type="button"
+              onClick={tap}
+              aria-label={`Tap the gift (${taps} of ${scene.taps})`}
+              className="absolute bottom-0 w-[200px] outline-none"
+              initial={false}
+              animate={{ rotate: taps ? [0, -wobble, wobble, -wobble / 2, 0] : 0 }}
+              exit={{ y: 36, opacity: 0, scale: 0.82 }}
+              transition={{ duration: 0.45, ease: EASE_OUT }}
             >
-              <rect x="10" y="44" width="180" height="34" rx="8" fill={palette.accent} />
-              <rect x="10" y="44" width="180" height="34" rx="8" fill="#fff" opacity=".14" />
-              <rect x="88" y="44" width="24" height="34" fill={palette.gold} />
-              <path d="M100 44 C70 6, 40 26, 62 42 C72 48, 90 46, 100 44Z M100 44 C130 6, 160 26, 138 42 C128 48, 110 46, 100 44Z" fill={palette.gold} />
-            </motion.g>
-          </svg>
-        </motion.button>
+              <svg viewBox="0 0 200 190" className="h-auto w-full overflow-visible" aria-hidden>
+                <rect x="20" y="70" width="160" height="115" rx="10" fill={palette.accent} />
+                <rect x="88" y="70" width="24" height="115" fill={palette.gold} />
+                <g>
+                  <rect x="10" y="44" width="180" height="34" rx="8" fill={palette.accent} />
+                  <rect x="10" y="44" width="180" height="34" rx="8" fill="#fff" opacity=".14" />
+                  <rect x="88" y="44" width="24" height="34" fill={palette.gold} />
+                  <path d="M100 44 C70 6, 40 26, 62 42 C72 48, 90 46, 100 44Z M100 44 C130 6, 160 26, 138 42 C128 48, 110 46, 100 44Z" fill={palette.gold} />
+                </g>
+              </svg>
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
       {!done && (
         <div className="mt-4 flex gap-2" aria-hidden>

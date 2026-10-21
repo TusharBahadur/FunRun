@@ -1,5 +1,6 @@
 import type { AccentFont, BirthdayPalette, PhotoTone } from "@/components/experiences/birthday/types";
-import type { GiftFont } from "./gift-fonts";
+import type { FontId } from "./font-catalog";
+import type { StoryFont } from "./gift-fonts";
 import type { AnyStickerId, StickerPlacement } from "./stickers";
 
 /**
@@ -33,6 +34,8 @@ type Heading = {
   reaction?: AnyStickerId;
   /** Website gifts: the short name for this section in the menu. */
   nav?: string;
+  /** A font per field on this page, keyed by field name; `list` covers every item in the page's list. */
+  fonts?: Partial<Record<string, FontId>>;
 };
 
 export type Photo = {
@@ -52,7 +55,7 @@ export type Scene =
   | ({ type: "knock" } & Heading & { knocks: number; reveal: string })
   | ({ type: "unwrap" } & Heading & { taps: number; inside: string; insideSub?: string })
   // About them
-  | ({ type: "spotlight" } & Heading & { photo?: string; tone?: PhotoTone; tags: string[] })
+  | ({ type: "spotlight" } & Heading & { photo?: string; tone?: PhotoTone; tags: string[]; /** Joins the notes at the end; defaults to the "yay!" stamp, null for none. */ stamp?: AnyStickerId | null })
   | ({ type: "compliments" } & Heading & { bubbles: string[] })
   // Website sections (work as pages too)
   | ({ type: "hero" } & Heading & { subtitle?: string; photo?: string; tone?: PhotoTone })
@@ -98,7 +101,7 @@ export type Story = {
   /** Highlight-font mood (see accent-moods.ts). Defaults to classic. */
   accentFont?: AccentFont;
   /** Headline, letter and caption font (see gift-fonts.ts). Defaults to classic. */
-  font?: GiftFont;
+  font?: StoryFont;
   scenes: Scene[];
 };
 

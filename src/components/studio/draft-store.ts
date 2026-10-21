@@ -151,7 +151,7 @@ export function useDraft(initial: Draft) {
 }
 
 /** Shrinks an image so drafts stay small enough to keep on this device. */
-export async function imageToDataUrl(file: File, maxSide = 1100) {
+export async function imageToDataUrl(file: File, maxSide = 1100, type: "image/jpeg" | "image/webp" = "image/jpeg") {
   const bitmap = await createImageBitmap(file);
   const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
   const c = document.createElement("canvas");
@@ -159,5 +159,5 @@ export async function imageToDataUrl(file: File, maxSide = 1100) {
   c.height = Math.round(bitmap.height * scale);
   c.getContext("2d")!.drawImage(bitmap, 0, 0, c.width, c.height);
   bitmap.close();
-  return c.toDataURL("image/jpeg", 0.8);
+  return c.toDataURL(type, 0.8);
 }

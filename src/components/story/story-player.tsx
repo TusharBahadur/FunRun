@@ -1,20 +1,20 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { ChevronLeft, ChevronRight, Lock, Volume2, VolumeX } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
+import { ChevronLeft, Volume2, VolumeX } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Confetti, type ConfettiHandle } from "@/components/experiences/confetti";
 import { MusicBox } from "@/components/experiences/music-box";
 import { EASE_OUT } from "@/lib/motion";
-import { cn } from "@/lib/utils";
 import { accentMoodVars } from "@/components/experiences/birthday/accent-moods";
-import { giftFontVars } from "./gift-fonts";
+import { giftFontRoot } from "./gift-fonts";
+import { autoTurn, turnLabel } from "./labels";
 import { melodies } from "./melodies";
-import { StoryContext, type SceneProps, type StoryApi } from "./scene-kit";
+import { SceneFontsContext, StoryContext, StudioEditContext, StudioSurface, TurnContext, type StoryApi, type StudioEdit } from "./scene-kit";
 import { SCENES } from "./scene-registry";
 import { SitePlayer } from "./site-player";
 import { ReactionSticker, StickerLayer } from "./stickers";
-import { passiveScenes, type Scene, type SceneType, type Story } from "./types";
+import { passiveScenes, type Scene, type Story } from "./types";
 
 const initialDone = (scenes: Scene[]) => scenes.map((s) => passiveScenes.includes(s.type));
 
@@ -26,12 +26,22 @@ type PlayerProps = {
   /** Studio: every page can be visited without playing the one before. */
   unlocked?: boolean;
   onIndexChange?: (index: number) => void;
+  /** Studio: tap copy in the gift to select the matching field. */
+  studio?: StudioEdit;
 };
 
 /** Plays a gift: page by page (the games), or as one scrolling website. */
 export function StoryPlayer(props: PlayerProps) {
-  return props.story.format === "site" ? <SitePlayer {...props} /> : <PagesPlayer {...props} />;
+  const inner = props.story.format === "site" ? <SitePlayer {...props} /> : <PagesPlayer {...props} />;
+  if (!props.studio) return inner;
+  return (
+    <StudioEditContext.Provider value={props.studio}>
+      <StudioSurface>{inner}</StudioSurface>
+    </StudioEditContext.Provider>
+  );
 }
+
+const noop = () => {};
 
 /** One scene per page, each unlocked by finishing the last. */
 function PagesPlayer({
@@ -40,6 +50,7 @@ function PagesPlayer({
   initialIndex = 0,
   unlocked = false,
   onIndexChange,
+  studio,
 }: PlayerProps) {
   const scenes = useMemo(() => story.scenes.filter((s) => !s.hidden), [story.scenes]);
   const [index, setIndex] = useState(() => Math.min(initialIndex, Math.max(0, scenes.length - 1)));
@@ -106,6 +117,7 @@ function PagesPlayer({
   const scene = scenes[safeIndex] as Scene | undefined;
   // A scene can override colours for itself; everything else uses the story's.
   const palette = useMemo(() => ({ ...story.palette, ...scene?.palette }), [story.palette, scene?.palette]);
+  const giftFace = giftFontRoot(story.font);
 
   const api = useMemo<StoryApi>(
     () => ({
@@ -134,6 +146,15 @@ function PagesPlayer({
     [palette, story.recipient, story.sender, playSong, scenes, slug],
   );
 
+  useEffect(() => {
+    if (studio || !scene) return;
+    const last = safeIndex >= scenes.length - 1;
+    const ready = (!!done[safeIndex] || unlocked) && !last;
+    if (!ready || !autoTurn.includes(scene.type)) return;
+    const id = window.setTimeout(() => go(safeIndex + 1), 2400);
+    return () => window.clearTimeout(id);
+  }, [studio, scene, safeIndex, done, unlocked, scenes.length, go]);
+
   if (!scene) {
     return (
       <div className="grid min-h-svh place-items-center p-8 text-center" style={{ backgroundColor: story.palette.bg, color: story.palette.fg }}>
@@ -143,15 +164,24 @@ function PagesPlayer({
   }
 
   const SceneView = SCENES[scene.type];
-  const canNext = (done[safeIndex] || unlocked) && safeIndex < scenes.length - 1;
   const last = safeIndex === scenes.length - 1;
+  const pageDone = studio ? true : !!done[safeIndex];
+  const canNext = (pageDone || unlocked) && !last;
+  const next = !last ? scenes[safeIndex + 1] : undefined;
 
   return (
     <StoryContext.Provider value={api}>
+      <TurnContext.Provider
+        value={{
+          label: next ? turnLabel(next, api.fill) : null,
+          ready: canNext,
+          onContinue: () => go(safeIndex + 1),
+        }}
+      >
       <div
-        data-gift-font={story.font ?? "classic"}
+        data-gift-font={giftFace["data-gift-font"]}
         className="relative isolate min-h-svh overflow-x-hidden transition-colors duration-700"
-        style={{ backgroundColor: palette.bg, color: palette.fg, ...accentMoodVars(story.accentFont ?? "classic"), ...giftFontVars(story.font) }}
+        style={{ backgroundColor: palette.bg, color: palette.fg, ...accentMoodVars(story.accentFont ?? "classic"), ...giftFace.style }}
       >
         <Confetti ref={confetti} colors={[palette.accent, palette.gold, palette.pink, palette.cream, palette.fg]} />
 
@@ -162,73 +192,32 @@ function PagesPlayer({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -30 }}
             transition={{ duration: 0.5, ease: EASE_OUT }}
+            data-studio-scene={safeIndex}
             className="relative"
           >
             <StickerLayer stickers={scene.stickers} />
-            <SceneView scene={scene} done={!!done[safeIndex]} onDone={() => complete(safeIndex)} />
+            {/* The studio shows every page finished, so what you edit is on screen without playing for it. */}
+            <SceneFontsContext.Provider value={scene.fonts}>
+              <SceneView scene={scene} done={pageDone} onDone={studio ? noop : () => complete(safeIndex)} />
+            </SceneFontsContext.Provider>
           </motion.main>
         </AnimatePresence>
 
-        <ReactionSticker key={`${run}-${safeIndex}`} id={scene.reaction} show={!!done[safeIndex]} />
+        <ReactionSticker key={`${run}-${safeIndex}`} id={scene.reaction} show={pageDone} />
 
-        {/* Page controls */}
-        <nav
-          aria-label="Pages"
-          className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+16px)]"
-        >
-          <div
-            className="flex items-center gap-1 rounded-full p-1.5 shadow-[0_12px_30px_-14px_rgba(27,18,21,.45)] backdrop-blur"
-            style={{ backgroundColor: `${palette.cream}e6`, color: palette.ink }}
+        {!studio && safeIndex > 0 && (
+          <button
+            type="button"
+            onClick={() => go(safeIndex - 1)}
+            aria-label="Previous page"
+            className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] left-4 z-40 grid size-10 place-items-center rounded-full backdrop-blur"
+            style={{ backgroundColor: `${palette.cream}cc`, color: palette.ink }}
           >
-            <button
-              type="button"
-              onClick={() => go(index - 1)}
-              disabled={safeIndex === 0}
-              aria-label="Previous page"
-              className="grid size-10 place-items-center rounded-full transition-opacity disabled:opacity-25"
-            >
-              <ChevronLeft className="size-5" />
-            </button>
-            <div className="flex items-center gap-1.5 px-1" aria-label={`Page ${safeIndex + 1} of ${scenes.length}`}>
-              {scenes.map((_, i) => (
-                <span
-                  key={i}
-                  className="h-1.5 rounded-full transition-all duration-500"
-                  style={{
-                    width: i === safeIndex ? 18 : 6,
-                    backgroundColor: i <= safeIndex ? palette.accent : `${palette.ink}30`,
-                  }}
-                />
-              ))}
-            </div>
-            {!last && (
-              <motion.button
-                key={`next-${nudge}`}
-                type="button"
-                onClick={() => go(index + 1)}
-                aria-label={canNext ? "Next page" : "Finish this page first"}
-                animate={nudge && !canNext ? { x: [0, -5, 5, -3, 0] } : {}}
-                transition={{ duration: 0.35 }}
-                className={cn(
-                  "flex h-10 items-center justify-center gap-1 rounded-full transition-all duration-500",
-                  canNext ? "px-4" : "w-10",
-                )}
-                style={canNext ? { backgroundColor: palette.accent, color: palette.cream } : { opacity: 0.45 }}
-              >
-                {canNext ? (
-                  <>
-                    <span className="text-sm font-medium">Next</span>
-                    <ChevronRight className="size-4" />
-                  </>
-                ) : (
-                  <Lock className="size-4" />
-                )}
-              </motion.button>
-            )}
-          </div>
-        </nav>
+            <ChevronLeft className="size-5" />
+          </button>
+        )}
 
-        {/* Music */}
+        {!studio && (
         <button
           type="button"
           onClick={() => {
@@ -243,23 +232,24 @@ function PagesPlayer({
         >
           {playing ? <Volume2 className="size-4" /> : <VolumeX className="size-4 opacity-60" />}
         </button>
+        )}
 
-        {/* Nudge when trying to skip ahead */}
         <AnimatePresence>
-          {nudge > 0 && !done[safeIndex] && !unlocked && (
+          {nudge > 0 && !pageDone && !unlocked && (
             <motion.p
               key={nudge}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               onAnimationComplete={() => setTimeout(() => setNudge(0), 1600)}
-              className="type-label fixed inset-x-0 bottom-24 z-40 text-center"
+              className="type-label fixed inset-x-0 bottom-10 z-40 text-center"
             >
               Finish this page to unlock the next
             </motion.p>
           )}
         </AnimatePresence>
       </div>
+      </TurnContext.Provider>
     </StoryContext.Provider>
   );
 }

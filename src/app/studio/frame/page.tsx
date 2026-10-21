@@ -14,6 +14,8 @@ export type StudioFrameMessage = {
   run: number;
   /** "edit": every page open, follows the studio. "play": plays like the real gift. */
   mode: "edit" | "play";
+  /** Studio: which field is selected, so the iframe can outline it. */
+  pick?: { field?: string | null; item?: number | null };
 };
 
 /**
@@ -46,17 +48,40 @@ export default function StudioFramePage() {
 
   if (!msg) return <main className="min-h-svh" />;
 
+  const editing = msg.mode === "edit";
+
+  // Lenis would swallow wheel scrolls here; letting them through scrolls the studio page instead.
   return (
+    <div data-lenis-prevent>
     <StoryPlayer
       key={jump}
       story={msg.story}
       slug={msg.slug}
       initialIndex={msg.index}
-      unlocked={msg.mode === "edit"}
+      unlocked={editing}
+      studio={
+        editing
+          ? {
+              pick: msg.pick ?? {},
+              onPick: (p) => {
+                window.parent?.postMessage(
+                  {
+                    type: "tynitales:studio-pick",
+                    field: p.field ?? null,
+                    item: p.item ?? null,
+                    index: p.index ?? shown.current,
+                  },
+                  window.location.origin,
+                );
+              },
+            }
+          : undefined
+      }
       onIndexChange={(i) => {
         shown.current = i;
         window.parent?.postMessage({ type: "tynitales:studio-index", index: i }, window.location.origin);
       }}
     />
+    </div>
   );
 }

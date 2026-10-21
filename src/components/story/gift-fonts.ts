@@ -1,13 +1,15 @@
 import type { CSSProperties } from "react";
+import { catalogFont, type FontId } from "./font-catalog";
 
 /**
- * The font a sender picks for their gift. All three are families already
- * loaded for the brand — nothing new is downloaded.
+ * The font a sender picks for their whole gift: one of three mixed presets
+ * built from the brand families, or any single font from the catalog.
  *
  * Classic keeps today's look: Fraunces headlines, Kalam for notes.
  * Handwritten sets the whole gift in Kalam. Clean sets it in Inter Tight.
  */
 export type GiftFont = "classic" | "hand" | "clean";
+export type StoryFont = GiftFont | FontId;
 
 export const giftFonts: Record<GiftFont, { name: string; note: string; family: string; weight: number; axes: string }> = {
   classic: { name: "Classic", note: "Clean headlines, handwritten notes", family: "var(--font-fraunces)", weight: 560, axes: '"SOFT" 30, "WONK" 0' },
@@ -17,6 +19,10 @@ export const giftFonts: Record<GiftFont, { name: string; note: string; family: s
 
 export const giftFontOrder: GiftFont[] = ["classic", "hand", "clean"];
 
+export function isGiftPreset(font: string | undefined): font is GiftFont {
+  return font === "classic" || font === "hand" || font === "clean";
+}
+
 /** Sample styling for the picker. Not used to render the gift itself. */
 export function giftFontStyle(font: GiftFont): CSSProperties {
   const f = giftFonts[font];
@@ -24,13 +30,21 @@ export function giftFontStyle(font: GiftFont): CSSProperties {
 }
 
 /**
- * Stickers read `--font-hand` directly. Headlines and `type-hand` are switched
- * in globals.css via `[data-gift-font]`, because those utilities inline the
- * family and would ignore a variable override.
+ * Attributes for the gift root. Presets are switched in globals.css via
+ * `[data-gift-font]`, because the type utilities inline their family and
+ * would ignore a variable override. Catalog fonts use `custom` plus a variable.
  */
-export function giftFontVars(font?: GiftFont): CSSProperties {
-  if (font === "clean") {
-    return { "--font-hand": "var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif" } as CSSProperties;
+export function giftFontRoot(font?: StoryFont): { "data-gift-font": string; style: CSSProperties } {
+  const custom = isGiftPreset(font) ? undefined : catalogFont(font);
+  if (custom) {
+    return {
+      "data-gift-font": "custom",
+      style: { "--gift-face": custom.stack, "--font-hand": custom.stack } as CSSProperties,
+    };
   }
-  return {};
+  const preset = isGiftPreset(font) ? font : "classic";
+  return {
+    "data-gift-font": preset,
+    style: preset === "clean" ? ({ "--font-hand": "var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif" } as CSSProperties) : {},
+  };
 }

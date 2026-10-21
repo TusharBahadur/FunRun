@@ -4,12 +4,12 @@ import { Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { accentMoodVars } from "@/components/experiences/birthday/accent-moods";
-import { giftFontVars } from "./gift-fonts";
+import { giftFontRoot } from "./gift-fonts";
 import { Confetti, type ConfettiHandle } from "@/components/experiences/confetti";
 import { MusicBox } from "@/components/experiences/music-box";
 import { cn } from "@/lib/utils";
 import { melodies } from "./melodies";
-import { StoryContext, type SceneProps, type StoryApi } from "./scene-kit";
+import { SceneFontsContext, StoryContext, type SceneProps, type StoryApi } from "./scene-kit";
 import { SCENES } from "./scene-registry";
 import { CountdownSection, GallerySection, HeroSection, NoticedSection, PlaylistSection, SiteLetter } from "./scenes/site";
 import { ReactionSticker, StickerLayer } from "./stickers";
@@ -41,12 +41,14 @@ export function SitePlayer({
   slug,
   initialIndex = 0,
   onIndexChange,
+  studio,
 }: {
   story: Story;
   slug: string;
   initialIndex?: number;
   unlocked?: boolean;
   onIndexChange?: (index: number) => void;
+  studio?: unknown;
 }) {
   const scenes = useMemo(() => story.scenes.filter((s) => !s.hidden), [story.scenes]);
   const palette = story.palette;
@@ -108,6 +110,7 @@ export function SitePlayer({
     [palette, story.recipient, story.sender, playSong, slug],
   );
 
+  const giftFace = giftFontRoot(story.font);
   const brand = (scenes.find((s) => s.type === "hero")?.title ?? story.recipient)
     .replace(/\*/g, "")
     .replaceAll("{to}", story.recipient)
@@ -120,13 +123,13 @@ export function SitePlayer({
   return (
     <StoryContext.Provider value={api}>
       <div
-        data-gift-font={story.font ?? "classic"}
+        data-gift-font={giftFace["data-gift-font"]}
         className="relative isolate min-h-svh overflow-x-clip"
         style={{
           color: palette.fg,
           background: `radial-gradient(80% 50% at 0% 30%, ${palette.pink}55, transparent 70%), radial-gradient(70% 50% at 100% 70%, ${palette.accent}22, transparent 70%), ${palette.bg}`,
           ...accentMoodVars(story.accentFont ?? "classic"),
-          ...giftFontVars(story.font),
+          ...giftFace.style,
         }}
         onPointerDown={() => {
           if (!playing && !music.current) playSong();
@@ -135,7 +138,7 @@ export function SitePlayer({
         <Confetti ref={confetti} colors={[palette.accent, palette.gold, palette.pink, palette.cream]} />
 
         {/* Floating menu: bottom on phones, top on bigger screens */}
-        {navItems.length > 1 && (
+        {!studio && navItems.length > 1 && (
           <nav
             aria-label="Sections"
             className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 lg:bottom-auto lg:top-5"
@@ -162,7 +165,7 @@ export function SitePlayer({
 
         <main>
           {scenes.map((scene, i) => (
-            <SiteBlock key={i} scene={scene} refCb={(el) => (sections.current[i] = el)} />
+            <SiteBlock key={i} scene={scene} index={i} studio={!!studio} refCb={(el) => (sections.current[i] = el)} />
           ))}
         </main>
 
@@ -172,39 +175,45 @@ export function SitePlayer({
           </Link>
         </footer>
 
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (playing) {
-              music.current?.stop();
-              setPlaying(false);
-            } else playSong();
-          }}
-          aria-label={playing ? "Stop the music" : "Play the music"}
-          className="fixed bottom-20 right-4 z-40 grid size-10 place-items-center rounded-full backdrop-blur lg:bottom-5"
-          style={{ backgroundColor: `${palette.cream}cc`, color: palette.ink }}
-        >
-          {playing ? <Volume2 className="size-4" /> : <VolumeX className="size-4 opacity-60" />}
-        </button>
+        {!studio && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (playing) {
+                music.current?.stop();
+                setPlaying(false);
+              } else playSong();
+            }}
+            aria-label={playing ? "Stop the music" : "Play the music"}
+            className="fixed bottom-20 right-4 z-40 grid size-10 place-items-center rounded-full backdrop-blur lg:bottom-5"
+            style={{ backgroundColor: `${palette.cream}cc`, color: palette.ink }}
+          >
+            {playing ? <Volume2 className="size-4" /> : <VolumeX className="size-4 opacity-60" />}
+          </button>
+        )}
       </div>
     </StoryContext.Provider>
   );
 }
 
 /** One section. Games keep their own “done” state so they still play inline. */
-function SiteBlock({ scene, refCb }: { scene: Scene; refCb: (el: HTMLElement | null) => void }) {
-  const [done, setDone] = useState(passiveScenes.includes(scene.type));
+function SiteBlock({ scene, index, studio, refCb }: { scene: Scene; index: number; studio: boolean; refCb: (el: HTMLElement | null) => void }) {
+  const [played, setDone] = useState(passiveScenes.includes(scene.type));
+  // The studio shows every section finished, so what you edit is on screen without playing for it.
+  const done = studio || played;
   const Section = SITE_SECTIONS[scene.type];
   const Game = SCENES[scene.type];
   return (
-    <div ref={refCb} className="relative scroll-mt-0">
+    <div ref={refCb} data-studio-scene={index} className="relative scroll-mt-0">
       <StickerLayer stickers={scene.stickers} />
-      {Section ? (
-        <Section scene={scene} done={done} onDone={() => setDone(true)} />
-      ) : (
-        <Game scene={scene} done={done} onDone={() => setDone(true)} />
-      )}
+      <SceneFontsContext.Provider value={scene.fonts}>
+        {Section ? (
+          <Section scene={scene} done={done} onDone={() => setDone(true)} />
+        ) : (
+          <Game scene={scene} done={done} onDone={() => setDone(true)} />
+        )}
+      </SceneFontsContext.Provider>
       {!passiveScenes.includes(scene.type) && <ReactionSticker id={scene.reaction} show={done} />}
     </div>
   );

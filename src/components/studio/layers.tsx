@@ -1,13 +1,14 @@
 "use client";
 
 import { Reorder } from "motion/react";
-import { ChevronRight, Eye, EyeOff, FileText, GripVertical, ImagePlus, Plus, Trash2 } from "lucide-react";
+import { ChevronRight, Eye, EyeOff, GripVertical, ImagePlus, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import type { Scene } from "@/components/story/types";
 import { cn } from "@/lib/utils";
 import { imageToDataUrl, type Draft } from "./draft-store";
-import type { Selection } from "./inspector";
-import { readItems, setScenes, updateScene } from "./ops";
+import { showNames, type Selection } from "./inspector";
+import { isLook, LOOK } from "./look";
+import { deleteSelected, readItems, setScenes, updateScene } from "./ops";
 import { childField, sceneSchemas, sceneSubtitle } from "./schema";
 
 type Edit = (next: Draft, tag?: string) => void;
@@ -71,21 +72,23 @@ function Layers({ draft, sel, setSel, edit }: { draft: Draft; sel: Selection; se
     <div className="space-y-0.5">
       <button
         type="button"
-        onClick={() => setSel({ scene: null, item: null })}
-        className={cn("flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm", sel.scene === null ? "bg-paper font-medium" : "hover:bg-paper/60")}
+        onClick={() => setSel({ scene: LOOK, item: null, field: null })}
+        className={cn(
+          "flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm",
+          isLook(sel.scene) ? "bg-paper font-medium shadow-sm" : "hover:bg-paper/60",
+        )}
       >
-        <FileText className="size-4 text-muted" />
-        Page
-        <span className="truncate text-xs text-muted">names, colours, music</span>
+        <span className="grid size-6 place-items-center rounded-md bg-cream text-[10px] font-semibold">Aa</span>
+        <span>Look</span>
+        <span className="truncate text-xs font-normal text-muted">Theme, names & font</span>
       </button>
-
       <Reorder.Group
         axis="y"
         values={scenes}
         onReorder={(next: Scene[]) => {
           const selected = sel.scene !== null ? scenes[sel.scene] : null;
           edit(setScenes(draft, next));
-          if (selected) setSel({ scene: next.indexOf(selected), item: null });
+          if (selected) setSel({ scene: next.indexOf(selected), item: null, field: null });
         }}
         className="space-y-0.5"
       >
@@ -94,8 +97,10 @@ function Layers({ draft, sel, setSel, edit }: { draft: Draft; sel: Selection; se
           const Icon = schema.icon;
           const list = childField(scene.type);
           const items = list ? readItems(scene, list.key) : [];
-          const expanded = open.has(i);
-          const active = sel.scene === i && sel.item === null;
+          const stickers = scene.stickers ?? [];
+          const hasKids = items.length > 0 || stickers.length > 0;
+          const expanded = open.has(i) || (sel.scene === i && (sel.item !== null || !!sel.field?.startsWith("sticker-")));
+          const active = sel.scene === i;
           return (
             <Reorder.Item key={sceneKey(scene)} value={scene} className="group list-none">
               <div
@@ -110,14 +115,14 @@ function Layers({ draft, sel, setSel, edit }: { draft: Draft; sel: Selection; se
                   type="button"
                   aria-label={expanded ? "Collapse" : "Expand"}
                   onClick={() => setOpen((o) => (o.has(i) ? new Set([...o].filter((x) => x !== i)) : new Set([...o, i])))}
-                  className={cn("grid size-5 place-items-center text-muted", !items.length && "invisible")}
+                  className={cn("grid size-5 place-items-center text-muted", !hasKids && "invisible")}
                 >
                   <ChevronRight className={cn("size-3.5 transition-transform", expanded && "rotate-90")} />
                 </button>
-                <button type="button" onClick={() => setSel({ scene: i, item: null })} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                <button type="button" onClick={() => setSel({ scene: i, item: null, field: null })} className="flex min-w-0 flex-1 items-center gap-2 text-left">
                   <Icon className="size-4 shrink-0 text-ink/70" />
                   <span className="shrink-0">{schema.name}</span>
-                  <span className="truncate text-xs font-normal text-muted">{sceneSubtitle(scene)}</span>
+                  <span className="truncate text-xs font-normal text-muted">{showNames(sceneSubtitle(scene), draft.story)}</span>
                 </button>
                 <button
                   type="button"
@@ -128,19 +133,61 @@ function Layers({ draft, sel, setSel, edit }: { draft: Draft; sel: Selection; se
                   {scene.hidden ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
                 </button>
               </div>
-              {expanded && list && (
+              {expanded && hasKids && (
                 <ul className="ml-9 border-l border-line pl-2">
-                  {items.map((item, j) => (
-                    <li key={j}>
+                  {list &&
+                    items.map((item, j) => (
+                      <li key={`${list.key}-${j}`} className="group/kid flex items-center">
+                        <button
+                          type="button"
+                          onClick={() => setSel({ scene: i, item: j, field: list.key })}
+                          className={cn(
+                            "min-w-0 flex-1 truncate rounded-md px-2 py-1 text-left text-xs",
+                            sel.scene === i && sel.item === j ? "bg-paper font-medium" : "text-muted hover:bg-paper/60 hover:text-ink",
+                          )}
+                        >
+                          {showNames(list.kind === "list" ? list.title(item as Record<string, unknown>) : String(item), draft.story)}
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={`Remove this ${list.itemLabel.toLowerCase()}`}
+                          disabled={items.length <= 1}
+                          onClick={() => {
+                            const next = deleteSelected(draft, { scene: i, item: j, field: list.key });
+                            if (!next) return;
+                            edit(next.draft);
+                            setSel(next.sel);
+                          }}
+                          className="grid size-6 shrink-0 place-items-center text-rose-deep disabled:opacity-30"
+                        >
+                          <Trash2 className="size-3" />
+                        </button>
+                      </li>
+                    ))}
+                  {stickers.map((_, n) => (
+                    <li key={`sticker-${n}`} className="group/kid flex items-center">
                       <button
                         type="button"
-                        onClick={() => setSel({ scene: i, item: j })}
+                        onClick={() => setSel({ scene: i, item: null, field: `sticker-${n}` })}
                         className={cn(
-                          "flex w-full items-center gap-2 truncate rounded-md px-2 py-1 text-left text-xs",
-                          sel.scene === i && sel.item === j ? "bg-paper font-medium" : "text-muted hover:bg-paper/60 hover:text-ink",
+                          "min-w-0 flex-1 truncate rounded-md px-2 py-1 text-left text-xs",
+                          sel.scene === i && sel.field === `sticker-${n}` ? "bg-paper font-medium" : "text-muted hover:bg-paper/60 hover:text-ink",
                         )}
                       >
-                        <span className="truncate">{list.kind === "list" ? list.title(item as Record<string, unknown>) : String(item)}</span>
+                        Sticker {n + 1}
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Remove this sticker"
+                        onClick={() => {
+                          const next = deleteSelected(draft, { scene: i, item: null, field: `sticker-${n}` });
+                          if (!next) return;
+                          edit(next.draft);
+                          setSel(next.sel);
+                        }}
+                        className="grid size-6 shrink-0 place-items-center text-rose-deep"
+                      >
+                        <Trash2 className="size-3" />
                       </button>
                     </li>
                   ))}

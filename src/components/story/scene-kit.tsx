@@ -1,11 +1,20 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Accented } from "@/components/experiences/birthday/accented";
 import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { catalogFont, type FontId } from "./font-catalog";
 import type { StoryPalette } from "./types";
+
+/** Fonts the sender picked for this page, keyed by field or `field:item`. */
+export const SceneFontsContext = createContext<Partial<Record<string, FontId>> | undefined>(undefined);
+
+export function fontKey(field: string, item?: number | null) {
+  return item == null ? field : `${field}:${item}`;
+}
 
 export type StoryApi = {
   palette: StoryPalette;
@@ -23,6 +32,175 @@ export type StoryApi = {
 };
 
 export const StoryContext = createContext<StoryApi | null>(null);
+
+/** Studio edit-mode: tapping copy in the preview selects the matching field. */
+export type StudioPick = { field?: string | null; item?: number | null; index?: number };
+export type StudioEdit = {
+  pick: { field?: string | null; item?: number | null };
+  onPick: (next: StudioPick) => void;
+};
+export const StudioEditContext = createContext<StudioEdit | null>(null);
+
+export function useStudioEdit() {
+  return useContext(StudioEditContext);
+}
+
+/** Page-by-page gifts: the in-scene button that turns to the next page. */
+export type TurnApi = {
+  label: string | null;
+  ready: boolean;
+  onContinue: () => void;
+};
+export const TurnContext = createContext<TurnApi | null>(null);
+
+export function TurnButton({ className }: { className?: string }) {
+  const turn = useContext(TurnContext);
+  const studio = useStudioEdit();
+  const { palette } = useStory();
+  if (studio || !turn?.label || !turn.ready) return null;
+  return (
+    <motion.button
+      type="button"
+      onClick={turn.onContinue}
+      initial={{ opacity: 0, y: 12, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.45, ease: EASE_OUT, delay: 0.15 }}
+      className={cn(
+        "mt-8 inline-flex h-14 items-center gap-2.5 rounded-full px-8 text-[13px] font-semibold uppercase tracking-[0.16em] shadow-[0_16px_32px_-16px_rgba(27,18,21,.5)] transition-transform active:scale-95",
+        className,
+      )}
+      style={{ backgroundColor: palette.accent, color: palette.cream }}
+    >
+      {turn.label}
+      <ArrowRight className="size-4" strokeWidth={2.5} aria-hidden />
+    </motion.button>
+  );
+}
+
+/**
+ * Studio: the gift is a picture to edit, not a game to play. Every tap selects
+ * the part under it, and never reaches the scene, so nothing pops, opens or
+ * swipes away. Pass-through outside the studio.
+ */
+export function StudioSurface({ children }: { children: ReactNode }) {
+  const studio = useStudioEdit();
+  if (!studio) return children;
+  const stop = (e: React.SyntheticEvent) => e.stopPropagation();
+  return (
+    <div
+      onPointerDownCapture={stop}
+      onPointerUpCapture={stop}
+      onKeyDownCapture={(e) => {
+        if (e.key === " " || e.key === "Enter") stop(e);
+      }}
+      onClickCapture={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const target = e.target as Element;
+        const hit = target.closest("[data-studio-field]");
+        const sceneEl = target.closest("[data-studio-scene]");
+        const index = sceneEl ? Number(sceneEl.getAttribute("data-studio-scene")) : NaN;
+        const item = hit?.getAttribute("data-studio-item");
+        studio.onPick({
+          field: hit?.getAttribute("data-studio-field") ?? null,
+          item: item ? Number(item) : null,
+          index: Number.isFinite(index) ? index : undefined,
+        });
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** Studio: which item of a list is selected, if the selection is one of `fields`. */
+export function usePickedItem(fields: string[]) {
+  const studio = useStudioEdit();
+  const { field, item } = studio?.pick ?? {};
+  return field && fields.includes(field) && typeof item === "number" ? item : null;
+}
+
+/** Studio only: numbered tabs for scenes that show one item at a time. */
+export function StudioPager({ count, field, current }: { count: number; field: string; current: number }) {
+  const studio = useStudioEdit();
+  const { palette } = useStory();
+  if (!studio || count < 2) return null;
+  return (
+    <div className="mt-5 flex flex-wrap justify-center gap-1.5">
+      {Array.from({ length: count }, (_, i) => (
+        <span
+          key={i}
+          data-studio-field={field}
+          data-studio-item={i}
+          className="grid size-8 cursor-pointer place-items-center rounded-full text-xs font-semibold tabular-nums"
+          style={
+            i === current
+              ? { backgroundColor: palette.accent, color: palette.cream }
+              : { boxShadow: `inset 0 0 0 1.5px ${palette.fg}40`, color: palette.fg }
+          }
+        >
+          {i + 1}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/** Studio only: copy the gift shows in another moment (after a "yes", once lit), shown alongside. */
+export function StudioAlso({ label, field, item, children }: { label: string; field: string; item?: number; children: ReactNode }) {
+  const studio = useStudioEdit();
+  if (!studio) return null;
+  return (
+    <div className="mt-6 w-full max-w-sm">
+      <p className="type-label mb-1.5 text-[10px] opacity-50">{label}</p>
+      <StudioHit field={field} item={item} className="mx-auto w-fit">
+        {children}
+      </StudioHit>
+    </div>
+  );
+}
+
+/** Marks a piece of the gift as tappable in the studio preview. No-op outside the studio. */
+export function StudioHit({
+  field,
+  item,
+  children,
+  className,
+  as: Tag = "div",
+}: {
+  field: string;
+  item?: number;
+  children: ReactNode;
+  className?: string;
+  as?: "span" | "div";
+}) {
+  const studio = useStudioEdit();
+  const fonts = useContext(SceneFontsContext);
+  const face = catalogFont((item != null && fonts?.[fontKey(field, item)]) || fonts?.[field]);
+  const fontStyle = face
+    ? ({ "--field-face": face.stack, fontFamily: face.stack, fontVariationSettings: "normal" } as CSSProperties)
+    : undefined;
+  const on = !!studio && studio.pick.field === field && (item === undefined ? studio.pick.item == null : studio.pick.item === item);
+  if (!studio && !face) return children;
+  return (
+    <Tag
+      data-studio-field={studio ? field : undefined}
+      data-studio-item={studio ? item : undefined}
+      data-field-font={face ? "" : undefined}
+      style={fontStyle}
+      className={cn(
+        "max-w-full",
+        Tag === "span" && "inline-block",
+        studio && "pointer-events-auto cursor-pointer rounded-[0.65rem] transition-[box-shadow,background-color]",
+        on && "bg-white/15 shadow-[0_0_0_2px_#e23b54,0_0_0_6px_rgba(226,59,84,.35)]",
+        studio && !on && "hover:shadow-[0_0_0_1.5px_rgba(255,255,255,.7)]",
+        className,
+      )}
+    >
+      {children}
+    </Tag>
+  );
+}
 
 export function useStory() {
   const api = useContext(StoryContext);
@@ -43,6 +221,7 @@ export function SceneShell({
   children,
   className,
   tone = "light",
+  titleField = "title",
 }: {
   eyebrow?: string;
   title: string;
@@ -53,65 +232,94 @@ export function SceneShell({
   className?: string;
   /** "dark" for scenes that paint their own dark backdrop. */
   tone?: "light" | "dark";
+  /** Studio: which field the headline maps to (e.g. "reveal" after a game). */
+  titleField?: string;
 }) {
   const { palette, fill } = useStory();
+  const studio = useStudioEdit();
   const accent = tone === "dark" ? palette.pink : palette.accent;
   return (
     <section
       className={cn(
-        "relative mx-auto flex min-h-svh w-full max-w-2xl flex-col items-center px-5 pb-36 pt-24 text-center",
+        "relative mx-auto flex min-h-svh w-full max-w-2xl flex-col items-center px-5 pb-24 pt-24 text-center",
         className,
       )}
     >
-      {eyebrow && (
-        <motion.span
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: EASE_OUT }}
-          className="type-label rounded-full border px-3 py-1 text-[10px]"
-          style={{ borderColor: "currentColor", opacity: 0.75 }}
-        >
-          {fill(eyebrow)}
-        </motion.span>
-      )}
-      <motion.h1
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.08 }}
-        className="type-display mt-4 text-balance text-[clamp(2.3rem,9vw,4.2rem)]"
-      >
-        <Accented text={fill(title)} color={accent} />
-      </motion.h1>
+      <div className="flex flex-col items-center gap-7">
+        {eyebrow && (
+          <StudioHit field="eyebrow" className="mx-auto w-fit">
+            <motion.span
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: EASE_OUT }}
+              className="type-label inline-block rounded-full border px-3.5 py-1.5"
+              style={{ borderColor: "currentColor", opacity: 0.7 }}
+            >
+              {fill(eyebrow)}
+            </motion.span>
+          </StudioHit>
+        )}
+        <StudioHit field={titleField} className="mx-auto w-fit">
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.08 }}
+            className="type-display text-balance text-[clamp(2.3rem,9vw,4.2rem)]"
+          >
+            <Accented text={fill(title)} color={accent} />
+          </motion.h1>
+        </StudioHit>
+      </div>
 
       <div className="relative mt-8 flex w-full flex-1 flex-col items-center justify-center">{children}</div>
 
-      <div className="mt-6 min-h-12">
+      {studio ? (
+        <div className="mt-6 flex flex-col items-center gap-3">
+          {hint && (
+            <StudioHit field="hint" className="mx-auto w-fit">
+              <p className="type-label opacity-70">{fill(hint)}</p>
+            </StudioHit>
+          )}
+          {doneText && (
+            <StudioHit field="done" className="mx-auto w-fit">
+              <p className="type-accent text-2xl" style={{ color: accent }}>
+                {fill(doneText)}
+              </p>
+            </StudioHit>
+          )}
+        </div>
+      ) : (
+      <div className="mt-6 flex min-h-12 flex-col items-center">
         <AnimatePresence mode="wait">
           {done && doneText ? (
-            <motion.p
-              key="done"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="type-accent text-2xl"
-              style={{ color: accent }}
-            >
-              {fill(doneText)}
-            </motion.p>
+            <StudioHit key="done" field="done" className="mx-auto w-fit">
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="type-accent text-2xl"
+                style={{ color: accent }}
+              >
+                {fill(doneText)}
+              </motion.p>
+            </StudioHit>
           ) : hint && !done ? (
-            <motion.p
-              key="hint"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.7 }}
-              exit={{ opacity: 0 }}
-              transition={{ delay: 0.6 }}
-              className="type-label"
-            >
-              {fill(hint)}
-            </motion.p>
+            <StudioHit key="hint" field="hint" className="mx-auto w-fit">
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.7 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 0.6 }}
+                className="type-label"
+              >
+                {fill(hint)}
+              </motion.p>
+            </StudioHit>
           ) : null}
         </AnimatePresence>
+        <TurnButton />
       </div>
+      )}
     </section>
   );
 }

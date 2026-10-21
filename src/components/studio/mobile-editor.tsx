@@ -3,39 +3,38 @@
 import {
   ArrowDown,
   ArrowUp,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Copy,
   Eye,
   EyeOff,
-  LayoutList,
-  PenLine,
   Plus,
   Trash2,
-  Type,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
-import { ColorInput, Field, TextArea, TextInput } from "@/components/editor/fields";
-import type { AccentFont } from "@/components/experiences/birthday/types";
-import type { GiftFont } from "@/components/story/gift-fonts";
-import type { MelodyId } from "@/components/story/types";
-import { palettes } from "@/data/stories/shared";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Field, TextArea } from "@/components/editor/fields";
 import { cn } from "@/lib/utils";
 import type { Draft } from "./draft-store";
-import { FontChoices } from "./font-choices";
 import {
   FieldEditor,
+  isStickerSlot,
+  keepNames,
   PhotoPicker,
+  showNames,
   SceneColours,
   SceneReaction,
+  SceneStamp,
   SceneStickers,
-  paletteFields,
+  StickerSlotEditor,
   type Selection,
 } from "./inspector";
+import { FieldFontPicker } from "./font-choices";
+import { isLook, LOOK, LookSettings, setFieldFont } from "./look";
 import {
   addItem,
-  deleteItem,
   deleteScene,
+  deleteSelected,
   duplicateItem,
   duplicateScene,
   moveItem,
@@ -47,267 +46,152 @@ import {
 import { childField, sceneSchemas, sceneSubtitle, type FieldDef } from "./schema";
 
 type Edit = (next: Draft, tag?: string) => void;
-type Mode = "simple" | "advanced";
-export type MobilePane = "edit" | "pages";
-
-const melodyOptions: { value: MelodyId; label: string }[] = [
-  { value: "birthday", label: "Happy Birthday, music box" },
-  { value: "lullaby", label: "Lullaby, slow and tender" },
-  { value: "waltz", label: "Waltz, romantic" },
-  { value: "sunny", label: "Sunny, bright and bouncy" },
-];
-
-/** Words and photos. Labels, hints, counts and menus wait for Advanced. */
-function isSimpleField(field: FieldDef) {
-  if (field.key === "eyebrow" || field.key === "hint" || field.key === "done" || field.key === "nav") return false;
-  return field.kind === "text" || field.kind === "textarea" || field.kind === "image" || field.kind === "list" || field.kind === "strings";
-}
-
-function isSimpleItemField(field: FieldDef) {
-  return field.kind === "text" || field.kind === "textarea" || field.kind === "image" || field.kind === "strings";
-}
 
 export function MobileEditor({
   draft,
   edit,
   sel,
   setSel,
-  pane,
-  onAddSection,
 }: {
   draft: Draft;
   edit: Edit;
   sel: Selection;
   setSel: (s: Selection) => void;
-  pane: MobilePane;
-  onAddSection: () => void;
-}) {
-  const [mode, setMode] = useState<Mode>("simple");
-  return (
-    <div className="bg-cream">
-      {pane === "pages" ? (
-        <Pages draft={draft} sel={sel} setSel={setSel} onAddSection={onAddSection} />
-      ) : (
-        <Editor draft={draft} edit={edit} sel={sel} setSel={setSel} mode={mode} setMode={setMode} />
-      )}
-    </div>
-  );
-}
-
-export function MobileNav({ pane, onChange }: { pane: MobilePane; onChange: (pane: MobilePane) => void }) {
-  const items: { id: MobilePane; label: string; icon: typeof PenLine }[] = [
-    { id: "edit", label: "Edit", icon: PenLine },
-    { id: "pages", label: "Pages", icon: LayoutList },
-  ];
-  return (
-    <nav className="grid shrink-0 grid-cols-2 border-t border-line bg-paper pb-[max(0.35rem,env(safe-area-inset-bottom))]" aria-label="Editor">
-      {items.map((item) => {
-        const Icon = item.icon;
-        const on = pane === item.id;
-        return (
-          <button
-            key={item.id}
-            type="button"
-            aria-current={on ? "page" : undefined}
-            onClick={() => onChange(item.id)}
-            className={cn("flex h-14 flex-col items-center justify-center gap-0.5 text-xs", on ? "font-medium text-ink" : "text-muted")}
-          >
-            <Icon className="size-5" />
-            {item.label}
-          </button>
-        );
-      })}
-    </nav>
-  );
-}
-
-function ModeSwitch({ mode, setMode }: { mode: Mode; setMode: (m: Mode) => void }) {
-  return (
-    <div>
-      <div className="grid grid-cols-2 gap-1 rounded-2xl bg-line/70 p-1" role="tablist" aria-label="Editing mode">
-        {(["simple", "advanced"] as const).map((m) => (
-          <button
-            key={m}
-            type="button"
-            role="tab"
-            aria-selected={mode === m}
-            onClick={() => setMode(m)}
-            className={cn("h-11 rounded-xl text-base capitalize", mode === m ? "bg-paper font-medium shadow-sm" : "text-muted")}
-          >
-            {m}
-          </button>
-        ))}
-      </div>
-      <p className="mt-2 text-sm leading-snug text-muted">
-        {mode === "simple" ? "The words, photos and fonts. Start here." : "Stickers, colours, music, and moving pages around."}
-      </p>
-    </div>
-  );
-}
-
-function Editor({
-  draft,
-  edit,
-  sel,
-  setSel,
-  mode,
-  setMode,
-}: {
-  draft: Draft;
-  edit: Edit;
-  sel: Selection;
-  setSel: (s: Selection) => void;
-  mode: Mode;
-  setMode: (m: Mode) => void;
 }) {
   const scenes = draft.story.scenes;
-  const i = sel.scene;
-  const scene = i !== null ? scenes[i] : undefined;
+  const look = isLook(sel.scene);
+  const i = !look && sel.scene !== null && scenes[sel.scene] ? sel.scene : 0;
+  const scene = look ? undefined : scenes[i];
   const list = scene ? childField(scene.type) : undefined;
   const item = scene && list && sel.item !== null ? readItems(scene, list.key)[sel.item] : undefined;
+  const field = sel.field ?? null;
+
+  useEffect(() => {
+    if (!field) return;
+    const id = window.setTimeout(() => {
+      const box = document.querySelector<HTMLElement>(`[data-studio-input="${field}"]`);
+      box?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      const input = box?.querySelector<HTMLElement>("input, textarea, select");
+      input?.focus({ preventScroll: true });
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [field, sel.item, sel.scene]);
+
+  if (look) {
+    return (
+      <div className="bg-cream">
+        <div className="space-y-8 px-4 py-5">
+          <LookSettings draft={draft} edit={edit} />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="sticky top-0 z-10 space-y-3 border-b border-line bg-cream/95 px-4 py-3 backdrop-blur">
-        <ModeSwitch mode={mode} setMode={setMode} />
-        {scene && item === undefined && (
-          <div>
-            <p className="text-sm text-muted">
-              Page {i! + 1} of {scenes.length}
-              {scene.hidden ? " · Hidden" : ""}
-            </p>
-            <p className="truncate text-lg font-medium leading-tight">{sceneSchemas[scene.type].name}</p>
-          </div>
-        )}
-        {scene && item !== undefined && list && (
+    <div className="bg-cream">
+      <div className="space-y-8 px-4 py-5">
+        {scene && item !== undefined && list && sel.item !== null && (
           <button
             type="button"
-            onClick={() => setSel({ scene: i, item: null })}
+            onClick={() => setSel({ scene: i, item: null, field: null })}
             className="flex h-11 items-center gap-1 text-base font-medium"
           >
             <ChevronLeft className="size-5" />
             Back to {sceneSchemas[scene.type].name}
           </button>
         )}
-        {!scene && <p className="text-lg font-medium">Whole gift</p>}
-      </div>
-
-      <div className="space-y-8 px-4 py-5">
-        {!scene && <GiftSettings draft={draft} edit={edit} mode={mode} />}
         {scene && item === undefined && (
-          <PageSettings draft={draft} edit={edit} i={i!} mode={mode} setSel={setSel} />
+          <PageSettings draft={draft} edit={edit} i={i!} field={field} setSel={setSel} />
         )}
         {scene && item !== undefined && list && sel.item !== null && (
-          <ItemSettings draft={draft} edit={edit} i={i!} j={sel.item} mode={mode} setSel={setSel} />
+          <ItemSettings draft={draft} edit={edit} i={i!} j={sel.item} field={field} setSel={setSel} />
         )}
       </div>
     </div>
   );
 }
 
-function GiftSettings({ draft, edit, mode }: { draft: Draft; edit: Edit; mode: Mode }) {
-  const { story } = draft;
-  const setStory = (patch: Partial<Draft["story"]>, tag?: string) => edit({ ...draft, story: { ...story, ...patch } }, tag);
-  return (
-    <>
-      <Names story={story} setStory={setStory} />
-      <FontChoices
-        font={story.font ?? "classic"}
-        accent={story.accentFont ?? "classic"}
-        sample={story.recipient || "Maya"}
-        onFont={(font: GiftFont) => setStory({ font })}
-        onAccent={(accentFont: AccentFont) => setStory({ accentFont })}
-      />
-      <Themes story={story} setStory={setStory} />
-      {mode === "advanced" && (
-        <>
-          <section className="space-y-3">
-            <h3 className="text-base font-medium">Music</h3>
-            <select
-              value={story.melody}
-              onChange={(e) => setStory({ melody: e.target.value as MelodyId })}
-              className="min-h-12 w-full rounded-2xl border border-line bg-paper px-4 text-base outline-none focus:border-ink/40"
-            >
-              {melodyOptions.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </section>
-          <section className="space-y-3">
-            <h3 className="text-base font-medium">Custom colours</h3>
-            <p className="text-sm leading-snug text-muted">Fine-tune the theme. These apply to every page that doesn’t have its own colours.</p>
-            <div className="grid gap-2">
-              {paletteFields.map((f) => (
-                <ColorInput
-                  key={f.key}
-                  label={f.label}
-                  value={story.palette[f.key]}
-                  onChange={(v) => setStory({ palette: { ...story.palette, [f.key]: v } }, `pal-${f.key}`)}
-                />
-              ))}
-            </div>
-          </section>
-        </>
-      )}
-    </>
-  );
-}
-
-function Names({
-  story,
-  setStory,
+/** Prev / next plus a tap-to-open list of pages, sitting under the preview. */
+export function PageSwitcher({
+  draft,
+  sel,
+  setSel,
+  onAddSection,
 }: {
-  story: Draft["story"];
-  setStory: (patch: Partial<Draft["story"]>, tag?: string) => void;
+  draft: Draft;
+  sel: Selection;
+  setSel: (s: Selection) => void;
+  onAddSection: () => void;
 }) {
-  return (
-    <section className="space-y-3">
-      <h3 className="text-base font-medium">Names</h3>
-      <p className="text-sm leading-snug text-muted">
-        Type {"{to}"} or {"{from}"} in any line and these names fill in.
-      </p>
-      <Field label="For" roomy>
-        <TextInput value={story.recipient} maxLength={30} onChange={(e) => setStory({ recipient: e.target.value }, "to")} className="min-h-12 text-base" />
-      </Field>
-      <Field label="From" roomy>
-        <TextInput value={story.sender} maxLength={30} onChange={(e) => setStory({ sender: e.target.value }, "from")} className="min-h-12 text-base" />
-      </Field>
-    </section>
-  );
-}
+  const [open, setOpen] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  const scenes = draft.story.scenes;
+  const i = sel.scene ?? LOOK;
+  const scene = i >= 0 ? scenes[i] : undefined;
+  const label = isLook(i) ? "Look · Theme, names & font" : scene ? `${i + 1} · ${sceneSchemas[scene.type].name}` : "";
 
-function Themes({
-  story,
-  setStory,
-}: {
-  story: Draft["story"];
-  setStory: (patch: Partial<Draft["story"]>) => void;
-}) {
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (listRef.current && !listRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [open]);
+
+  function go(next: number) {
+    setSel({ scene: next, item: null, field: null });
+    setOpen(false);
+  }
+
   return (
-    <section>
-      <h3 className="text-base font-medium">Colour theme</h3>
-      <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-        {Object.entries(palettes).map(([id, p]) => {
-          const on = story.palette.bg === p.bg && story.palette.accent === p.accent;
-          return (
-            <button
-              key={id}
-              type="button"
-              aria-pressed={on}
-              onClick={() => setStory({ palette: { ...p } })}
-              className={cn("flex w-20 shrink-0 flex-col items-center gap-1.5 rounded-2xl border-2 px-2 py-2", on ? "border-ink" : "border-transparent")}
-            >
-              <span className="grid size-12 place-items-center rounded-xl" style={{ backgroundColor: p.bg }}>
-                <span className="size-5 rounded-full" style={{ backgroundColor: p.accent }} />
-              </span>
-              <span className="text-xs capitalize text-muted">{id}</span>
-            </button>
-          );
-        })}
+    <div ref={listRef} className="border-t border-ink/10 bg-[#efe8dc]">
+      <div className="flex items-center gap-1 px-1.5 py-1.5">
+        <button
+          type="button"
+          aria-label="Previous page"
+          disabled={isLook(i)}
+          onClick={() => go(i - 1)}
+          className="grid size-11 shrink-0 place-items-center rounded-xl disabled:opacity-30"
+        >
+          <ChevronLeft className="size-5" />
+        </button>
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={() => setOpen((o) => !o)}
+          className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl bg-paper px-3 text-center"
+        >
+          <span className="min-w-0 truncate text-base font-medium">{label}</span>
+          <ChevronDown className={cn("size-4 shrink-0 text-muted transition-transform", open && "rotate-180")} />
+        </button>
+        <button
+          type="button"
+          aria-label="Next page"
+          disabled={i >= scenes.length - 1}
+          onClick={() => go(i + 1)}
+          className="grid size-11 shrink-0 place-items-center rounded-xl disabled:opacity-30"
+        >
+          <ChevronRight className="size-5" />
+        </button>
       </div>
-    </section>
+      {open && (
+        <div className="max-h-[min(50vh,22rem)] overflow-y-auto border-t border-ink/10 bg-cream px-3 py-3">
+          <Pages
+            draft={draft}
+            sel={sel}
+            setSel={(s) => {
+              setSel(s);
+              setOpen(false);
+            }}
+            onAddSection={() => {
+              setOpen(false);
+              onAddSection();
+            }}
+          />
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -315,90 +199,142 @@ function PageSettings({
   draft,
   edit,
   i,
-  mode,
+  field,
   setSel,
 }: {
   draft: Draft;
   edit: Edit;
   i: number;
-  mode: Mode;
+  field: string | null;
   setSel: (s: Selection) => void;
 }) {
   const scene = draft.story.scenes[i];
   const schema = sceneSchemas[scene.type];
   const list = childField(scene.type);
-  const fields = schema.fields.filter((f) => f !== list && (mode === "advanced" || isSimpleField(f)));
+  const fields = schema.fields.filter((f) => f !== list);
   const items = list ? readItems(scene, list.key) : [];
   const set = (key: string, value: unknown) => edit(updateScene(draft, i, { [key]: value }), `${i}-${key}`);
+  const focused = field ? schema.fields.find((f) => f.key === field && f !== list) : undefined;
+  const shown = focused ? [focused] : fields;
+  const allSettings = (
+    <button
+      type="button"
+      onClick={() => setSel({ scene: i, item: null, field: null })}
+      className="flex h-12 w-full items-center justify-center rounded-2xl bg-paper text-base font-medium"
+    >
+      All settings on this page
+    </button>
+  );
+
+  if (isStickerSlot(scene, field)) {
+    return (
+      <>
+        <p className="text-sm leading-snug text-muted">Swap it for another, upload your own picture, or remove it.</p>
+        <StudioField id={field!} on>
+          <StickerSlotEditor
+            draft={draft}
+            i={i}
+            field={field}
+            edit={edit}
+            onRemoved={() => setSel({ scene: i, item: null, field: null })}
+          />
+        </StudioField>
+        {allSettings}
+      </>
+    );
+  }
 
   return (
     <>
-      <p className="text-sm leading-snug text-muted">{schema.blurb}</p>
-      {fields.map((f) => (
-        <FieldEditor
-          key={f.key}
-          field={f}
-          draft={draft}
-          roomy
-          value={(scene as unknown as Record<string, unknown>)[f.key]}
-          onChange={(v) => set(f.key, v)}
-        />
+      <p className="text-sm leading-snug text-muted">{focused ? `Everything for this ${focused.label.toLowerCase()}.` : schema.blurb}</p>
+      {shown.map((f) => (
+        <StudioField key={f.key} id={f.key} on={!!focused || field === f.key}>
+          <FieldEditor
+            field={f}
+            draft={draft}
+            roomy
+            highlight={!!focused || field === f.key}
+            value={(scene as unknown as Record<string, unknown>)[f.key]}
+            onChange={(v) => set(f.key, v)}
+            font={scene.fonts?.[f.key]}
+            onFont={(id) => edit(setFieldFont(draft, i, f.key, id), `${i}-font-${f.key}`)}
+            onRemove={
+              "optional" in f && f.optional
+                ? () => set(f.key, f.kind === "image" ? undefined : "")
+                : undefined
+            }
+          />
+        </StudioField>
       ))}
 
-      {list && (
-        <section className="space-y-2">
-          <div className="flex items-baseline justify-between">
-            <h3 className="text-base font-medium">{list.label}</h3>
-            <span className="text-sm text-muted">
-              {items.length} / {list.max}
-            </span>
-          </div>
-          <ul className="space-y-2">
-            {items.map((item, j) => (
-              <li key={j}>
-                <button
-                  type="button"
-                  onClick={() => setSel({ scene: i, item: j })}
-                  className="flex min-h-16 w-full items-center gap-3 rounded-2xl border border-line bg-paper px-3 text-left"
-                >
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-cream text-sm font-medium">{j + 1}</span>
-                  <span className="min-w-0 flex-1 truncate text-base">
-                    {list.kind === "list" ? list.title(item as Record<string, unknown>) : String(item)}
-                  </span>
-                  <ChevronRight className="size-5 shrink-0 text-muted" />
-                </button>
-              </li>
-            ))}
-          </ul>
-          {items.length < list.max && (
-            <button
-              type="button"
-              onClick={() => {
-                const value = list.kind === "list" ? list.newItem() : `New ${list.itemLabel.toLowerCase()}`;
-                edit(addItem(draft, i, list.key, value));
-                setSel({ scene: i, item: items.length });
-              }}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-ink/30 text-base font-medium"
-            >
-              <Plus className="size-4" /> Add {list.itemLabel.toLowerCase()}
-            </button>
-          )}
-        </section>
+      {list && !focused && (
+        <StudioField id={list.key} on={field === list.key}>
+          <section className="space-y-2">
+            <div className="flex items-baseline justify-between">
+              <h3 className={cn("text-base font-medium", field === list.key && "text-rose-deep")}>{list.label}</h3>
+              <span className="text-sm text-muted">
+                {items.length} / {list.max}
+              </span>
+            </div>
+            <ul className="space-y-2">
+              {items.map((entry, j) => (
+                <li key={j} className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSel({ scene: i, item: j, field: list.key })}
+                    className="flex min-h-16 min-w-0 flex-1 items-center gap-3 rounded-2xl border border-line bg-paper px-3 text-left"
+                  >
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-cream text-sm font-medium">{j + 1}</span>
+                    <span className="min-w-0 flex-1 truncate text-base">
+                      {showNames(list.kind === "list" ? list.title(entry as Record<string, unknown>) : String(entry), draft.story)}
+                    </span>
+                    <ChevronRight className="size-5 shrink-0 text-muted" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`Remove this ${list.itemLabel.toLowerCase()}`}
+                    disabled={items.length <= 1}
+                    onClick={() => {
+                      const next = deleteSelected(draft, { scene: i, item: j, field: list.key });
+                      if (!next) return;
+                      edit(next.draft);
+                      setSel(next.sel);
+                    }}
+                    className="grid size-12 shrink-0 place-items-center rounded-2xl border border-rose/30 text-rose-deep disabled:opacity-30"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {items.length < list.max && (
+              <button
+                type="button"
+                onClick={() => {
+                  const value = list.kind === "list" ? list.newItem() : `New ${list.itemLabel.toLowerCase()}`;
+                  edit(addItem(draft, i, list.key, value));
+                  setSel({ scene: i, item: items.length, field: list.key });
+                }}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-ink/30 text-base font-medium"
+              >
+                <Plus className="size-4" /> Add {list.itemLabel.toLowerCase()}
+              </button>
+            )}
+          </section>
+        </StudioField>
       )}
 
-      {mode === "simple" && (
-        <button type="button" onClick={() => setSel({ scene: null, item: null })} className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-paper text-base font-medium">
-          <Type className="size-4" /> Fonts, names and colours
-        </button>
-      )}
+      {focused && allSettings}
 
-      {mode === "advanced" && (
+      {!focused && (
         <>
           <SceneStickers
+            draft={draft}
             stickers={scene.stickers ?? []}
             onChange={(next) => edit(updateScene(draft, i, { stickers: next.length ? next : undefined }))}
           />
-          <SceneReaction value={scene.reaction} onChange={(reaction) => edit(updateScene(draft, i, { reaction }))} />
+          <SceneReaction draft={draft} value={scene.reaction} onChange={(reaction) => edit(updateScene(draft, i, { reaction }))} />
+          <SceneStamp draft={draft} i={i} edit={edit} />
           <SceneColours draft={draft} i={i} edit={edit} />
           <PageActions draft={draft} edit={edit} i={i} setSel={setSel} />
         </>
@@ -434,7 +370,7 @@ function PageActions({
           label="Duplicate"
           onClick={() => {
             edit(duplicateScene(draft, i));
-            setSel({ scene: i + 1, item: null });
+            setSel({ scene: i + 1, item: null, field: null });
           }}
         >
           <Copy className="size-4" />
@@ -444,7 +380,7 @@ function PageActions({
           disabled={i === 0}
           onClick={() => {
             edit(moveScene(draft, i, i - 1));
-            setSel({ scene: i - 1, item: null });
+            setSel({ scene: i - 1, item: null, field: null });
           }}
         >
           <ArrowUp className="size-4" />
@@ -454,7 +390,7 @@ function PageActions({
           disabled={i === count - 1}
           onClick={() => {
             edit(moveScene(draft, i, i + 1));
-            setSel({ scene: i + 1, item: null });
+            setSel({ scene: i + 1, item: null, field: null });
           }}
         >
           <ArrowDown className="size-4" />
@@ -467,7 +403,7 @@ function PageActions({
         onClick={() => {
           if (!window.confirm("Delete this page?")) return;
           edit(deleteScene(draft, i));
-          setSel({ scene: Math.max(0, i - 1), item: null });
+          setSel({ scene: Math.max(0, i - 1), item: null, field: null });
         }}
       >
         <Trash2 className="size-4" />
@@ -481,14 +417,14 @@ function ItemSettings({
   edit,
   i,
   j,
-  mode,
+  field,
   setSel,
 }: {
   draft: Draft;
   edit: Edit;
   i: number;
   j: number;
-  mode: Mode;
+  field: string | null;
   setSel: (s: Selection) => void;
 }) {
   const scene = draft.story.scenes[i];
@@ -496,7 +432,8 @@ function ItemSettings({
   const items = readItems(scene, list.key);
   const item = items[j];
   const set = (value: unknown) => edit(updateItem(draft, i, list.key, j, value), `${i}-${list.key}-${j}`);
-  const fields = list.kind === "list" ? list.item.filter((f) => mode === "advanced" || isSimpleItemField(f)) : [];
+  const fields = list.kind === "list" ? list.item : [];
+  const ordered: FieldDef[] = field ? [...fields.filter((f) => f.key === field), ...fields.filter((f) => f.key !== field)] : fields;
 
   return (
     <>
@@ -504,70 +441,93 @@ function ItemSettings({
         {list.itemLabel} {j + 1}
       </h2>
       {list.kind === "strings" ? (
-        <Field label={list.itemLabel} roomy>
-          <TextArea value={String(item ?? "")} maxLength={400} onChange={(e) => set(e.target.value)} className="min-h-28 text-base" />
-        </Field>
+        <StudioField id={list.key} on>
+          <Field label={list.itemLabel} roomy highlight>
+            <TextArea
+              value={showNames(String(item ?? ""), draft.story)}
+              maxLength={400}
+              onChange={(e) => set(keepNames(e.target.value, draft.story))}
+              className="min-h-28 text-base"
+            />
+            <FieldFontPicker
+              value={scene.fonts?.[`${list.key}:${j}`]}
+              sample={String(item ?? "")}
+              onChange={(id) => edit(setFieldFont(draft, i, `${list.key}:${j}`, id), `${i}-font-${list.key}-${j}`)}
+            />
+          </Field>
+        </StudioField>
       ) : (
-        fields.map((f) => (
-          <FieldEditor
-            key={f.key}
-            field={f}
-            draft={draft}
-            roomy
-            value={(item as Record<string, unknown>)[f.key]}
-            onChange={(v) => set({ ...(item as Record<string, unknown>), [f.key]: v })}
-          />
+        ordered.map((f) => (
+          <StudioField key={f.key} id={f.key} on={field === f.key}>
+            <FieldEditor
+              field={f}
+              draft={draft}
+              roomy
+              highlight={field === f.key}
+              value={(item as Record<string, unknown>)[f.key]}
+              onChange={(v) => set({ ...(item as Record<string, unknown>), [f.key]: v })}
+              font={scene.fonts?.[`${f.key}:${j}`]}
+              onFont={(id) => edit(setFieldFont(draft, i, `${f.key}:${j}`, id), `${i}-font-${f.key}-${j}`)}
+            />
+          </StudioField>
         ))
       )}
       {(list.key === "photos" || list.key === "songs") && (
-        <PhotoPicker draft={draft} roomy src={(item as Record<string, unknown>).src as string | undefined} onChange={(src) => set({ ...(item as Record<string, unknown>), src })} />
+        <StudioField id="src" on={field === "src"}>
+          <PhotoPicker
+            draft={draft}
+            roomy
+            highlight={field === "src"}
+            src={(item as Record<string, unknown>).src as string | undefined}
+            onChange={(src) => set({ ...(item as Record<string, unknown>), src })}
+          />
+        </StudioField>
       )}
-      {mode === "advanced" && (
-        <div className="grid grid-cols-2 gap-2">
-          <ActionButton
-            label="Duplicate"
-            disabled={items.length >= list.max}
-            onClick={() => {
-              edit(duplicateItem(draft, i, list.key, j));
-              setSel({ scene: i, item: j + 1 });
-            }}
-          >
-            <Copy className="size-4" />
-          </ActionButton>
-          <ActionButton
-            label="Move up"
-            disabled={j === 0}
-            onClick={() => {
-              edit(moveItem(draft, i, list.key, j, j - 1));
-              setSel({ scene: i, item: j - 1 });
-            }}
-          >
-            <ArrowUp className="size-4" />
-          </ActionButton>
-          <ActionButton
-            label="Move down"
-            disabled={j === items.length - 1}
-            onClick={() => {
-              edit(moveItem(draft, i, list.key, j, j + 1));
-              setSel({ scene: i, item: j + 1 });
-            }}
-          >
-            <ArrowDown className="size-4" />
-          </ActionButton>
-          <ActionButton
-            label="Delete"
-            danger
-            disabled={items.length <= 1}
-            onClick={() => {
-              if (!window.confirm(`Delete this ${list.itemLabel.toLowerCase()}?`)) return;
-              edit(deleteItem(draft, i, list.key, j));
-              setSel({ scene: i, item: Math.max(0, j - 1) });
-            }}
-          >
-            <Trash2 className="size-4" />
-          </ActionButton>
-        </div>
-      )}
+      <div className="grid grid-cols-2 gap-2">
+        <ActionButton
+          label="Duplicate"
+          disabled={items.length >= list.max}
+          onClick={() => {
+            edit(duplicateItem(draft, i, list.key, j));
+            setSel({ scene: i, item: j + 1, field: list.key });
+          }}
+        >
+          <Copy className="size-4" />
+        </ActionButton>
+        <ActionButton
+          label="Move up"
+          disabled={j === 0}
+          onClick={() => {
+            edit(moveItem(draft, i, list.key, j, j - 1));
+            setSel({ scene: i, item: j - 1, field: list.key });
+          }}
+        >
+          <ArrowUp className="size-4" />
+        </ActionButton>
+        <ActionButton
+          label="Move down"
+          disabled={j === items.length - 1}
+          onClick={() => {
+            edit(moveItem(draft, i, list.key, j, j + 1));
+            setSel({ scene: i, item: j + 1, field: list.key });
+          }}
+        >
+          <ArrowDown className="size-4" />
+        </ActionButton>
+      </div>
+      <button
+        type="button"
+        disabled={items.length <= 1}
+        onClick={() => {
+          const next = deleteSelected(draft, { scene: i, item: j, field: list.key });
+          if (!next) return;
+          edit(next.draft);
+          setSel(next.sel);
+        }}
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-rose/30 text-base font-medium text-rose-deep disabled:opacity-40"
+      >
+        <Trash2 className="size-4" /> Remove this {list.itemLabel.toLowerCase()}
+      </button>
     </>
   );
 }
@@ -601,6 +561,20 @@ function ActionButton({
   );
 }
 
+function StudioField({ id, on, children }: { id: string; on: boolean; children: ReactNode }) {
+  return (
+    <div
+      data-studio-input={id}
+      className={cn(
+        "scroll-mt-20 rounded-2xl transition-colors",
+        on && "-mx-2 bg-rose/10 px-2 py-3 ring-2 ring-rose/40",
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
 function Pages({
   draft,
   sel,
@@ -614,40 +588,35 @@ function Pages({
 }) {
   const scenes = draft.story.scenes;
   return (
-    <div className="px-4 py-4">
-      <h2 className="text-lg font-medium">Pages</h2>
-      <p className="mt-1 text-sm leading-snug text-muted">Tap a page to edit its words. The gift-wide settings are at the top.</p>
-      <ul className="mt-4 space-y-2">
+    <div>
+      <ul className="space-y-2">
         <li>
           <button
             type="button"
-            onClick={() => setSel({ scene: null, item: null })}
+            onClick={() => setSel({ scene: LOOK, item: null, field: null })}
             className={cn(
-              "flex min-h-16 w-full items-center gap-3 rounded-2xl border px-3 text-left",
-              sel.scene === null ? "border-ink bg-paper" : "border-line bg-paper/50",
+              "flex min-h-14 w-full items-center gap-3 rounded-2xl border px-3 text-left",
+              isLook(sel.scene) ? "border-ink bg-paper" : "border-line bg-paper/50",
             )}
           >
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-cream">
-              <Type className="size-4" />
-            </span>
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-cream text-sm font-medium">Aa</span>
             <span className="min-w-0 flex-1">
-              <span className="block text-base font-medium">Whole gift</span>
-              <span className="block truncate text-sm text-muted">Names, fonts, colours</span>
+              <span className="block text-base font-medium">Look</span>
+              <span className="block truncate text-sm text-muted">Theme, names and font</span>
             </span>
-            <ChevronRight className="size-5 text-muted" />
           </button>
         </li>
         {scenes.map((scene, i) => {
           const schema = sceneSchemas[scene.type];
           const Icon = schema.icon;
-          const on = sel.scene === i && sel.item === null;
+          const on = sel.scene === i;
           return (
             <li key={i}>
               <button
                 type="button"
-                onClick={() => setSel({ scene: i, item: null })}
+                onClick={() => setSel({ scene: i, item: null, field: null })}
                 className={cn(
-                  "flex min-h-16 w-full items-center gap-3 rounded-2xl border px-3 text-left",
+                  "flex min-h-14 w-full items-center gap-3 rounded-2xl border px-3 text-left",
                   on ? "border-ink bg-paper" : "border-line bg-paper/50",
                   scene.hidden && "opacity-60",
                 )}
@@ -658,9 +627,8 @@ function Pages({
                     <Icon className="size-4 shrink-0 text-ink/70" />
                     <span className="truncate">{schema.name}</span>
                   </span>
-                  <span className="block truncate text-sm text-muted">{scene.hidden ? "Hidden" : sceneSubtitle(scene)}</span>
+                  <span className="block truncate text-sm text-muted">{scene.hidden ? "Hidden" : showNames(sceneSubtitle(scene), draft.story)}</span>
                 </span>
-                <ChevronRight className="size-5 shrink-0 text-muted" />
               </button>
             </li>
           );
