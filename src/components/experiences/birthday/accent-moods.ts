@@ -2,14 +2,14 @@ import type { CSSProperties } from "react";
 import type { AccentFont } from "./types";
 
 /**
- * Highlight-font "moods" a sender can pick. Three are the same Fraunces file
- * with different axis settings, so variety costs no extra downloads.
+ * Highlight weights a sender can pick. All Inter Tight — gift previews never
+ * use the thin italic serif, even on a starred word.
  */
 export const accentMoods: Record<AccentFont, { name: string; family: string; axes: string; weight: number }> = {
-  classic: { name: "Classic", family: "var(--font-fraunces)", axes: '"SOFT" 0, "WONK" 0', weight: 400 },
-  soft: { name: "Soft", family: "var(--font-fraunces)", axes: '"SOFT" 100, "WONK" 0', weight: 350 },
-  playful: { name: "Playful", family: "var(--font-fraunces)", axes: '"SOFT" 50, "WONK" 1', weight: 500 },
-  modern: { name: "Modern", family: "var(--font-inter-tight)", axes: "normal", weight: 500 },
+  classic: { name: "Classic", family: "var(--font-inter-tight)", axes: "normal", weight: 600 },
+  soft: { name: "Soft", family: "var(--font-inter-tight)", axes: "normal", weight: 500 },
+  playful: { name: "Playful", family: "var(--font-inter-tight)", axes: "normal", weight: 700 },
+  modern: { name: "Modern", family: "var(--font-inter-tight)", axes: "normal", weight: 800 },
 };
 
 export const accentMoodOrder: AccentFont[] = ["classic", "soft", "playful", "modern"];
@@ -27,5 +27,5 @@ export function accentMoodVars(mood: AccentFont): CSSProperties {
 /** Inline style for showing a mood on its own (e.g. a picker sample). */
 export function accentMoodStyle(mood: AccentFont): CSSProperties {
   const m = accentMoods[mood];
-  return { fontFamily: m.family, fontVariationSettings: m.axes, fontWeight: m.weight, fontStyle: "italic" };
+  return { fontFamily: m.family, fontVariationSettings: m.axes, fontWeight: m.weight, fontStyle: "normal" };
 }

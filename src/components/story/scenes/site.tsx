@@ -39,8 +39,8 @@ function Block({ eyebrow, title, children, className }: { eyebrow?: string; titl
         </StudioHit>
       )}
       <StudioHit field="title" className="mt-7 w-fit">
-        <motion.h2 {...rise} className="text-balance font-serif text-[clamp(2rem,6.5vw,3.4rem)] font-semibold leading-[1.05] tracking-[-0.02em]">
-          <Accented text={fill(title)} color={palette.accent} />
+        <motion.h2 {...rise} className="type-display text-balance text-[clamp(2rem,6.5vw,3.4rem)] font-semibold">
+          <Accented text={fill(title)} color={palette.accent} face="sans" />
         </motion.h2>
       </StudioHit>
       <div className="mt-10 md:mt-14">{children}</div>
@@ -86,9 +86,9 @@ export function HeroSection({ scene }: SceneProps<S<"hero">>) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 1.1, ease: EASE_OUT }}
-          className="mt-7 text-balance font-serif text-[clamp(3.2rem,13vw,8rem)] font-semibold leading-[0.95] tracking-[-0.03em] drop-shadow-[0_4px_30px_rgba(0,0,0,.35)]"
+          className="type-display mt-7 text-balance text-[clamp(3.2rem,13vw,8rem)] font-semibold drop-shadow-[0_4px_30px_rgba(0,0,0,.35)]"
         >
-          <Accented text={fill(scene.title)} color={palette.pink} />
+          <Accented text={fill(scene.title)} color={palette.pink} face="sans" />
         </motion.h1>
         </StudioHit>
       </div>
@@ -98,7 +98,7 @@ export function HeroSection({ scene }: SceneProps<S<"hero">>) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 1, ease: EASE_OUT }}
-          className="absolute bottom-32 left-5 right-16 font-serif text-[clamp(2rem,8vw,4.5rem)] font-semibold leading-none tracking-[-0.02em] text-white md:bottom-24 md:left-10 md:right-10"
+          className="type-display absolute bottom-32 left-5 right-16 text-[clamp(2rem,8vw,4.5rem)] font-semibold text-white md:bottom-24 md:left-10 md:right-10"
         >
           {fill(scene.subtitle)}
         </motion.p>
@@ -150,12 +150,12 @@ export function CountdownSection({ scene }: SceneProps<S<"countdown">>) {
             <p className="type-label opacity-60">{fill(scene.eyebrow ?? (p?.future === false ? "It’s been" : "Counting down to"))}</p>
           </StudioHit>
           <StudioHit field="date" className="mx-auto mt-7 w-fit">
-            <h2 className="font-serif text-[clamp(2.4rem,9vw,4.6rem)] font-semibold leading-none tracking-[-0.02em]">{label}</h2>
+            <h2 className="type-display text-[clamp(2.4rem,9vw,4.6rem)] font-semibold">{label}</h2>
           </StudioHit>
           <div className="mt-8 grid grid-cols-4 gap-2 md:gap-4">
             {units.map((u) => (
               <div key={u.label} className="rounded-2xl border px-1 py-4 md:py-6" style={{ borderColor: `${palette.ink}14`, backgroundColor: `${palette.cream}cc` }}>
-                <span className="block font-serif text-[clamp(1.6rem,6vw,2.8rem)] font-semibold tabular-nums leading-none">
+                <span className="type-display block text-[clamp(1.6rem,6vw,2.8rem)] font-semibold tabular-nums">
                   {u.value === undefined ? "–" : String(u.value).padStart(2, "0")}
                 </span>
                 <span className="type-label mt-2 block text-[9px] opacity-55 md:text-[10px]">{u.label}</span>
@@ -164,7 +164,7 @@ export function CountdownSection({ scene }: SceneProps<S<"countdown">>) {
           </div>
           <StudioHit field="title" className="mx-auto mt-8 w-fit">
             <p className="type-display text-xl opacity-80" style={{ color: palette.accent }}>
-              <Accented text={fill(scene.title)} color={palette.accent} />
+              <Accented text={fill(scene.title)} color={palette.accent} face="sans" />
             </p>
           </StudioHit>
           {scene.caption && (
@@ -189,8 +189,8 @@ export function NoticedSection({ scene }: SceneProps<S<"noticed">>) {
           <motion.div key={i} {...rise} transition={{ ...rise.transition, delay: i * 0.08 }}>
             <StudioHit field="items" item={i}>
             <Glass className="px-6 py-7 md:px-9 md:py-9">
-              <span className="font-serif text-3xl opacity-25">{String(i + 1).padStart(2, "0")}</span>
-              <h3 className="mt-3 font-serif text-2xl font-semibold">{fill(it.title)}</h3>
+              <span className="type-display text-3xl font-semibold opacity-25">{String(i + 1).padStart(2, "0")}</span>
+              <h3 className="type-display mt-3 text-2xl font-semibold">{fill(it.title)}</h3>
               <p className="mt-2 text-[1.02rem] leading-relaxed opacity-75">{fill(it.text)}</p>
             </Glass>
             </StudioHit>
@@ -246,13 +246,13 @@ export function PlaylistSection({ scene }: SceneProps<S<"playlist">>) {
               <Glass className="overflow-hidden p-3 md:p-4">
                 <div className="relative">
                   <PhotoFill src={song.src} tone={song.tone} alt="" className="aspect-[16/9] w-full rounded-[1.2rem]" iconClassName="size-10" />
-                  <span className="absolute left-4 top-4 rounded-full px-3 py-1 font-serif text-sm" style={{ backgroundColor: `${palette.cream}e6`, color: palette.ink }}>
+                  <span className="type-label absolute left-4 top-4 rounded-full px-3 py-1" style={{ backgroundColor: `${palette.cream}e6`, color: palette.ink }}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
                 </div>
                 <div className="flex items-end justify-between gap-4 px-2 pb-2 pt-4">
                   <div className="min-w-0">
-                    <h3 className="font-serif text-2xl font-semibold">{song.title}</h3>
+                    <h3 className="type-display text-2xl font-semibold">{song.title}</h3>
                     <p className="mt-1 text-sm opacity-65">{fill(song.note)}</p>
                   </div>
                   <SongPlayButton
@@ -286,7 +286,7 @@ export function SiteLetter({ scene }: SceneProps<S<"letter">>) {
             <span>For {to}</span>
           </div>
           <StudioHit field="title" className="mt-6">
-            <h2 className="font-serif text-[clamp(2.6rem,9vw,4.4rem)] font-semibold leading-none tracking-[-0.02em]" style={{ color: `${palette.accent}66` }}>
+            <h2 className="type-display text-[clamp(2.6rem,9vw,4.4rem)] font-semibold" style={{ color: `${palette.accent}66` }}>
               {fill(scene.title).replace(/\*/g, "")}
             </h2>
           </StudioHit>
@@ -298,7 +298,7 @@ export function SiteLetter({ scene }: SceneProps<S<"letter">>) {
             ))}
           </div>
           <StudioHit field="signoff" className="mt-8">
-            <p className="font-serif text-2xl font-semibold" style={{ color: palette.accent }}>
+            <p className="type-hand text-2xl font-bold" style={{ color: palette.accent }}>
               {fill(scene.signoff)}
             </p>
           </StudioHit>

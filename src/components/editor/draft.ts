@@ -43,7 +43,7 @@ export const hideableSections: { key: HideableSection; label: string }[] = [
   { key: "keepsake", label: "Keepsake poster download" },
 ];
 
-export const photoLimit: Record<BirthdayTierId, number> = { candle: 0, wish: 6, party: 20 };
+export const photoLimit: Record<BirthdayTierId, number> = { candle: 4, wish: 6, party: 20 };
 export const wishLimit: Record<BirthdayTierId, number> = { candle: 0, wish: 0, party: 15 };
 
 export type Theme = { id: string; name: string; palette: BirthdayPalette };

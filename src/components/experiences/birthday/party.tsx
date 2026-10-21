@@ -77,7 +77,7 @@ export function Surprise({
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", bounce: 0.55, delay: 0.1 }}
       >
-        <span className="type-accent font-normal" style={{ color: palette.accent }}>
+        <span className="font-semibold" style={{ color: palette.accent }}>
           Surprise!
         </span>
       </motion.h1>
@@ -228,7 +228,7 @@ export function Timeline({ gift, palette }: { gift: BirthdayGift; palette: Birth
   return (
     <section className="py-20 md:py-28">
       <motion.h2 {...reveal} className="type-display px-5 text-center text-[clamp(2.2rem,7vw,3.6rem)]">
-        Your year, <span className="type-accent" style={{ color: palette.accent }}>month by month.</span>
+        Your year, <span className="font-semibold" style={{ color: palette.accent }}>month by month.</span>
       </motion.h2>
       <div
         data-lenis-prevent
@@ -275,7 +275,7 @@ export function WishesWall({ gift, palette }: { gift: BirthdayGift; palette: Bir
         {gift.wishes.length} friends joined in
       </motion.p>
       <motion.h2 {...reveal} className="type-display mx-auto mt-4 max-w-2xl text-center text-[clamp(2.2rem,7vw,3.6rem)]">
-        Everyone has <span className="type-accent" style={{ color: palette.accent }}>something to say.</span>
+        Everyone has <span className="font-semibold" style={{ color: palette.accent }}>something to say.</span>
       </motion.h2>
 
       <div className="mx-auto mt-14 max-w-5xl columns-1 gap-4 sm:columns-2 lg:columns-3">
@@ -341,7 +341,6 @@ export function KeepsakeButton({ gift, palette }: { gift: BirthdayGift; palette:
     setBusy(true);
     await document.fonts.ready;
     const css = getComputedStyle(document.documentElement);
-    const serif = css.getPropertyValue("--font-fraunces").trim() || "serif";
     const sans = css.getPropertyValue("--font-inter-tight").trim() || "sans-serif";
     const mark = css.getPropertyValue("--font-fraunces").trim() || "serif";
 
@@ -365,7 +364,7 @@ export function KeepsakeButton({ gift, palette }: { gift: BirthdayGift; palette:
     ctx.font = `600 96px ${sans}`;
     ctx.fillText("Happy birthday,", 80, 260);
     ctx.fillStyle = palette.accent;
-    ctx.font = `italic 400 150px ${serif}`;
+    ctx.font = `600 150px ${sans}`;
     ctx.fillText(`${gift.recipient}.`, 80, 410);
 
     ctx.fillStyle = palette.fg;

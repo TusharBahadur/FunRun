@@ -225,6 +225,7 @@ export function SceneShell({
   className,
   tone = "light",
   titleField = "title",
+  layout = "stage",
 }: {
   eyebrow?: string;
   title: string;
@@ -237,18 +238,22 @@ export function SceneShell({
   tone?: "light" | "dark";
   /** Studio: which field the headline maps to (e.g. "reveal" after a game). */
   titleField?: string;
+  /** "stack" sits the playfield under a smaller title — quizzes, doors. */
+  layout?: "stage" | "stack";
 }) {
   const { palette, fill } = useStory();
   const studio = useStudioEdit();
   const accent = tone === "dark" ? palette.pink : palette.accent;
+  const stacked = layout === "stack";
   return (
     <section
       className={cn(
-        "relative mx-auto flex min-h-svh w-full max-w-2xl flex-col items-center px-5 pb-24 pt-24 text-center",
+        "relative mx-auto flex min-h-svh w-full max-w-2xl flex-col items-center px-5 text-center",
+        stacked ? "pb-28 pt-16" : "pb-24 pt-24",
         className,
       )}
     >
-      <div className="flex flex-col items-center gap-7">
+      <div className={cn("flex flex-col items-center", stacked ? "gap-3" : "gap-7")}>
         {eyebrow && (
           <StudioHit field="eyebrow" className="mx-auto w-fit">
             <motion.span
@@ -267,14 +272,24 @@ export function SceneShell({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.08 }}
-            className="type-display text-balance text-[clamp(2.3rem,9vw,4.2rem)]"
+            className={cn(
+              "type-display text-balance",
+              stacked ? "max-w-[18rem] text-[clamp(1.7rem,7vw,2.7rem)] leading-[1.12]" : "text-[clamp(2.3rem,9vw,4.2rem)]",
+            )}
           >
-            <Accented text={fill(title)} color={accent} />
+            <Accented text={fill(title)} color={accent} face="sans" />
           </motion.h1>
         </StudioHit>
       </div>
 
-      <div className="relative mt-8 flex w-full flex-1 flex-col items-center justify-center">{children}</div>
+      <div
+        className={cn(
+          "relative flex w-full flex-col items-center",
+          stacked ? "mt-6" : "mt-8 flex-1 justify-center",
+        )}
+      >
+        {children}
+      </div>
 
       {studio ? (
         <div className="mt-6 flex flex-col items-center gap-3">

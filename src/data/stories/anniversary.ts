@@ -125,7 +125,7 @@ export const anniversaryStories = [
         hint: "Tap each photo",
         photos: [
           { caption: "Lonavala rain", date: "Jul ’23", tone: "leaf", src: photo("misty-chai") },
-          { caption: "That road trip", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
+          { caption: "These two", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
           { caption: "Chai for two", date: "Every day", tone: "dusk", src: photo("chai-hands") },
           { caption: "Stargazing", date: "Our 2nd", tone: "night", src: photo("night-sky") },
         ],

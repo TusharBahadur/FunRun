@@ -55,7 +55,7 @@ export function TrackField({
       </Field>
 
       <div>
-        <p className={cn(roomy ? "text-base font-medium" : "type-label text-muted", highlight && "text-rose-deep")}>
+        <p className={cn(roomy ? "type-heading text-base font-semibold text-ink" : "type-label text-muted", highlight && "text-rose-deep")}>
           Or upload a file
         </p>
         <div className="mt-2 flex items-center gap-3">

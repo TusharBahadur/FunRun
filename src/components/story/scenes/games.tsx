@@ -1,8 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Cake, Flower2, Gem, Heart, Star, Sun, type LucideIcon } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { Cake, Check, Flower2, Gem, Heart, Star, Sun, type LucideIcon } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Accented } from "@/components/experiences/birthday/accented";
 import { EASE_OUT } from "@/lib/motion";
 import { Backdrop, Paper, SceneShell, StoryButton, StudioAlso, StudioHit, StudioPager, usePickedItem, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
@@ -30,66 +30,100 @@ export function QuizScene({ scene, done, onDone }: SceneProps<S<"quiz">>) {
     if (last) onDone();
   }
 
+  const letters = ["A", "B", "C", "D"];
+
   return (
-    <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
+    <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done} layout="stack">
       <AnimatePresence mode="wait">
         <motion.div
           key={index}
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -40 }}
-          transition={{ duration: 0.4, ease: EASE_OUT }}
-          className="w-[min(90vw,380px)]"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.35, ease: EASE_OUT }}
+          className="w-[min(92vw,400px)]"
         >
-          <p className="type-label opacity-60">
-            Question {index + 1} of {scene.questions.length}
-          </p>
-          <StudioHit field="q" item={index}>
-            <p className="mt-2 text-xl font-medium leading-snug">{fill(q.q)}</p>
-          </StudioHit>
-          <StudioHit field="options" item={index} className="mt-5">
-          <div className="grid gap-2.5">
-            {q.options.map((opt, i) => {
-              const chosen = picked === i;
-              return (
-                <motion.button
-                  key={i}
-                  type="button"
-                  onClick={() => pick(i)}
-                  whileTap={{ scale: 0.97 }}
-                  className="rounded-2xl border px-4 py-3.5 text-left text-[15px] transition-colors"
-                  style={{
-                    borderColor: chosen ? palette.accent : `${palette.fg}25`,
-                    backgroundColor: chosen ? palette.accent : "transparent",
-                    color: chosen ? palette.cream : palette.fg,
-                    opacity: picked !== null && !chosen ? 0.45 : 1,
-                  }}
-                >
-                  {fill(opt)}
-                </motion.button>
-              );
-            })}
-          </div>
-          </StudioHit>
-          {(picked !== null || studio) && (
-            <StudioHit field="reply" item={index} className="mt-5">
-              <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="type-hand text-2xl" style={{ color: palette.accent }}>
-                {fill(q.reply)}
-              </motion.p>
+          <Paper className="px-5 py-5 text-left sm:px-6 sm:py-6">
+            <div className="flex items-center justify-between gap-3">
+              <p className="type-label opacity-55">
+                {index + 1} of {scene.questions.length}
+              </p>
+              <div className="flex gap-1.5" aria-hidden>
+                {scene.questions.map((_, i) => (
+                  <span
+                    key={i}
+                    className="h-1.5 rounded-full"
+                    style={{
+                      width: i === index ? 16 : 6,
+                      backgroundColor: i <= index ? palette.accent : `${palette.ink}18`,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            <StudioHit field="q" item={index}>
+              <p className="type-heading mt-3 text-[1.15rem] leading-snug sm:text-xl">{fill(q.q)}</p>
             </StudioHit>
-          )}
-          {picked !== null && !last && (
-            <div className="mt-5">
-              <StoryButton
+            <StudioHit field="options" item={index} className="mt-4">
+              <div className="grid gap-2">
+                {q.options.map((opt, i) => {
+                  const chosen = picked === i;
+                  const faded = picked !== null && !chosen;
+                  return (
+                    <motion.button
+                      key={i}
+                      type="button"
+                      onClick={() => pick(i)}
+                      whileTap={picked === null ? { scale: 0.98 } : undefined}
+                      className="flex w-full items-center gap-3 rounded-[1.15rem] px-3 py-3 text-left transition-colors"
+                      style={{
+                        backgroundColor: chosen ? `${palette.accent}1f` : "#fff",
+                        boxShadow: chosen ? `inset 0 0 0 2px ${palette.accent}` : `inset 0 0 0 1px ${palette.ink}12`,
+                        color: palette.ink,
+                        opacity: faded ? 0.42 : 1,
+                      }}
+                    >
+                      <span
+                        className="grid size-8 shrink-0 place-items-center rounded-full text-[12px] font-semibold"
+                        style={{
+                          backgroundColor: chosen ? palette.accent : `${palette.ink}0d`,
+                          color: chosen ? palette.cream : palette.ink,
+                        }}
+                      >
+                        {chosen ? <Check className="size-4" strokeWidth={2.6} /> : letters[i]}
+                      </span>
+                      <span className="text-[15px] font-medium leading-snug">{fill(opt)}</span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </StudioHit>
+            {(picked !== null || studio) && (
+              <StudioHit field="reply" item={index} className="mt-4">
+                <motion.p
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="type-hand rounded-2xl px-4 py-3 text-lg leading-snug"
+                  style={{ backgroundColor: `${palette.pink}99`, color: palette.accent }}
+                >
+                  {fill(q.reply)}
+                </motion.p>
+              </StudioHit>
+            )}
+            {picked !== null && !last && (
+              <button
+                type="button"
                 onClick={() => {
                   setIndex(index + 1);
                   setPicked(null);
                 }}
+                className="mt-4 flex h-11 w-full items-center justify-center rounded-full text-[13px] font-semibold uppercase tracking-[0.14em] transition-transform active:scale-[0.98]"
+                style={{ backgroundColor: palette.ink, color: palette.cream }}
               >
                 Next question
-              </StoryButton>
-            </div>
-          )}
+              </button>
+            )}
+          </Paper>
         </motion.div>
       </AnimatePresence>
       <StudioPager count={scene.questions.length} field="questions" current={index} />
@@ -247,7 +281,7 @@ export function StarsScene({ scene, done, onDone }: SceneProps<S<"stars">>) {
         </div>
         <StudioAlso label="Headline once the heart is drawn" field="reveal">
           <p className="type-display text-balance text-3xl">
-            <Accented text={fill(scene.reveal)} color={palette.pink} />
+            <Accented text={fill(scene.reveal)} color={palette.pink} face="sans" />
           </p>
         </StudioAlso>
       </SceneShell>
@@ -401,16 +435,29 @@ export function RingboxScene({ scene, done, onDone }: SceneProps<S<"ringbox">>) 
 
 /* ───────────── Bouquet: add flowers to the vase ───────────── */
 
-const FLOWER_SPOTS: [number, number, number][] = [
-  [120, 70, -4], [80, 92, -18], [160, 90, 16], [100, 48, -8], [142, 46, 10], [60, 120, -26], [182, 118, 24],
-];
+function flowerSpots(n: number): [number, number, number][] {
+  const count = Math.max(0, Math.round(n));
+  return Array.from({ length: count }, (_, i) => {
+    const t = count === 1 ? 0.5 : i / (count - 1);
+    const angle = (t - 0.5) * Math.min(84, 28 + count * 4);
+    const reach = 54 + (i % 2) * 14 + Math.min(count, 10) * 1.6;
+    const x = 120 + Math.sin((angle * Math.PI) / 180) * reach;
+    const y = 126 - Math.cos((angle * Math.PI) / 180) * (reach * 0.82) + (i % 3) * 3;
+    return [x, y, angle];
+  });
+}
 
 export function BouquetScene({ scene, done, onDone }: SceneProps<S<"bouquet">>) {
   const { palette, fill } = useStory();
-  const total = Math.min(scene.flowers, FLOWER_SPOTS.length);
+  const total = Math.max(0, Math.round(scene.flowers));
+  const spots = useMemo(() => flowerSpots(total), [total]);
   const [count, setCount] = useState(done ? total : 0);
   const vase = useRef<HTMLDivElement>(null);
   const colors = [palette.accent, palette.pink, palette.gold, palette.cream];
+
+  useEffect(() => {
+    setCount(done ? total : (n) => Math.min(n, total));
+  }, [total, done]);
 
   function add() {
     const n = count + 1;
@@ -425,7 +472,7 @@ export function BouquetScene({ scene, done, onDone }: SceneProps<S<"bouquet">>) 
       <div ref={vase} className="relative w-[240px]">
         <StudioHit field="flowers">
         <svg viewBox="0 0 240 280" className="h-auto w-full overflow-visible" aria-hidden>
-          {FLOWER_SPOTS.slice(0, count).map(([x, y, r], i) => (
+          {spots.slice(0, count).map(([x, y, r], i) => (
             <motion.g key={i} initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", bounce: 0.5 }} style={{ originX: `${x}px`, originY: `${y}px` }}>
               <path d={`M${x} ${y + 6} Q ${x + r * 0.3} ${y + 70}, 120 190`} stroke="#3f7a4a" strokeWidth={3} fill="none" />
               {Array.from({ length: 6 }).map((_, p) => (

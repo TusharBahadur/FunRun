@@ -1,16 +1,19 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, Check, ChevronDown, Eye, Loader2, Redo2, RotateCcw, Undo2, UserRound, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Eye, LayoutGrid, Loader2, Redo2, RotateCcw, Undo2, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { StudioFrameMessage } from "@/app/studio/frame/page";
 import type { SceneType, Story } from "@/components/story/types";
+import type { Template } from "@/lib/templates";
 import { formatInr } from "@/lib/utils";
 import { AddSection } from "./add-section";
 import { Canvas, type DeviceMode } from "./canvas";
+import { ChangeDesign } from "./change-design";
 import { Checkout } from "./checkout";
 import { freshDraft, loadDraft, useDraft } from "./draft-store";
+import { ImageCropProvider } from "./image-crop";
 import { Inspector, type Selection } from "./inspector";
 import { isLook, LOOK } from "./look";
 import { LeftPanel } from "./layers";
@@ -23,7 +26,15 @@ import { sceneSchemas } from "./schema";
 export type StudioTemplate = { slug: string; name: string; pricePaise: number; story: Story };
 
 /** The workspace: layers on the left, live artboards in the middle, inspector on the right. */
-export function Studio({ template, askNames = false }: { template: StudioTemplate; askNames?: boolean }) {
+export function Studio({
+  template,
+  designs,
+  askNames = false,
+}: {
+  template: StudioTemplate;
+  designs: Template[];
+  askNames?: boolean;
+}) {
   const initial = useMemo(() => freshDraft(template.slug, `${template.name} for ${template.story.recipient}`, template.story), [template]);
   const { draft, edit, undo, redo, reset, canUndo, canRedo, saved } = useDraft(initial);
   const [sel, setSel] = useState<Selection>({ scene: LOOK, item: null });
@@ -33,6 +44,7 @@ export function Studio({ template, askNames = false }: { template: StudioTemplat
   const [checkout, setCheckout] = useState(false);
   const [preview, setPreview] = useState(false);
   const [names, setNames] = useState<"first" | "edit" | null>(null);
+  const [designsOpen, setDesignsOpen] = useState(false);
   const wide = useMinLg();
 
   // A fresh gift starts by asking who it's for; a saved draft already knows.
@@ -152,8 +164,9 @@ export function Studio({ template, askNames = false }: { template: StudioTemplat
   const sceneLabel = isLook(sel.scene) ? "Look" : sceneSchemas[scenes[sceneIdx]?.type ?? "letter"].name;
 
   return (
-    // Pinned to the screen and unscrollable (clip, not hidden, so scrollIntoView can't move it), so the top bar never scrolls away.
-    <div className="fixed inset-0 flex flex-col overflow-clip bg-cream text-ink">
+    <ImageCropProvider>
+      {/* Pinned to the screen and unscrollable (clip, not hidden, so scrollIntoView can't move it), so the top bar never scrolls away. */}
+      <div className="fixed inset-0 flex flex-col overflow-clip bg-cream text-ink">
       {/* Top bar */}
       <header className="flex h-14 shrink-0 items-center gap-1 border-b border-line px-2 sm:gap-2 sm:px-3">
         <Link href={`/templates/${template.slug}`} aria-label="Back to the template" className="grid size-9 place-items-center rounded-lg hover:bg-paper">
@@ -178,6 +191,17 @@ export function Studio({ template, askNames = false }: { template: StudioTemplat
             <RotateCcw className="size-4" />
           </TopButton>
         </span>
+        {designs.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setDesignsOpen(true)}
+            aria-label="Change design"
+            className="flex h-9 items-center gap-1.5 rounded-lg px-2 text-sm font-medium hover:bg-paper sm:rounded-full sm:border sm:border-line sm:px-3"
+          >
+            <LayoutGrid className="size-4 shrink-0" />
+            <span className="whitespace-nowrap">Change design</span>
+          </button>
+        )}
 
         <div className="mx-auto flex min-w-0 flex-1 items-center justify-center gap-2">
           <button
@@ -295,6 +319,15 @@ export function Studio({ template, askNames = false }: { template: StudioTemplat
         )}
       </div>
 
+      <ChangeDesign
+        open={designsOpen}
+        onClose={() => setDesignsOpen(false)}
+        currentSlug={template.slug}
+        designs={designs}
+        to={draft.story.recipient}
+        from={draft.story.sender}
+      />
+
       <AddSection
         open={adding}
         onClose={() => setAdding(false)}
@@ -340,7 +373,8 @@ export function Studio({ template, askNames = false }: { template: StudioTemplat
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </ImageCropProvider>
   );
 }
 

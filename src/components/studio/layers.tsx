@@ -5,7 +5,8 @@ import { ChevronRight, Eye, EyeOff, GripVertical, ImagePlus, Plus, Trash2 } from
 import { useState } from "react";
 import type { Scene } from "@/components/story/types";
 import { cn } from "@/lib/utils";
-import { imageToDataUrl, type Draft } from "./draft-store";
+import { type Draft } from "./draft-store";
+import { FileCropInput } from "./image-crop";
 import { showNames, type Selection } from "./inspector";
 import { isLook, LOOK } from "./look";
 import { deleteSelected, readItems, setScenes, updateScene } from "./ops";
@@ -202,26 +203,19 @@ function Layers({ draft, sel, setSel, edit }: { draft: Draft; sel: Selection; se
 }
 
 function Assets({ draft, edit }: { draft: Draft; edit: Edit }) {
-  const [busy, setBusy] = useState(false);
   return (
     <div className="space-y-3 px-1">
       <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-ink/25 py-4 text-sm font-medium hover:border-ink/50 hover:bg-paper">
-        <ImagePlus className="size-4" /> {busy ? "Adding…" : "Upload photos"}
-        <input
-          type="file"
-          accept="image/*"
+        <ImagePlus className="size-4" /> Upload photos
+        <FileCropInput
           multiple
-          className="sr-only"
-          onChange={async (e) => {
-            const files = Array.from(e.target.files ?? []);
-            e.target.value = "";
-            if (!files.length) return;
-            setBusy(true);
-            const added = await Promise.all(
-              files.map(async (f) => ({ id: Math.random().toString(36).slice(2, 10), name: f.name, src: await imageToDataUrl(f) })),
-            );
+          onDone={(urls) => {
+            const added = urls.map((src, i) => ({
+              id: Math.random().toString(36).slice(2, 10),
+              name: `Photo ${draft.assets.length + i + 1}`,
+              src,
+            }));
             edit({ ...draft, assets: [...draft.assets, ...added] });
-            setBusy(false);
           }}
         />
       </label>

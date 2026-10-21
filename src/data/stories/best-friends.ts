@@ -139,7 +139,7 @@ export const bestFriendsStories = [
         title: "If anyone asks, *this.*",
         hint: "Tap each photo",
         photos: [
-          { caption: "The drive", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
+          { caption: "Park day", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
           { caption: "Chai alibi", date: "Weekly", tone: "dusk", src: photo("misty-chai") },
           { caption: "2am, no plan", date: "Mar ’25", tone: "rose", src: photo("maggi-3am") },
         ],

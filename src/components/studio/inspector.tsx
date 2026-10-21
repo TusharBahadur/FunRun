@@ -3,6 +3,7 @@
 import {
   ArrowDown,
   ArrowUp,
+  ChevronDown,
   ChevronRight,
   Copy,
   Eye,
@@ -14,10 +15,11 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ColorInput,
   Field,
+  NumberInput,
   TextArea,
   TextInput,
   Toggle,
@@ -25,7 +27,8 @@ import {
 import type { FontId } from "@/components/story/font-catalog";
 import type { Scene, StoryPalette } from "@/components/story/types";
 import { cn } from "@/lib/utils";
-import { imageToDataUrl, type Draft } from "./draft-store";
+import { type Draft } from "./draft-store";
+import { FileCropInput } from "./image-crop";
 import {
   addItem,
   deleteScene,
@@ -38,7 +41,7 @@ import {
   updateItem,
   updateScene,
 } from "./ops";
-import { FieldFontPicker } from "./font-choices";
+import { FieldFontPicker, FontPickerScope } from "./font-choices";
 import { isLook, LookSettings, setFieldFont } from "./look";
 import { childField, sceneSchemas, type FieldDef } from "./schema";
 import { TrackField } from "./track-field";
@@ -69,6 +72,24 @@ export const paletteFields: { key: keyof StoryPalette; label: string }[] = [
 ];
 
 export function Inspector({
+  draft,
+  sel,
+  setSel,
+  edit,
+}: {
+  draft: Draft;
+  sel: Selection;
+  setSel: (s: Selection) => void;
+  edit: Edit;
+}) {
+  return (
+    <FontPickerScope key={`${sel.scene}-${sel.item ?? ""}`}>
+      <InspectorBody draft={draft} sel={sel} setSel={setSel} edit={edit} />
+    </FontPickerScope>
+  );
+}
+
+function InspectorBody({
   draft,
   sel,
   setSel,
@@ -418,15 +439,11 @@ function UploadButton({ onUpload }: { onUpload: (id: AnyStickerId) => void }) {
   return (
     <label className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-ink px-3 text-sm font-medium text-paper">
       <Upload className="size-3.5" /> Upload your own
-      <input
-        type="file"
-        accept="image/*"
-        className="sr-only"
-        onChange={async (e) => {
-          const f = e.target.files?.[0];
-          e.target.value = "";
-          if (f) onUpload((await imageToDataUrl(f, STICKER_SIDE, "image/webp")) as AnyStickerId);
-        }}
+      <FileCropInput
+        maxSide={STICKER_SIDE}
+        type="image/webp"
+        aspect="1:1"
+        onDone={(urls) => onUpload(urls[0] as AnyStickerId)}
       />
     </label>
   );
@@ -502,6 +519,8 @@ export function SceneReaction({
   );
 }
 
+const STICKER_PEEK = 8;
+
 function StickerGrid({
   selected,
   yours = [],
@@ -517,11 +536,21 @@ function StickerGrid({
   /** Adds an "upload" tile to the "Yours" row. */
   onUpload?: (id: AnyStickerId) => void;
 }) {
-  const groups: { title: string; ids: AnyStickerId[]; upload?: boolean }[] = [
-    { title: "Yours", ids: yours, upload: !!onUpload },
-    { title: "Memes & doodles", ids: boardStickerIds },
-    { title: "Animated", ids: drawnStickerIds },
-  ];
+  const [more, setMore] = useState(false);
+  const pack = [...boardStickerIds, ...drawnStickerIds];
+  const peek = peekStickers(pack, selected, STICKER_PEEK);
+  const groups: { title: string; ids: AnyStickerId[]; upload?: boolean }[] = more
+    ? [
+        { title: "Yours", ids: yours, upload: !!onUpload },
+        { title: "Memes & doodles", ids: boardStickerIds },
+        { title: "Animated", ids: drawnStickerIds },
+      ]
+    : [
+        { title: "Yours", ids: yours, upload: !!onUpload },
+        { title: "Stickers", ids: peek },
+      ];
+  const hidden = pack.length - peek.length;
+
   return (
     <div className="space-y-3">
       {groups.filter((g) => g.ids.length || g.upload).map((g) => (
@@ -540,16 +569,12 @@ function StickerGrid({
                   <Upload className="size-4" />
                   Upload
                 </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
+                <FileCropInput
                   disabled={full}
-                  onChange={async (e) => {
-                    const f = e.target.files?.[0];
-                    e.target.value = "";
-                    if (f) onUpload((await imageToDataUrl(f, STICKER_SIDE, "image/webp")) as AnyStickerId);
-                  }}
+                  maxSide={STICKER_SIDE}
+                  type="image/webp"
+                  aspect="1:1"
+                  onDone={(urls) => onUpload(urls[0] as AnyStickerId)}
                 />
               </label>
             )}
@@ -584,8 +609,25 @@ function StickerGrid({
           </div>
         </div>
       ))}
+      {hidden > 0 && (
+        <button
+          type="button"
+          aria-expanded={more}
+          onClick={() => setMore((m) => !m)}
+          className="flex h-10 w-full items-center justify-center gap-1.5 rounded-2xl border border-dashed border-ink/25 text-sm font-medium hover:border-ink/40 hover:bg-paper"
+        >
+          {more ? "Show less" : "Explore more"}
+          <ChevronDown className={cn("size-4 text-muted transition-transform", more && "rotate-180")} />
+        </button>
+      )}
     </div>
   );
+}
+
+function peekStickers(ids: AnyStickerId[], selected: AnyStickerId[], limit: number) {
+  const picked = ids.filter((id) => selected.includes(id));
+  const rest = ids.filter((id) => !selected.includes(id));
+  return [...picked, ...rest.slice(0, Math.max(0, limit - picked.length))];
 }
 
 /** Spotlight pages: the sticker that lands after the last note. */
@@ -812,6 +854,7 @@ export function PhotoPicker({
   hint,
   roomy,
   highlight,
+  hideLabel,
 }: {
   draft: Draft;
   src?: string;
@@ -820,9 +863,10 @@ export function PhotoPicker({
   hint?: string;
   roomy?: boolean;
   highlight?: boolean;
+  hideLabel?: boolean;
 }) {
   return (
-    <Field label={label} hint={hint} roomy={roomy} highlight={highlight}>
+    <Field label={label} hint={hint} roomy={roomy} highlight={highlight} hideLabel={hideLabel}>
       <div className="flex items-center gap-3">
         <label className={cn("relative grid shrink-0 cursor-pointer place-items-center overflow-hidden rounded-xl bg-line/60 text-muted", roomy ? "size-24" : "size-20")}>
           {src ? (
@@ -831,18 +875,10 @@ export function PhotoPicker({
           ) : (
             <ImagePlus className="size-5" />
           )}
-          <input
-            type="file"
-            accept="image/*"
-            className="sr-only"
-            onChange={async (e) => {
-              const f = e.target.files?.[0];
-              if (f) onChange(await imageToDataUrl(f));
-            }}
-          />
+          <FileCropInput onDone={(urls) => onChange(urls[0])} />
         </label>
         <div className="flex flex-col gap-1.5 text-xs text-muted">
-          <span>Tap the square to upload, or pick from your assets.</span>
+          <span>Tap the square to upload and crop, or pick from your assets.</span>
           {src && (
             <button
               type="button"
@@ -910,6 +946,7 @@ export function FieldEditor({
   draft,
   roomy,
   highlight,
+  hideLabel,
   font,
   onFont,
   onRemove,
@@ -920,6 +957,7 @@ export function FieldEditor({
   draft: Draft;
   roomy?: boolean;
   highlight?: boolean;
+  hideLabel?: boolean;
   font?: FontId;
   onFont?: (id?: FontId) => void;
   onRemove?: () => void;
@@ -938,6 +976,7 @@ export function FieldEditor({
             onChange={onChange}
             roomy={roomy}
             highlight={highlight}
+            hideLabel={hideLabel}
           />
           {onRemove && String(value ?? "") && (
             <button type="button" onClick={onRemove} className="mt-1.5 text-sm text-rose-deep">
@@ -949,7 +988,7 @@ export function FieldEditor({
     case "text":
       return (
         <div>
-          <Field label={field.label} hint={field.help} roomy={roomy} highlight={highlight}>
+          <Field label={field.label} hint={field.help} roomy={roomy} highlight={highlight} hideLabel={hideLabel}>
             <TextInput
               value={showNames(String(value ?? ""), names)}
               maxLength={field.max}
@@ -969,7 +1008,7 @@ export function FieldEditor({
     case "textarea":
       return (
         <div>
-          <Field label={field.label} hint={field.help} roomy={roomy} highlight={highlight}>
+          <Field label={field.label} hint={field.help} roomy={roomy} highlight={highlight} hideLabel={hideLabel}>
             <TextArea
               value={showNames(String(value ?? ""), names)}
               maxLength={field.max}
@@ -987,27 +1026,19 @@ export function FieldEditor({
       );
     case "number":
       return (
-        <Field label={field.label} roomy={roomy} highlight={highlight}>
-          <TextInput
-            type="number"
+        <Field label={field.label} roomy={roomy} highlight={highlight} hideLabel={hideLabel}>
+          <NumberInput
+            value={Number(value ?? field.min)}
             min={field.min}
             max={field.max}
-            value={Number(value ?? field.min)}
-            onChange={(e) =>
-              onChange(
-                Math.min(
-                  field.max,
-                  Math.max(field.min, Number(e.target.value) || field.min),
-                ),
-              )
-            }
+            onChange={onChange}
             className={input}
           />
         </Field>
       );
     case "select":
       return (
-        <Field label={field.label} roomy={roomy} highlight={highlight}>
+        <Field label={field.label} roomy={roomy} highlight={highlight} hideLabel={hideLabel}>
           <select
             value={String(value ?? "")}
             onChange={(e) => onChange(e.target.value)}
@@ -1028,7 +1059,7 @@ export function FieldEditor({
     case "multi": {
       const chosen = (value as string[]) ?? [];
       return (
-        <Field label={`${field.label} (${field.min}–${field.max})`} roomy={roomy} highlight={highlight}>
+        <Field label={`${field.label} (${field.min}–${field.max})`} roomy={roomy} highlight={highlight} hideLabel={hideLabel}>
           <div className="flex flex-wrap gap-2">
             {field.options.map((o) => {
               const on = chosen.includes(o.value);
@@ -1060,7 +1091,7 @@ export function FieldEditor({
       // Nested lists (e.g. a quiz question's answers) are edited inline.
       const items = (value as string[]) ?? [];
       return (
-        <Field label={field.label} roomy={roomy} highlight={highlight}>
+        <Field label={field.label} roomy={roomy} highlight={highlight} hideLabel={hideLabel}>
           <div className="space-y-2">
             {items.map((s, k) => (
               <div key={k} className="flex items-center gap-2">
@@ -1145,7 +1176,9 @@ function Panel({
           </>
         )}
         {actions && (
-          <div className="mt-2 flex items-center gap-1">{actions}</div>
+          <div className="mt-2 flex items-center gap-0.5 rounded-2xl border border-line bg-paper/70 p-0.5">
+            {actions}
+          </div>
         )}
       </div>
       <div className="space-y-6 px-5 py-5">{children}</div>

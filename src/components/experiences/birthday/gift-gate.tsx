@@ -51,7 +51,7 @@ export function GiftGate({
         className="type-display mt-4 max-w-md text-[clamp(2.4rem,9vw,4.2rem)]"
       >
         <span className="font-semibold">{sender}</span>{" "}
-        <Accented text={openingLine} color={palette.accent} />
+        <Accented text={openingLine} color={palette.accent} face="sans" />
       </motion.h1>
 
       <motion.button

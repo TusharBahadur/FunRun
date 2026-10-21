@@ -140,7 +140,7 @@ export function SitePlayer({
               className="flex w-full items-center gap-0.5 rounded-full border p-1 shadow-[0_12px_30px_-14px_rgba(0,0,0,.35)] backdrop-blur-md lg:w-auto lg:max-w-4xl lg:gap-1 lg:p-1.5"
               style={{ backgroundColor: `${palette.cream}cc`, borderColor: `${palette.cream}`, color: palette.ink }}
             >
-              <span className="hidden shrink-0 px-3 font-serif text-sm font-semibold lg:block">{brand}</span>
+              <span className="hidden shrink-0 px-3 text-sm font-semibold lg:block">{brand}</span>
               {navItems.map((n) => (
                 <button
                   key={n.i}

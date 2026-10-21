@@ -1,32 +1,17 @@
 import {
-  Abril_Fatface,
-  Amatic_SC,
   Baloo_2,
-  Bodoni_Moda,
   Bricolage_Grotesque,
   Bungee,
   Caveat,
-  Cinzel,
-  Cormorant,
-  Dancing_Script,
-  DM_Serif_Display,
   Fredoka,
-  Great_Vibes,
-  Homemade_Apple,
   Indie_Flower,
-  Instrument_Serif,
   Lobster,
-  Lora,
   Outfit,
-  Pacifico,
   Patrick_Hand,
   Permanent_Marker,
-  Playfair_Display,
   Poppins,
   Quicksand,
   Righteous,
-  Sacramento,
-  Shadows_Into_Light,
   Space_Grotesk,
   Space_Mono,
   Special_Elite,
@@ -38,15 +23,10 @@ import {
  * Extra faces for gifts only. None are preloaded — the browser downloads a
  * family once some text on screen uses it. Import this file from layout.tsx,
  * not from client components.
+ *
+ * Thin italic serifs and script faces are not loaded: they do not belong
+ * on gift previews.
  */
-
-const playfair = Playfair_Display({ subsets: ["latin", "latin-ext"], variable: "--gf-playfair", preload: false, display: "swap" });
-const dmSerif = DM_Serif_Display({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-dm-serif", preload: false, display: "swap" });
-const cormorant = Cormorant({ subsets: ["latin", "latin-ext"], variable: "--gf-cormorant", preload: false, display: "swap" });
-const lora = Lora({ subsets: ["latin", "latin-ext"], variable: "--gf-lora", preload: false, display: "swap" });
-const bodoni = Bodoni_Moda({ subsets: ["latin", "latin-ext"], variable: "--gf-bodoni", preload: false, display: "swap" });
-const instrument = Instrument_Serif({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-instrument", preload: false, display: "swap" });
-const cinzel = Cinzel({ subsets: ["latin", "latin-ext"], variable: "--gf-cinzel", preload: false, display: "swap" });
 
 const poppins = Poppins({ subsets: ["latin", "latin-ext", "devanagari"], weight: ["400", "600"], variable: "--gf-poppins", preload: false, display: "swap" });
 const outfit = Outfit({ subsets: ["latin", "latin-ext"], variable: "--gf-outfit", preload: false, display: "swap" });
@@ -57,19 +37,11 @@ const fredoka = Fredoka({ subsets: ["latin", "latin-ext"], variable: "--gf-fredo
 const unbounded = Unbounded({ subsets: ["latin", "latin-ext"], variable: "--gf-unbounded", preload: false, display: "swap" });
 
 const caveat = Caveat({ subsets: ["latin", "latin-ext"], variable: "--gf-caveat", preload: false, display: "swap" });
-const dancing = Dancing_Script({ subsets: ["latin", "latin-ext"], variable: "--gf-dancing", preload: false, display: "swap" });
-const pacifico = Pacifico({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-pacifico", preload: false, display: "swap" });
-const greatVibes = Great_Vibes({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-great-vibes", preload: false, display: "swap" });
-const sacramento = Sacramento({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-sacramento", preload: false, display: "swap" });
 const patrick = Patrick_Hand({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-patrick", preload: false, display: "swap" });
-const shadows = Shadows_Into_Light({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-shadows", preload: false, display: "swap" });
-const amatic = Amatic_SC({ subsets: ["latin", "latin-ext"], weight: ["400", "700"], variable: "--gf-amatic", preload: false, display: "swap" });
 const marker = Permanent_Marker({ subsets: ["latin"], weight: "400", variable: "--gf-marker", preload: false, display: "swap" });
 const indie = Indie_Flower({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-indie", preload: false, display: "swap" });
-const apple = Homemade_Apple({ subsets: ["latin"], weight: "400", variable: "--gf-apple", preload: false, display: "swap" });
 const yatra = Yatra_One({ subsets: ["latin", "latin-ext", "devanagari"], weight: "400", variable: "--gf-yatra", preload: false, display: "swap" });
 
-const abril = Abril_Fatface({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-abril", preload: false, display: "swap" });
 const righteous = Righteous({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-righteous", preload: false, display: "swap" });
 const bungee = Bungee({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-bungee", preload: false, display: "swap" });
 const lobster = Lobster({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-lobster", preload: false, display: "swap" });
@@ -79,10 +51,9 @@ const spaceMono = Space_Mono({ subsets: ["latin", "latin-ext"], weight: ["400", 
 const specialElite = Special_Elite({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--gf-special-elite", preload: false, display: "swap" });
 
 export const giftFontVariables = [
-  playfair, dmSerif, cormorant, lora, bodoni, instrument, cinzel,
   poppins, outfit, quicksand, spaceGrotesk, bricolage, fredoka, unbounded,
-  caveat, dancing, pacifico, greatVibes, sacramento, patrick, shadows, amatic, marker, indie, apple, yatra,
-  abril, righteous, bungee, lobster, baloo,
+  caveat, patrick, marker, indie, yatra,
+  righteous, bungee, lobster, baloo,
   spaceMono, specialElite,
 ]
   .map((f) => f.variable)

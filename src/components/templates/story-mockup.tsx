@@ -1,6 +1,7 @@
 import { Heart, Phone, Sparkles, Video } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
+import { DoorArt } from "@/components/story/gift-door";
 import { Sticker, type AnyStickerId, type StickerId } from "@/components/story/stickers";
 import type { Photo, Scene, Story, StoryPalette } from "@/components/story/types";
 import type { Template } from "@/lib/templates";
@@ -276,25 +277,35 @@ function Stage({ children, style }: { children: ReactNode; style: CSSProperties 
 
 /* ───────────── 1. CANDLE (Midnight 11:59 pm bedroom lights) ───────────── */
 function CandleLayout({ g }: { g: Gift }) {
-  const { p, scenes } = g;
+  const { scenes } = g;
   const lights = scenes[0];
+  const portrait = giftPhotos(scenes, 1)[0];
   const stickers = giftStickers(scenes);
   return (
     <Stage style={{ background: `radial-gradient(circle at 50% 35%, #ffb70333, transparent 65%), #171520` }}>
       <Hearts color="#f59e0b" spots={[{ left: "10%", top: "75%", size: 4.5, delay: "0s" }, { left: "84%", top: "20%", size: 3.5, delay: "-3s" }]} />
-      {/* 11:59 pm ambient digital time glow */}
       <div className="absolute inset-x-0 top-[6%] text-center font-mono text-[2.6cqw] uppercase tracking-[0.25em] text-amber-300/80">
         {g.kicker}
       </div>
 
-      {/* Prominent phone showing the candle scene */}
-      <PhoneFrame className="bottom-[8%] left-[22%] w-[56%]" rotate={-3}>
+      <div
+        className="absolute left-[5%] top-[18%] w-[34%] bg-white p-[1.6cqw] pb-[7cqw] shadow-[0_4cqw_8cqw_-3cqw_rgba(0,0,0,0.45)]"
+        style={{ rotate: "-9deg" }}
+      >
+        <span className="absolute -top-[1.4cqw] left-1/2 h-[2.8cqw] w-[12cqw] -translate-x-1/2 rotate-2 bg-amber-200/90" />
+        <PhotoFill src={portrait.src} tone={portrait.tone} alt="" className="aspect-square w-full" iconClassName="size-[8cqw]" />
+        <span className="type-hand absolute inset-x-0 bottom-[1.2cqw] text-center text-[3.2cqw] text-[#2a1a1f]">
+          {g.story.recipient}
+        </span>
+      </div>
+
+      <PhoneFrame className="bottom-[7%] right-[8%] w-[52%]" rotate={5}>
         <ScreenPeek scene={lights} g={g} className="aspect-[9/16]" />
       </PhoneFrame>
 
       {stickers.slice(0, 2).map((id, i) => (
-        <div key={id} aria-hidden className="absolute z-10 animate-float" style={[{ left: "6%", bottom: "12%", rotate: "-8deg" }, { right: "5%", top: "14%", rotate: "10deg", animationDelay: "-2.5s" }][i]}>
-          <Sticker id={id} className="size-[17cqw]" />
+        <div key={id} aria-hidden className="absolute z-10 animate-float" style={[{ left: "8%", bottom: "8%", rotate: "-8deg" }, { right: "4%", top: "10%", rotate: "10deg", animationDelay: "-2.5s" }][i]}>
+          <Sticker id={id} className="size-[15cqw]" />
         </div>
       ))}
     </Stage>
@@ -725,7 +736,7 @@ function SiteLayout({ g }: { g: Gift }) {
   const noticed = scenes.find((s): s is Extract<Scene, { type: "noticed" }> => s.type === "noticed");
   const photos = giftPhotos(scenes, 3);
   const nav = ["Home", countdown ? "Countdown" : null, "Photos", "Letter"].filter(Boolean) as string[];
-  const serif = "font-serif font-semibold tracking-[-0.02em]";
+  const serif = "type-display font-semibold";
   return (
     <Stage style={{ background: `radial-gradient(90% 60% at 0% 0%, ${p.pink}, transparent 70%), radial-gradient(80% 60% at 100% 100%, ${p.accent}30, transparent 70%), ${p.bg}` }}>
       <div className="absolute left-[6%] top-[5%] w-[80%] overflow-hidden rounded-[3cqw] bg-white shadow-[0_6cqw_12cqw_-6cqw_rgba(27,18,21,0.5)]">
@@ -763,7 +774,7 @@ function SiteLayout({ g }: { g: Gift }) {
             </div>
           ) : noticed ? (
             <div className="rounded-[2cqw] px-[3cqw] py-[2.4cqw]" style={{ backgroundColor: p.cream, color: p.ink }}>
-              <span className="font-serif text-[3cqw] opacity-30">01</span>
+              <span className="type-display text-[3cqw] font-semibold opacity-30">01</span>
               <p className={cn(serif, "text-[3.4cqw]")}>{g.fill(noticed.items[0]?.title ?? "")}</p>
             </div>
           ) : null}
@@ -820,7 +831,11 @@ export function ScreenPeek({ scene, g, className, big = false }: { scene: Scene;
       )}
       <p className={cn("type-display mt-[1.6cqw] text-balance", big ? "text-[5.6cqw]" : "text-[3.4cqw]")}>{unstar(title)}</p>
 
-      {photo ? (
+      {scene.type === "knock" ? (
+        <div className={cn("mt-[2cqw]", big ? "w-[38%]" : "w-[52%]")}>
+          <DoorArt palette={palette} />
+        </div>
+      ) : photo ? (
         <div className={cn("relative mt-[3cqw] bg-white p-[1cqw] pb-[3.5cqw] shadow-[0_2cqw_3cqw_-2cqw_rgba(0,0,0,.4)]", big ? "w-[34%]" : "w-[78%]")} style={{ rotate: "-3deg" }}>
           <span className="absolute -top-[1.2cqw] left-1/2 h-[2.6cqw] w-[9cqw] -translate-x-1/2 rotate-2" style={{ backgroundColor: `${palette.pink}d0` }} />
           <PhotoFill src={photo.src} tone={photo.tone} alt="" className="aspect-[4/5] w-full" iconClassName="size-[5cqw]" />
@@ -1003,7 +1018,7 @@ function SiteFlowVideo({ template }: { template: Template }) {
           <div className="aspect-[4/3] rounded-2xl overflow-hidden relative" style={{ backgroundColor: p.accent }}>
             <PhotoFill src={hero?.photo} tone="rose" alt="" className="size-full" iconClassName="size-[8cqw]" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-[3cqw]">
-              <p className="font-serif text-[4cqw] text-white font-bold leading-tight">
+              <p className="type-display text-[4cqw] font-semibold leading-tight text-white">
                 {g.fill(hero?.title ?? g.opening)}
               </p>
             </div>

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Accented } from "@/components/experiences/birthday/accented";
 import { EASE_OUT } from "@/lib/motion";
+import { GiftDoor } from "../gift-door";
 import { Backdrop, capturePointer, HoldRing, SceneShell, StudioAlso, StudioHit, useHold, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
 import type { Scene } from "../types";
 
@@ -66,7 +67,7 @@ export function SealScene({ scene, done, onDone }: SceneProps<S<"seal">>) {
           >
             <HoldRing progress={p} size={92} color={palette.gold} track={`${palette.cream}66`} />
             <motion.span
-              className="grid size-[70px] place-items-center rounded-full font-serif text-3xl italic"
+              className="grid size-[70px] place-items-center rounded-full type-display text-3xl font-semibold"
               style={{ backgroundColor: palette.accent, color: palette.cream, boxShadow: `inset 0 -6px 0 ${palette.fg}33` }}
               animate={{ scale: 1 - p * 0.12, rotate: p * 8 }}
             >
@@ -244,7 +245,7 @@ export function LightsScene({ scene, done, onDone }: SceneProps<S<"lights">>) {
         </StudioHit>
         <StudioAlso label="Headline once every candle is lit" field="reveal">
           <p className="type-display text-balance text-3xl">
-            <Accented text={fill(scene.reveal)} color={palette.accent} />
+            <Accented text={fill(scene.reveal)} color={palette.accent} face="sans" />
           </p>
         </StudioAlso>
       </SceneShell>
@@ -258,7 +259,6 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
   const { palette, fill } = useStory();
   const [knocks, setKnocks] = useState(done ? scene.knocks : 0);
   const [shake, setShake] = useState(0);
-  const door = useRef<HTMLDivElement>(null);
 
   function knock() {
     if (done) return;
@@ -273,35 +273,24 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
   }
 
   return (
-    <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
-      <div ref={door} className="relative h-[300px] w-[200px] [perspective:800px]">
-        {/* What's behind the door */}
-        <div
-          className="absolute inset-0 grid place-items-center rounded-t-[100px] px-4 text-center"
-          style={{ background: `radial-gradient(circle at 50% 40%, #fff6dc, ${palette.gold})`, color: palette.ink }}
-        >
-          <StudioHit field="reveal">
-            <p className="type-hand text-2xl leading-tight">{fill(scene.reveal)}</p>
-          </StudioHit>
-        </div>
-        <motion.button
-          type="button"
-          onClick={knock}
-          aria-label={`Knock (${knocks} of ${scene.knocks})`}
-          className="absolute inset-0 origin-left rounded-t-[100px] outline-none"
-          style={{ backgroundColor: palette.accent, transformStyle: "preserve-3d", boxShadow: "inset 0 0 0 10px rgba(27,18,21,.08)", pointerEvents: done ? "none" : undefined }}
-          animate={done ? { rotateY: -105 } : { rotateY: 0, x: shake ? [0, -6, 6, -3, 0] : 0 }}
-          transition={done ? { duration: 1, ease: EASE_OUT } : { duration: 0.3 }}
-          key={done ? "open" : `k${shake}`}
-        >
-          <span className="absolute inset-x-6 top-10 h-24 rounded-t-[60px] border-2 opacity-25" style={{ borderColor: palette.cream }} />
-          <span className="absolute inset-x-6 bottom-10 h-20 rounded-md border-2 opacity-25" style={{ borderColor: palette.cream }} />
-          <span className="absolute right-5 top-1/2 size-4 rounded-full" style={{ backgroundColor: palette.gold }} />
-        </motion.button>
+    <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done} layout="stack">
+      <div className="relative">
+        <GiftDoor
+          open={done}
+          shake={shake}
+          onKnock={knock}
+          knocks={knocks}
+          total={scene.knocks}
+          reveal={
+            <StudioHit field="reveal">
+              <p className="type-display text-[1.35rem] font-semibold leading-[1.15] sm:text-[1.5rem]">{fill(scene.reveal)}</p>
+            </StudioHit>
+          }
+        />
         {!done && knocks > 0 && (
           <motion.span
             key={`t${knocks}`}
-            className="type-display pointer-events-none absolute -right-10 top-6 text-2xl"
+            className="type-display pointer-events-none absolute -right-8 top-8 text-xl font-semibold"
             style={{ color: palette.accent }}
             initial={{ opacity: 0, y: 10, rotate: -8 }}
             animate={{ opacity: [0, 1, 0], y: -20 }}
@@ -310,11 +299,6 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
             knock!
           </motion.span>
         )}
-      </div>
-      <div className="mt-6 flex gap-2 p-1.5" aria-hidden>
-        {Array.from({ length: scene.knocks }).map((_, i) => (
-          <span key={i} className="size-2.5 rounded-full" style={{ backgroundColor: i < knocks ? palette.accent : `${palette.fg}25` }} />
-        ))}
       </div>
     </SceneShell>
   );

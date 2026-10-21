@@ -30,7 +30,7 @@ export function Letter({ gift, palette }: { gift: BirthdayGift; palette: Birthda
         <p className="type-label opacity-60">A note from {gift.sender}</p>
         <h2 className="type-display mt-5 text-[clamp(2.2rem,7vw,3.4rem)]">
           Dear{" "}
-          <span className="type-accent" style={{ color: palette.accent }}>
+          <span className="font-semibold" style={{ color: palette.accent }}>
             {gift.recipient},
           </span>
         </h2>
@@ -84,7 +84,7 @@ export function Memories({ gift }: { gift: BirthdayGift }) {
         Remember these?
       </motion.p>
       <motion.h2 {...reveal} className="type-display mx-auto mt-4 max-w-lg text-[clamp(2.2rem,7vw,3.6rem)]">
-        A few of our <span className="type-accent">favorite</span> days.
+        A few of our <span className="font-semibold">favorite</span> days.
       </motion.h2>
 
       <div className="relative mx-auto mt-16 aspect-[4/5] w-[min(72vw,300px)]">
@@ -168,7 +168,7 @@ export function Numbers({ gift, palette }: { gift: BirthdayGift; palette: Birthd
         {...reveal}
         className="type-display mx-auto max-w-2xl text-center text-[clamp(2.2rem,7vw,3.6rem)]"
       >
-        You, <span className="type-accent" style={{ color: palette.accent }}>by the numbers.</span>
+        You, <span className="font-semibold" style={{ color: palette.accent }}>by the numbers.</span>
       </motion.h2>
       <div className="mx-auto mt-14 grid max-w-4xl gap-4 sm:grid-cols-3">
         {stats.map((s, i) => (
@@ -237,7 +237,7 @@ export function Finale({
         One more thing
       </motion.p>
       <motion.h2 {...reveal} className="type-display mx-auto mt-5 max-w-3xl text-[clamp(2.8rem,11vw,6.5rem)]">
-        <Accented text={gift.copy?.finale || `Here’s to *year ${gift.age + 1}.*`} color={highlight} />
+        <Accented text={gift.copy?.finale || `Here’s to *year ${gift.age + 1}.*`} color={highlight} face="sans" />
       </motion.h2>
 
       <motion.div {...reveal} className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">

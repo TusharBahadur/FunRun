@@ -1,10 +1,37 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
+import { createContext, useContext, useId, useState, type ReactNode } from "react";
 import { accentMoodOrder, accentMoods, accentMoodStyle } from "@/components/experiences/birthday/accent-moods";
 import type { AccentFont } from "@/components/experiences/birthday/types";
 import { catalogFont, fontCatalog, fontGroups, type FontId } from "@/components/story/font-catalog";
 import { giftFontOrder, giftFonts, giftFontStyle, isGiftPreset, type StoryFont } from "@/components/story/gift-fonts";
 import { cn } from "@/lib/utils";
+
+/** Only one per-field font catalog is open at a time. */
+const FontPickerCtx = createContext<{
+  openId: string | null;
+  setOpenId: (id: string | null) => void;
+} | null>(null);
+
+export function FontPickerScope({ children }: { children: ReactNode }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  return <FontPickerCtx.Provider value={{ openId, setOpenId }}>{children}</FontPickerCtx.Provider>;
+}
+
+function useExclusiveOpen() {
+  const id = useId();
+  const ctx = useContext(FontPickerCtx);
+  const [local, setLocal] = useState(false);
+  if (!ctx) {
+    return { open: local, toggle: () => setLocal((o) => !o), close: () => setLocal(false) };
+  }
+  return {
+    open: ctx.openId === id,
+    toggle: () => ctx.setOpenId(ctx.openId === id ? null : id),
+    close: () => ctx.setOpenId(null),
+  };
+}
 
 /** Gift-wide font and highlight pickers. Large samples, so the choice is obvious on a phone. */
 export function FontChoices({
@@ -101,18 +128,33 @@ export function FieldFontPicker({
   sample: string;
 }) {
   const current = catalogFont(value);
+  const { open, toggle, close } = useExclusiveOpen();
+  function pick(id?: FontId) {
+    onChange(id);
+    close();
+  }
   return (
-    <details className="mt-3 rounded-2xl border border-line bg-paper/50 px-3 py-2">
-      <summary className="cursor-pointer list-none text-sm font-medium [&::-webkit-details-marker]:hidden">
-        Font · {current ? current.name : "Gift font"}
-      </summary>
-      {value && (
-        <button type="button" onClick={() => onChange(undefined)} className="mt-2 text-sm text-muted hover:text-ink">
-          Use the gift font
-        </button>
+    <div className="mt-3 rounded-2xl border border-line bg-paper/50 px-3 py-2">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={toggle}
+        className="flex w-full items-center justify-between gap-2 text-left text-sm font-medium"
+      >
+        <span>Font · {current ? current.name : "Gift font"}</span>
+        <ChevronDown className={cn("size-4 shrink-0 text-muted transition-transform", open && "rotate-180")} />
+      </button>
+      {open && (
+        <div className="pb-1">
+          {value && (
+            <button type="button" onClick={() => pick(undefined)} className="mt-2 text-sm text-muted hover:text-ink">
+              Use the gift font
+            </button>
+          )}
+          <FontGrid value={value} onChange={pick} sample={sample || "Aa"} allowClear />
+        </div>
       )}
-      <FontGrid value={value} onChange={onChange} sample={sample || "Aa"} allowClear />
-    </details>
+    </div>
   );
 }
 

@@ -266,8 +266,8 @@ function KeepsakeButton({ to, from, title }: { to: string; from: string; title: 
     setBusy(true);
     await document.fonts.ready;
     const css = getComputedStyle(document.documentElement);
-    const serif = css.getPropertyValue("--font-fraunces").trim() || "serif";
     const sans = css.getPropertyValue("--font-inter-tight").trim() || "sans-serif";
+    const mark = css.getPropertyValue("--font-fraunces").trim() || "serif";
     const W = 1080;
     const H = 1350;
     const c = document.createElement("canvas");
@@ -285,14 +285,14 @@ function KeepsakeButton({ to, from, title }: { to: string; from: string; title: 
     ctx.font = `600 54px ${sans}`;
     ctx.fillText(`For ${to},`, 90, 300);
     ctx.fillStyle = palette.accent;
-    ctx.font = `italic 400 112px ${serif}`;
+    ctx.font = `600 112px ${sans}`;
     wrap(ctx, title.replace(/\*/g, ""), 90, 450, W - 180, 118);
     ctx.fillStyle = palette.fg;
     ctx.globalAlpha = 0.7;
     ctx.font = `500 32px ${sans}`;
     ctx.fillText(`With love, ${from} · ${new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}`, 90, H - 200);
     ctx.globalAlpha = 1;
-    ctx.font = `italic 900 54px ${serif}`;
+    ctx.font = `italic 900 54px ${mark}`;
     ctx.fillText("TyniTales.", 90, H - 100);
     const a = document.createElement("a");
     a.href = c.toDataURL("image/png");

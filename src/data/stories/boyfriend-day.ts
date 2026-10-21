@@ -135,7 +135,7 @@ export const boyfriendDayStories = [
         title: "The ones I *keep staring at.*",
         hint: "Tap each photo",
         photos: [
-          { caption: "Road trip hair", date: "Dec ’24", tone: "sun", src: photo("road-trip") },
+          { caption: "The babies", date: "Dec ’24", tone: "sun", src: photo("road-trip") },
           { caption: "Chai face", date: "Every day", tone: "dusk", src: photo("chai-cheers") },
           { caption: "2am maggi", date: "Mar ’25", tone: "rose", src: photo("maggi-3am") },
         ],

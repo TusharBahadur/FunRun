@@ -229,7 +229,7 @@ export function ActivationTimer({
             </div>
           ) : (
             <div className="py-4 text-center">
-              <p className="font-serif text-lg font-semibold text-ink">
+              <p className="type-display text-lg font-semibold text-ink">
                 {targetDate.toLocaleDateString("en-IN", {
                   weekday: "short",
                   month: "short",
@@ -388,7 +388,7 @@ export function RecipientUnlockCountdown({
       </p>
 
       <h1 className="type-display mt-3 text-4xl sm:text-5xl font-semibold">
-        Unlocks In <span className="type-accent" style={{ color: accentColor }}>...</span>
+        Unlocks In <span className="font-semibold" style={{ color: accentColor }}>...</span>
       </h1>
 
       {/* Ticking Digital Block Countdown */}
@@ -417,7 +417,7 @@ export function RecipientUnlockCountdown({
       </div>
 
       {/* Micro-interaction hint */}
-      <p className="mt-8 font-serif italic text-sm opacity-60">
+      <p className="mt-8 text-sm opacity-60">
         Tap the screen to send warm wishes while waiting 💖
       </p>
       <p className="type-label mt-2 text-[10px] opacity-40">

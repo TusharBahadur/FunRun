@@ -5,14 +5,14 @@ import { catalogFont, type FontId } from "./font-catalog";
  * The font a sender picks for their whole gift: one of three mixed presets
  * built from the brand families, or any single font from the catalog.
  *
- * Classic keeps today's look: Fraunces headlines, Kalam for notes.
+ * Classic keeps Inter Tight headlines and Kalam for notes.
  * Handwritten sets the whole gift in Kalam. Clean sets it in Inter Tight.
  */
 export type GiftFont = "classic" | "hand" | "clean";
 export type StoryFont = GiftFont | FontId;
 
 export const giftFonts: Record<GiftFont, { name: string; note: string; family: string; weight: number; axes: string }> = {
-  classic: { name: "Classic", note: "Clean headlines, handwritten notes", family: "var(--font-fraunces)", weight: 560, axes: '"SOFT" 30, "WONK" 0' },
+  classic: { name: "Classic", note: "Clean headlines, handwritten notes", family: "var(--font-inter-tight)", weight: 560, axes: "normal" },
   hand: { name: "Handwritten", note: "The whole gift, like a real note", family: "var(--font-kalam)", weight: 700, axes: "normal" },
   clean: { name: "Clean", note: "Plain and modern", family: "var(--font-inter-tight)", weight: 500, axes: "normal" },
 };

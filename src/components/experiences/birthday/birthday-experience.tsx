@@ -101,6 +101,7 @@ export function BirthdayExperience({
   return (
     <div
       className="min-h-svh"
+      data-gift-font="classic"
       style={
         {
           backgroundColor: palette.bg,
@@ -165,7 +166,7 @@ export function BirthdayExperience({
             >
               <span className="font-semibold">{gift.copy?.greeting || "Happy birthday,"}</span>
               <br />
-              <span className="type-accent" style={{ color: palette.accent }}>
+              <span className="font-semibold" style={{ color: palette.accent }}>
                 {gift.recipient}.
               </span>
             </motion.h1>

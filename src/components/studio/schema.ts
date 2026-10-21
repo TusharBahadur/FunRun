@@ -407,7 +407,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Games",
     icon: Flower2,
     blurb: "Add flowers to a vase one by one; a card appears.",
-    fields: [...heading, { key: "flowers", label: "Flowers", kind: "number", min: 3, max: 7 }, { key: "card", label: "Card on the vase", kind: "text", max: 30 }],
+    fields: [...heading, { key: "flowers", label: "Flowers", kind: "number", min: 1, max: 24 }, { key: "card", label: "Card on the vase", kind: "text", max: 30 }],
     create: () => ({ type: "bouquet", eyebrow: "Fresh flowers", title: "A bouquet, *picked by me.*", hint: "Add five flowers", flowers: 5, card: "For you ♥" }),
   },
   award: {

@@ -69,7 +69,7 @@ export function TemplateCard({ template, className }: { template: Template; clas
           <span className="type-display shrink-0 text-xl font-semibold">{formatInr(template.pricePaise)}</span>
         </Link>
         {/* The gift's opening line, in its own words. */}
-        <p className="mt-2 font-serif text-[1.05rem] leading-snug opacity-80">"{template.preview.title}"</p>
+        <p className="type-display mt-2 text-[1.05rem] leading-snug opacity-80">"{template.preview.title}"</p>
 
         {chips.length > 0 && (
           <ul className="mt-4 flex flex-wrap gap-1.5">

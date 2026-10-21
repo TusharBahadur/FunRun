@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronDown, Lock } from "lucide-react";
-import { useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -67,6 +67,7 @@ export function Field({
   counter,
   roomy,
   highlight,
+  hideLabel,
 }: {
   label: string;
   hint?: ReactNode;
@@ -76,22 +77,67 @@ export function Field({
   roomy?: boolean;
   /** Studio: this field is the one tapped in the preview. */
   highlight?: boolean;
+  /** Accordion title already names this field. */
+  hideLabel?: boolean;
 }) {
   return (
     <label className="block">
-      <span
-        className={cn(
-          "flex items-baseline justify-between",
-          roomy ? "text-base font-medium" : "type-label",
-          highlight ? "text-rose-deep" : roomy ? "text-ink" : "text-muted",
-        )}
-      >
-        {label}
-        {counter && <span className={roomy ? "text-sm font-normal text-muted" : "text-[10px]"}>{counter}</span>}
-      </span>
-      <span className="mt-2 block">{children}</span>
+      {!hideLabel && (
+        <span
+          className={cn(
+            "flex items-baseline justify-between",
+            roomy ? "type-heading text-base font-semibold" : "type-label",
+            highlight ? "text-rose-deep" : roomy ? "text-ink" : "text-muted",
+          )}
+        >
+          {label}
+          {counter && <span className={roomy ? "text-sm font-normal text-muted" : "text-[10px]"}>{counter}</span>}
+        </span>
+      )}
+      <span className={cn(hideLabel ? "block" : "mt-2 block")}>{children}</span>
       {hint && <span className={roomy ? "mt-2 block text-sm leading-snug text-muted" : "mt-1.5 block text-xs text-muted"}>{hint}</span>}
     </label>
+  );
+}
+
+/** Closed by default. Phone studio: one row until they open it. */
+export function Fold({
+  title,
+  preview,
+  open: forceOpen,
+  children,
+}: {
+  title: string;
+  preview?: string;
+  open?: boolean;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  useEffect(() => {
+    if (forceOpen) setOpen(true);
+  }, [forceOpen]);
+  return (
+    <section className={cn("overflow-hidden rounded-2xl border bg-paper", open ? "border-ink/20" : "border-line")}>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={id}
+        onClick={() => setOpen((o) => !o)}
+        className={cn("flex min-h-14 w-full items-center gap-3 px-4 py-3.5 text-left", open && "bg-blush/40")}
+      >
+        <span className="min-w-0 flex-1">
+          <span className="type-heading block text-[1.05rem] font-semibold text-ink">{title}</span>
+          {!open && preview ? <span className="mt-1 block truncate text-[15px] text-ink/55">{preview}</span> : null}
+        </span>
+        <ChevronDown className={cn("size-5 shrink-0 text-ink/40 transition-transform", open && "rotate-180")} />
+      </button>
+      {open && (
+        <div id={id} className="border-t border-ink/10 px-4 py-4">
+          {children}
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -100,6 +146,73 @@ const inputClass =
 
 export function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={cn(inputClass, props.className)} />;
+}
+
+/**
+ * A number you can actually type. Clamping on every keystroke used to snap
+ * the field to min or max (flowers jumped 3 ↔ 7). We keep the draft while
+ * typing and only clamp when the field blurs.
+ */
+export function NumberInput({
+  value,
+  min,
+  max,
+  onChange,
+  className,
+}: {
+  value: number;
+  min: number;
+  max: number;
+  onChange: (n: number) => void;
+  className?: string;
+}) {
+  const [raw, setRaw] = useState(String(value));
+  const focused = useRef(false);
+
+  useEffect(() => {
+    if (!focused.current) setRaw(String(value));
+  }, [value]);
+
+  function clamp(n: number) {
+    if (!Number.isFinite(n)) return min;
+    return Math.min(max, Math.max(min, Math.round(n)));
+  }
+
+  function commit(text: string) {
+    const next = clamp(text === "" ? min : Number(text));
+    setRaw(String(next));
+    if (next !== value) onChange(next);
+  }
+
+  return (
+    <input
+      type="text"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      value={raw}
+      onFocus={() => {
+        focused.current = true;
+      }}
+      onBlur={() => {
+        focused.current = false;
+        commit(raw);
+      }}
+      onChange={(e) => {
+        const next = e.target.value.replace(/[^\d]/g, "");
+        setRaw(next);
+        if (next === "") return;
+        const n = Number(next);
+        if (Number.isFinite(n) && n >= min && n <= max) onChange(n);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          (e.target as HTMLInputElement).blur();
+        }
+      }}
+      className={cn(inputClass, "tabular-nums", className)}
+    />
+  );
 }
 
 export function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {

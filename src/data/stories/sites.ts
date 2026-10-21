@@ -55,7 +55,7 @@ export const ourCorner = siteTemplate({
         { caption: "Chai for two", date: "Every day", tone: "dusk", src: photo("chai-hands") },
         { caption: "Lonavala, in the rain", date: "Jul ’23", tone: "leaf", src: photo("misty-chai") },
         { caption: "Basically us", date: "Always", tone: "rose", src: board("07.jpg") },
-        { caption: "That road trip", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
+        { caption: "These two", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
         { caption: "Stargazing", date: "Feb ’25", tone: "night", src: photo("night-sky") },
       ],
     },
@@ -194,7 +194,7 @@ export const birthdayPage = siteTemplate({
       eyebrow: "Year 27 in photos",
       title: "What a *year* you had.",
       photos: [
-        { caption: "That road trip!!", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
+        { caption: "These two!!", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
         { caption: "Cousin’s wedding", date: "Nov ’24", tone: "rose", src: photo("saree-laughs") },
         { caption: "Girls’ night", date: "Mar ’25", tone: "dusk", src: photo("party-girls") },
         { caption: "Last year’s cake", date: "Oct ’24", tone: "rose", src: photo("pink-cake") },
@@ -325,7 +325,7 @@ export const hisPage = siteTemplate({
       eyebrow: "Fan cam",
       title: "His best *moments*, as captured by his biggest fan.",
       photos: [
-        { caption: "Road trip hair", date: "Dec ’24", tone: "sun", src: photo("road-trip") },
+        { caption: "The babies", date: "Dec ’24", tone: "sun", src: photo("road-trip") },
         { caption: "Chai face", date: "Daily", tone: "dusk", src: photo("chai-cheers") },
         { caption: "2am maggi", date: "Mar ’25", tone: "rose", src: photo("maggi-3am") },
         { caption: "The usual", date: "Always", tone: "sun", src: photo("misty-chai") },

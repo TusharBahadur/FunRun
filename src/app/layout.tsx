@@ -38,12 +38,11 @@ const plexMono = IBM_Plex_Mono({
 });
 
 // Hand: handwritten captions, notes and signatures inside gifts — the human touch.
-// Also writes Hindi. Not preloaded: only gift pages use it.
+// Also writes Hindi. Preloaded so gift previews never fall back to a thin system script.
 const kalam = Kalam({
   variable: "--font-kalam",
   subsets: ["latin", "latin-ext", "devanagari"],
   weight: ["400", "700"],
-  preload: false,
 });
 
 export const metadata: Metadata = {

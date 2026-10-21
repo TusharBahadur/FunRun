@@ -36,9 +36,12 @@ async function StudioLoader({ params, searchParams }: Pick<PageProps<"/studio/[s
     sender: fromName || template.story.sender,
   };
 
+  const designs = await getTemplates({ occasion: template.occasion });
+
   return (
     <Studio
       template={{ slug: template.slug, name: template.name, pricePaise: template.pricePaise, story }}
+      designs={designs}
       askNames={!toName && !fromName}
     />
   );
