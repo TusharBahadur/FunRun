@@ -7,10 +7,13 @@ import { Accented } from "@/components/experiences/birthday/accented";
 import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { catalogFont, type FontId } from "./font-catalog";
-import type { StoryPalette } from "./types";
+import type { LayerPosition, StoryPalette } from "./types";
 
 /** Fonts the sender picked for this page, keyed by field or `field:item`. */
 export const SceneFontsContext = createContext<Partial<Record<string, FontId>> | undefined>(undefined);
+
+/** Positions and lock states for child layers on this page, keyed by field or field:item. */
+export const ScenePositionsContext = createContext<Record<string, LayerPosition> | undefined>(undefined);
 
 export function fontKey(field: string, item?: number | null) {
   return item == null ? field : `${field}:${item}`;
@@ -38,6 +41,7 @@ export type StudioPick = { field?: string | null; item?: number | null; index?: 
 export type StudioEdit = {
   pick: { field?: string | null; item?: number | null };
   onPick: (next: StudioPick) => void;
+  onPositionChange?: (key: string, pos: { x: number; y: number }) => void;
 };
 export const StudioEditContext = createContext<StudioEdit | null>(null);
 
@@ -88,27 +92,40 @@ export function TurnButton({ className }: { className?: string }) {
 export function StudioSurface({ children }: { children: ReactNode }) {
   const studio = useStudioEdit();
   if (!studio) return children;
-  const stop = (e: React.SyntheticEvent) => e.stopPropagation();
   return (
     <div
-      onPointerDownCapture={stop}
-      onPointerUpCapture={stop}
+      onPointerDownCapture={(e) => {
+        const target = e.target as Element;
+        if (target.closest("[data-studio-unlocked]")) {
+          return;
+        }
+        e.stopPropagation();
+      }}
+      onPointerUpCapture={(e) => {
+        const target = e.target as Element;
+        if (target.closest("[data-studio-unlocked]")) {
+          return;
+        }
+        e.stopPropagation();
+      }}
       onKeyDownCapture={(e) => {
-        if (e.key === " " || e.key === "Enter") stop(e);
+        if (e.key === " " || e.key === "Enter") e.stopPropagation();
       }}
       onClickCapture={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
         const target = e.target as Element;
         const hit = target.closest("[data-studio-field]");
         const sceneEl = target.closest("[data-studio-scene]");
         const index = sceneEl ? Number(sceneEl.getAttribute("data-studio-scene")) : NaN;
         const item = hit?.getAttribute("data-studio-item");
-        studio.onPick({
-          field: hit?.getAttribute("data-studio-field") ?? null,
-          item: item ? Number(item) : null,
-          index: Number.isFinite(index) ? index : undefined,
-        });
+        if (hit) {
+          e.preventDefault();
+          e.stopPropagation();
+          studio.onPick({
+            field: hit.getAttribute("data-studio-field") ?? null,
+            item: item ? Number(item) : null,
+            index: Number.isFinite(index) ? index : undefined,
+          });
+        }
       }}
     >
       {children}
@@ -179,17 +196,80 @@ export function StudioHit({
 }) {
   const studio = useStudioEdit();
   const fonts = useContext(SceneFontsContext);
+  const positions = useContext(ScenePositionsContext);
+  const posKey = item != null ? `${field}:${item}` : field;
+  const pos = positions?.[posKey];
+  const isUnlocked = pos?.locked === false;
+
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
+
+  const curX = dragOffset ? dragOffset.x : (pos?.x ?? 0);
+  const curY = dragOffset ? dragOffset.y : (pos?.y ?? 0);
+  const transformStyle = curX !== 0 || curY !== 0 ? `translate3d(${curX}px, ${curY}px, 0)` : undefined;
+
   const face = catalogFont((item != null && fonts?.[fontKey(field, item)]) || fonts?.[field]);
-  const fontStyle = face
-    ? ({ "--field-face": face.stack, fontFamily: face.stack, fontVariationSettings: "normal" } as CSSProperties)
-    : undefined;
+  const fontStyle: CSSProperties = {
+    ...(face ? { "--field-face": face.stack, fontFamily: face.stack, fontVariationSettings: "normal" } : {}),
+    ...(transformStyle ? { transform: transformStyle } : {}),
+    ...(isUnlocked ? { touchAction: "none", userSelect: "none" } : {}),
+  };
+
   const on = !!studio && studio.pick.field === field && (item === undefined ? studio.pick.item == null : studio.pick.item === item);
-  if (!studio && !face) return children;
+  if (!studio && !face && !transformStyle) return children;
+
+  const onPointerDown = isUnlocked && studio ? (e: React.PointerEvent) => {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    e.preventDefault();
+
+    studio.onPick({ field, item });
+
+    const elem = e.currentTarget as HTMLElement;
+    const pointerId = e.pointerId;
+    try {
+      elem.setPointerCapture(pointerId);
+    } catch {}
+
+    const startClientX = e.clientX;
+    const startClientY = e.clientY;
+    const startX = pos?.x ?? 0;
+    const startY = pos?.y ?? 0;
+    let latestX = startX;
+    let latestY = startY;
+
+    const onPointerMove = (ev: PointerEvent) => {
+      ev.preventDefault();
+      const dx = ev.clientX - startClientX;
+      const dy = ev.clientY - startClientY;
+      latestX = Math.round(Math.max(-250, Math.min(250, startX + dx)));
+      latestY = Math.round(Math.max(-250, Math.min(250, startY + dy)));
+      setDragOffset({ x: latestX, y: latestY });
+    };
+
+    const onPointerUp = (ev: PointerEvent) => {
+      ev.preventDefault();
+      try {
+        elem.releasePointerCapture(pointerId);
+      } catch {}
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
+      setDragOffset(null);
+      studio.onPositionChange?.(posKey, { x: latestX, y: latestY });
+    };
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
+  } : undefined;
+
   return (
     <Tag
       data-studio-field={studio ? field : undefined}
       data-studio-item={studio ? item : undefined}
       data-field-font={face ? "" : undefined}
+      data-studio-unlocked={isUnlocked ? "" : undefined}
+      onPointerDown={onPointerDown}
       style={fontStyle}
       className={cn(
         "max-w-full",
@@ -197,6 +277,7 @@ export function StudioHit({
         studio && "pointer-events-auto cursor-pointer rounded-[0.65rem] transition-[box-shadow,background-color]",
         on && "bg-white/15 shadow-[0_0_0_2px_#e23b54,0_0_0_6px_rgba(226,59,84,.35)]",
         studio && !on && "hover:shadow-[0_0_0_1.5px_rgba(255,255,255,.7)]",
+        studio && isUnlocked && "ring-2 ring-amber-500 ring-offset-2 ring-offset-paper/60 cursor-grab active:cursor-grabbing",
         className,
       )}
     >

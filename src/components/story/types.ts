@@ -23,6 +23,17 @@ export type Track = {
   /** Uploaded audio as a data URL. */
   file?: string;
   fileName?: string;
+  /** Title extracted from video/audio metadata. */
+  title?: string;
+  /** Extracted YouTube video ID. */
+  youtubeId?: string;
+};
+
+/** Individual child layer position on canvas and locked status (locked by default). */
+export type LayerPosition = {
+  x?: number;
+  y?: number;
+  locked?: boolean;
 };
 
 /** Shared headline block most scenes start with, plus per-scene studio settings. */
@@ -45,6 +56,8 @@ type Heading = {
   nav?: string;
   /** A font per field on this page, keyed by field name; `list` covers every item in the page's list. */
   fonts?: Partial<Record<string, FontId>>;
+  /** Position offsets and lock states for child layers on this page (locked by default). */
+  positions?: Record<string, LayerPosition>;
 };
 
 export type Photo = {
@@ -92,7 +105,7 @@ export type Scene =
   | ({ type: "award" } & Heading & { photo?: string; engraving: string })
   | ({ type: "map" } & Heading & { pins: { place: string; when: string; memory: string }[] })
   // Reading and endings
-  | ({ type: "letter" } & Heading & { paragraphs: string[]; signoff: string; /** A photo pinned to the corner of the letter. */ photo?: string })
+  | ({ type: "letter" } & Heading & { greeting?: string; meta?: string; paragraphs: string[]; signoff: string; /** A photo pinned to the corner of the letter. */ photo?: string })
   | ({ type: "numbers" } & Heading & { stats: { value: number; suffix?: string; label: string }[] })
   | ({ type: "wishes" } & Heading & { wishes: { name: string; message: string }[] })
   | ({ type: "voice" } & Heading & { transcript: string; seconds: number })

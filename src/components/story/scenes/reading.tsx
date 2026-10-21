@@ -39,12 +39,16 @@ export function LetterScene({ scene, done }: SceneProps<S<"letter">>) {
           </motion.div>
           </StudioHit>
         )}
-        <p className="type-hand pl-6 text-[1.05rem] leading-[34px] opacity-55">
-          For {to} · from {from}
-        </p>
-        <p className="type-hand pl-6 text-[2rem] font-bold leading-[34px]" style={{ color: palette.accent }}>
-          Dear {to},
-        </p>
+        <StudioHit field="meta">
+          <p className="type-hand pl-6 text-[1.05rem] leading-[34px] opacity-55">
+            {scene.meta !== undefined ? (scene.meta ? fill(scene.meta) : "") : fill(`For ${to} · from ${from}`)}
+          </p>
+        </StudioHit>
+        <StudioHit field="greeting">
+          <p className="type-hand pl-6 text-[2rem] font-bold leading-[34px]" style={{ color: palette.accent }}>
+            {scene.greeting !== undefined ? (scene.greeting ? fill(scene.greeting) : "") : fill(`Dear ${to},`)}
+          </p>
+        </StudioHit>
         <div className="type-hand mt-[34px] space-y-[34px] pl-6 text-[1.28rem] leading-[34px]">
           {scene.paragraphs.map((p, i) => (
             <StudioHit key={i} field="paragraphs" item={i}>

@@ -53,6 +53,19 @@ export const familyStories = [
         reaction: "m-kuchu-puchu",
       },
       {
+        type: "polaroids",
+        eyebrow: "Our memories",
+        title: "Moments I *treasure with you.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Your gentle smile", date: "Every day", tone: "sun" },
+          { caption: "That trip together", date: "Diwali '24", tone: "rose" },
+          { caption: "Chai and stories", date: "Sundays", tone: "leaf" },
+          { caption: "Always by my side", date: "Forever", tone: "dusk" },
+        ],
+        stickers: [{ id: "b-flowers", at: "tr", size: "s" }],
+      },
+      {
         type: "letter",
         eyebrow: "From me",
         title: "{to}, *read this.*",
@@ -88,7 +101,7 @@ export const familyStories = [
         label: "Cool-o-meter",
         levels: ["Sandals with socks", "Decent", "Pretty cool", "Coolest dad on the street", "Broke the meter"],
         done: "Results are in. Coolest {to}.",
-        stickers: [{ id: "m-side-eye", at: "br" }],
+        stickers: [{ id: "crown", at: "br" }],
         reaction: "m-ahhh",
       },
       {
@@ -105,7 +118,7 @@ export const familyStories = [
         ],
         total: "Bill kaun bharega? He did.",
         done: "I’ll get the next one. (I’ll try.)",
-        stickers: [{ id: "m-side-eye", at: "br" }],
+        stickers: [{ id: "crown", at: "br" }],
         reaction: "m-bow-down",
       },
       {
@@ -121,7 +134,7 @@ export const familyStories = [
           "“I’m proud of you.” (Rare. Remembered forever.)",
         ],
         done: "I’ll be saying these to my kids.",
-        stickers: [{ id: "m-hat-dog", at: "tl", size: "s" }],
+        stickers: [{ id: "b-besties", at: "tl", size: "s" }],
         reaction: "m-heart-monkey",
       },
       {
@@ -133,6 +146,19 @@ export const familyStories = [
         terms: "I make the chai · you do commentary · no work calls",
         done: "See you Sunday.",
         stickers: [{ id: "chai", at: "tl", size: "s" }],
+      },
+      {
+        type: "polaroids",
+        eyebrow: "The archive",
+        title: "Some of our *favourite days.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Teaching me life", date: "Day 1", tone: "sun" },
+          { caption: "That Sunday drive", date: "Summer '24", tone: "dusk" },
+          { caption: "The classic Papa pose", date: "Holiday", tone: "rose" },
+          { caption: "My hero, always", date: "Forever", tone: "leaf" },
+        ],
+        stickers: [{ id: "crown", at: "tr", size: "s" }],
       },
       {
         type: "letter",
@@ -171,7 +197,7 @@ export const familyStories = [
         sub: "She already knows. We all know.",
         done: "Your reign continues.",
         stickers: [{ id: "crown", at: "tr", size: "s" }],
-        reaction: "m-scream-cat",
+        reaction: "m-heart-monkey",
       },
       {
         type: "jar",
@@ -199,6 +225,19 @@ export const familyStories = [
         done: "I’m already boiling the water.",
         stickers: [{ id: "chai", at: "tr", size: "s" }],
         reaction: "m-kuchu-puchu",
+      },
+      {
+        type: "polaroids",
+        eyebrow: "Evidence",
+        title: "Best sister in the *whole world.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Partners in crime", date: "Childhood", tone: "rose" },
+          { caption: "Stealing each other's clothes", date: "Always", tone: "sun" },
+          { caption: "Late-night chats", date: "Last week", tone: "dusk" },
+          { caption: "My favourite person", date: "Forever", tone: "leaf" },
+        ],
+        stickers: [{ id: "b-besties", at: "tr", size: "s" }],
       },
       {
         type: "letter",
@@ -237,7 +276,7 @@ export const familyStories = [
         label: "{to}-meter",
         levels: ["Mild", "Regular", "Professional", "National-level", "Broke the meter (love him though)"],
         done: "Certified menace. Favourite menace.",
-        stickers: [{ id: "m-side-eye", at: "br" }],
+        stickers: [{ id: "crown", at: "br" }],
         reaction: "m-ahhh",
       },
       {
@@ -253,7 +292,7 @@ export const familyStories = [
           "Showing up anyway, every time it actually mattered.",
         ],
         done: "The last one is why you get this gift.",
-        stickers: [{ id: "m-hat-dog", at: "tl", size: "s" }],
+        stickers: [{ id: "b-besties", at: "tl", size: "s" }],
         reaction: "m-heart-monkey",
       },
       {
@@ -266,6 +305,19 @@ export const familyStories = [
         done: "Saturday. Don’t be late. You will be late.",
         stickers: [{ id: "b-tiny-heart", at: "tr", size: "s" }],
         reaction: "m-kuchu-puchu",
+      },
+      {
+        type: "polaroids",
+        eyebrow: "The camera roll",
+        title: "Troublemakers *for life.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Before we fought", date: "Years ago", tone: "sun" },
+          { caption: "That epic roadtrip", date: "Dec '24", tone: "dusk" },
+          { caption: "Always got my back", date: "Every day", tone: "leaf" },
+          { caption: "Brothers for life", date: "Forever", tone: "rose" },
+        ],
+        stickers: [{ id: "crown", at: "tr", size: "s" }],
       },
       {
         type: "letter",

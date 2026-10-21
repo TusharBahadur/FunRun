@@ -337,6 +337,19 @@ export const birthdayStories = [
         reaction: "m-ahhh",
       },
       {
+        type: "polaroids",
+        eyebrow: "The year in pictures",
+        title: "Look how *gorgeous your year was.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Main character energy", date: "Jan '24", tone: "sun" },
+          { caption: "Unstoppable joy", date: "June '24", tone: "rose" },
+          { caption: "Best trip ever", date: "Nov '24", tone: "dusk" },
+          { caption: "Here's to your best year yet", date: "Today", tone: "leaf" },
+        ],
+        stickers: [{ id: "sparkles", at: "tr", size: "s" }],
+      },
+      {
         type: "cake",
         eyebrow: "Lights off, everyone",
         title: "Everyone’s singing. *Blow!*",

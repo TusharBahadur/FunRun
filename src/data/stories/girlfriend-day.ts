@@ -49,6 +49,19 @@ export const girlfriendDayStories = [
         reaction: "m-kuchu-puchu",
       },
       {
+        type: "polaroids",
+        eyebrow: "The fan-cam",
+        title: "Photos I *stare at for hours.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Golden hour perfection", date: "Sunday", tone: "sun" },
+          { caption: "That breathtaking smile", date: "Coffee run", tone: "rose" },
+          { caption: "Candid and gorgeous", date: "Walks", tone: "dusk" },
+          { caption: "Prettiest girl alive", date: "Forever", tone: "leaf" },
+        ],
+        stickers: [{ id: "b-flowers", at: "tr", size: "s" }],
+      },
+      {
         type: "letter",
         eyebrow: "From your sidekick",
         title: "Happy Girlfriend’s *Day.*",
@@ -255,6 +268,19 @@ export const girlfriendDayStories = [
         transcript: "{to}, thank you for being the best girlfriend in the whole universe. I’m so lucky. Happy Girlfriend’s Day!",
         seconds: 9,
         stickers: [{ id: "m-penguin", at: "bl" }],
+      },
+      {
+        type: "polaroids",
+        eyebrow: "Our gallery",
+        title: "The girl of *all my dreams.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Where it all started", date: "Day 1", tone: "sun" },
+          { caption: "Our happiest vacation", date: "Summer '24", tone: "rose" },
+          { caption: "Purest happiness", date: "Autumn", tone: "dusk" },
+          { caption: "Girlfriend of the century", date: "Forever", tone: "leaf" },
+        ],
+        stickers: [{ id: "crown", at: "tr", size: "s" }],
       },
       {
         type: "letter",

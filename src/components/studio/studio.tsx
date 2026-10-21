@@ -21,7 +21,7 @@ import { LeftPanel } from "./layers";
 import { MobileEditor, PageSwitcher } from "./mobile-editor";
 import { MobilePreview } from "./mobile-preview";
 import { NamesDialog } from "./names-dialog";
-import { deleteSelected, insertScene } from "./ops";
+import { deleteSelected, insertScene, updateScene } from "./ops";
 import { sceneSchemas } from "./schema";
 
 export type StudioTemplate = { slug: string; name: string; pricePaise: number; story: Story };
@@ -95,6 +95,8 @@ export function Studio({
   const outdated = draft.base !== initial.base;
   const frames = useRef(new Map<string, HTMLIFrameElement>());
   const previewFrame = useRef<HTMLIFrameElement>(null);
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
 
   const scenes = draft.story.scenes;
   const sceneIdx = !isLook(sel.scene) && sel.scene !== null && scenes[sel.scene] ? sel.scene : 0;
@@ -150,6 +152,24 @@ export function Studio({
           if (i >= 0) scene = i;
         }
         setSel({ scene, item: e.data.item ?? null, field: e.data.field ?? null });
+      }
+      if (e.data?.type === "tynitales:studio-position" && e.source !== previewFrame.current?.contentWindow) {
+        let scene = sceneIdx;
+        if (typeof e.data.index === "number") {
+          let seen = -1;
+          const i = frameStory.scenes.findIndex((s) => !s.hidden && ++seen === e.data.index);
+          if (i >= 0) scene = i;
+        }
+        const curDraft = draftRef.current;
+        const s = curDraft.story.scenes[scene];
+        if (s) {
+          const curPos = s.positions?.[e.data.key] ?? {};
+          const nextPositions = {
+            ...(s.positions ?? {}),
+            [e.data.key]: { ...curPos, ...e.data.pos, locked: false },
+          };
+          edit(updateScene(curDraft, scene, { positions: nextPositions }), `${scene}-pos-${e.data.key}`);
+        }
       }
     };
     window.addEventListener("message", onMessage);
@@ -396,7 +416,7 @@ export function Studio({
               <X className="size-4" /> Close preview
             </button>
             <div className="h-[min(88vh,844px)] w-[min(92vw,calc(min(88vh,844px)*390/844))] overflow-hidden rounded-[2rem] border-[8px] border-ink bg-paper">
-              <iframe ref={previewFrame} src="/studio/frame" title="Preview of your gift" className="size-full border-0" onLoad={postPreview} />
+              <iframe ref={previewFrame} src="/studio/frame" title="Preview of your gift" allow="autoplay; encrypted-media" className="size-full border-0" onLoad={postPreview} />
             </div>
             <p className="type-label mt-3 text-[10px] text-paper/70">This is exactly what they’ll see</p>
           </motion.div>

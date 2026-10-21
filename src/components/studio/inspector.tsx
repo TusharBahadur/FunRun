@@ -1,7 +1,6 @@
 "use client";
 
-import {
-  ArrowDown,
+import {ArrowDown,
   ArrowUp,
   ChevronDown,
   ChevronRight,
@@ -14,6 +13,8 @@ import {
   Trash2,
   Upload,
   X,
+  Lock as LockIcon,
+  Unlock as UnlockIcon,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import {
@@ -25,7 +26,7 @@ import {
   Toggle,
 } from "@/components/editor/fields";
 import type { FontId } from "@/components/story/font-catalog";
-import type { Scene, StoryPalette } from "@/components/story/types";
+import type { LayerPosition, Scene, StoryPalette } from "@/components/story/types";
 import { keepNames, showNames } from "@/lib/gift-names";
 import { cn } from "@/lib/utils";
 import { type Draft } from "./draft-store";
@@ -41,6 +42,7 @@ import {
   readItems,
   updateItem,
   updateScene,
+  setFieldPosition,
 } from "./ops";
 import { FieldFontPicker, FontPickerScope } from "./font-choices";
 import { isLook, LookSettings, setFieldFont } from "./look";
@@ -230,10 +232,20 @@ function SceneInspector({
               key={f.key}
               field={f}
               draft={draft}
-              value={(scene as unknown as Rec)[f.key]}
+              value={
+                (scene as unknown as Rec)[f.key] !== undefined
+                  ? (scene as unknown as Rec)[f.key]
+                  : f.key === "meta" && scene.type === "letter"
+                    ? "For {to} · from {from}"
+                    : f.key === "greeting" && scene.type === "letter"
+                      ? "Dear {to},"
+                      : ""
+              }
               onChange={(v) => set(f.key, v)}
               font={scene.fonts?.[f.key]}
               onFont={(id) => edit(setFieldFont(draft, i, f.key, id), `${i}-font-${f.key}`)}
+              position={scene.positions?.[f.key]}
+              onPosition={(pos) => edit(setFieldPosition(draft, i, f.key, pos), `${i}-pos-${f.key}`)}
               onRemove={
                 "optional" in f && f.optional
                   ? () => set(f.key, f.kind === "image" ? undefined : "")
@@ -814,31 +826,49 @@ function ItemInspector({
       <Group title="Content">
         {list.kind === "strings" ? (
           <>
-            <Field label={list.itemLabel}>
-              <TextArea
-                value={showNames(String(item ?? ""), draft.story)}
-                maxLength={400}
-                onChange={(e) => set(keepNames(e.target.value, draft.story))}
-              />
-            </Field>
+            {(() => {
+              const itemStr = showNames(String(item ?? ""), draft.story);
+              const charLimit = ("charMax" in list && typeof list.charMax === "number") ? list.charMax : 800;
+              return (
+                <Field label={list.itemLabel} counter={`${itemStr.length}/${charLimit}`}>
+                  <TextArea
+                    value={itemStr}
+                    maxLength={charLimit}
+                    onChange={(e) => set(keepNames(e.target.value, draft.story))}
+                  />
+                </Field>
+              );
+            })()}
             <FieldFontPicker
               value={scene.fonts?.[`${list.key}:${j}`]}
               sample={String(item ?? "")}
               onChange={(id) => edit(setFieldFont(draft, i, `${list.key}:${j}`, id), `${i}-font-${list.key}-${j}`)}
             />
+            <LayerPositionControl
+              label={`${list.itemLabel} position`}
+              position={scene.positions?.[`${list.key}:${j}`]}
+              onChange={(pos) => edit(setFieldPosition(draft, i, `${list.key}:${j}`, pos), `${i}-pos-${list.key}-${j}`)}
+            />
           </>
         ) : (
-          list.item.map((f) => (
-            <FieldEditor
-              key={f.key}
-              field={f}
-              draft={draft}
-              value={(item as Rec)[f.key]}
-              onChange={(v) => set({ ...(item as Rec), [f.key]: v })}
-              font={scene.fonts?.[`${f.key}:${j}`]}
-              onFont={(id) => edit(setFieldFont(draft, i, `${f.key}:${j}`, id), `${i}-font-${f.key}-${j}`)}
+          <>
+            {list.item.map((f) => (
+              <FieldEditor
+                key={f.key}
+                field={f}
+                draft={draft}
+                value={(item as Rec)[f.key]}
+                onChange={(v) => set({ ...(item as Rec), [f.key]: v })}
+                font={scene.fonts?.[`${f.key}:${j}`]}
+                onFont={(id) => edit(setFieldFont(draft, i, `${f.key}:${j}`, id), `${i}-font-${f.key}-${j}`)}
+              />
+            ))}
+            <LayerPositionControl
+              label={`${list.itemLabel} position`}
+              position={scene.positions?.[`${list.key}:${j}`]}
+              onChange={(pos) => edit(setFieldPosition(draft, i, `${list.key}:${j}`, pos), `${i}-pos-${list.key}-${j}`)}
             />
-          ))
+          </>
         )}
         {(list.key === "photos" || list.key === "songs") && (
           <PhotoPicker
@@ -847,6 +877,15 @@ function ItemInspector({
             onChange={(src) => set({ ...(item as Rec), src })}
           />
         )}
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={() => setSel({ scene: i, item: null, field: null })}
+            className="text-xs text-muted hover:text-ink underline"
+          >
+            ← Back to all ${sceneSchemas[scene.type].name} fields
+          </button>
+        </div>
         {list.key === "songs" && (
           <TrackField
             value={{
@@ -966,6 +1005,8 @@ export function FieldEditor({
   hideLabel,
   font,
   onFont,
+  position,
+  onPosition,
   onRemove,
 }: {
   field: FieldDef;
@@ -977,6 +1018,8 @@ export function FieldEditor({
   hideLabel?: boolean;
   font?: FontId;
   onFont?: (id?: FontId) => void;
+  position?: LayerPosition;
+  onPosition?: (pos: LayerPosition) => void;
   onRemove?: () => void;
 }) {
   const input = roomy ? "min-h-12 text-base" : undefined;
@@ -1260,5 +1303,133 @@ export function IconAction({
     >
       {children}
     </button>
+  );
+}
+
+
+export function LayerPositionControl({
+  position,
+  onChange,
+  label = "Layer position",
+}: {
+  position?: LayerPosition;
+  onChange: (next: LayerPosition) => void;
+  label?: string;
+}) {
+  const isLocked = position?.locked !== false; // Locked by default!
+  const x = position?.x ?? 0;
+  const y = position?.y ?? 0;
+
+  return (
+    <div className="mt-2.5 rounded-xl border border-line bg-paper/60 p-2.5 text-xs">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 font-medium">
+          {isLocked ? (
+            <>
+              <LockIcon className="size-3.5 text-muted" />
+              <span className="text-muted">{label}: <span className="font-semibold text-ink">Locked</span></span>
+            </>
+          ) : (
+            <>
+              <UnlockIcon className="size-3.5 text-amber-600" />
+              <span className="text-amber-700 font-semibold">{label}: Unlocked</span>
+            </>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => onChange({ ...position, locked: !isLocked })}
+          className={cn(
+            "rounded-md px-2 py-1 text-[11px] font-medium transition-colors",
+            isLocked
+              ? "bg-cream text-ink hover:bg-blush/60 border border-line"
+              : "bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-300",
+          )}
+        >
+          {isLocked ? "Unlock to move" : "Lock position"}
+        </button>
+      </div>
+
+      {!isLocked && (
+        <div className="mt-2 space-y-2 border-t border-line/60 pt-2">
+          <div>
+            <div className="flex justify-between text-[10px] text-muted">
+              <span>Horizontal offset (X)</span>
+              <span className="font-mono">{x > 0 ? `+${x}px` : `${x}px`}</span>
+            </div>
+            <input
+              type="range"
+              min={-120}
+              max={120}
+              value={x}
+              onChange={(e) => onChange({ ...position, locked: false, x: Number(e.target.value) })}
+              className="mt-1 h-1.5 w-full cursor-pointer rounded-lg bg-line accent-ink"
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between text-[10px] text-muted">
+              <span>Vertical offset (Y)</span>
+              <span className="font-mono">{y > 0 ? `+${y}px` : `${y}px`}</span>
+            </div>
+            <input
+              type="range"
+              min={-120}
+              max={120}
+              value={y}
+              onChange={(e) => onChange({ ...position, locked: false, y: Number(e.target.value) })}
+              className="mt-1 h-1.5 w-full cursor-pointer rounded-lg bg-line accent-ink"
+            />
+          </div>
+
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-[10px] text-muted">Nudge:</span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                title="Nudge left"
+                onClick={() => onChange({ ...position, locked: false, x: Math.max(-120, x - 5) })}
+                className="grid size-6 place-items-center rounded bg-paper text-ink shadow-xs hover:bg-cream"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                title="Nudge right"
+                onClick={() => onChange({ ...position, locked: false, x: Math.min(120, x + 5) })}
+                className="grid size-6 place-items-center rounded bg-paper text-ink shadow-xs hover:bg-cream"
+              >
+                →
+              </button>
+              <button
+                type="button"
+                title="Nudge up"
+                onClick={() => onChange({ ...position, locked: false, y: Math.max(-120, y - 5) })}
+                className="grid size-6 place-items-center rounded bg-paper text-ink shadow-xs hover:bg-cream"
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                title="Nudge down"
+                onClick={() => onChange({ ...position, locked: false, y: Math.min(120, y + 5) })}
+                className="grid size-6 place-items-center rounded bg-paper text-ink shadow-xs hover:bg-cream"
+              >
+                ↓
+              </button>
+            </div>
+            {(x !== 0 || y !== 0) && (
+              <button
+                type="button"
+                onClick={() => onChange({ ...position, locked: false, x: 0, y: 0 })}
+                className="text-[10px] text-muted underline hover:text-ink"
+              >
+                Reset (0,0)
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

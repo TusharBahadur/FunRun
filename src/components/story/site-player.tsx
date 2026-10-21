@@ -8,7 +8,7 @@ import { giftFontRoot } from "./gift-fonts";
 import { Confetti, type ConfettiHandle } from "@/components/experiences/confetti";
 import { cn } from "@/lib/utils";
 import { useGiftMusic } from "./gift-music";
-import { SceneFontsContext, StoryContext, type SceneProps, type StoryApi } from "./scene-kit";
+import { SceneFontsContext, ScenePositionsContext, StoryContext, type SceneProps, type StoryApi } from "./scene-kit";
 import { SCENES } from "./scene-registry";
 import { CountdownSection, GallerySection, HeroSection, NoticedSection, PlaylistSection, SiteLetter } from "./scenes/site";
 import { ReactionSticker, StickerLayer } from "./stickers";
@@ -199,14 +199,16 @@ function SiteBlock({ scene, index, studio, refCb }: { scene: Scene; index: numbe
   const Game = SCENES[scene.type];
   return (
     <div ref={refCb} data-studio-scene={index} className="relative scroll-mt-0 lg:scroll-mt-24">
-      {scene.type !== "knock" && <StickerLayer stickers={scene.stickers} />}
-      <SceneFontsContext.Provider value={scene.fonts}>
-        {Section ? (
-          <Section scene={scene} done={done} onDone={() => setDone(true)} />
-        ) : (
-          <Game scene={scene} done={done} onDone={() => setDone(true)} />
-        )}
-      </SceneFontsContext.Provider>
+      <ScenePositionsContext.Provider value={scene.positions}>
+        <SceneFontsContext.Provider value={scene.fonts}>
+          {scene.type !== "knock" && <StickerLayer stickers={scene.stickers} />}
+          {Section ? (
+            <Section scene={scene} done={done} onDone={() => setDone(true)} />
+          ) : (
+            <Game scene={scene} done={done} onDone={() => setDone(true)} />
+          )}
+        </SceneFontsContext.Provider>
+      </ScenePositionsContext.Provider>
       {!passiveScenes.includes(scene.type) && <ReactionSticker id={scene.reaction} show={done} />}
     </div>
   );

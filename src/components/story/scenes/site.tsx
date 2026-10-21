@@ -7,7 +7,7 @@ import { Accented } from "@/components/experiences/birthday/accented";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
 import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import { playHtmlAudio, trackHref, trackSrc } from "../gift-music";
+import { playHtmlAudio, playTrackAudio, trackHref, trackSrc, getTrackPlayable, type Stopper } from "../gift-music";
 import { StudioHit, TurnButton, useStudioEdit, useStory, type SceneProps } from "../scene-kit";
 import type { Scene, Track } from "../types";
 
@@ -329,10 +329,10 @@ function SongPlayButton({
   style?: CSSProperties;
 }) {
   const studio = useStudioEdit();
-  const src = trackSrc(song);
+  const playable = getTrackPlayable(song);
   const href = trackHref(song, title) ?? "#";
   const [on, setOn] = useState(false);
-  const handle = useRef<ReturnType<typeof playHtmlAudio> | null>(null);
+  const handle = useRef<Stopper | null>(null);
 
   useEffect(() => () => handle.current?.stop(), []);
 
@@ -345,7 +345,7 @@ function SongPlayButton({
       </span>
     );
   }
-  if (src) {
+  if (playable) {
     return (
       <button
         type="button"
@@ -360,7 +360,7 @@ function SongPlayButton({
             setOn(false);
             return;
           }
-          handle.current = playHtmlAudio(src, { onEnd: () => setOn(false), onStop: () => setOn(false) });
+          handle.current = playTrackAudio(song, { onEnd: () => setOn(false), onStop: () => setOn(false) });
           setOn(true);
         }}
       >

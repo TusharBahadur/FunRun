@@ -1,7 +1,7 @@
 "use client";
 
 import { Reorder } from "motion/react";
-import { ChevronRight, Eye, EyeOff, GripVertical, ImagePlus, Plus, Trash2 } from "lucide-react";
+import { ChevronRight, Eye, EyeOff, GripVertical, Image as ImgIcon, ImagePlus, Lock as LockIcon, Plus, Sparkles, Trash2, Type, Unlock as UnlockIcon } from "lucide-react";
 import { useState } from "react";
 import type { Scene } from "@/components/story/types";
 import { cn } from "@/lib/utils";
@@ -99,9 +99,27 @@ function Layers({ draft, sel, setSel, edit }: { draft: Draft; sel: Selection; se
           const list = childField(scene.type);
           const items = list ? readItems(scene, list.key) : [];
           const stickers = scene.stickers ?? [];
-          const hasKids = items.length > 0 || stickers.length > 0;
-          const expanded = open.has(i) || (sel.scene === i && (sel.item !== null || !!sel.field?.startsWith("sticker-")));
-          const active = sel.scene === i;
+          const sceneRecord = scene as unknown as Record<string, unknown>;
+          const fieldLayers = schema.fields.filter(
+            (f) =>
+              f !== list &&
+              (f.kind === "text" || f.kind === "textarea" || f.kind === "image") &&
+              (f.key === "meta" || f.key === "greeting" || (sceneRecord[f.key] !== undefined && sceneRecord[f.key] !== ""))
+          );
+          const hasKids = fieldLayers.length > 0 || items.length > 0 || stickers.length > 0;
+          const expanded = open.has(i) || (sel.scene === i && (sel.item !== null || sel.field !== null));
+          const active = sel.scene === i && sel.item === null && sel.field === null;
+
+          const toggleLock = (layerKey: string) => {
+            const cur = scene.positions?.[layerKey] ?? {};
+            const nextLocked = cur.locked === false ? true : false;
+            const nextPositions = {
+              ...(scene.positions ?? {}),
+              [layerKey]: { ...cur, locked: nextLocked },
+            };
+            edit(updateScene(draft, i, { positions: nextPositions }));
+          };
+
           return (
             <Reorder.Item key={sceneKey(scene)} value={scene} className="group list-none">
               <div
@@ -135,63 +153,143 @@ function Layers({ draft, sel, setSel, edit }: { draft: Draft; sel: Selection; se
                 </button>
               </div>
               {expanded && hasKids && (
-                <ul className="ml-9 border-l border-line pl-2">
-                  {list &&
-                    items.map((item, j) => (
-                      <li key={`${list.key}-${j}`} className="group/kid flex items-center">
+                <ul className="ml-7 border-l border-line pl-1.5 space-y-0.5 mt-0.5">
+                  {/* Field layers (Headline, Label, Greeting, Pinned Photo, etc.) */}
+                  {fieldLayers.map((f) => {
+                    const layerKey = f.key;
+                    const isLocked = scene.positions?.[layerKey]?.locked !== false;
+                    const isSel = sel.scene === i && sel.field === layerKey && sel.item === null;
+                    return (
+                      <li key={layerKey} className="group/kid flex items-center gap-1 rounded-md px-1 py-0.5 hover:bg-paper/40">
                         <button
                           type="button"
-                          onClick={() => setSel({ scene: i, item: j, field: list.key })}
+                          onClick={() => setSel({ scene: i, item: null, field: layerKey })}
                           className={cn(
-                            "min-w-0 flex-1 truncate rounded-md px-2 py-1 text-left text-xs",
-                            sel.scene === i && sel.item === j ? "bg-paper font-medium" : "text-muted hover:bg-paper/60 hover:text-ink",
+                            "flex min-w-0 flex-1 items-center gap-1.5 truncate rounded px-1.5 py-1 text-left text-xs",
+                            isSel ? "bg-paper font-medium text-ink shadow-2xs" : "text-muted hover:text-ink",
                           )}
                         >
-                          {showNames(list.kind === "list" ? list.title(item as Record<string, unknown>) : String(item), draft.story)}
+                          {f.kind === "image" ? (
+                            <ImgIcon className="size-3 shrink-0 text-ink/60" />
+                          ) : (
+                            <Type className="size-3 shrink-0 text-ink/60" />
+                          )}
+                          <span className="truncate">{f.label}</span>
                         </button>
                         <button
                           type="button"
-                          aria-label={`Remove this ${list.itemLabel.toLowerCase()}`}
-                          disabled={items.length <= 1}
+                          title={isLocked ? "Position locked (default). Click to unlock." : "Position unlocked. Click to lock."}
+                          onClick={() => toggleLock(layerKey)}
+                          className={cn(
+                            "grid size-6 shrink-0 place-items-center rounded hover:bg-paper transition-colors",
+                            isLocked ? "text-muted" : "text-amber-600 bg-amber-50"
+                          )}
+                        >
+                          {isLocked ? <LockIcon className="size-3" /> : <UnlockIcon className="size-3" />}
+                        </button>
+                      </li>
+                    );
+                  })}
+
+                  {/* List / Strings items (Paragraphs, Photos, Cards, etc.) */}
+                  {list &&
+                    items.map((item, j) => {
+                      const layerKey = `${list.key}:${j}`;
+                      const isLocked = scene.positions?.[layerKey]?.locked !== false;
+                      const isSel = sel.scene === i && sel.item === j;
+                      return (
+                        <li key={layerKey} className="group/kid flex items-center gap-1 rounded-md px-1 py-0.5 hover:bg-paper/40">
+                          <button
+                            type="button"
+                            onClick={() => setSel({ scene: i, item: j, field: list.key })}
+                            className={cn(
+                              "flex min-w-0 flex-1 items-center gap-1.5 truncate rounded px-1.5 py-1 text-left text-xs",
+                              isSel ? "bg-paper font-medium text-ink shadow-2xs" : "text-muted hover:text-ink",
+                            )}
+                          >
+                            {list.key === "photos" ? (
+                              <ImgIcon className="size-3 shrink-0 text-ink/60" />
+                            ) : (
+                              <Type className="size-3 shrink-0 text-ink/60" />
+                            )}
+                            <span className="truncate">
+                              {showNames(list.kind === "list" ? list.title(item as Record<string, unknown>) : String(item), draft.story)}
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            title={isLocked ? "Position locked (default). Click to unlock." : "Position unlocked. Click to lock."}
+                            onClick={() => toggleLock(layerKey)}
+                            className={cn(
+                              "grid size-6 shrink-0 place-items-center rounded hover:bg-paper transition-colors",
+                              isLocked ? "text-muted" : "text-amber-600 bg-amber-50"
+                            )}
+                          >
+                            {isLocked ? <LockIcon className="size-3" /> : <UnlockIcon className="size-3" />}
+                          </button>
+                          <button
+                            type="button"
+                            aria-label={`Remove this ${list.itemLabel.toLowerCase()}`}
+                            disabled={items.length <= 1}
+                            onClick={() => {
+                              const next = deleteSelected(draft, { scene: i, item: j, field: list.key });
+                              if (!next) return;
+                              edit(next.draft);
+                              setSel(next.sel);
+                            }}
+                            className="grid size-6 shrink-0 place-items-center text-rose-deep disabled:opacity-30"
+                          >
+                            <Trash2 className="size-3" />
+                          </button>
+                        </li>
+                      );
+                    })}
+
+                  {/* Stickers */}
+                  {stickers.map((_, n) => {
+                    const layerKey = `sticker-${n}`;
+                    const isLocked = scene.positions?.[layerKey]?.locked !== false;
+                    const isSel = sel.scene === i && sel.field === layerKey;
+                    return (
+                      <li key={layerKey} className="group/kid flex items-center gap-1 rounded-md px-1 py-0.5 hover:bg-paper/40">
+                        <button
+                          type="button"
+                          onClick={() => setSel({ scene: i, item: null, field: layerKey })}
+                          className={cn(
+                            "flex min-w-0 flex-1 items-center gap-1.5 truncate rounded px-1.5 py-1 text-left text-xs",
+                            isSel ? "bg-paper font-medium text-ink shadow-2xs" : "text-muted hover:text-ink",
+                          )}
+                        >
+                          <Sparkles className="size-3 shrink-0 text-ink/60" />
+                          <span className="truncate">Sticker {n + 1}</span>
+                        </button>
+                        <button
+                          type="button"
+                          title={isLocked ? "Position locked (default). Click to unlock." : "Position unlocked. Click to lock."}
+                          onClick={() => toggleLock(layerKey)}
+                          className={cn(
+                            "grid size-6 shrink-0 place-items-center rounded hover:bg-paper transition-colors",
+                            isLocked ? "text-muted" : "text-amber-600 bg-amber-50"
+                          )}
+                        >
+                          {isLocked ? <LockIcon className="size-3" /> : <UnlockIcon className="size-3" />}
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Remove this sticker"
                           onClick={() => {
-                            const next = deleteSelected(draft, { scene: i, item: j, field: list.key });
+                            const next = deleteSelected(draft, { scene: i, item: null, field: layerKey });
                             if (!next) return;
                             edit(next.draft);
                             setSel(next.sel);
                           }}
-                          className="grid size-6 shrink-0 place-items-center text-rose-deep disabled:opacity-30"
+                          className="grid size-6 shrink-0 place-items-center text-rose-deep"
                         >
                           <Trash2 className="size-3" />
                         </button>
                       </li>
-                    ))}
-                  {stickers.map((_, n) => (
-                    <li key={`sticker-${n}`} className="group/kid flex items-center">
-                      <button
-                        type="button"
-                        onClick={() => setSel({ scene: i, item: null, field: `sticker-${n}` })}
-                        className={cn(
-                          "min-w-0 flex-1 truncate rounded-md px-2 py-1 text-left text-xs",
-                          sel.scene === i && sel.field === `sticker-${n}` ? "bg-paper font-medium" : "text-muted hover:bg-paper/60 hover:text-ink",
-                        )}
-                      >
-                        Sticker {n + 1}
-                      </button>
-                      <button
-                        type="button"
-                        aria-label="Remove this sticker"
-                        onClick={() => {
-                          const next = deleteSelected(draft, { scene: i, item: null, field: `sticker-${n}` });
-                          if (!next) return;
-                          edit(next.draft);
-                          setSel(next.sel);
-                        }}
-                        className="grid size-6 shrink-0 place-items-center text-rose-deep"
-                      >
-                        <Trash2 className="size-3" />
-                      </button>
-                    </li>
-                  ))}
+                    );
+                  })}
                 </ul>
               )}
             </Reorder.Item>

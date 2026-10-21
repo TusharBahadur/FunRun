@@ -74,6 +74,19 @@ export const anniversaryStories = [
         reaction: "m-kuchu-puchu",
       },
       {
+        type: "polaroids",
+        eyebrow: "Our camera roll",
+        title: "Three years of *good days.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Day one", date: "Year 1", tone: "sun" },
+          { caption: "Rainy Lonavala trip", date: "Year 2", tone: "dusk" },
+          { caption: "Our favourite flat", date: "Year 3", tone: "rose" },
+          { caption: "Still my person", date: "Now", tone: "leaf" },
+        ],
+        stickers: [{ id: "b-tiny-heart", at: "tr", size: "s" }],
+      },
+      {
         type: "letter",
         eyebrow: "Okay, the sappy part",
         title: "Three years. *Still you.*",
@@ -269,6 +282,19 @@ export const anniversaryStories = [
         done: "Same wish as mine, I bet.",
         stickers: [{ id: "sparkles", at: "tl", size: "s" }],
         reaction: "m-heart-eyes",
+      },
+      {
+        type: "polaroids",
+        eyebrow: "Our journey",
+        title: "Look at *us through the years.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Where it started", date: "2023", tone: "sun" },
+          { caption: "Best trip ever", date: "2024", tone: "dusk" },
+          { caption: "Home with you", date: "2025", tone: "rose" },
+          { caption: "Forever us", date: "Always", tone: "leaf" },
+        ],
+        stickers: [{ id: "sparkles", at: "tr", size: "s" }],
       },
       {
         type: "letter",

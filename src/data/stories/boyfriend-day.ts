@@ -49,6 +49,19 @@ export const boyfriendDayStories = [
         reaction: "m-kuchu-puchu",
       },
       {
+        type: "polaroids",
+        eyebrow: "Camera roll",
+        title: "My *favourite boy* in the world.",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Looking handsome as always", date: "Weekend", tone: "sun" },
+          { caption: "That laugh I love", date: "Summer", tone: "rose" },
+          { caption: "Mid-conversation cute", date: "Coffee date", tone: "dusk" },
+          { caption: "My favourite human", date: "Forever", tone: "leaf" },
+        ],
+        stickers: [{ id: "b-cheek", at: "tr", size: "s" }],
+      },
+      {
         type: "letter",
         eyebrow: "From your biggest fan",
         title: "Happy Boyfriend’s *Day.*",
@@ -255,6 +268,19 @@ export const boyfriendDayStories = [
         transcript: "{to}, thank you for being the easiest person to love. Happy Boyfriend’s Day. I’m keeping you.",
         seconds: 8,
         stickers: [{ id: "m-penguin", at: "bl" }],
+      },
+      {
+        type: "polaroids",
+        eyebrow: "Hall of fame",
+        title: "Unbeatable *leading man.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "First date vibes", date: "Day 1", tone: "sun" },
+          { caption: "Our favourite holiday", date: "Summer '24", tone: "rose" },
+          { caption: "Pure unfiltered happiness", date: "Autumn", tone: "dusk" },
+          { caption: "Boyfriend of every year", date: "Always", tone: "leaf" },
+        ],
+        stickers: [{ id: "crown", at: "tr", size: "s" }],
       },
       {
         type: "letter",

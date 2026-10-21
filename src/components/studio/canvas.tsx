@@ -122,6 +122,7 @@ export function Canvas({
                   }}
                   src="/studio/frame"
                   title={`${d.label} artboard`}
+                  allow="autoplay; encrypted-media"
                   className="absolute left-0 top-0 origin-top-left border-0"
                   style={{ width: d.w, height: d.h, transform: `scale(${zoom})`, opacity: hidden ? 0.55 : 1 }}
                 />

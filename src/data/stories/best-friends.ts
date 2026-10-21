@@ -49,6 +49,19 @@ export const bestFriendsStories = [
         reaction: "m-heart-monkey",
       },
       {
+        type: "polaroids",
+        eyebrow: "Camera roll dump",
+        title: "A few of my *favourite chaotic moments.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Certified chaos", date: "Jan '24", tone: "sun" },
+          { caption: "Before we did something dumb", date: "Spring", tone: "rose" },
+          { caption: "Uncontrollable giggles", date: "Summer", tone: "dusk" },
+          { caption: "Ride or die", date: "Forever", tone: "leaf" },
+        ],
+        stickers: [{ id: "b-besties", at: "tr", size: "s" }],
+      },
+      {
         type: "letter",
         eyebrow: "The sincere paragraph",
         title: "Happy Best Friends *Day.*",
@@ -246,6 +259,19 @@ export const bestFriendsStories = [
         transcript: "{to}, you’re my person. That’s the whole speech. Happy Best Friends Day. Come over.",
         seconds: 6,
         stickers: [{ id: "m-penguin", at: "bl" }],
+      },
+      {
+        type: "polaroids",
+        eyebrow: "The highlight reel",
+        title: "The years *look good on us.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Day one friendship", date: "Year 1", tone: "sun" },
+          { caption: "Roadtrip madness", date: "Year 2", tone: "rose" },
+          { caption: "Late nights & life talks", date: "Year 3", tone: "dusk" },
+          { caption: "Always my person", date: "Now", tone: "leaf" },
+        ],
+        stickers: [{ id: "sparkles", at: "tr", size: "s" }],
       },
       {
         type: "letter",

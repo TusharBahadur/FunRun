@@ -74,6 +74,17 @@ export default function StudioFramePage() {
                   window.location.origin,
                 );
               },
+              onPositionChange: (key, pos) => {
+                window.parent?.postMessage(
+                  {
+                    type: "tynitales:studio-position",
+                    key,
+                    pos,
+                    index: shown.current,
+                  },
+                  window.location.origin,
+                );
+              },
             }
           : undefined
       }

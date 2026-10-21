@@ -54,6 +54,7 @@ export function MobilePreview({
               else frames.current.delete("mobile");
             }}
             src="/studio/frame"
+            allow="autoplay; encrypted-media"
             title={`Live preview, ${sceneLabel}. Tap anything to edit it.`}
             scrolling="no"
             className="absolute left-0 top-0 origin-top-left border-0"

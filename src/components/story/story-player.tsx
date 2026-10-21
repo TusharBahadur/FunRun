@@ -9,7 +9,7 @@ import { accentMoodVars } from "@/components/experiences/birthday/accent-moods";
 import { giftFontRoot } from "./gift-fonts";
 import { useGiftMusic } from "./gift-music";
 import { autoTurn, turnLabel } from "./labels";
-import { SceneFontsContext, StoryContext, StudioEditContext, StudioSurface, TurnContext, type StoryApi, type StudioEdit } from "./scene-kit";
+import { SceneFontsContext, ScenePositionsContext, StoryContext, StudioEditContext, StudioSurface, TurnContext, type StoryApi, type StudioEdit } from "./scene-kit";
 import { SCENES } from "./scene-registry";
 import { SitePlayer } from "./site-player";
 import { ReactionSticker, StickerLayer } from "./stickers";
@@ -189,11 +189,13 @@ function PagesPlayer({
             data-studio-scene={safeIndex}
             className="relative"
           >
-            {scene.type !== "knock" && <StickerLayer stickers={scene.stickers} />}
             {/* The studio shows every page finished, so what you edit is on screen without playing for it. */}
-            <SceneFontsContext.Provider value={scene.fonts}>
-              <SceneView scene={scene} done={pageDone} onDone={studio ? noop : () => complete(safeIndex)} />
-            </SceneFontsContext.Provider>
+            <ScenePositionsContext.Provider value={scene.positions}>
+              <SceneFontsContext.Provider value={scene.fonts}>
+                {scene.type !== "knock" && <StickerLayer stickers={scene.stickers} />}
+                <SceneView scene={scene} done={pageDone} onDone={studio ? noop : () => complete(safeIndex)} />
+              </SceneFontsContext.Provider>
+            </ScenePositionsContext.Provider>
           </motion.main>
         </AnimatePresence>
 

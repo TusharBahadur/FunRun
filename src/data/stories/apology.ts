@@ -56,6 +56,19 @@ export const apologyStories = [
         reaction: "m-kuchu-puchu",
       },
       {
+        type: "polaroids",
+        eyebrow: "Us on good days",
+        title: "We're *way too good* to stay mad.",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "When we couldn't stop laughing", date: "Summer", tone: "sun" },
+          { caption: "Our favourite chai spot", date: "Fall", tone: "rose" },
+          { caption: "Us being silly", date: "Winter", tone: "leaf" },
+          { caption: "My favourite human", date: "Always", tone: "dusk" },
+        ],
+        stickers: [{ id: "b-heart-peek", at: "tr", size: "s" }],
+      },
+      {
         type: "letter",
         eyebrow: "Okay, for real",
         title: "I’m *sorry.*",
@@ -146,6 +159,19 @@ export const apologyStories = [
         done: "Friends again!!",
         stickers: [{ id: "m-penguin", at: "br" }],
         reaction: "m-dance-cat",
+      },
+      {
+        type: "polaroids",
+        eyebrow: "The good times",
+        title: "Worth *every single second.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Best afternoon ever", date: "Trip '24", tone: "sun" },
+          { caption: "Unfiltered smiles", date: "October", tone: "rose" },
+          { caption: "Just us being us", date: "November", tone: "dusk" },
+          { caption: "Still your biggest fan", date: "Forever", tone: "leaf" },
+        ],
+        stickers: [{ id: "b-hug-hearts", at: "tl", size: "s" }],
       },
       {
         type: "letter",

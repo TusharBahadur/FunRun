@@ -135,3 +135,20 @@ export function deleteSelected(d: Draft, sel: Sel): { draft: Draft; sel: Sel } |
 
   return null;
 }
+
+export function setFieldPosition(
+  d: Draft,
+  i: number,
+  key: string,
+  pos?: { x?: number; y?: number; locked?: boolean }
+): Draft {
+  const scene = d.story.scenes[i];
+  if (!scene) return d;
+  const positions = { ...(scene.positions ?? {}) };
+  if (!pos) {
+    delete positions[key];
+  } else {
+    positions[key] = pos;
+  }
+  return updateScene(d, i, { positions: Object.keys(positions).length ? positions : undefined });
+}

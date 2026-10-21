@@ -68,6 +68,19 @@ export const friendshipStories = [
         reaction: "m-kuchu-puchu",
       },
       {
+        type: "polaroids",
+        eyebrow: "Squad archive",
+        title: "Moments *you can't make up.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "The whole crew", date: "Classic", tone: "sun" },
+          { caption: "Uncontrollable laughter", date: "Summer", tone: "rose" },
+          { caption: "Late night chai runs", date: "3 AM", tone: "dusk" },
+          { caption: "Real ones forever", date: "Always", tone: "leaf" },
+        ],
+        stickers: [{ id: "b-besties", at: "tr", size: "s" }],
+      },
+      {
         type: "letter",
         eyebrow: "Okay, one sincere bit",
         title: "Happy Friendship *Day.*",

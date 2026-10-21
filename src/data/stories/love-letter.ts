@@ -52,6 +52,19 @@ export const loveLetterStories = [
         reaction: "m-penguin",
       },
       {
+        type: "polaroids",
+        eyebrow: "Snapshot in time",
+        title: "Every picture *feels like home.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "The day I fell in love", date: "Day 1", tone: "sun" },
+          { caption: "Lost in the moment", date: "Rainy day", tone: "rose" },
+          { caption: "Holding your hand", date: "Last month", tone: "dusk" },
+          { caption: "You and me", date: "Forever", tone: "leaf" },
+        ],
+        stickers: [{ id: "b-couple", at: "tr", size: "s" }],
+      },
+      {
         type: "letter",
         eyebrow: "The actual letter",
         title: "Okay, *read this.*",
@@ -150,6 +163,19 @@ export const loveLetterStories = [
         hint: "Hold it, then let go",
         done: "Hope it’s about me.",
         stickers: [{ id: "b-tiny-heart", at: "tr", size: "s" }],
+      },
+      {
+        type: "polaroids",
+        eyebrow: "Chapter 6",
+        title: "Memories *under the stars.*",
+        hint: "Tap each photo to develop",
+        photos: [
+          { caption: "Late-night conversations", date: "2 AM", tone: "dusk" },
+          { caption: "Your eyes in the dark", date: "Starry night", tone: "sun" },
+          { caption: "Dancing slowly", date: "That evening", tone: "rose" },
+          { caption: "My midnight wish", date: "Always", tone: "leaf" },
+        ],
+        stickers: [{ id: "sparkles", at: "tr", size: "s" }],
       },
       {
         type: "letter",

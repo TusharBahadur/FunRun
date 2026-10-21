@@ -43,7 +43,7 @@ export type FieldDef =
   | { key: string; label: string; kind: "image"; help?: string; optional?: boolean }
   | { key: string; label: string; kind: "sticker"; help?: string; optional?: boolean }
   | { key: string; label: string; kind: "multi"; options: { value: string; label: string }[]; min: number; max: number }
-  | { key: string; label: string; kind: "strings"; itemLabel: string; max: number; placeholder?: string }
+  | { key: string; label: string; kind: "strings"; itemLabel: string; max: number; placeholder?: string; charMax?: number }
   | { key: string; label: string; kind: "list"; itemLabel: string; max: number; item: FieldDef[]; newItem: () => Record<string, unknown>; title: (item: Record<string, unknown>) => string };
 
 export type SceneCategory = "Website" | "Openers" | "About them" | "Games" | "Paper & keepsakes" | "Feelings" | "Reading" | "Endings";
@@ -73,7 +73,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Openers",
     icon: Mail,
     blurb: "Press and hold to break the seal; a note slides out.",
-    fields: [...heading, { key: "note", label: "Note inside", kind: "text", max: 60 }],
+    fields: [...heading, { key: "note", label: "Note inside", kind: "text", max: 250 }],
     create: () => ({ type: "seal", eyebrow: "For {to}", title: "Open this *slowly.*", hint: "Press and hold the seal", note: "I have something to tell you." }),
   },
   scratch: {
@@ -81,7 +81,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Openers",
     icon: Sparkles,
     blurb: "Scratch away the foil to reveal a message.",
-    fields: [...heading, { key: "reveal", label: "Hidden message", kind: "text", max: 60 }, { key: "sub", label: "Small print", kind: "text", max: 40 }],
+    fields: [...heading, { key: "reveal", label: "Hidden message", kind: "text", max: 250 }, { key: "sub", label: "Small print", kind: "text", max: 120 }],
     create: () => ({ type: "scratch", eyebrow: "A secret", title: "Scratch here, *gently.*", hint: "Scratch the card", reveal: "You’re my favourite person.", sub: "Always" }),
   },
   lights: {
@@ -89,7 +89,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Openers",
     icon: Lamp,
     blurb: "Light each candle; the room warms up and the message appears.",
-    fields: [...heading, { key: "candles", label: "Candles", kind: "number", min: 1, max: 6 }, { key: "reveal", label: "Headline once lit", kind: "text", max: 80 }],
+    fields: [...heading, { key: "candles", label: "Candles", kind: "number", min: 1, max: 6 }, { key: "reveal", label: "Headline once lit", kind: "text", max: 250 }],
     create: () => ({ type: "lights", eyebrow: "Shh…", title: "It’s a little *dark* in here.", hint: "Tap each candle", candles: 3, reveal: "Hi, *{to}.*" }),
   },
   knock: {
@@ -99,7 +99,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     blurb: "Answer the call. It takes a few rings — then the surprise picks up.",
     fields: [
       ...heading,
-      { key: "reveal", label: "What they say", kind: "text", max: 60 },
+      { key: "reveal", label: "What they say", kind: "text", max: 250 },
       { key: "caller", label: "Who’s calling", kind: "sticker", help: "Fills the phone before they pick up." },
       { key: "party", label: "After they pick up", kind: "sticker", help: "Fills the phone once the call connects." },
     ],
@@ -125,7 +125,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Openers",
     icon: Gift,
     blurb: "Tap the box until the lid flies off.",
-    fields: [...heading, { key: "inside", label: "What’s inside", kind: "text", max: 60 }, { key: "insideSub", label: "Small print", kind: "text", max: 40 }],
+    fields: [...heading, { key: "inside", label: "What’s inside", kind: "text", max: 200 }, { key: "insideSub", label: "Small print", kind: "text", max: 120 }],
     create: () => ({ type: "unwrap", eyebrow: "For {to}", title: "{from} sent you *something.*", hint: "Tap the box three times", taps: 3, inside: "A little surprise", insideSub: "Keep going ↓" }),
   },
   hero: {
@@ -241,7 +241,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     fields: [
       ...heading,
       { key: "photo", label: "Their photo", kind: "image", help: "A favourite photo of them, smiling.", optional: true },
-      { key: "tags", label: "Notes", kind: "strings", itemLabel: "Note", max: 6 },
+      { key: "tags", label: "Notes", kind: "strings", itemLabel: "Note", max: 6, charMax: 150 },
     ],
     create: () => ({ type: "spotlight", eyebrow: "Look who it is", title: "The *star* of the day.", hint: "Tap the photo", tone: "rose", tags: ["Best laugh in any room", "Gives the best hugs", "Secretly hilarious"] }),
   },
@@ -250,7 +250,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "About them",
     icon: Heart,
     blurb: "Floating bubbles; each one pops into a compliment.",
-    fields: [...heading, { key: "bubbles", label: "Compliments", kind: "strings", itemLabel: "Compliment", max: 9 }],
+    fields: [...heading, { key: "bubbles", label: "Compliments", kind: "strings", itemLabel: "Compliment", max: 9, charMax: 300 }],
     create: () => ({ type: "compliments", eyebrow: "Facts only", title: "Things I never *say enough.*", hint: "Pop every bubble", bubbles: ["You make hard days lighter.", "Your taste in music? Elite.", "You always know what to say."] }),
   },
   dandelion: {
@@ -274,7 +274,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Feelings",
     icon: Gauge,
     blurb: "Tap fast to push the meter past 100%.",
-    fields: [...heading, { key: "label", label: "Meter name", kind: "text", max: 30 }, { key: "levels", label: "Levels, low to high", kind: "strings", itemLabel: "Level", max: 6 }],
+    fields: [...heading, { key: "label", label: "Meter name", kind: "text", max: 100 }, { key: "levels", label: "Levels, low to high", kind: "strings", itemLabel: "Level", max: 6, charMax: 100 }],
     create: () => ({ type: "meter", eyebrow: "Honest answer", title: "How much do I *love you?*", hint: "Tap fast to fill it up", label: "Love level", levels: ["A lot", "Loads", "Tons", "Off the charts"] }),
   },
   receipt: {
@@ -307,7 +307,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Paper & keepsakes",
     icon: SquareStack,
     blurb: "Swipe through a stack of cards.",
-    fields: [...heading, { key: "cards", label: "Cards", kind: "strings", itemLabel: "Card", max: 10 }],
+    fields: [...heading, { key: "cards", label: "Cards", kind: "strings", itemLabel: "Card", max: 10, charMax: 400 }],
     create: () => ({ type: "deck", eyebrow: "Reasons", title: "Why it’s *you.*", hint: "Swipe or tap each card", cards: ["Your laugh.", "Your kindness.", "Everything else."] }),
   },
   coupon: {
@@ -315,7 +315,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Paper & keepsakes",
     icon: Ticket,
     blurb: "Drag the scissors to tear off a coupon.",
-    fields: [...heading, { key: "offer", label: "The offer", kind: "text", max: 50 }, { key: "terms", label: "Terms", kind: "text", max: 50 }],
+    fields: [...heading, { key: "offer", label: "The offer", kind: "text", max: 200 }, { key: "terms", label: "Terms", kind: "text", max: 200 }],
     create: () => ({ type: "coupon", eyebrow: "For you", title: "A little *something.*", hint: "Tear along the dotted line", offer: "One dinner, my treat", terms: "Valid forever" }),
   },
   jar: {
@@ -323,7 +323,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Paper & keepsakes",
     icon: Candy,
     blurb: "Shake the jar; a folded note pops out each time.",
-    fields: [...heading, { key: "notes", label: "Notes", kind: "strings", itemLabel: "Note", max: 10 }],
+    fields: [...heading, { key: "notes", label: "Notes", kind: "strings", itemLabel: "Note", max: 10, charMax: 400 }],
     create: () => ({ type: "jar", eyebrow: "Little notes", title: "A jar of *small things.*", hint: "Shake the jar for a note", notes: ["You make every day better.", "Thank you for being you."] }),
   },
   polaroids: {
@@ -365,7 +365,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
         max: 5,
         item: [
           { key: "q", label: "Question", kind: "text", max: 80 },
-          { key: "options", label: "Answers", kind: "strings", itemLabel: "Answer", max: 4 },
+          { key: "options", label: "Answers", kind: "strings", itemLabel: "Answer", max: 4, charMax: 40 },
           { key: "reply", label: "Reply after answering", kind: "text", max: 60 },
         ],
         newItem: () => ({ q: "What’s my favourite thing about you?", options: ["Your laugh", "Your heart", "Everything"], reply: "Correct. All of it." }),
@@ -397,7 +397,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Games",
     icon: Sparkles,
     blurb: "Connect the stars in a night sky until they make a heart.",
-    fields: [...heading, { key: "reveal", label: "Headline once drawn", kind: "text", max: 80 }],
+    fields: [...heading, { key: "reveal", label: "Headline once drawn", kind: "text", max: 250 }],
     create: () => ({ type: "stars", eyebrow: "Look up", title: "Connect the *stars.*", hint: "Tap the glowing star, then the next", reveal: "Written in the *stars.*" }),
   },
   question: {
@@ -419,7 +419,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Games",
     icon: Gem,
     blurb: "Tap to open a ring box; the ring rises and sparkles.",
-    fields: [...heading, { key: "question", label: "Question under the ring", kind: "text", max: 60 }],
+    fields: [...heading, { key: "question", label: "Question under the ring", kind: "text", max: 200 }],
     create: () => ({ type: "ringbox", eyebrow: "One more thing", title: "Open the *box.*", hint: "Tap the box", question: "Will you marry me?" }),
   },
   bouquet: {
@@ -427,7 +427,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Games",
     icon: Flower2,
     blurb: "Add flowers to a vase one by one; a card appears.",
-    fields: [...heading, { key: "flowers", label: "Flowers", kind: "number", min: 1, max: 24 }, { key: "card", label: "Card on the vase", kind: "text", max: 30 }],
+    fields: [...heading, { key: "flowers", label: "Flowers", kind: "number", min: 1, max: 24 }, { key: "card", label: "Card on the vase", kind: "text", max: 100 }],
     create: () => ({ type: "bouquet", eyebrow: "Fresh flowers", title: "A bouquet, *picked by me.*", hint: "Add five flowers", flowers: 5, card: "For you ♥" }),
   },
   award: {
@@ -472,13 +472,23 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     icon: PenLine,
     blurb: "Your words, revealed paragraph by paragraph.",
     fields: [
-      { key: "eyebrow", label: "Small label", kind: "text", max: 40 },
-      { key: "title", label: "Headline", kind: "text", max: 80, help: "Wrap words in *stars* to highlight them." },
-      { key: "paragraphs", label: "Paragraphs", kind: "strings", itemLabel: "Paragraph", max: 6 },
-      { key: "signoff", label: "Sign-off", kind: "text", max: 40 },
+      { key: "eyebrow", label: "Small label", kind: "text", max: 100, optional: true },
+      { key: "title", label: "Headline", kind: "text", max: 250, help: "Wrap words in *stars* to highlight them." },
+      { key: "meta", label: "Date & from / to", kind: "text", max: 150, placeholder: "e.g. For {to} · from {from}", optional: true },
+      { key: "greeting", label: "Greeting", kind: "text", max: 120, placeholder: "e.g. Dear {to},", optional: true },
+      { key: "paragraphs", label: "Paragraphs", kind: "strings", itemLabel: "Paragraph", max: 6, charMax: 800 },
+      { key: "signoff", label: "Sign-off", kind: "text", max: 120 },
       { key: "photo", label: "Pinned photo", kind: "image", help: "Optional: a photo of you two, pinned to the corner.", optional: true },
     ],
-    create: () => ({ type: "letter", eyebrow: "A letter", title: "Just so you *know.*", paragraphs: ["Write something from the heart."], signoff: "— {from}" }),
+    create: () => ({
+      type: "letter",
+      eyebrow: "A letter",
+      title: "Just so you *know.*",
+      meta: "For {to} · from {from}",
+      greeting: "Dear {to},",
+      paragraphs: ["Write something from the heart."],
+      signoff: "— {from}",
+    }),
   },
   numbers: {
     name: "By the numbers",
