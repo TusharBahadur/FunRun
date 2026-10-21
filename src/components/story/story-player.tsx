@@ -4,12 +4,11 @@ import { AnimatePresence, motion } from "motion/react";
 import { ChevronLeft, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Confetti, type ConfettiHandle } from "@/components/experiences/confetti";
-import { MusicBox } from "@/components/experiences/music-box";
 import { EASE_OUT } from "@/lib/motion";
 import { accentMoodVars } from "@/components/experiences/birthday/accent-moods";
 import { giftFontRoot } from "./gift-fonts";
+import { useGiftMusic } from "./gift-music";
 import { autoTurn, turnLabel } from "./labels";
-import { melodies } from "./melodies";
 import { SceneFontsContext, StoryContext, StudioEditContext, StudioSurface, TurnContext, type StoryApi, type StudioEdit } from "./scene-kit";
 import { SCENES } from "./scene-registry";
 import { SitePlayer } from "./site-player";
@@ -52,30 +51,23 @@ function PagesPlayer({
   onIndexChange,
   studio,
 }: PlayerProps) {
-  const scenes = useMemo(() => story.scenes.filter((s) => !s.hidden), [story.scenes]);
+  const scenes = useMemo(
+    () => story.scenes.filter((s) => !s.hidden && s.type !== "finale"),
+    [story.scenes],
+  );
   const [index, setIndex] = useState(() => Math.min(initialIndex, Math.max(0, scenes.length - 1)));
   const [done, setDone] = useState<boolean[]>(() => initialDone(scenes));
   const [run, setRun] = useState(0);
   const [nudge, setNudge] = useState(0);
-  const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
   const confetti = useRef<ConfettiHandle>(null);
-  const music = useRef<MusicBox | null>(null);
   const started = useRef(false);
+  const { playing, play, stop } = useGiftMusic(story);
 
   const playSong = useCallback(() => {
-    music.current ??= new MusicBox();
-    music.current.play(() => setPlaying(false), melodies[story.melody]);
-    setPlaying(true);
+    play({ openLink: true });
     setMuted(false);
-  }, [story.melody]);
-
-  const stopSong = useCallback(() => {
-    music.current?.stop();
-    setPlaying(false);
-  }, []);
-
-  useEffect(() => () => music.current?.stop(), []);
+  }, [play]);
 
   const complete = useCallback(
     (i: number) => {
@@ -83,10 +75,10 @@ function PagesPlayer({
       // The first finished gesture is the first moment browsers allow sound.
       if (!started.current) {
         started.current = true;
-        if (!muted) playSong();
+        if (!muted) play();
       }
     },
-    [muted, playSong],
+    [muted, play],
   );
 
   const go = useCallback(
@@ -166,16 +158,18 @@ function PagesPlayer({
   const SceneView = SCENES[scene.type];
   const last = safeIndex === scenes.length - 1;
   const pageDone = studio ? true : !!done[safeIndex];
-  const canNext = (pageDone || unlocked) && !last;
   const next = !last ? scenes[safeIndex + 1] : undefined;
+  const again = last && pageDone && !studio;
+  const canTurn = (pageDone || unlocked) && (!last || again);
 
   return (
     <StoryContext.Provider value={api}>
       <TurnContext.Provider
         value={{
-          label: next ? turnLabel(next, api.fill) : null,
-          ready: canNext,
-          onContinue: () => go(safeIndex + 1),
+          label: next ? turnLabel(next, api.fill) : again ? "Start again" : null,
+          ready: canTurn,
+          onContinue: again ? api.restart : () => go(safeIndex + 1),
+          again,
         }}
       >
       <div
@@ -222,7 +216,7 @@ function PagesPlayer({
           type="button"
           onClick={() => {
             if (playing) {
-              stopSong();
+              stop();
               setMuted(true);
             } else playSong();
           }}

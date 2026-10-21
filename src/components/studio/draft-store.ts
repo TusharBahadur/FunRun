@@ -161,3 +161,20 @@ export async function imageToDataUrl(file: File, maxSide = 1100, type: "image/jp
   bitmap.close();
   return c.toDataURL(type, 0.8);
 }
+
+/** Songs stay as data URLs so they travel with the draft. Keep them small enough for this device. */
+const AUDIO_MAX_BYTES = 4 * 1024 * 1024;
+
+export async function audioToDataUrl(file: File) {
+  const audio = file.type.startsWith("audio/") || /\.(mp3|m4a|aac|wav|ogg|opus|webm|flac)$/i.test(file.name);
+  if (!audio) throw new Error("Choose an audio file (mp3, m4a, wav).");
+  if (file.size > AUDIO_MAX_BYTES) {
+    throw new Error("Keep songs under 4 MB so they save with the gift. Or paste a link instead.");
+  }
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Couldn't read that file."));
+    reader.readAsDataURL(file);
+  });
+}

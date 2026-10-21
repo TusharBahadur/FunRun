@@ -10,7 +10,7 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { Cake, Camera, Flower2, Gem, Gift, Heart, Plane, type LucideIcon } from "lucide-react";
+import { Cake, Gem, Gift, Heart, HeartHandshake, Home, Sparkles, Users, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -20,9 +20,10 @@ const items: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Love", href: "/templates?occasion=love", icon: Heart },
   { label: "Birthday", href: "/templates?occasion=birthday", icon: Cake },
   { label: "Anniversary", href: "/templates?occasion=anniversary", icon: Gem },
-  { label: "Thank you", href: "/templates?occasion=thank-you", icon: Flower2 },
-  { label: "Long distance", href: "/templates?occasion=long-distance", icon: Plane },
-  { label: "Memories", href: "/templates?occasion=memories", icon: Camera },
+  { label: "Girlfriend's Day", href: "/templates?occasion=girlfriend-day", icon: Sparkles },
+  { label: "Boyfriend's Day", href: "/templates?occasion=boyfriend-day", icon: HeartHandshake },
+  { label: "Friendship", href: "/templates?occasion=friendship", icon: Users },
+  { label: "Family", href: "/templates?occasion=family", icon: Home },
 ];
 
 /** macOS-style magnifying dock for jumping straight into an occasion. */

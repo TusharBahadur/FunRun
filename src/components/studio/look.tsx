@@ -1,34 +1,17 @@
 "use client";
 
-import { palettes } from "@/data/stories/shared";
 import type { FontId } from "@/components/story/font-catalog";
 import type { StoryPalette } from "@/components/story/types";
+import { themeList } from "@/data/themes";
 import { cn } from "@/lib/utils";
 import { FontChoices } from "./font-choices";
 import { type Draft } from "./draft-store";
 import { updateScene } from "./ops";
+import { TrackField } from "./track-field";
 
 export const LOOK = -1;
 
-const themeNames: Record<keyof typeof palettes, string> = {
-  frosting: "Frosting",
-  butter: "Butter",
-  midnight: "Midnight",
-  mint: "Mint",
-  lavender: "Lavender",
-  ocean: "Ocean",
-  noir: "Noir & gold",
-  lilac: "Lilac",
-  peach: "Peach",
-  blush: "Blush",
-  wine: "Wine",
-};
-
-export const themeList = (Object.keys(palettes) as (keyof typeof palettes)[]).map((id) => ({
-  id,
-  name: themeNames[id],
-  palette: palettes[id],
-}));
+export { themeList };
 
 function samePalette(a: StoryPalette, b: StoryPalette) {
   return a.bg === b.bg && a.fg === b.fg && a.accent === b.accent && a.cream === b.cream;
@@ -36,7 +19,7 @@ function samePalette(a: StoryPalette, b: StoryPalette) {
 
 type Edit = (next: Draft, tag?: string) => void;
 
-/** First studio page: names, a colour theme, and the font for the whole gift. */
+/** First studio page: names, a colour theme, music, and the font for the whole gift. */
 export function LookSettings({ draft, edit }: { draft: Draft; edit: Edit }) {
   const { story } = draft;
   const selected = themeList.find((t) => samePalette(t.palette, story.palette));
@@ -90,16 +73,28 @@ export function LookSettings({ draft, edit }: { draft: Draft; edit: Edit }) {
                   on ? "border-ink" : "border-line",
                 )}
               >
-                <span className="flex h-14">
-                  <span className="flex-1" style={{ backgroundColor: t.palette.bg }} />
-                  <span className="w-8" style={{ backgroundColor: t.palette.accent }} />
-                  <span className="w-6" style={{ backgroundColor: t.palette.cream }} />
+                <span className="relative block h-[4.75rem] overflow-hidden px-2.5 pt-2.5" style={{ backgroundColor: t.palette.bg }}>
+                  <span className="absolute -right-3 -top-4 size-12 rounded-full" style={{ backgroundColor: t.palette.pink }} />
+                  <span
+                    className="relative block rounded-xl px-2.5 py-2 shadow-[0_8px_16px_-12px_rgba(27,18,21,.45)]"
+                    style={{ backgroundColor: t.palette.cream, color: t.palette.ink }}
+                  >
+                    <span className="block text-[11px] font-medium leading-none">{t.name}</span>
+                    <span className="mt-2 block h-1.5 w-9 rounded-full" style={{ backgroundColor: t.palette.accent }} />
+                  </span>
                 </span>
-                <span className="block px-3 py-2 text-sm font-medium">{t.name}</span>
               </button>
             );
           })}
         </div>
+      </section>
+
+      <section className="space-y-3">
+        <h3 className="text-base font-medium">Music</h3>
+        <p className="text-sm leading-snug text-muted">
+          Plays in the background of the whole gift. Paste a link, upload a file, or leave it and we’ll use the music box.
+        </p>
+        <TrackField roomy value={story.track} onChange={(track) => setStory({ track }, "music")} />
       </section>
 
       <FontChoices

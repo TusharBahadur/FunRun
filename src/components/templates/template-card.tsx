@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowRight, Camera, Gamepad2, Globe, Layers, Mic, Music, Timer, Users, type LucideIcon } from "lucide-react";
+import { ArrowRight, Camera, Gamepad2, Globe, Layers, Mic, Music, Play, Timer, Users, type LucideIcon } from "lucide-react";
+import Link from "next/link";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { storyFacts } from "@/components/story/labels";
 import { TemplatePreview } from "@/components/templates/template-preview";
@@ -39,55 +40,69 @@ export function TemplateCard({ template, className }: { template: Template; clas
   const href = template.story ? `/studio/${template.slug}` : `/templates/${template.slug}`;
 
   return (
-      <a
-        href={href}
-        data-cursor="view"
-        className={cn("group block", className)}
-      >
+    <div className={cn(className)}>
+      <Link href={href} data-cursor="view" className="block">
         <TiltCard className="rounded-[1.75rem] shadow-[0_24px_50px_-28px_rgba(27,18,21,0.45)]">
           <TemplatePreview template={template} />
         </TiltCard>
+      </Link>
 
-        <div className="mt-5 px-1">
-          <p className="type-label flex items-center gap-2 text-[10px] opacity-60">
-            {occasion?.label}
-            {template.level && (
-              <>
-                <span aria-hidden>·</span>
-                {levelName[template.level]}
-              </>
-            )}
-            {template.story?.format === "site" && (
-              <>
-                <span aria-hidden>·</span>
-                Website
-              </>
-            )}
-            {template.isNew && <span className="rounded-full bg-rose-deep px-2 py-0.5 text-[9px] text-paper">New</span>}
-          </p>
-          <div className="mt-1.5 flex items-baseline justify-between gap-4">
-            <h3 className="type-heading text-xl">{template.name}</h3>
-            <span className="type-display shrink-0 text-xl font-semibold">{formatInr(template.pricePaise)}</span>
-          </div>
-          {/* The gift's opening line, in its own words. */}
-          <p className="mt-2 font-serif text-[1.05rem] leading-snug opacity-80">"{template.preview.title}"</p>
-
-          {chips.length > 0 && (
-            <ul className="mt-4 flex flex-wrap gap-1.5">
-              {chips.map((c) => (
-                <li key={c.label} className="flex items-center gap-1.5 rounded-full border border-current/15 px-2.5 py-1 text-xs opacity-80">
-                  <c.icon className="size-3.5" />
-                  {c.label}
-                </li>
-              ))}
-            </ul>
+      <div className="mt-5 px-1">
+        <p className="type-label flex items-center gap-2 text-[10px] opacity-60">
+          {occasion?.label}
+          {template.level && (
+            <>
+              <span aria-hidden>·</span>
+              {levelName[template.level]}
+            </>
           )}
+          {template.story?.format === "site" && (
+            <>
+              <span aria-hidden>·</span>
+              Website
+            </>
+          )}
+          {template.isNew && <span className="rounded-full bg-rose-deep px-2 py-0.5 text-[9px] text-paper">New</span>}
+        </p>
+        <Link href={href} data-cursor="view" className="mt-1.5 flex items-baseline justify-between gap-4">
+          <h3 className="type-heading text-xl">{template.name}</h3>
+          <span className="type-display shrink-0 text-xl font-semibold">{formatInr(template.pricePaise)}</span>
+        </Link>
+        {/* The gift's opening line, in its own words. */}
+        <p className="mt-2 font-serif text-[1.05rem] leading-snug opacity-80">"{template.preview.title}"</p>
 
-          <span className="mt-5 inline-flex h-10 items-center gap-1.5 rounded-full border border-current/25 px-4 text-sm font-medium transition-colors group-hover:border-rose-deep group-hover:bg-rose-deep group-hover:text-paper">
+        {chips.length > 0 && (
+          <ul className="mt-4 flex flex-wrap gap-1.5">
+            {chips.map((c) => (
+              <li key={c.label} className="flex items-center gap-1.5 rounded-full border border-current/15 px-2.5 py-1 text-xs opacity-80">
+                <c.icon className="size-3.5" />
+                {c.label}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          {template.experience && (
+            <Link
+              href={`/preview/${template.slug}`}
+              data-cursor="view"
+              className="inline-flex h-10 items-center gap-1.5 rounded-full border border-current/25 px-4 text-sm font-medium transition-colors hover:border-ink hover:bg-ink hover:text-paper"
+            >
+              <Play className="size-3.5 fill-current" />
+              Preview
+            </Link>
+          )}
+          <Link
+            href={href}
+            data-cursor="view"
+            className="group inline-flex h-10 items-center gap-1.5 rounded-full border border-current/25 px-4 text-sm font-medium transition-colors hover:border-rose-deep hover:bg-rose-deep hover:text-paper"
+          >
             Make it yours
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-          </span>
+          </Link>
         </div>
-      </a>
+      </div>
+    </div>
   );
 }

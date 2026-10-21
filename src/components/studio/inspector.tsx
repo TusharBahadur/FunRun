@@ -41,6 +41,7 @@ import {
 import { FieldFontPicker } from "./font-choices";
 import { isLook, LookSettings, setFieldFont } from "./look";
 import { childField, sceneSchemas, type FieldDef } from "./schema";
+import { TrackField } from "./track-field";
 import {
   boardStickerIds,
   drawnStickerIds,
@@ -734,18 +735,20 @@ function ItemInspector({
     >
       <Group title="Content">
         {list.kind === "strings" ? (
-          <Field label={list.itemLabel}>
-            <TextArea
-              value={showNames(String(item ?? ""), draft.story)}
-              maxLength={400}
-              onChange={(e) => set(keepNames(e.target.value, draft.story))}
-            />
+          <>
+            <Field label={list.itemLabel}>
+              <TextArea
+                value={showNames(String(item ?? ""), draft.story)}
+                maxLength={400}
+                onChange={(e) => set(keepNames(e.target.value, draft.story))}
+              />
+            </Field>
             <FieldFontPicker
               value={scene.fonts?.[`${list.key}:${j}`]}
               sample={String(item ?? "")}
               onChange={(id) => edit(setFieldFont(draft, i, `${list.key}:${j}`, id), `${i}-font-${list.key}-${j}`)}
             />
-          </Field>
+          </>
         ) : (
           list.item.map((f) => (
             <FieldEditor
@@ -764,6 +767,23 @@ function ItemInspector({
             draft={draft}
             src={(item as Rec).src as string | undefined}
             onChange={(src) => set({ ...(item as Rec), src })}
+          />
+        )}
+        {list.key === "songs" && (
+          <TrackField
+            value={{
+              link: (item as Rec).link as string | undefined,
+              file: (item as Rec).file as string | undefined,
+              fileName: (item as Rec).fileName as string | undefined,
+            }}
+            onChange={(track) =>
+              set({
+                ...(item as Rec),
+                link: track?.link,
+                file: track?.file,
+                fileName: track?.fileName,
+              })
+            }
           />
         )}
       </Group>
@@ -937,8 +957,8 @@ export function FieldEditor({
               onChange={(e) => onChange(keepNames(e.target.value, names))}
               className={input}
             />
-            {onFont && <FieldFontPicker value={font} sample={String(value ?? "")} onChange={onFont} />}
           </Field>
+          {onFont && <FieldFontPicker value={font} sample={String(value ?? "")} onChange={onFont} />}
           {onRemove && String(value ?? "") ? (
             <button type="button" onClick={onRemove} className="mt-1.5 text-sm text-rose-deep">
               Remove from this page
@@ -956,8 +976,8 @@ export function FieldEditor({
               onChange={(e) => onChange(keepNames(e.target.value, names))}
               className={input}
             />
-            {onFont && <FieldFontPicker value={font} sample={String(value ?? "")} onChange={onFont} />}
           </Field>
+          {onFont && <FieldFontPicker value={font} sample={String(value ?? "")} onChange={onFont} />}
           {onRemove && String(value ?? "") ? (
             <button type="button" onClick={onRemove} className="mt-1.5 text-sm text-rose-deep">
               Remove from this page

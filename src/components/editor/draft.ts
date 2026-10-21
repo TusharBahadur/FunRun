@@ -6,6 +6,7 @@ import type {
   PhotoTone,
 } from "@/components/experiences/birthday/types";
 import { demoBirthdayGift } from "@/data/demo-gifts";
+import { themeList } from "@/data/themes";
 
 /** Everything a sender can change in the "Make your own" editor. */
 export type Draft = {
@@ -47,45 +48,9 @@ export const wishLimit: Record<BirthdayTierId, number> = { candle: 0, wish: 0, p
 
 export type Theme = { id: string; name: string; palette: BirthdayPalette };
 
-export const themes: Theme[] = [
-  {
-    id: "frosting",
-    name: "Frosting",
-    palette: { bg: "#ffd6dc", fg: "#43111f", accent: "#e8344e", cream: "#fff4ef", pink: "#ffb3c1", gold: "#f6b73c", ink: "#43111f" },
-  },
-  {
-    id: "butter",
-    name: "Butter",
-    palette: { bg: "#fbe6b3", fg: "#3b2410", accent: "#e2683b", cream: "#fff8e8", pink: "#ffc9a8", gold: "#f6b73c", ink: "#3b2410" },
-  },
-  {
-    id: "midnight",
-    name: "Midnight",
-    palette: { bg: "#24113a", fg: "#fdeefe", accent: "#ff5c8a", cream: "#fff1f6", pink: "#ffb3d1", gold: "#ffd166", ink: "#24113a" },
-  },
-  {
-    id: "mint",
-    name: "Mint",
-    palette: { bg: "#d9efe3", fg: "#12352a", accent: "#ff6b5b", cream: "#f6fff9", pink: "#ffc2b8", gold: "#f6b73c", ink: "#12352a" },
-  },
-  {
-    id: "lavender",
-    name: "Lavender",
-    palette: { bg: "#e6dcfb", fg: "#2b1a4a", accent: "#7c4dff", cream: "#faf7ff", pink: "#d6c4ff", gold: "#ffcf5c", ink: "#2b1a4a" },
-  },
-  {
-    id: "ocean",
-    name: "Ocean",
-    palette: { bg: "#0f2a3d", fg: "#eaf6ff", accent: "#4cc9f0", cream: "#f2fbff", pink: "#a8e6ff", gold: "#ffd166", ink: "#0f2a3d" },
-  },
-  {
-    id: "noir",
-    name: "Noir & gold",
-    palette: { bg: "#141414", fg: "#f5f0e8", accent: "#e8c26b", cream: "#fbf6ec", pink: "#f2dfb4", gold: "#e8c26b", ink: "#141414" },
-  },
-];
+export const themes: Theme[] = themeList;
 
-const tierTheme: Record<BirthdayTierId, string> = { candle: "butter", wish: "frosting", party: "midnight" };
+const tierTheme: Record<BirthdayTierId, string> = { candle: "honey", wish: "strawberry", party: "moon" };
 
 export function defaultDraft(tier: BirthdayTierId = "wish"): Draft {
   const demo = demoBirthdayGift;

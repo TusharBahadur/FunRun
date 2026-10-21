@@ -4,7 +4,7 @@ replace them with their own photos.
 
 | File | Source |
 | --- | --- |
-| maya-portrait.jpg | https://unsplash.com/photos/1789500381106-ba13068a6520 |
+| maya-portrait.jpg | https://pin.it/1wLMWYsGE |
 | road-trip.jpg | https://unsplash.com/photos/1580825175616-77f8df1bb507 |
 | chai-cheers.jpg | https://unsplash.com/photos/1680413002471-965cca788f5b |
 | misty-chai.jpg | https://unsplash.com/photos/1695809725756-4cc167d0d15e |

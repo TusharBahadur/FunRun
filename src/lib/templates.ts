@@ -9,11 +9,13 @@ export type { Experience, Motif, Template } from "@/data/templates";
  * signatures, so pages and components stay untouched.
  */
 
+const playable = templates.filter((t) => t.story);
+
 export async function getTemplates(filter?: { occasion?: OccasionId }) {
-  if (!filter?.occasion) return templates;
-  return templates.filter((t) => t.occasion === filter.occasion);
+  if (!filter?.occasion) return playable;
+  return playable.filter((t) => t.occasion === filter.occasion);
 }
 
 export async function getTemplateBySlug(slug: string) {
-  return templates.find((t) => t.slug === slug) ?? null;
+  return playable.find((t) => t.slug === slug) ?? null;
 }

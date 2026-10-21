@@ -20,13 +20,11 @@ export function LevelCompare({ current, siblings }: { current: Template; sibling
     { label: "By the numbers", value: (i) => facts[i].numbers },
     { label: "Friends’ wishes", value: (i) => facts[i].wishes },
     { label: "Your voice note", value: (i) => facts[i].voice },
-    { label: "Thank-you reply", value: (i) => facts[i].thankYou },
-    { label: "Keepsake poster", value: (i) => facts[i].keepsake },
   ];
 
   return (
     <section className="mt-28">
-      <p className="type-label text-muted">Three ways to say it</p>
+      <p className="type-label text-muted">{cols.length === 2 ? "Two ways to say it" : "Three ways to say it"}</p>
       <h2 className="type-display mt-4 text-[clamp(2.2rem,5vw,4rem)]">
         Pick how <span className="type-accent text-rose">big</span> to go.
       </h2>

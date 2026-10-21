@@ -74,7 +74,7 @@ async function TemplateDetail({ params, searchParams }: Pick<PageProps<"/templat
       <div className="mt-10 grid items-start gap-12 md:grid-cols-12 md:gap-16">
         <div className="md:col-span-5">
           <TiltCard className="rounded-[1.75rem] shadow-[0_40px_80px_-40px_rgba(27,18,21,0.5)]">
-            <TemplatePreview template={template} />
+            <TemplatePreview template={template} playable />
           </TiltCard>
         </div>
 

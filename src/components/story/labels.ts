@@ -82,15 +82,13 @@ export function turnLabel(next: Scene, fill: (text: string) => string) {
 export const autoTurn: SceneType[] = ["dandelion", "stars", "match"];
 
 export function storyFacts(scenes: Scene[]) {
-  const finale = scenes.find((s) => s.type === "finale");
+  const playable = scenes.filter((s) => s.type !== "finale");
   return {
-    pages: scenes.length,
-    games: scenes.filter((s) => !passiveScenes.includes(s.type)).length,
-    wishes: scenes.some((s) => s.type === "wishes"),
-    voice: scenes.some((s) => s.type === "voice"),
-    letter: scenes.some((s) => s.type === "letter"),
-    numbers: scenes.some((s) => s.type === "numbers"),
-    thankYou: finale?.type === "finale" && !!finale.thankYou,
-    keepsake: finale?.type === "finale" && !!finale.keepsake,
+    pages: playable.length,
+    games: playable.filter((s) => !passiveScenes.includes(s.type)).length,
+    wishes: playable.some((s) => s.type === "wishes"),
+    voice: playable.some((s) => s.type === "voice"),
+    letter: playable.some((s) => s.type === "letter"),
+    numbers: playable.some((s) => s.type === "numbers"),
   };
 }

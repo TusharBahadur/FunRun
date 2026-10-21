@@ -1,6 +1,5 @@
 import { Heart, Phone, Sparkles, Video } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
-import { Accented } from "@/components/experiences/birthday/accented";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
 import { Sticker, type AnyStickerId, type StickerId } from "@/components/story/stickers";
 import type { Photo, Scene, Story, StoryPalette } from "@/components/story/types";
@@ -46,7 +45,8 @@ type Layout =
   | "envelope"
   | "site";
 
-// Every template has its own unique, dedicated layout
+// Every template has its own dedicated composition. Sites skip this map
+// and use SiteLayout via format === "site".
 const layoutFor: Record<string, Layout> = {
   candle: "candle",
   "make-a-wish": "cakescrapbook",
@@ -57,21 +57,24 @@ const layoutFor: Record<string, Layout> = {
   "sealed-with-love": "waxenvelope",
   "midnight-notes": "midnightchat",
   "forever-yours": "foreverscrapbook",
-  "the-question": "proposallayout",
-  "ring-box": "ringboxlayout",
-  "happily-ever-after": "fairytalelayout",
   "little-sorry": "apologychat",
   "white-flag": "trucelayout",
   "make-it-right": "couponlayout",
   "main-character": "magazinelayout",
   "top-fan": "fandecklayout",
   "girlfriend-of-the-year": "trophybrowser",
+  "leading-man": "magazinelayout",
+  "soft-launch": "filmstrip",
+  "boyfriend-of-the-year": "trophybrowser",
+  "the-band": "magazinelayout",
+  "patch-notes": "recipesitelayout",
+  "you-get-me": "recipesitelayout",
+  "partner-in-crime": "dadjokeslayout",
+  "my-person": "ringboxlayout",
   "for-maa": "recipelayout",
-  "maas-recipe": "recipesitelayout",
-  supermom: "supermomlayout",
   "for-papa": "papalayout",
-  "dad-jokes": "dadjokeslayout",
-  "my-hero": "herolayout",
+  "for-didi": "cakescrapbook",
+  "for-bhai": "filmstrip",
 };
 const fallbackLayouts: Layout[] = ["browser", "fan", "poster", "scrapbook", "envelope", "chat"];
 
@@ -195,10 +198,8 @@ function scenePhoto(scene: Scene): Photo | null {
   return null;
 }
 
-function accentTail(line: string, words = 2) {
-  const parts = line.split(" ");
-  if (parts.length <= words) return `*${line}*`;
-  return `${parts.slice(0, -words).join(" ")} *${parts.slice(-words).join(" ")}*`;
+function unstar(line: string) {
+  return line.replaceAll("*", "");
 }
 
 /* ───────────── The Static Mockup Card ───────────── */
@@ -283,7 +284,7 @@ function CandleLayout({ g }: { g: Gift }) {
       <Hearts color="#f59e0b" spots={[{ left: "10%", top: "75%", size: 4.5, delay: "0s" }, { left: "84%", top: "20%", size: 3.5, delay: "-3s" }]} />
       {/* 11:59 pm ambient digital time glow */}
       <div className="absolute inset-x-0 top-[6%] text-center font-mono text-[2.6cqw] uppercase tracking-[0.25em] text-amber-300/80">
-        11:59 PM · {g.kicker}
+        {g.kicker}
       </div>
 
       {/* Prominent phone showing the candle scene */}
@@ -381,7 +382,7 @@ function ProposalPosterLayout({ g }: { g: Gift }) {
     <Stage style={{ background: `radial-gradient(circle at 50% 30%, ${p.accent}55, transparent 65%), #140d12` }}>
       <Hearts color={p.accent} spots={[{ left: "12%", top: "20%", size: 5, delay: "0s" }, { left: "80%", top: "75%", size: 4, delay: "-3s" }]} />
       <p className="absolute inset-x-0 top-[6%] text-center font-mono text-[2.4cqw] uppercase tracking-[0.25em] text-amber-200">
-        TOP SECRET · A QUESTION FOR YOU
+        {g.kicker}
       </p>
 
       <PhoneFrame className="bottom-[8%] left-[22%] w-[56%]" rotate={-2}>
@@ -576,9 +577,7 @@ function ChatLayout({ g }: { g: Gift }) {
             <div className="overflow-hidden rounded-[2.2cqw]" style={{ backgroundColor: p.bg, color: p.fg }}>
               <div className="px-[3cqw] py-[3cqw] text-center">
                 <p className="font-mono text-[1.8cqw] uppercase opacity-70">{fill(first.eyebrow ?? g.kicker)}</p>
-                <p className="type-display mt-[1cqw] text-[4.4cqw]">
-                  <Accented text={fill(first.title)} color={p.accent} />
-                </p>
+                <p className="type-display mt-[1cqw] text-[4.4cqw]">{unstar(fill(first.title))}</p>
               </div>
             </div>
             <p className="px-[1.4cqw] pt-[1.2cqw] text-[2.4cqw] text-[#1b1215]">tynitales.com/for-{story.recipient.toLowerCase()}</p>
@@ -671,9 +670,7 @@ function PosterLayout({ g }: { g: Gift }) {
         <span className="self-start rounded-full border px-[2.6cqw] py-[0.8cqw] font-mono text-[2.4cqw] uppercase" style={{ borderColor: `${p.fg}55` }}>
           {g.kicker}
         </span>
-        <p className="type-display mt-[6cqw] text-[11.5cqw] leading-[0.95]">
-          <Accented text={accentTail(g.opening)} color={p.accent} />
-        </p>
+        <p className="type-display mt-[6cqw] text-[11.5cqw] leading-[0.95]">{unstar(g.opening)}</p>
         <div className="mt-auto flex items-center">
           <span className="ml-auto rounded-full px-[3.4cqw] py-[1.6cqw] text-[2.8cqw] font-medium" style={{ backgroundColor: p.accent, color: p.cream }}>
             Open it →
@@ -749,8 +746,8 @@ function SiteLayout({ g }: { g: Gift }) {
               ))}
             </span>
           </div>
-          <p className={cn(serif, "absolute inset-x-0 top-[38%] text-center text-[8cqw] leading-none text-white drop-shadow")}>
-            <Accented text={g.fill(hero?.title ?? g.opening)} color={p.pink} />
+          <p className="type-display absolute inset-x-0 top-[38%] text-center text-[8cqw] leading-none text-white drop-shadow">
+            {unstar(g.fill(hero?.title ?? g.opening))}
           </p>
           {hero?.subtitle && <p className={cn(serif, "absolute bottom-[4cqw] left-[4cqw] text-[5.6cqw] leading-none text-white")}>{g.fill(hero.subtitle)}</p>}
         </div>
@@ -821,9 +818,7 @@ export function ScreenPeek({ scene, g, className, big = false }: { scene: Scene;
           {g.fill(scene.eyebrow)}
         </span>
       )}
-      <p className={cn("type-display mt-[1.6cqw] text-balance", big ? "text-[5.6cqw]" : "text-[3.4cqw]")}>
-        <Accented text={title} color={palette.accent} />
-      </p>
+      <p className={cn("type-display mt-[1.6cqw] text-balance", big ? "text-[5.6cqw]" : "text-[3.4cqw]")}>{unstar(title)}</p>
 
       {photo ? (
         <div className={cn("relative mt-[3cqw] bg-white p-[1cqw] pb-[3.5cqw] shadow-[0_2cqw_3cqw_-2cqw_rgba(0,0,0,.4)]", big ? "w-[34%]" : "w-[78%]")} style={{ rotate: "-3deg" }}>
@@ -1056,7 +1051,7 @@ function ClassicCardFlowVideo({ template }: { template: Template }) {
         <div className="my-auto">
           <span className="font-mono text-[2.2cqw] uppercase tracking-wider opacity-70 block">{preview.kicker}</span>
           <p className="type-display mt-[1.5cqw] text-[6.5cqw] font-semibold leading-tight">{preview.title}</p>
-          <p className="mt-[2cqw] font-serif text-[3.4cqw] italic opacity-80">{preview.signoff}</p>
+          <p className="type-hand mt-[2cqw] text-[3.4cqw] opacity-80">{preview.signoff}</p>
         </div>
         <div className="flex justify-center">
           <Heart className="size-[8cqw] fill-rose-500 text-rose-500 animate-bounce" />

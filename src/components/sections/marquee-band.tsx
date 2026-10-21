@@ -5,10 +5,12 @@ const words = [
   "Love letters",
   "Birthdays",
   "Anniversaries",
-  "Thank yous",
-  "Long distance",
+  "Girlfriend's Day",
+  "Boyfriend's Day",
+  "Friendship",
+  "Best friends",
+  "Family",
   "Just because",
-  "Proposals",
   "Apologies",
 ];
 

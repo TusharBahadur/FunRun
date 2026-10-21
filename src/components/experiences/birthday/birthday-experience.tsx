@@ -230,7 +230,7 @@ export function BirthdayExperience({
                     transition={{ delay: 0.8, duration: 0.6 }}
                     className="flex flex-col items-center gap-3"
                   >
-                    <p className="type-accent text-3xl" style={{ color: palette.accent }}>
+                    <p className="type-display text-3xl" style={{ color: palette.accent }}>
                       Wish sent.
                     </p>
                     <p className="type-label opacity-70">Scroll, there&rsquo;s more ↓</p>

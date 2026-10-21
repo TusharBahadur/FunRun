@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Accented } from "@/components/experiences/birthday/accented";
@@ -50,6 +50,8 @@ export type TurnApi = {
   label: string | null;
   ready: boolean;
   onContinue: () => void;
+  /** Last page: replay instead of turning forward. */
+  again?: boolean;
 };
 export const TurnContext = createContext<TurnApi | null>(null);
 
@@ -71,8 +73,9 @@ export function TurnButton({ className }: { className?: string }) {
       )}
       style={{ backgroundColor: palette.accent, color: palette.cream }}
     >
+      {turn.again && <RotateCcw className="size-4" strokeWidth={2.5} aria-hidden />}
       {turn.label}
-      <ArrowRight className="size-4" strokeWidth={2.5} aria-hidden />
+      {!turn.again && <ArrowRight className="size-4" strokeWidth={2.5} aria-hidden />}
     </motion.button>
   );
 }
@@ -282,7 +285,7 @@ export function SceneShell({
           )}
           {doneText && (
             <StudioHit field="done" className="mx-auto w-fit">
-              <p className="type-accent text-2xl" style={{ color: accent }}>
+              <p className="type-hand text-2xl" style={{ color: accent }}>
                 {fill(doneText)}
               </p>
             </StudioHit>
@@ -297,7 +300,7 @@ export function SceneShell({
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="type-accent text-2xl"
+                className="type-hand text-2xl"
                 style={{ color: accent }}
               >
                 {fill(doneText)}

@@ -6,9 +6,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType }
 import { accentMoodVars } from "@/components/experiences/birthday/accent-moods";
 import { giftFontRoot } from "./gift-fonts";
 import { Confetti, type ConfettiHandle } from "@/components/experiences/confetti";
-import { MusicBox } from "@/components/experiences/music-box";
 import { cn } from "@/lib/utils";
-import { melodies } from "./melodies";
+import { useGiftMusic } from "./gift-music";
 import { SceneFontsContext, StoryContext, type SceneProps, type StoryApi } from "./scene-kit";
 import { SCENES } from "./scene-registry";
 import { CountdownSection, GallerySection, HeroSection, NoticedSection, PlaylistSection, SiteLetter } from "./scenes/site";
@@ -28,10 +27,10 @@ const SITE_SECTIONS: Partial<Record<SceneType, ComponentType<SceneProps<any>>>> 
 
 const navNames: Partial<Record<SceneType, string>> = {
   hero: "Home",
-  countdown: "Countdown",
+  countdown: "Days",
   noticed: "Notes",
   gallery: "Photos",
-  playlist: "Playlist",
+  playlist: "Songs",
   letter: "Letter",
 };
 
@@ -52,22 +51,16 @@ export function SitePlayer({
 }) {
   const scenes = useMemo(() => story.scenes.filter((s) => !s.hidden), [story.scenes]);
   const palette = story.palette;
-  const [playing, setPlaying] = useState(false);
   const [active, setActive] = useState(initialIndex);
   const confetti = useRef<ConfettiHandle>(null);
-  const music = useRef<MusicBox | null>(null);
   const sections = useRef<(HTMLElement | null)[]>([]);
   const reported = useRef(onIndexChange);
+  const { playing, play, stop } = useGiftMusic(story);
   useEffect(() => {
     reported.current = onIndexChange;
   }, [onIndexChange]);
 
-  const playSong = useCallback(() => {
-    music.current ??= new MusicBox();
-    music.current.play(() => setPlaying(false), melodies[story.melody]);
-    setPlaying(true);
-  }, [story.melody]);
-  useEffect(() => () => music.current?.stop(), []);
+  const playSong = useCallback(() => play({ openLink: true }), [play]);
 
   // Studio: open on the selected section.
   useEffect(() => {
@@ -132,7 +125,7 @@ export function SitePlayer({
           ...giftFace.style,
         }}
         onPointerDown={() => {
-          if (!playing && !music.current) playSong();
+          if (!playing) play();
         }}
       >
         <Confetti ref={confetti} colors={[palette.accent, palette.gold, palette.pink, palette.cream]} />
@@ -141,10 +134,10 @@ export function SitePlayer({
         {!studio && navItems.length > 1 && (
           <nav
             aria-label="Sections"
-            className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 lg:bottom-auto lg:top-5"
+            className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 lg:inset-x-0 lg:bottom-auto lg:top-5 lg:flex lg:justify-center lg:px-4"
           >
             <div
-              className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-full border p-1.5 shadow-[0_12px_30px_-14px_rgba(0,0,0,.35)] backdrop-blur-md"
+              className="flex w-full items-center gap-0.5 rounded-full border p-1 shadow-[0_12px_30px_-14px_rgba(0,0,0,.35)] backdrop-blur-md lg:w-auto lg:max-w-4xl lg:gap-1 lg:p-1.5"
               style={{ backgroundColor: `${palette.cream}cc`, borderColor: `${palette.cream}`, color: palette.ink }}
             >
               <span className="hidden shrink-0 px-3 font-serif text-sm font-semibold lg:block">{brand}</span>
@@ -153,7 +146,9 @@ export function SitePlayer({
                   key={n.i}
                   type="button"
                   onClick={() => sections.current[n.i]?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                  className={cn("type-label shrink-0 rounded-full px-3 py-2 text-[10px] transition-colors")}
+                  className={cn(
+                    "type-label min-w-0 flex-1 truncate rounded-full px-1 py-2 text-center text-[9px] tracking-[0.06em] transition-colors lg:flex-none lg:px-3 lg:text-[10px]",
+                  )}
                   style={active === n.i ? { backgroundColor: palette.accent, color: palette.cream } : undefined}
                 >
                   {n.label}
@@ -180,13 +175,11 @@ export function SitePlayer({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (playing) {
-                music.current?.stop();
-                setPlaying(false);
-              } else playSong();
+              if (playing) stop();
+              else play({ openLink: true });
             }}
             aria-label={playing ? "Stop the music" : "Play the music"}
-            className="fixed bottom-20 right-4 z-40 grid size-10 place-items-center rounded-full backdrop-blur lg:bottom-5"
+            className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-3 z-40 grid size-10 place-items-center rounded-full backdrop-blur lg:bottom-5 lg:right-4"
             style={{ backgroundColor: `${palette.cream}cc`, color: palette.ink }}
           >
             {playing ? <Volume2 className="size-4" /> : <VolumeX className="size-4 opacity-60" />}
@@ -205,7 +198,7 @@ function SiteBlock({ scene, index, studio, refCb }: { scene: Scene; index: numbe
   const Section = SITE_SECTIONS[scene.type];
   const Game = SCENES[scene.type];
   return (
-    <div ref={refCb} data-studio-scene={index} className="relative scroll-mt-0">
+    <div ref={refCb} data-studio-scene={index} className="relative scroll-mt-0 lg:scroll-mt-24">
       <StickerLayer stickers={scene.stickers} />
       <SceneFontsContext.Provider value={scene.fonts}>
         {Section ? (

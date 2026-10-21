@@ -1,14 +1,15 @@
 import { anniversaryStories } from "./anniversary";
 import { apologyStories } from "./apology";
+import { bestFriendsStories } from "./best-friends";
 import { birthdayStories } from "./birthday";
-import { fathersDayStories } from "./fathers-day";
+import { boyfriendDayStories } from "./boyfriend-day";
+import { familyStories } from "./family";
+import { friendshipStories } from "./friendship";
 import { girlfriendDayStories } from "./girlfriend-day";
 import { loveLetterStories } from "./love-letter";
-import { mothersDayStories } from "./mothers-day";
-import { proposalStories } from "./proposal";
-import { birthdayPage, fanPage, justForYou, ourCorner } from "./sites";
+import { birthdayPage, fanPage, hisPage, justForYou, ourCorner } from "./sites";
 
-/** The playable templates: three game stories per occasion (₹99 / ₹149 / ₹179), plus website-style gifts. */
+/** The playable templates: game stories per occasion (usually ₹99 / ₹149 / ₹179), plus website-style gifts. */
 export const storyTemplates = [
   ...birthdayStories,
   birthdayPage,
@@ -16,10 +17,12 @@ export const storyTemplates = [
   ourCorner,
   ...loveLetterStories,
   justForYou,
-  ...proposalStories,
   ...apologyStories,
   ...girlfriendDayStories,
   fanPage,
-  ...mothersDayStories,
-  ...fathersDayStories,
+  ...boyfriendDayStories,
+  hisPage,
+  ...friendshipStories,
+  ...bestFriendsStories,
+  ...familyStories,
 ];

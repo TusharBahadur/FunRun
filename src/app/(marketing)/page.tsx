@@ -24,7 +24,7 @@ export default async function HomePage() {
         <Hero featured={pick(["sealed-with-love", "make-a-wish", "written-in-the-stars", "for-maa"])} />
         <MarqueeBand />
         <Statement />
-        <HowItWorks previews={pick(["little-bloom", "paper-hearts", "midnight-letter"])} />
+        <HowItWorks previews={pick(["candle", "make-a-wish", "sealed-with-love"])} />
         <TemplateShowcase templates={templates.filter((t) => t.level === "classic")} />
         <Features />
         <LoveNotes notes={loveNotes} />

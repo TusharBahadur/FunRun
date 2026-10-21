@@ -18,7 +18,6 @@ import { cn } from "@/lib/utils";
 import type { Draft } from "./draft-store";
 import {
   FieldEditor,
-  isStickerSlot,
   keepNames,
   PhotoPicker,
   showNames,
@@ -26,11 +25,11 @@ import {
   SceneReaction,
   SceneStamp,
   SceneStickers,
-  StickerSlotEditor,
   type Selection,
 } from "./inspector";
 import { FieldFontPicker } from "./font-choices";
 import { isLook, LOOK, LookSettings, setFieldFont } from "./look";
+import { TrackField } from "./track-field";
 import {
   addItem,
   deleteScene,
@@ -70,7 +69,7 @@ export function MobileEditor({
     if (!field) return;
     const id = window.setTimeout(() => {
       const box = document.querySelector<HTMLElement>(`[data-studio-input="${field}"]`);
-      box?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      box?.scrollIntoView({ behavior: "smooth", block: "start" });
       const input = box?.querySelector<HTMLElement>("input, textarea, select");
       input?.focus({ preventScroll: true });
     }, 80);
@@ -214,46 +213,18 @@ function PageSettings({
   const fields = schema.fields.filter((f) => f !== list);
   const items = list ? readItems(scene, list.key) : [];
   const set = (key: string, value: unknown) => edit(updateScene(draft, i, { [key]: value }), `${i}-${key}`);
-  const focused = field ? schema.fields.find((f) => f.key === field && f !== list) : undefined;
-  const shown = focused ? [focused] : fields;
-  const allSettings = (
-    <button
-      type="button"
-      onClick={() => setSel({ scene: i, item: null, field: null })}
-      className="flex h-12 w-full items-center justify-center rounded-2xl bg-paper text-base font-medium"
-    >
-      All settings on this page
-    </button>
-  );
-
-  if (isStickerSlot(scene, field)) {
-    return (
-      <>
-        <p className="text-sm leading-snug text-muted">Swap it for another, upload your own picture, or remove it.</p>
-        <StudioField id={field!} on>
-          <StickerSlotEditor
-            draft={draft}
-            i={i}
-            field={field}
-            edit={edit}
-            onRemoved={() => setSel({ scene: i, item: null, field: null })}
-          />
-        </StudioField>
-        {allSettings}
-      </>
-    );
-  }
+  const stickerOn = !!field?.startsWith("sticker-");
 
   return (
     <>
-      <p className="text-sm leading-snug text-muted">{focused ? `Everything for this ${focused.label.toLowerCase()}.` : schema.blurb}</p>
-      {shown.map((f) => (
-        <StudioField key={f.key} id={f.key} on={!!focused || field === f.key}>
+      <p className="text-sm leading-snug text-muted">{schema.blurb}</p>
+      {fields.map((f) => (
+        <StudioField key={f.key} id={f.key} on={field === f.key}>
           <FieldEditor
             field={f}
             draft={draft}
             roomy
-            highlight={!!focused || field === f.key}
+            highlight={field === f.key}
             value={(scene as unknown as Record<string, unknown>)[f.key]}
             onChange={(v) => set(f.key, v)}
             font={scene.fonts?.[f.key]}
@@ -267,7 +238,7 @@ function PageSettings({
         </StudioField>
       ))}
 
-      {list && !focused && (
+      {list && (
         <StudioField id={list.key} on={field === list.key}>
           <section className="space-y-2">
             <div className="flex items-baseline justify-between">
@@ -324,21 +295,21 @@ function PageSettings({
         </StudioField>
       )}
 
-      {focused && allSettings}
-
-      {!focused && (
-        <>
-          <SceneStickers
-            draft={draft}
-            stickers={scene.stickers ?? []}
-            onChange={(next) => edit(updateScene(draft, i, { stickers: next.length ? next : undefined }))}
-          />
-          <SceneReaction draft={draft} value={scene.reaction} onChange={(reaction) => edit(updateScene(draft, i, { reaction }))} />
-          <SceneStamp draft={draft} i={i} edit={edit} />
-          <SceneColours draft={draft} i={i} edit={edit} />
-          <PageActions draft={draft} edit={edit} i={i} setSel={setSel} />
-        </>
-      )}
+      <StudioField id={stickerOn ? field! : "stickers"} on={stickerOn}>
+        <SceneStickers
+          draft={draft}
+          stickers={scene.stickers ?? []}
+          onChange={(next) => edit(updateScene(draft, i, { stickers: next.length ? next : undefined }))}
+        />
+      </StudioField>
+      <StudioField id="reaction" on={field === "reaction"}>
+        <SceneReaction draft={draft} value={scene.reaction} onChange={(reaction) => edit(updateScene(draft, i, { reaction }))} />
+      </StudioField>
+      <StudioField id="stamp" on={field === "stamp"}>
+        <SceneStamp draft={draft} i={i} edit={edit} />
+      </StudioField>
+      <SceneColours draft={draft} i={i} edit={edit} />
+      <PageActions draft={draft} edit={edit} i={i} setSel={setSel} />
     </>
   );
 }
@@ -449,12 +420,12 @@ function ItemSettings({
               onChange={(e) => set(keepNames(e.target.value, draft.story))}
               className="min-h-28 text-base"
             />
-            <FieldFontPicker
-              value={scene.fonts?.[`${list.key}:${j}`]}
-              sample={String(item ?? "")}
-              onChange={(id) => edit(setFieldFont(draft, i, `${list.key}:${j}`, id), `${i}-font-${list.key}-${j}`)}
-            />
           </Field>
+          <FieldFontPicker
+            value={scene.fonts?.[`${list.key}:${j}`]}
+            sample={String(item ?? "")}
+            onChange={(id) => edit(setFieldFont(draft, i, `${list.key}:${j}`, id), `${i}-font-${list.key}-${j}`)}
+          />
         </StudioField>
       ) : (
         ordered.map((f) => (
@@ -480,6 +451,27 @@ function ItemSettings({
             highlight={field === "src"}
             src={(item as Record<string, unknown>).src as string | undefined}
             onChange={(src) => set({ ...(item as Record<string, unknown>), src })}
+          />
+        </StudioField>
+      )}
+      {list.key === "songs" && (
+        <StudioField id="link" on={field === "link" || field === "file"}>
+          <TrackField
+            roomy
+            highlight={field === "link" || field === "file"}
+            value={{
+              link: (item as Record<string, unknown>).link as string | undefined,
+              file: (item as Record<string, unknown>).file as string | undefined,
+              fileName: (item as Record<string, unknown>).fileName as string | undefined,
+            }}
+            onChange={(track) =>
+              set({
+                ...(item as Record<string, unknown>),
+                link: track?.link,
+                file: track?.file,
+                fileName: track?.fileName,
+              })
+            }
           />
         </StudioField>
       )}

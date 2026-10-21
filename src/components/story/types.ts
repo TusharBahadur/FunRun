@@ -16,6 +16,15 @@ export type StoryPalette = BirthdayPalette;
 export type StoryLevel = "little" | "classic" | "grand";
 export type MelodyId = "birthday" | "lullaby" | "waltz" | "sunny";
 
+/** A song the sender picked: a streaming link, an uploaded file, or both. */
+export type Track = {
+  /** YouTube, Spotify, Apple Music, or a direct audio URL. */
+  link?: string;
+  /** Uploaded audio as a data URL. */
+  file?: string;
+  fileName?: string;
+};
+
 /** Shared headline block most scenes start with, plus per-scene studio settings. */
 type Heading = {
   /** Hidden in the studio: skipped when the gift plays. */
@@ -62,7 +71,7 @@ export type Scene =
   | ({ type: "countdown" } & Heading & { /** YYYY-MM-DD. Counts down if ahead, counts up if past. */ date: string; caption?: string })
   | ({ type: "noticed" } & Heading & { items: { title: string; text: string }[] })
   | ({ type: "gallery" } & Heading & { photos: Photo[] })
-  | ({ type: "playlist" } & Heading & { songs: { title: string; note: string; link?: string; src?: string; tone: PhotoTone }[] })
+  | ({ type: "playlist" } & Heading & { songs: (Track & { title: string; note: string; src?: string; tone: PhotoTone })[] })
   // Wishes and feelings
   | ({ type: "dandelion" } & Heading)
   | ({ type: "cake" } & Heading & { age: number })
@@ -97,6 +106,8 @@ export type Story = {
   recipient: string;
   sender: string;
   melody: MelodyId;
+  /** Their song, if they uploaded a file or pasted a link. Otherwise the music-box melody plays. */
+  track?: Track;
   palette: StoryPalette;
   /** Highlight-font mood (see accent-moods.ts). Defaults to classic. */
   accentFont?: AccentFont;

@@ -7,7 +7,7 @@ import type { SceneType, StoryPalette } from "@/components/story/types";
 import { cn } from "@/lib/utils";
 import { categoryOrder, sceneSchemas, type SceneCategory } from "./schema";
 
-const allTypes = Object.keys(sceneSchemas) as SceneType[];
+const allTypes = (Object.keys(sceneSchemas) as SceneType[]).filter((t) => t !== "finale");
 
 /** The section library: every mini-game, grouped like a design tool's insert menu. */
 export function AddSection({

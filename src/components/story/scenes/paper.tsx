@@ -104,7 +104,7 @@ export function DeckScene({ scene, done, onDone }: SceneProps<S<"deck">>) {
       <div className="relative h-[300px] w-[min(78vw,280px)]">
         {left === 0 && (
           <div className="grid h-full place-items-center">
-            <p className="type-accent text-3xl" style={{ color: palette.accent }}>
+            <p className="type-display text-3xl" style={{ color: palette.accent }}>
               …and counting.
             </p>
           </div>
@@ -185,7 +185,7 @@ function DeckCard({
       <span className="type-label text-[10px] opacity-50">
         No. {index + 1} of {total}
       </span>
-      <span className="type-accent text-[1.75rem] leading-tight">{children}</span>
+      <span className="type-hand text-[1.75rem] leading-tight">{children}</span>
       <span className="text-2xl" style={{ color: palette.accent }} aria-hidden>
         ♥
       </span>
@@ -212,7 +212,7 @@ export function CouponScene({ scene, done, onDone }: SceneProps<S<"coupon">>) {
         >
           <p className="type-label text-[10px] opacity-60">Admit one · valid forever</p>
           <StudioHit field="offer" className="mx-auto w-fit">
-            <p className="type-accent mt-2 text-[1.9rem] leading-tight" style={{ color: palette.accent }}>
+            <p className="type-hand mt-2 text-[1.9rem] leading-tight" style={{ color: palette.accent }}>
               {fill(scene.offer)}
             </p>
           </StudioHit>

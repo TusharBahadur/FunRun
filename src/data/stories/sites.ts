@@ -15,7 +15,7 @@ export const ourCorner = siteTemplate({
   occasion: "anniversary",
   description: "A little website about the two of you: a photo hero, a live countdown, things you’ve noticed, your photos, your songs and a letter.",
   pricePaise: 14900,
-  palette: palettes.lilac,
+  palette: palettes.blueberry,
   motif: "hearts",
   preview: { kicker: "Our website", title: "Made us a tiny website. Don’t laugh.", signoff: "A scrolling page · 6 sections" },
   recipient: "Aditi",
@@ -90,7 +90,7 @@ export const justForYou = siteTemplate({
   occasion: "love",
   description: "A love letter as a website: their photo up top, the little things you’ve noticed, your favourite pictures, your songs and the letter.",
   pricePaise: 14900,
-  palette: palettes.blush,
+  palette: palettes.strawberry,
   motif: "hearts",
   preview: { kicker: "A website, for you", title: "Couldn’t fit it in a text, so I made a website.", signoff: "A scrolling page · 5 sections" },
   recipient: "Meher",
@@ -177,7 +177,7 @@ export const birthdayPage = siteTemplate({
       date: "1999-10-18",
       title: "And honestly, every one of them *counted.*",
       caption: "The world’s been better since. Just saying.",
-      nav: "Your days",
+      nav: "Days",
     },
     {
       type: "noticed",
@@ -230,7 +230,7 @@ export const fanPage = siteTemplate({
   occasion: "girlfriend-day",
   description: "A fan website for her: her photo up top, verified facts about her, a gallery, her playlist and a fan letter.",
   pricePaise: 14900,
-  palette: palettes.wine,
+  palette: palettes.taro,
   motif: "stars",
   preview: { kicker: "Official fan page", title: "Every celebrity has a fan page. So now you do too.", signoff: "A scrolling page · 5 sections" },
   recipient: "Zoya",
@@ -284,6 +284,71 @@ export const fanPage = siteTemplate({
         "Happy Girlfriend’s Day. Thanks for being exactly you, loudly. The fan club meets daily. Membership: me.",
       ],
       signoff: "Your #1 fan, Ishaan",
+    },
+  ],
+});
+
+/* ── Boyfriend’s Day ── */
+export const hisPage = siteTemplate({
+  slug: "his-page",
+  name: "His Page",
+  occasion: "boyfriend-day",
+  description: "A fan website for him: his photo up top, verified facts, a gallery, his playlist and a letter.",
+  pricePaise: 14900,
+  palette: palettes.peach,
+  motif: "sun",
+  preview: { kicker: "Official fan page", title: "Every celebrity has a fan page. So now you do too.", signoff: "A scrolling page · 5 sections" },
+  recipient: "Kabir",
+  sender: "Meher",
+  melody: "sunny",
+  scenes: [
+    {
+      type: "hero",
+      eyebrow: "The official fan page",
+      title: "Kabir: *the website.*",
+      subtitle: "leading man, obviously",
+      photo: photo("chai-cheers"),
+      tone: "sun",
+    },
+    {
+      type: "noticed",
+      eyebrow: "Verified facts",
+      title: "Things about Kabir that are *simply true.*",
+      items: [
+        { title: "Makes a plan and actually does it", text: "Rare in this economy. He says ‘Saturday’ and then Saturday happens." },
+        { title: "Calm in a crisis", text: "I spiral. He brings water. It’s embarrassing how well it works." },
+        { title: "Looks good in a plain t-shirt", text: "Unfair. I’ve stopped trying to compete." },
+      ],
+    },
+    {
+      type: "gallery",
+      eyebrow: "Fan cam",
+      title: "His best *moments*, as captured by his biggest fan.",
+      photos: [
+        { caption: "Road trip hair", date: "Dec ’24", tone: "sun", src: photo("road-trip") },
+        { caption: "Chai face", date: "Daily", tone: "dusk", src: photo("chai-cheers") },
+        { caption: "2am maggi", date: "Mar ’25", tone: "rose", src: photo("maggi-3am") },
+        { caption: "The usual", date: "Always", tone: "sun", src: photo("misty-chai") },
+      ],
+    },
+    {
+      type: "playlist",
+      eyebrow: "His playlist",
+      title: "Approved by Kabir. *Mostly.*",
+      songs: [
+        { title: "Ilahi", note: "his road trip song, no skipping", tone: "sun", src: photo("road-trip") },
+        { title: "Tum Se Hi", note: "this one’s from me", tone: "rose", src: photo("chai-hands") },
+      ],
+    },
+    {
+      type: "letter",
+      eyebrow: "A letter from your #1 fan",
+      title: "Dear Kabir",
+      paragraphs: [
+        "I could post you. I didn’t. I made you a website instead, which is worse, honestly.",
+        "Happy Boyfriend’s Day. You’re my favourite person to come home to. The fan club meets daily. Membership: me.",
+      ],
+      signoff: "Your #1 fan, Meher",
     },
   ],
 });

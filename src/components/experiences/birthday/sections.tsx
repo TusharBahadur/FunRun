@@ -43,7 +43,7 @@ export function Letter({ gift, palette }: { gift: BirthdayGift; palette: Birthda
         </div>
         <motion.p
           {...reveal}
-          className="type-accent mt-10 text-4xl"
+          className="type-hand mt-10 text-4xl"
           style={{ color: palette.accent }}
         >
           — {gift.sender}
@@ -64,7 +64,7 @@ export function ShortNote({ gift, palette }: { gift: BirthdayGift; palette: Birt
       >
         <p className="type-label opacity-60">A note from {gift.sender}</p>
         <p className="mt-5 text-xl leading-snug">{gift.shortNote}</p>
-        <p className="type-accent mt-6 text-3xl" style={{ color: palette.accent }}>
+        <p className="type-hand mt-6 text-3xl" style={{ color: palette.accent }}>
           — {gift.sender}
         </p>
       </motion.article>
@@ -145,7 +145,7 @@ function Polaroid({
         className="h-full w-full rounded-sm"
       />
       <div className="absolute inset-x-4 bottom-3">
-        <p className="type-accent text-xl leading-tight">{memory.caption}</p>
+        <p className="type-hand text-xl leading-tight">{memory.caption}</p>
         <p className="type-label text-[10px] opacity-50">{memory.date}</p>
       </div>
     </motion.button>

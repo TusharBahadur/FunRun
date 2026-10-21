@@ -1,0 +1,201 @@
+import { demoPhoto as photo, palettes, storyTemplate } from "./shared";
+
+const people = { recipient: "Riya", sender: "Ananya", melody: "sunny" as const };
+
+/*
+ * Friendship Day is not a birthday with the word swapped. Two objects:
+ * a band you have to wear, and a software update you cannot decline.
+ * Copy: the way you’d text her. Short, specific, a little mean, mostly fond.
+ */
+
+export const friendshipStories = [
+  /* ── The Band: the whole ritual, five minutes, no cake. ── */
+  storyTemplate({
+    slug: "the-band",
+    name: "The Band",
+    occasion: "friendship",
+    level: "little",
+    description: "Scratch the band, dodge the ‘no’, see how tight it is, tear off a maggi coupon.",
+    palette: palettes.peach,
+    motif: "bloom",
+    preview: { kicker: "Wrist out", title: "I made you a band. Don’t take it off. I’m watching.", signoff: "6 little pages" },
+    ...people,
+    scenes: [
+      {
+        type: "scratch",
+        eyebrow: "Friendship Day. Obviously.",
+        title: "Wrist *out.*",
+        hint: "Scratch it with your finger",
+        reveal: "Tied. No take-backs. That’s the whole ritual.",
+        sub: "Thread colour: whatever was left. Sentiment: aggressive.",
+        done: "Stop tugging it.",
+        stickers: [{ id: "b-tiny-heart", at: "tr", size: "s" }],
+        reaction: "m-kuchu-puchu",
+      },
+      {
+        type: "question",
+        eyebrow: "A formality",
+        title: "Will you *wear it?*",
+        hint: "You already know the answer",
+        question: "Will you wear it all day? No cheating.",
+        yes: "Fine. Tie it.",
+        no: "Absolutely not",
+        after: "Too late. It’s on. Don’t tug.",
+        done: "I saw you try to hide it. Cute.",
+        stickers: [{ id: "m-side-eye", at: "br" }],
+        reaction: "m-ahhh",
+      },
+      {
+        type: "meter",
+        eyebrow: "Quality check",
+        title: "How tight is *this thing?*",
+        hint: "Tap fast",
+        label: "Band-o-meter",
+        levels: ["Fashion", "Friendship", "Circulation?", "Married (jk)", "Do not remove"],
+        done: "Yeah. Leave it.",
+        stickers: [{ id: "m-hat-dog", at: "tl", size: "s" }],
+        reaction: "m-heart-monkey",
+      },
+      {
+        type: "coupon",
+        eyebrow: "The small print",
+        title: "Redeem after *midnight.*",
+        hint: "Tear along the dotted line",
+        offer: "One maggi, one rant, you still wearing the band",
+        terms: "No taking it off in the bathroom · I’ll know · extra masala included",
+        done: "I’m already boiling the water.",
+        stickers: [{ id: "b-flowers", at: "tr" }],
+        reaction: "m-kuchu-puchu",
+      },
+      {
+        type: "letter",
+        eyebrow: "Okay, one sincere bit",
+        title: "Happy Friendship *Day.*",
+        paragraphs: [
+          "I know it’s a thread. I know we make fun of it every year. I’m still tying it.",
+          "You’re the person I send the unhinged voice note to. That’s a sacred job. Don’t apply for a transfer.",
+        ],
+        signoff: "Your HR of nothing useful, {from}",
+        photo: photo("party-girls"),
+        stickers: [{ id: "b-hug-hearts", at: "bl" }],
+      },
+    ],
+  }),
+
+  /* ── Patch Notes: the friendship, shipped. ── */
+  storyTemplate({
+    slug: "patch-notes",
+    name: "Patch Notes",
+    occasion: "friendship",
+    level: "classic",
+    description: "Install the update, print the invoice, fail the quiz you skipped, see the screenshots, hear the notes.",
+    palette: palettes.matcha,
+    motif: "stamp",
+    preview: { kicker: "v8.4 is ready", title: "Don’t force quit. I wrote you release notes.", signoff: "8 pages · please read" },
+    ...people,
+    scenes: [
+      {
+        type: "scratch",
+        eyebrow: "System update",
+        title: "Don’t *force quit.*",
+        hint: "Scratch to install",
+        reveal: "Friendship v8.4. Changelog: you. Known issues: you.",
+        sub: "Estimated time: forever. Storage: I already made space.",
+        done: "Installed. You’re welcome.",
+        stickers: [{ id: "m-dance-kitten", at: "bl" }],
+        reaction: "m-ahhh",
+      },
+      {
+        type: "receipt",
+        eyebrow: "Invoice",
+        title: "Services *rendered.*",
+        hint: "Tap to print",
+        store: "Ananya Systems",
+        items: [
+          { name: "Voice-note hosting", qty: "412" },
+          { name: "‘I’m 5 min away’ bug (unfixed)", qty: "1" },
+          { name: "Maggi, on-call", qty: "∞" },
+          { name: "Uptime", qty: "6 yrs" },
+        ],
+        total: "Amount due: stay.",
+        done: "No refunds. Don’t uninstall.",
+        stickers: [{ id: "m-hat-dog", at: "tr" }],
+        reaction: "m-bow-down",
+      },
+      {
+        type: "deck",
+        eyebrow: "Changelog",
+        title: "Please *read these.*",
+        hint: "Swipe through them",
+        cards: [
+          "NEW: late-night maggi is now a default, not a feature flag.",
+          "FIXED: the ‘I’m five minutes away’ timer. (joke. still broken.)",
+          "ADDED: permission to start a rant mid-sentence.",
+          "REMOVED: the version of us that pretended we weren’t like this.",
+          "KNOWN ISSUE: you still screenshot everything. we live with it.",
+        ],
+        done: "You skipped these. I knew you would.",
+        stickers: [{ id: "m-pleading", at: "br" }],
+      },
+      {
+        type: "quiz",
+        eyebrow: "Pop quiz, because you skipped",
+        title: "Did you even *read them?*",
+        hint: "Pick your answers",
+        questions: [
+          {
+            q: "Who still says ‘I’m 5 minutes away’?",
+            options: ["Riya", "Ananya", "Both, every time"],
+            reply: "Both. The patch did not take. We ship it anyway.",
+          },
+          {
+            q: "Emergency food in this build is…",
+            options: ["Maggi", "Whatever’s in your fridge", "A real meal, as if"],
+            reply: "Maggi. Version 1.0. Never deprecated.",
+          },
+          {
+            q: "This friendship was first compiled in…",
+            options: ["A group project", "The canteen queue", "We don’t remember and that’s the bit"],
+            reply: "The group project. Accidental soulmates. Don’t tell the others.",
+          },
+        ],
+        done: "Passed. Barely. Shipping you anyway.",
+        stickers: [{ id: "m-side-eye", at: "tr" }],
+        reaction: "m-bow-down",
+      },
+      {
+        type: "polaroids",
+        eyebrow: "Screenshots",
+        title: "QA from *this year.*",
+        hint: "Tap each photo",
+        photos: [
+          { caption: "Build 2024.11", date: "That night", tone: "dusk", src: photo("party-girls") },
+          { caption: "Chai staging", date: "Weekly", tone: "sun", src: photo("chai-cheers") },
+          { caption: "2am hotfix", date: "Mar ’25", tone: "rose", src: photo("maggi-3am") },
+        ],
+        done: "All of these passed review. Barely.",
+        reaction: "m-heart-monkey",
+      },
+      {
+        type: "letter",
+        eyebrow: "From engineering",
+        title: "Dear *Riya.*",
+        paragraphs: [
+          "I could have sent a sticker. I wrote you a whole changelog instead, which is more embarrassing, honestly.",
+          "Happy Friendship Day. Don’t uninstall me. The rollback is ugly.",
+        ],
+        signoff: "Your least stable dependency, {from}",
+        photo: photo("party-girls"),
+        stickers: [{ id: "b-smooch", at: "bl" }],
+      },
+      {
+        type: "voice",
+        eyebrow: "Release notes, narrated",
+        title: "Play this. *Don’t skip.*",
+        transcript: "{to}, v8.4 is you. That’s the whole note. Come over, I have maggi. Do not reply with a sticker.",
+        seconds: 8,
+        stickers: [{ id: "m-penguin", at: "bl" }],
+      },
+    ],
+  }),
+];

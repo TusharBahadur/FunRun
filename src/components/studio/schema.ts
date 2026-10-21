@@ -191,11 +191,11 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     name: "Playlist",
     category: "Website",
     icon: Music,
-    blurb: "Your songs, each with a cover photo and a play button.",
+    blurb: "Your songs — paste a link or upload a file, each with a cover photo.",
     fields: [
       { key: "eyebrow", label: "Small label", kind: "text", max: 40 },
       { key: "title", label: "Headline", kind: "text", max: 90, help: "Wrap words in *stars* to highlight them." },
-      { key: "nav", label: "Menu name", kind: "text", max: 14, placeholder: "Playlist" },
+      { key: "nav", label: "Menu name", kind: "text", max: 14, placeholder: "Songs" },
       {
         key: "songs",
         label: "Songs",
@@ -205,7 +205,6 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
         item: [
           { key: "title", label: "Song", kind: "text", max: 40 },
           { key: "note", label: "Why this one", kind: "text", max: 60 },
-          { key: "link", label: "Link (YouTube or Spotify)", kind: "text", max: 200, placeholder: "Optional" },
           { key: "tone", label: "Placeholder colour", kind: "select", options: tones },
         ],
         newItem: () => ({ title: "Our song", note: "You know why", tone: "dusk" }),
@@ -551,7 +550,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
   },
 };
 
-export const categoryOrder: SceneCategory[] = ["Website", "Openers", "About them", "Games", "Paper & keepsakes", "Feelings", "Reading", "Endings"];
+export const categoryOrder: SceneCategory[] = ["Website", "Openers", "About them", "Games", "Paper & keepsakes", "Feelings", "Reading"];
 
 /** A short line describing a scene in the layers list. */
 export function sceneSubtitle(scene: Scene) {

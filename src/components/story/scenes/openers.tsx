@@ -31,7 +31,7 @@ export function SealScene({ scene, done, onDone }: SceneProps<S<"seal">>) {
           transition={{ delay: done ? 0.45 : 0, duration: 0.9, ease: EASE_OUT }}
         >
           <StudioHit field="note">
-            <p className="type-accent text-[1.65rem] leading-tight" style={{ color: palette.accent }}>
+            <p className="type-hand text-[1.65rem] leading-tight" style={{ color: palette.accent }}>
               {fill(scene.note)}
             </p>
           </StudioHit>
@@ -143,7 +143,7 @@ export function ScratchScene({ scene, done, onDone }: SceneProps<S<"scratch">>) 
       >
         <div>
           <StudioHit field="reveal">
-            <p className="type-accent text-[2rem] leading-tight" style={{ color: palette.accent }}>
+            <p className="type-hand text-[2rem] leading-tight" style={{ color: palette.accent }}>
               {fill(scene.reveal)}
             </p>
           </StudioHit>
@@ -281,7 +281,7 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
           style={{ background: `radial-gradient(circle at 50% 40%, #fff6dc, ${palette.gold})`, color: palette.ink }}
         >
           <StudioHit field="reveal">
-            <p className="type-accent text-2xl leading-tight">{fill(scene.reveal)}</p>
+            <p className="type-hand text-2xl leading-tight">{fill(scene.reveal)}</p>
           </StudioHit>
         </div>
         <motion.button
@@ -301,7 +301,7 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
         {!done && knocks > 0 && (
           <motion.span
             key={`t${knocks}`}
-            className="type-accent pointer-events-none absolute -right-10 top-6 text-2xl"
+            className="type-display pointer-events-none absolute -right-10 top-6 text-2xl"
             style={{ color: palette.accent }}
             initial={{ opacity: 0, y: 10, rotate: -8 }}
             animate={{ opacity: [0, 1, 0], y: -20 }}
@@ -350,7 +350,7 @@ export function UnwrapScene({ scene, done, onDone }: SceneProps<S<"unwrap">>) {
         >
           <p className="type-label text-[10px] opacity-60">Inside</p>
           <StudioHit field="inside">
-            <p className="type-accent mt-1 text-[1.7rem] leading-tight" style={{ color: palette.accent }}>
+            <p className="type-hand mt-1 text-[1.7rem] leading-tight" style={{ color: palette.accent }}>
               {fill(scene.inside)}
             </p>
           </StudioHit>

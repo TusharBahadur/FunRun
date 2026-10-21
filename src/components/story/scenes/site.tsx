@@ -1,14 +1,15 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Play } from "lucide-react";
-import { useEffect, useState, type ComponentType, type ReactNode } from "react";
+import { Pause, Play } from "lucide-react";
+import { useEffect, useRef, useState, type ComponentType, type CSSProperties, type ReactNode } from "react";
 import { Accented } from "@/components/experiences/birthday/accented";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
 import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import { StudioHit, TurnButton, useStory, type SceneProps } from "../scene-kit";
-import type { Scene } from "../types";
+import { playHtmlAudio, trackHref, trackSrc } from "../gift-music";
+import { StudioHit, TurnButton, useStudioEdit, useStory, type SceneProps } from "../scene-kit";
+import type { Scene, Track } from "../types";
 
 type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
 
@@ -29,7 +30,7 @@ const rise = {
 function Block({ eyebrow, title, children, className }: { eyebrow?: string; title: string; children: ReactNode; className?: string }) {
   const { palette, fill } = useStory();
   return (
-    <section className={cn("mx-auto w-full max-w-3xl px-5 py-24 md:py-32", className)}>
+    <section className={cn("mx-auto w-full max-w-3xl px-5 pb-32 pt-20 md:py-32", className)}>
       {eyebrow && (
         <StudioHit field="eyebrow" className="w-fit">
           <motion.p {...rise} className="type-label opacity-60">
@@ -92,12 +93,12 @@ export function HeroSection({ scene }: SceneProps<S<"hero">>) {
         </StudioHit>
       </div>
       {scene.subtitle && (
-        <StudioHit field="subtitle" className="absolute bottom-24 left-5 right-5 md:left-10">
+        <StudioHit field="subtitle">
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 1, ease: EASE_OUT }}
-          className="font-serif text-[clamp(2rem,8vw,4.5rem)] font-semibold leading-none tracking-[-0.02em] text-white"
+          className="absolute bottom-32 left-5 right-16 font-serif text-[clamp(2rem,8vw,4.5rem)] font-semibold leading-none tracking-[-0.02em] text-white md:bottom-24 md:left-10 md:right-10"
         >
           {fill(scene.subtitle)}
         </motion.p>
@@ -142,7 +143,7 @@ export function CountdownSection({ scene }: SceneProps<S<"countdown">>) {
     { label: "Seconds", value: p?.seconds },
   ];
   return (
-    <section className="mx-auto w-full max-w-3xl px-5 py-20">
+    <section className="mx-auto flex min-h-svh w-full max-w-3xl items-center px-5 pb-32 pt-16">
       <motion.div {...rise}>
         <Glass className="px-6 py-10 text-center md:px-12 md:py-14">
           <StudioHit field="eyebrow" className="mx-auto w-fit">
@@ -162,7 +163,7 @@ export function CountdownSection({ scene }: SceneProps<S<"countdown">>) {
             ))}
           </div>
           <StudioHit field="title" className="mx-auto mt-8 w-fit">
-            <p className="font-serif text-xl italic opacity-80" style={{ color: palette.accent }}>
+            <p className="type-display text-xl opacity-80" style={{ color: palette.accent }}>
               <Accented text={fill(scene.title)} color={palette.accent} />
             </p>
           </StudioHit>
@@ -239,9 +240,7 @@ export function PlaylistSection({ scene }: SceneProps<S<"playlist">>) {
   return (
     <Block eyebrow={scene.eyebrow} title={scene.title}>
       <div className="space-y-5">
-        {scene.songs.map((song, i) => {
-          const href = song.link || `https://www.youtube.com/results?search_query=${encodeURIComponent(song.title)}`;
-          return (
+        {scene.songs.map((song, i) => (
             <motion.div key={i} {...rise}>
               <StudioHit field="songs" item={i}>
               <Glass className="overflow-hidden p-3 md:p-4">
@@ -256,22 +255,17 @@ export function PlaylistSection({ scene }: SceneProps<S<"playlist">>) {
                     <h3 className="font-serif text-2xl font-semibold">{song.title}</h3>
                     <p className="mt-1 text-sm opacity-65">{fill(song.note)}</p>
                   </div>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`Play ${song.title}`}
+                  <SongPlayButton
+                    song={song}
+                    title={song.title}
                     className="grid size-12 shrink-0 place-items-center rounded-full transition-transform active:scale-95"
                     style={{ backgroundColor: palette.accent, color: palette.cream }}
-                  >
-                    <Play className="ml-0.5 size-5 fill-current" />
-                  </a>
+                  />
                 </div>
               </Glass>
               </StudioHit>
             </motion.div>
-          );
-        })}
+          ))}
       </div>
     </Block>
   );
@@ -282,7 +276,7 @@ export function PlaylistSection({ scene }: SceneProps<S<"playlist">>) {
 export function SiteLetter({ scene }: SceneProps<S<"letter">>) {
   const { palette, fill, to } = useStory();
   return (
-    <section className="mx-auto w-full max-w-3xl px-5 py-24 md:py-32">
+    <section className="mx-auto w-full max-w-3xl px-5 pb-32 pt-20 md:py-32">
       <motion.div {...rise}>
         <Glass
           className="relative px-7 py-10 md:px-14 md:py-14"
@@ -323,6 +317,72 @@ export function SiteLetter({ scene }: SceneProps<S<"letter">>) {
 
 /** For the regular page-by-page player: the same section, centred on its own page. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function SongPlayButton({
+  song,
+  title,
+  className,
+  style,
+}: {
+  song: Track;
+  title: string;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  const studio = useStudioEdit();
+  const src = trackSrc(song);
+  const href = trackHref(song, title) ?? "#";
+  const [on, setOn] = useState(false);
+  const handle = useRef<ReturnType<typeof playHtmlAudio> | null>(null);
+
+  useEffect(() => () => handle.current?.stop(), []);
+
+  const icon = on ? <Pause className="size-5 fill-current" /> : <Play className="ml-0.5 size-5 fill-current" />;
+
+  if (studio) {
+    return (
+      <span className={className} style={style}>
+        {icon}
+      </span>
+    );
+  }
+  if (src) {
+    return (
+      <button
+        type="button"
+        aria-label={on ? `Pause ${title}` : `Play ${title}`}
+        className={className}
+        style={style}
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={() => {
+          if (on) {
+            handle.current?.stop();
+            handle.current = null;
+            setOn(false);
+            return;
+          }
+          handle.current = playHtmlAudio(src, { onEnd: () => setOn(false), onStop: () => setOn(false) });
+          setOn(true);
+        }}
+      >
+        {icon}
+      </button>
+    );
+  }
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={`Play ${title}`}
+      className={className}
+      style={style}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
+      <Play className="ml-0.5 size-5 fill-current" />
+    </a>
+  );
+}
+
 export function asPage(Section: ComponentType<SceneProps<any>>, fullBleed = false) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function Page(props: SceneProps<any>) {

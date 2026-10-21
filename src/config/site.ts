@@ -17,14 +17,12 @@ export const occasions = [
   { id: "birthday", label: "Birthday" },
   { id: "anniversary", label: "Anniversary" },
   { id: "love", label: "Love letter" },
-  { id: "proposal", label: "Proposal" },
-  { id: "apology", label: "Apology" },
   { id: "girlfriend-day", label: "Girlfriend's Day" },
-  { id: "mothers-day", label: "Mother's Day" },
-  { id: "fathers-day", label: "Father's Day" },
-  { id: "thank-you", label: "Thank you" },
-  { id: "long-distance", label: "Long distance" },
-  { id: "memories", label: "Memories" },
+  { id: "boyfriend-day", label: "Boyfriend's Day" },
+  { id: "friendship", label: "Friendship Day" },
+  { id: "best-friends", label: "Best Friends Day" },
+  { id: "apology", label: "Apology" },
+  { id: "family", label: "Family" },
 ] as const;
 
 export type OccasionId = (typeof occasions)[number]["id"];

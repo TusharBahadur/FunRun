@@ -8,28 +8,26 @@ import { sceneLabels } from "@/components/story/labels";
 
 /**
  * 1-Second Timer Flow Player:
- * When hovered, advances through every page inside the template one after another,
+ * While playing, advances through every page inside the template one after another,
  * displaying each page for exactly 1 second with a live 1s countdown indicator.
  */
 export function TemplatePageFlow({
   template,
-  isHovered,
+  playing,
 }: {
   template: Template;
-  isHovered: boolean;
+  playing: boolean;
 }) {
-  if (template.story) {
-    return <StoryPageFlow template={template} isHovered={isHovered} />;
-  }
-  return <ClassicCardPageFlow template={template} isHovered={isHovered} />;
+  if (!template.story) return null;
+  return <StoryPageFlow template={template} playing={playing} />;
 }
 
 function StoryPageFlow({
   template,
-  isHovered,
+  playing,
 }: {
   template: Template;
-  isHovered: boolean;
+  playing: boolean;
 }) {
   const g = readGift(template);
   const scenes = g.scenes;
@@ -39,7 +37,7 @@ function StoryPageFlow({
 
   // Exact 1-second interval timer per page
   useEffect(() => {
-    if (!isHovered) {
+    if (!playing) {
       setIndex(0);
       setKey(0);
       return;
@@ -51,7 +49,7 @@ function StoryPageFlow({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isHovered, total]);
+  }, [playing, total]);
 
   const currentScene = scenes[index];
   const label = currentScene ? sceneLabels[currentScene.type] : "Page";
@@ -162,82 +160,6 @@ function StoryPageFlow({
         <span className="font-mono text-[2cqw] text-amber-300 font-bold">
           {index + 1}s / {total}s
         </span>
-      </div>
-    </div>
-  );
-}
-
-function ClassicCardPageFlow({
-  template,
-  isHovered,
-}: {
-  template: Template;
-  isHovered: boolean;
-}) {
-  const { palette, preview } = template;
-  const stages = [
-    { title: "Opening Envelope", subtitle: preview.kicker },
-    { title: "Personal Message", subtitle: preview.title },
-    { title: "Love & Signoff", subtitle: preview.signoff || "With all my heart" },
-  ];
-  const total = stages.length;
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    if (!isHovered) {
-      setIndex(0);
-      return;
-    }
-    const timer = setInterval(() => {
-      setIndex((p) => (p + 1) % total);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [isHovered, total]);
-
-  const current = stages[index];
-
-  return (
-    <div
-      className="relative h-full w-full overflow-hidden select-none p-[6cqw] flex flex-col justify-between"
-      style={{ backgroundColor: palette.bg, color: palette.fg }}
-    >
-      {/* Top Header: 1s countdown */}
-      <div className="flex flex-col gap-[2cqw]">
-        <div className="grid grid-cols-3 gap-[1.5cqw] w-full">
-          {stages.map((_, i) => (
-            <div key={i} className="h-[0.8cqw] rounded-full overflow-hidden bg-black/20">
-              <div
-                className="h-full rounded-full"
-                style={{
-                  backgroundColor: palette.accent,
-                  width: i < index ? "100%" : i === index ? "100%" : "0%",
-                  transition: i === index ? "width 1s linear" : "none",
-                }}
-              />
-            </div>
-          ))}
-        </div>
-
-        <div className="flex items-center justify-between font-mono text-[2.2cqw] uppercase">
-          <span className="rounded-full bg-black/50 px-[2.5cqw] py-[0.6cqw] text-white">
-            1.0s TIMER
-          </span>
-          <span className="font-semibold">STAGE {index + 1} OF {total}</span>
-        </div>
-      </div>
-
-      {/* Center Animated Stage */}
-      <div key={index} className="my-auto text-center" style={{ animation: "pageSwapFade 0.25s ease-out" }}>
-        <span className="font-mono text-[2.4cqw] uppercase tracking-wider opacity-70 block">
-          {current.title}
-        </span>
-        <p className="type-display mt-[2cqw] text-[7.5cqw] font-semibold leading-tight">
-          {current.subtitle}
-        </p>
-      </div>
-
-      <div className="text-center font-mono text-[2cqw] opacity-60">
-        Next page in 1s →
       </div>
     </div>
   );

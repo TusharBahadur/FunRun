@@ -212,7 +212,7 @@ export function SongCard({
         </motion.span>
         <span className="flex-1">
           <span className="type-label block opacity-60">{playing ? "Now playing" : "Tap to play"}</span>
-          <span className="type-accent block text-2xl">{gift.song.title}</span>
+          <span className="type-hand block text-2xl">{gift.song.title}</span>
           <span className="type-label block text-[10px] opacity-45">
             {gift.song.artist}. Preview plays the music box.
           </span>
@@ -253,7 +253,7 @@ export function Timeline({ gift, palette }: { gift: BirthdayGift; palette: Birth
               />
               <figcaption className="mt-3">
                 <span className="type-label block opacity-50">{t.month}</span>
-                <span className="type-accent text-lg">{t.caption}</span>
+                <span className="type-hand text-lg">{t.caption}</span>
               </figcaption>
             </motion.figure>
           );

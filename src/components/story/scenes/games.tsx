@@ -73,7 +73,7 @@ export function QuizScene({ scene, done, onDone }: SceneProps<S<"quiz">>) {
           </StudioHit>
           {(picked !== null || studio) && (
             <StudioHit field="reply" item={index} className="mt-5">
-              <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="type-accent text-2xl" style={{ color: palette.accent }}>
+              <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="type-hand text-2xl" style={{ color: palette.accent }}>
                 {fill(q.reply)}
               </motion.p>
             </StudioHit>
@@ -292,7 +292,7 @@ export function QuestionScene({ scene, done, onDone }: SceneProps<S<"question">>
           </StudioHit>
         </div>
         <StudioAlso label="After they say yes" field="after">
-          <p className="type-accent text-[2rem] leading-tight" style={{ color: palette.accent }}>
+          <p className="type-hand text-[2rem] leading-tight" style={{ color: palette.accent }}>
             {fill(scene.after)}
           </p>
         </StudioAlso>
@@ -303,7 +303,7 @@ export function QuestionScene({ scene, done, onDone }: SceneProps<S<"question">>
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
       {done ? (
-        <motion.p initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="type-accent text-[2.4rem] leading-tight" style={{ color: palette.accent }}>
+        <motion.p initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="type-hand text-[2.4rem] leading-tight" style={{ color: palette.accent }}>
           {fill(scene.after)}
         </motion.p>
       ) : (
@@ -390,7 +390,7 @@ export function RingboxScene({ scene, done, onDone }: SceneProps<S<"ringbox">>) 
       </motion.button>
       {done && (
         <StudioHit field="question" className="mt-6">
-          <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="type-accent text-[2rem] leading-tight" style={{ color: palette.accent }}>
+          <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="type-hand text-[2rem] leading-tight" style={{ color: palette.accent }}>
             {fill(scene.question)}
           </motion.p>
         </StudioHit>
@@ -442,7 +442,7 @@ export function BouquetScene({ scene, done, onDone }: SceneProps<S<"bouquet">>) 
           <motion.div initial={{ opacity: 0, rotate: 0, y: 10 }} animate={{ opacity: 1, rotate: -6, y: 0 }} className="absolute -right-10 bottom-10">
             <StudioHit field="card">
               <Paper className="px-3 py-2">
-                <p className="type-accent text-lg leading-tight" style={{ color: palette.accent }}>
+                <p className="type-hand text-lg leading-tight" style={{ color: palette.accent }}>
                   {fill(scene.card)}
                 </p>
               </Paper>
@@ -522,7 +522,7 @@ export function AwardScene({ scene, done, onDone }: SceneProps<S<"award">>) {
       </StudioHit>
       <StudioHit field="engraving" className="mt-6">
         <motion.p
-          className="type-accent text-[1.8rem] leading-tight"
+          className="type-hand text-[1.8rem] leading-tight"
           style={{ color: palette.accent }}
           initial={false}
           animate={{ opacity: shine >= 1 ? 1 : 0, y: shine >= 1 ? 0 : 10 }}

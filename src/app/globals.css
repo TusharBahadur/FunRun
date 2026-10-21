@@ -162,6 +162,11 @@
   font-family: inherit !important;
   font-variation-settings: inherit !important;
 }
+/* Whole lines set in type-accent (a reveal, a note). *Starred* words keep the highlight face. */
+[data-field-font] .type-accent:not([data-accent]) {
+  font-family: inherit !important;
+  font-variation-settings: inherit !important;
+}
 
 @utility no-scrollbar {
   scrollbar-width: none;
