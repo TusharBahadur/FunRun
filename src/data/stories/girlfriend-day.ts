@@ -24,7 +24,7 @@ export const girlfriendDayStories = [
         sub: "Supporting role: me",
         done: "Was there ever any doubt.",
         stickers: [{ id: "crown", at: "tr", size: "s" }],
-        reaction: "m-scream-cat",
+        reaction: "pin-224",
       },
       {
         type: "spotlight",
@@ -35,7 +35,7 @@ export const girlfriendDayStories = [
         tone: "rose",
         tags: ["Walks in like there’s background music", "Best outfit, every single time", "Funniest person in the room"],
         done: "Iconic. As usual.",
-        stickers: [{ id: "m-heart-eyes", at: "br" }],
+        stickers: [{ id: "pin-001", at: "br" }],
       },
       {
         type: "coupon",
@@ -46,7 +46,7 @@ export const girlfriendDayStories = [
         terms: "No sighing · snacks included · I’ll say everything looks good (it will)",
         done: "Make a list.",
         stickers: [{ id: "b-flowers", at: "tr" }],
-        reaction: "m-kuchu-puchu",
+        reaction: "pin-020",
       },
       {
         type: "polaroids",
@@ -70,7 +70,7 @@ export const girlfriendDayStories = [
           "Thanks for letting me be in it. Even if it’s just as the guy holding the bags.",
         ],
         signoff: "Your sidekick, {from}",
-        stickers: [{ id: "b-cheek", at: "bl" }],
+        stickers: [{ id: "pin-024", at: "bl" }],
       },
     ],
   }),
@@ -95,7 +95,7 @@ export const girlfriendDayStories = [
         taps: 3,
         inside: "Membership card #001: {from}",
         insideSub: "Founding member. Only member.",
-        stickers: [{ id: "m-dance-kitten", at: "bl" }],
+        stickers: [{ id: "pin-006", at: "bl" }],
         reaction: "m-ahhh",
       },
       {
@@ -109,7 +109,7 @@ export const girlfriendDayStories = [
           { q: "Who’s her biggest fan?", options: ["Her Maa", "Her best friend", "{from}"], reply: "{from}. It’s not even close." },
         ],
         done: "Superfan, certified.",
-        stickers: [{ id: "m-side-eye", at: "tr" }],
+        stickers: [{ id: "pin-028", at: "tr" }],
         reaction: "m-bow-down",
       },
       {
@@ -165,7 +165,7 @@ export const girlfriendDayStories = [
         ],
         signoff: "Your #1 fan, {from}",
         photo: photo("maya-portrait"),
-        stickers: [{ id: "b-smooch", at: "bl" }],
+        stickers: [{ id: "pin-022", at: "bl" }],
       },
     ],
   }),
@@ -198,7 +198,7 @@ export const girlfriendDayStories = [
           { id: "popper", at: "bl" },
           { id: "yay", at: "br" },
         ],
-        reaction: "m-scream-cat",
+        reaction: "pin-224",
       },
       {
         type: "award",
@@ -247,7 +247,7 @@ export const girlfriendDayStories = [
         hint: "Flip two at a time",
         symbols: ["heart", "star", "flower", "sun", "cake"],
         done: "Winner. Again.",
-        reaction: "m-kuchu-puchu",
+        reaction: "pin-020",
       },
       {
         type: "wishes",

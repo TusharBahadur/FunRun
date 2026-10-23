@@ -22,7 +22,7 @@ export const loveLetterStories = [
         hint: "Press and hold the seal",
         note: "So you miss me. Good. Same.",
         stickers: [{ id: "b-heart-peek", at: "tr", size: "s" }],
-        reaction: "m-pleading",
+        reaction: "pin-020",
       },
       {
         type: "deck",
@@ -37,8 +37,8 @@ export const loveLetterStories = [
           "Open when you’re happy: tell me everything. I want all the details.",
         ],
         done: "Save these for later.",
-        stickers: [{ id: "m-cat-cuddle", at: "br" }],
-        reaction: "m-heart-monkey",
+        stickers: [{ id: "pin-224", at: "br" }],
+        reaction: "pin-022",
       },
       {
         type: "coupon",
@@ -62,7 +62,7 @@ export const loveLetterStories = [
           { caption: "Holding your hand", date: "Last month", tone: "dusk" },
           { caption: "You and me", date: "Forever", tone: "leaf" },
         ],
-        stickers: [{ id: "b-couple", at: "tr", size: "s" }],
+        stickers: [{ id: "pin-001", at: "tr", size: "s" }],
       },
       {
         type: "letter",
@@ -128,7 +128,7 @@ export const loveLetterStories = [
         ],
         done: "Okay. You know me. Come here.",
         stickers: [{ id: "m-pleading", at: "br" }],
-        reaction: "m-heart-monkey",
+        reaction: "pin-022",
       },
       {
         type: "stars",
@@ -138,7 +138,7 @@ export const loveLetterStories = [
         reveal: "Same sky. *Same us.*",
         done: "Ours now.",
         stickers: [{ id: "sparkles", at: "tr", size: "s" }],
-        reaction: "m-heart-eyes",
+        reaction: "pin-001",
       },
       {
         type: "compliments",
@@ -154,7 +154,7 @@ export const loveLetterStories = [
         ],
         done: "Every one of these is true.",
         stickers: [{ id: "b-melting", at: "tl", size: "s" }],
-        reaction: "m-pleading",
+        reaction: "pin-020",
       },
       {
         type: "dandelion",
@@ -162,7 +162,7 @@ export const loveLetterStories = [
         title: "Make a wish. *Quietly.*",
         hint: "Hold it, then let go",
         done: "Hope it’s about me.",
-        stickers: [{ id: "b-tiny-heart", at: "tr", size: "s" }],
+        stickers: [{ id: "pin-004", at: "tr", size: "s" }],
       },
       {
         type: "polaroids",
@@ -188,7 +188,7 @@ export const loveLetterStories = [
         ],
         signoff: "Night, {from}",
         photo: photo("night-sky"),
-        stickers: [{ id: "b-cheek", at: "bl" }],
+        stickers: [{ id: "pin-024", at: "bl" }],
       },
     ],
   }),
@@ -228,7 +228,7 @@ export const loveLetterStories = [
           { place: "Here", when: "Now", memory: "Still my favourite part." },
         ],
         done: "Every page has you in it.",
-        stickers: [{ id: "b-couple", at: "tl", size: "s" }],
+        stickers: [{ id: "pin-038", at: "tl", size: "s" }],
       },
       {
         type: "receipt",
@@ -274,7 +274,7 @@ export const loveLetterStories = [
         ],
         done: "My whole camera roll is you.",
         stickers: [{ id: "chai", at: "bl", size: "s" }],
-        reaction: "m-heart-eyes",
+        reaction: "pin-001",
       },
       {
         type: "voice",

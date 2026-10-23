@@ -29,8 +29,8 @@ export const birthdayStories = [
         candles: 3,
         reveal: "Almost midnight. *Your* midnight.",
         done: "One more minute…",
-        stickers: [{ id: "m-dance-kitten", at: "bl" }],
-        reaction: "m-ahhh",
+        stickers: [{ id: "pin-004", at: "bl" }],
+        reaction: "pin-104",
       },
       {
         type: "scratch",
@@ -40,8 +40,8 @@ export const birthdayStories = [
         reveal: "Happy birthday, {to}!! I was first, right?",
         sub: "From {from}. Screenshot this as proof.",
         done: "First. Obviously.",
-        stickers: [{ id: "b-tiny-heart", at: "tr", size: "s" }],
-        reaction: "m-kuchu-puchu",
+        stickers: [{ id: "pin-022", at: "tr", size: "s" }],
+        reaction: "pin-020",
       },
       {
         type: "spotlight",
@@ -56,7 +56,7 @@ export const birthdayStories = [
           "First wish of the year. Mine.",
         ],
         done: "Yeah. That’s you.",
-        stickers: [{ id: "b-heart-peek", at: "tl", size: "s" }],
+        stickers: [{ id: "pin-173", at: "tl", size: "s" }],
       },
       {
         type: "polaroids",
@@ -70,7 +70,7 @@ export const birthdayStories = [
         ],
         done: "We need more of these this year.",
         stickers: [{ id: "chai", at: "bl", size: "s" }],
-        reaction: "m-heart-eyes",
+        reaction: "pin-004",
       },
       {
         type: "cake",
@@ -80,7 +80,7 @@ export const birthdayStories = [
         age: 27,
         done: "What did you wish for? Jk, don’t tell me.",
         stickers: [{ id: "b-cake", at: "bl" }],
-        reaction: "m-dance-cat",
+        reaction: "pin-168",
       },
       {
         type: "letter",
@@ -122,7 +122,7 @@ export const birthdayStories = [
           { id: "b-flowers", at: "tr" },
           { id: "b-tiny-heart", at: "bl", size: "s" },
         ],
-        reaction: "m-scream-cat",
+        reaction: "pin-104",
       },
       {
         type: "spotlight",
@@ -156,7 +156,7 @@ export const birthdayStories = [
           { id: "m-shy-monkey", at: "br" },
           { id: "b-heart-peek", at: "tl", size: "s" },
         ],
-        reaction: "m-ahhh",
+        reaction: "pin-104",
       },
       {
         type: "deck",
@@ -203,7 +203,7 @@ export const birthdayStories = [
           { id: "chai", at: "bl", size: "s" },
           { id: "m-cat-cuddle", at: "tr" },
         ],
-        reaction: "m-heart-eyes",
+        reaction: "pin-004",
       },
       {
         type: "letter",
@@ -253,7 +253,7 @@ export const birthdayStories = [
           { id: "popper", at: "bl" },
           { id: "yay", at: "br" },
         ],
-        reaction: "m-scream-cat",
+        reaction: "pin-104",
       },
       {
         type: "receipt",
@@ -295,7 +295,7 @@ export const birthdayStories = [
         levels: ["Polite clapping", "Whistles", "The dhol is out", "Neighbours complaining", "Baraat level"],
         done: "The whole building knows it’s your birthday now.",
         stickers: [{ id: "b-besties", at: "tl", size: "s" }],
-        reaction: "m-kuchu-puchu",
+        reaction: "pin-020",
       },
       {
         type: "wishes",
@@ -334,7 +334,7 @@ export const birthdayStories = [
         engraving: "{to} · Best Human of 2026",
         done: "Speech! Speech!",
         stickers: [{ id: "crown", at: "tl", size: "s" }],
-        reaction: "m-ahhh",
+        reaction: "pin-104",
       },
       {
         type: "polaroids",
@@ -360,7 +360,7 @@ export const birthdayStories = [
           { id: "b-cake", at: "bl" },
           { id: "balloons", at: "tr", size: "s" },
         ],
-        reaction: "m-dance-cat",
+        reaction: "pin-168",
       },
       {
         type: "letter",

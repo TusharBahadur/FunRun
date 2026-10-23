@@ -31,7 +31,7 @@ export const apologyStories = [
           { id: "popper", at: "bl" },
           { id: "yay", at: "br" },
         ],
-        reaction: "m-pleading",
+        reaction: "pin-134",
       },
       {
         type: "meter",
@@ -41,8 +41,8 @@ export const apologyStories = [
         label: "Sorry-meter",
         levels: ["A little", "Quite", "Very", "Embarrassingly", "Broke the meter"],
         done: "Yeah. That sorry.",
-        stickers: [{ id: "m-shy-monkey", at: "br" }],
-        reaction: "m-bow-down",
+        stickers: [{ id: "pin-133", at: "br" }],
+        reaction: "pin-133",
       },
       {
         type: "coupon",
@@ -100,8 +100,8 @@ export const apologyStories = [
         title: "I *surrender.*",
         hint: "Press and hold the seal",
         note: "I, {from}, was wrong. This cat is my witness.",
-        stickers: [{ id: "m-bow-cat", at: "tr" }],
-        reaction: "m-bow-down",
+        stickers: [{ id: "pin-125", at: "tr" }],
+        reaction: "pin-133",
       },
       {
         type: "receipt",
@@ -118,7 +118,7 @@ export const apologyStories = [
         total: "Owed: one massive sorry",
         done: "Guilty. All of it.",
         stickers: [{ id: "m-side-eye", at: "br" }],
-        reaction: "m-shy-monkey",
+        reaction: "pin-134",
       },
       {
         type: "quiz",
@@ -130,8 +130,8 @@ export const apologyStories = [
           { q: "I also have to…", options: ["Say you were right, in the group chat", "Plan our next date", "Buy the momos"], reply: "All three. I deserve it." },
         ],
         done: "Accepted. No complaints.",
-        stickers: [{ id: "m-please-monkey", at: "bl" }],
-        reaction: "m-pleading",
+        stickers: [{ id: "pin-007", at: "bl" }],
+        reaction: "pin-134",
       },
       {
         type: "compliments",
@@ -207,7 +207,7 @@ export const apologyStories = [
         inside: "One very sorry {from}",
         insideSub: "No returns, sorry",
         stickers: [{ id: "m-pleading", at: "tr" }],
-        reaction: "m-bow-down",
+        reaction: "pin-133",
       },
       {
         type: "bouquet",
@@ -217,7 +217,7 @@ export const apologyStories = [
         flowers: 5,
         card: "Sorry, {to}. Really.",
         done: "Yeah, it’s a big bouquet. I know.",
-        stickers: [{ id: "m-flower-kitten", at: "bl" }],
+        stickers: [{ id: "pin-020", at: "bl" }],
         reaction: "m-flower-cat",
       },
       {
@@ -276,7 +276,7 @@ export const apologyStories = [
         offer: "Unlimited “you were right” cards",
         terms: "Use anytime · I have to say it out loud · no arguing back",
         done: "Use it wisely. Or don’t.",
-        stickers: [{ id: "m-bow-cat", at: "tr" }],
+        stickers: [{ id: "pin-125", at: "tr" }],
         reaction: "m-ahhh",
       },
       {
@@ -288,7 +288,7 @@ export const apologyStories = [
         no: "No",
         after: "You won’t regret it. Promise.",
         done: "Friends again!!",
-        stickers: [{ id: "m-please-monkey", at: "bl" }],
+        stickers: [{ id: "pin-007", at: "bl" }],
         reaction: "m-dance-cat",
       },
       {

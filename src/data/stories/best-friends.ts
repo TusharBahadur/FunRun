@@ -24,7 +24,7 @@ export const bestFriendsStories = [
         sub: "If you screenshot this I will deny it.",
         done: "You already knew. Shut up.",
         stickers: [{ id: "b-tiny-heart", at: "tr", size: "s" }],
-        reaction: "m-kuchu-puchu",
+        reaction: "pin-012",
       },
       {
         type: "spotlight",
@@ -35,7 +35,7 @@ export const bestFriendsStories = [
         tone: "sun",
         tags: ["Knows my order without asking", "Roasts me and then pays for food", "Shows up when the text is just ‘here?’"],
         done: "Yeah. That’s him.",
-        stickers: [{ id: "m-heart-eyes", at: "br" }],
+        stickers: [{ id: "pin-006", at: "br" }],
       },
       {
         type: "coupon",
@@ -59,7 +59,7 @@ export const bestFriendsStories = [
           { caption: "Uncontrollable giggles", date: "Summer", tone: "dusk" },
           { caption: "Ride or die", date: "Forever", tone: "leaf" },
         ],
-        stickers: [{ id: "b-besties", at: "tr", size: "s" }],
+        stickers: [{ id: "pin-173", at: "tr", size: "s" }],
       },
       {
         type: "letter",
@@ -96,8 +96,8 @@ export const bestFriendsStories = [
         taps: 3,
         inside: "We were at mine. Watching a match. That’s the story.",
         insideSub: "Stick to it.",
-        stickers: [{ id: "m-dance-kitten", at: "bl" }],
-        reaction: "m-ahhh",
+        stickers: [{ id: "pin-019", at: "bl" }],
+        reaction: "pin-029",
       },
       {
         type: "quiz",
@@ -110,7 +110,7 @@ export const bestFriendsStories = [
           { q: "Who’s the bad influence?", options: ["Me", "Him", "Both, equally"], reply: "The jury (his Maa) says both." },
         ],
         done: "Passed. Barely. Proud of us.",
-        stickers: [{ id: "m-side-eye", at: "tr" }],
+        stickers: [{ id: "pin-021", at: "tr" }],
         reaction: "m-bow-down",
       },
       {
@@ -204,7 +204,7 @@ export const bestFriendsStories = [
         engraving: "My person · {to}",
         done: "Don’t wear it in public. Or do.",
         stickers: [{ id: "crown", at: "tl", size: "s" }],
-        reaction: "m-ahhh",
+        reaction: "pin-029",
       },
       {
         type: "numbers",
@@ -216,7 +216,7 @@ export const bestFriendsStories = [
           { value: 9, label: "trips that started as a joke" },
           { value: 1, label: "person I’d call at 3am" },
         ],
-        stickers: [{ id: "m-hat-dog", at: "tr" }],
+        stickers: [{ id: "pin-034", at: "tr" }],
       },
       {
         type: "map",
@@ -238,7 +238,7 @@ export const bestFriendsStories = [
         hint: "Flip two at a time",
         symbols: ["heart", "star", "sun", "cake", "flower"],
         done: "You still peek. I still notice.",
-        reaction: "m-kuchu-puchu",
+        reaction: "pin-012",
       },
       {
         type: "wishes",

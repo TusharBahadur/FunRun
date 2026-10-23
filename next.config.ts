@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    agentUpgrade: "security",
+  },
   cacheComponents: true,
   // 127.0.0.1 plus temporary phone-testing tunnels (dev only).
   allowedDevOrigins: [

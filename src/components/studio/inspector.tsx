@@ -16,7 +16,7 @@ import {ArrowDown,
   Lock as LockIcon,
   Unlock as UnlockIcon,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   ColorInput,
   Field,
@@ -53,6 +53,8 @@ import {
   drawnStickerIds,
   isUploadedSticker,
   Sticker,
+  stickerCategories,
+  stickerCategory,
   stickerName,
   type AnyStickerId,
   type StickerPlacement,
@@ -585,13 +587,32 @@ function StickerGrid({
   onUpload?: (id: AnyStickerId) => void;
 }) {
   const [more, setMore] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   const pack = [...boardStickerIds, ...drawnStickerIds];
   const peek = peekStickers(pack, selected, STICKER_PEEK);
+
+  const filteredBoardStickers = useMemo(() => {
+    if (activeCategory === "all") return boardStickerIds;
+    if (activeCategory === "animated") return [];
+    if (activeCategory === "cat") {
+      return boardStickerIds.filter((id) => {
+        const cat = stickerCategory(id);
+        return cat === "cat" || cat === "dog";
+      });
+    }
+    return boardStickerIds.filter((id) => stickerCategory(id) === activeCategory);
+  }, [activeCategory]);
+
+  const filteredAnimatedStickers = useMemo(() => {
+    if (activeCategory === "all" || activeCategory === "animated") return drawnStickerIds;
+    return [];
+  }, [activeCategory]);
+
   const groups: { title: string; ids: AnyStickerId[]; upload?: boolean }[] = more
     ? [
         { title: "Yours", ids: yours, upload: !!onUpload },
-        { title: "Memes & doodles", ids: boardStickerIds },
-        { title: "Animated", ids: drawnStickerIds },
+        ...(filteredBoardStickers.length ? [{ title: `Board Stickers (${filteredBoardStickers.length})`, ids: filteredBoardStickers }] : []),
+        ...(filteredAnimatedStickers.length ? [{ title: "Animated Stickers", ids: filteredAnimatedStickers }] : []),
       ]
     : [
         { title: "Yours", ids: yours, upload: !!onUpload },
@@ -601,6 +622,25 @@ function StickerGrid({
 
   return (
     <div className="space-y-3">
+      {more && (
+        <div className="flex flex-wrap gap-1 pb-1">
+          {stickerCategories.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setActiveCategory(cat.id)}
+              className={cn(
+                "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
+                activeCategory === cat.id
+                  ? "bg-ink text-paper"
+                  : "bg-paper border border-line text-muted hover:text-ink hover:border-ink/30",
+              )}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+      )}
       {groups.filter((g) => g.ids.length || g.upload).map((g) => (
         <div key={g.title}>
           <p className="type-label mb-1.5 text-[10px] text-muted">{g.title}</p>
@@ -664,7 +704,7 @@ function StickerGrid({
           onClick={() => setMore((m) => !m)}
           className="flex h-10 w-full items-center justify-center gap-1.5 rounded-2xl border border-dashed border-ink/25 text-sm font-medium hover:border-ink/40 hover:bg-paper"
         >
-          {more ? "Show less" : "Explore more"}
+          {more ? "Show less" : `Explore all ${pack.length} stickers`}
           <ChevronDown className={cn("size-4 text-muted transition-transform", more && "rotate-180")} />
         </button>
       )}

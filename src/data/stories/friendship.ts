@@ -30,7 +30,7 @@ export const friendshipStories = [
         sub: "Thread colour: whatever was left. Sentiment: aggressive.",
         done: "Stop tugging it.",
         stickers: [{ id: "b-tiny-heart", at: "tr", size: "s" }],
-        reaction: "m-kuchu-puchu",
+        reaction: "pin-006",
       },
       {
         type: "question",
@@ -42,8 +42,8 @@ export const friendshipStories = [
         no: "Absolutely not",
         after: "Too late. It’s on. Don’t tug.",
         done: "I saw you try to hide it. Cute.",
-        stickers: [{ id: "m-side-eye", at: "br" }],
-        reaction: "m-ahhh",
+        stickers: [{ id: "pin-019", at: "br" }],
+        reaction: "pin-029",
       },
       {
         type: "meter",
@@ -53,7 +53,7 @@ export const friendshipStories = [
         label: "Band-o-meter",
         levels: ["Fashion", "Friendship", "Circulation?", "Married (jk)", "Do not remove"],
         done: "Yeah. Leave it.",
-        stickers: [{ id: "m-hat-dog", at: "tl", size: "s" }],
+        stickers: [{ id: "pin-012", at: "tl", size: "s" }],
         reaction: "m-heart-monkey",
       },
       {
@@ -65,7 +65,7 @@ export const friendshipStories = [
         terms: "No taking it off in the bathroom · I’ll know · extra masala included",
         done: "I’m already boiling the water.",
         stickers: [{ id: "b-flowers", at: "tr" }],
-        reaction: "m-kuchu-puchu",
+        reaction: "pin-006",
       },
       {
         type: "polaroids",
@@ -78,7 +78,7 @@ export const friendshipStories = [
           { caption: "Late night chai runs", date: "3 AM", tone: "dusk" },
           { caption: "Real ones forever", date: "Always", tone: "leaf" },
         ],
-        stickers: [{ id: "b-besties", at: "tr", size: "s" }],
+        stickers: [{ id: "pin-173", at: "tr", size: "s" }],
       },
       {
         type: "letter",
@@ -115,8 +115,8 @@ export const friendshipStories = [
         reveal: "Friendship v8.4. Changelog: you. Known issues: you.",
         sub: "Estimated time: forever. Storage: I already made space.",
         done: "Installed. You’re welcome.",
-        stickers: [{ id: "m-dance-kitten", at: "bl" }],
-        reaction: "m-ahhh",
+        stickers: [{ id: "pin-021", at: "bl" }],
+        reaction: "pin-029",
       },
       {
         type: "receipt",
@@ -173,7 +173,7 @@ export const friendshipStories = [
           },
         ],
         done: "Passed. Barely. Shipping you anyway.",
-        stickers: [{ id: "m-side-eye", at: "tr" }],
+        stickers: [{ id: "pin-034", at: "tr" }],
         reaction: "m-bow-down",
       },
       {
