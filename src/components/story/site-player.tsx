@@ -6,7 +6,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType }
 import { accentMoodVars } from "@/components/experiences/birthday/accent-moods";
 import { giftFontRoot } from "./gift-fonts";
 import { Confetti, type ConfettiHandle } from "@/components/experiences/confetti";
-import { cn } from "@/lib/utils";
 import { useGiftMusic } from "./gift-music";
 import { SceneFontsContext, ScenePositionsContext, StoryContext, type SceneProps, type StoryApi } from "./scene-kit";
 import { SCENES } from "./scene-registry";
@@ -25,16 +24,7 @@ const SITE_SECTIONS: Partial<Record<SceneType, ComponentType<SceneProps<any>>>> 
   letter: SiteLetter,
 };
 
-const navNames: Partial<Record<SceneType, string>> = {
-  hero: "Home",
-  countdown: "Days",
-  noticed: "Notes",
-  gallery: "Photos",
-  playlist: "Songs",
-  letter: "Letter",
-};
-
-/** A gift as one long, scrolling page: hero, sections, a floating menu. */
+/** A gift as one long, scrolling page: hero, sections, no section bar. */
 export function SitePlayer({
   story,
   slug,
@@ -51,7 +41,6 @@ export function SitePlayer({
 }) {
   const scenes = useMemo(() => story.scenes.filter((s) => !s.hidden), [story.scenes]);
   const palette = story.palette;
-  const [active, setActive] = useState(initialIndex);
   const confetti = useRef<ConfettiHandle>(null);
   const sections = useRef<(HTMLElement | null)[]>([]);
   const reported = useRef(onIndexChange);
@@ -74,10 +63,7 @@ export function SitePlayer({
         for (const e of entries) {
           if (!e.isIntersecting) continue;
           const i = sections.current.indexOf(e.target as HTMLElement);
-          if (i >= 0) {
-            setActive(i);
-            reported.current?.(i);
-          }
+          if (i >= 0) reported.current?.(i);
         }
       },
       { rootMargin: "-45% 0px -50% 0px" },
@@ -104,14 +90,6 @@ export function SitePlayer({
   );
 
   const giftFace = giftFontRoot(story.font);
-  const brand = (scenes.find((s) => s.type === "hero")?.title ?? story.recipient)
-    .replace(/\*/g, "")
-    .replaceAll("{to}", story.recipient)
-    .replaceAll("{from}", story.sender);
-  const navItems = scenes
-    .map((s, i) => ({ i, label: s.nav ?? navNames[s.type] }))
-    .filter((n): n is { i: number; label: string } => !!n.label)
-    .slice(0, 6);
 
   return (
     <StoryContext.Provider value={api}>
@@ -130,41 +108,13 @@ export function SitePlayer({
       >
         <Confetti ref={confetti} colors={[palette.accent, palette.gold, palette.pink, palette.cream]} />
 
-        {/* Floating menu: bottom on phones, top on bigger screens */}
-        {!studio && navItems.length > 1 && (
-          <nav
-            aria-label="Sections"
-            className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 lg:inset-x-0 lg:bottom-auto lg:top-5 lg:flex lg:justify-center lg:px-4"
-          >
-            <div
-              className="flex w-full items-center gap-0.5 rounded-full border p-1 shadow-[0_12px_30px_-14px_rgba(0,0,0,.35)] backdrop-blur-md lg:w-auto lg:max-w-4xl lg:gap-1 lg:p-1.5"
-              style={{ backgroundColor: `${palette.cream}cc`, borderColor: `${palette.cream}`, color: palette.ink }}
-            >
-              <span className="hidden shrink-0 px-3 text-sm font-semibold lg:block">{brand}</span>
-              {navItems.map((n) => (
-                <button
-                  key={n.i}
-                  type="button"
-                  onClick={() => sections.current[n.i]?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                  className={cn(
-                    "type-label min-w-0 flex-1 truncate rounded-full px-1 py-2 text-center text-[9px] tracking-[0.06em] transition-colors lg:flex-none lg:px-3 lg:text-[10px]",
-                  )}
-                  style={active === n.i ? { backgroundColor: palette.accent, color: palette.cream } : undefined}
-                >
-                  {n.label}
-                </button>
-              ))}
-            </div>
-          </nav>
-        )}
-
         <main>
           {scenes.map((scene, i) => (
             <SiteBlock key={i} scene={scene} index={i} studio={!!studio} refCb={(el) => (sections.current[i] = el)} />
           ))}
         </main>
 
-        <footer className="px-5 pb-28 pt-10 text-center md:pb-16">
+        <footer className="px-5 pb-16 pt-10 text-center">
           <Link href={`/templates/${slug}`} className="type-label opacity-60 hover:opacity-100">
             Made with <span className="type-wordmark text-base normal-case">TyniTales.</span> Make one for someone →
           </Link>
@@ -179,7 +129,7 @@ export function SitePlayer({
               else play({ openLink: true });
             }}
             aria-label={playing ? "Stop the music" : "Play the music"}
-            className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-3 z-40 grid size-10 place-items-center rounded-full backdrop-blur lg:bottom-5 lg:right-4"
+            className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-3 z-40 grid size-10 place-items-center rounded-full backdrop-blur lg:bottom-5 lg:right-4"
             style={{ backgroundColor: `${palette.cream}cc`, color: palette.ink }}
           >
             {playing ? <Volume2 className="size-4" /> : <VolumeX className="size-4 opacity-60" />}
@@ -198,7 +148,7 @@ function SiteBlock({ scene, index, studio, refCb }: { scene: Scene; index: numbe
   const Section = SITE_SECTIONS[scene.type];
   const Game = SCENES[scene.type];
   return (
-    <div ref={refCb} data-studio-scene={index} className="relative scroll-mt-0 lg:scroll-mt-24">
+    <div ref={refCb} data-studio-scene={index} className="relative scroll-mt-0">
       <ScenePositionsContext.Provider value={scene.positions}>
         <SceneFontsContext.Provider value={scene.fonts}>
           {scene.type !== "knock" && <StickerLayer stickers={scene.stickers} />}

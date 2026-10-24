@@ -53,7 +53,7 @@ export const friendshipStories = [
         label: "Band-o-meter",
         levels: ["Fashion", "Friendship", "Circulation?", "Married (jk)", "Do not remove"],
         done: "Yeah. Leave it.",
-        stickers: [{ id: "pin-012", at: "tl", size: "s" }],
+        stickers: [{ id: "m-cat-kiss", at: "tl" }],
         reaction: "m-heart-monkey",
       },
       {

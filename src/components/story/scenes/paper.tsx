@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useMotionValue, useTransform, type PanInfo } from "motion/react";
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
 import { Paper, SceneShell, StoryButton, StudioHit, StudioPager, Tape, usePickedItem, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
 import type { Scene } from "../types";
@@ -116,8 +116,14 @@ export function DeckScene({ scene, done, onDone }: SceneProps<S<"deck">>) {
             if (depth > 3) return null;
             return (
               <StudioHit key={i} field="cards" item={i} className="absolute inset-0">
-                <DeckCard index={i} total={scene.cards.length} depth={depth} onThrow={next}>
-                  {fill(text)}
+                <DeckCard index={i} depth={depth} onThrow={next} label={fill(text)}>
+                  <span className="type-label text-[10px] opacity-50">
+                    No. {i + 1} of {scene.cards.length}
+                  </span>
+                  <span className="type-hand text-[1.75rem] leading-tight">{fill(text)}</span>
+                  <span className="text-2xl" style={{ color: palette.accent }} aria-hidden>
+                    ♥
+                  </span>
                 </DeckCard>
               </StudioHit>
             );
@@ -137,28 +143,30 @@ export function DeckScene({ scene, done, onDone }: SceneProps<S<"deck">>) {
 function DeckCard({
   children,
   index,
-  total,
   depth,
   onThrow,
+  label,
+  tint,
 }: {
-  children: string;
+  children: ReactNode;
   index: number;
-  total: number;
   depth: number;
   onThrow: () => void;
+  label: string;
+  tint?: string;
 }) {
   const { palette } = useStory();
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-16, 16]);
   const top = depth === 0;
-  const tint = [palette.cream, palette.pink, palette.gold, palette.cream][index % 4];
+  const bg = tint ?? [palette.cream, palette.pink, palette.gold, palette.cream][index % 4];
   const dragged = useRef(false);
 
   return (
     <motion.button
       type="button"
-      className="absolute inset-0 flex flex-col justify-between rounded-[1.6rem] p-6 text-left shadow-[0_24px_50px_-28px_rgba(27,18,21,0.6)]"
-      style={{ x, rotate: top ? rotate : depth * (index % 2 ? 3 : -3), zIndex: 10 - depth, backgroundColor: tint, color: palette.ink }}
+      className="absolute inset-0 flex min-h-0 flex-col justify-between rounded-[1.6rem] p-4 text-left shadow-[0_24px_50px_-28px_rgba(27,18,21,0.6)] sm:p-6"
+      style={{ x, rotate: top ? rotate : depth * (index % 2 ? 3 : -3), zIndex: 10 - depth, backgroundColor: bg, color: palette.ink }}
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1 - depth * 0.04, y: depth * 10, opacity: 1 }}
       exit={{ x: x.get() < 0 ? -420 : 420, rotate: x.get() < 0 ? -30 : 30, opacity: 0, transition: { duration: 0.4 } }}
@@ -180,16 +188,73 @@ function DeckCard({
         if (top) onThrow();
       }}
       tabIndex={top ? 0 : -1}
-      aria-label={top ? `${children}. Next` : undefined}
+      aria-label={top ? `${label}. Next` : undefined}
     >
-      <span className="type-label text-[10px] opacity-50">
-        No. {index + 1} of {total}
-      </span>
-      <span className="type-hand text-[1.75rem] leading-tight">{children}</span>
-      <span className="text-2xl" style={{ color: palette.accent }} aria-hidden>
-        ♥
-      </span>
+      {children}
     </motion.button>
+  );
+}
+
+/* ───────────── Album: swipe a stack of photo cards ───────────── */
+
+export function AlbumScene({ scene, done, onDone }: SceneProps<S<"album">>) {
+  const { palette, fill } = useStory();
+  const studio = useStudioEdit();
+  const picked = usePickedItem(["photos"]);
+  const [thrown, setThrown] = useState(done ? scene.photos.length : 0);
+  const gone = studio ? Math.min(picked ?? 0, Math.max(0, scene.photos.length - 1)) : thrown;
+  const left = scene.photos.length - gone;
+
+  function next() {
+    const n = thrown + 1;
+    setThrown(n);
+    if (n >= scene.photos.length) onDone();
+  }
+
+  return (
+    <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
+      <div className="relative h-[min(58vh,420px)] w-[min(82vw,300px)]">
+        {left === 0 && (
+          <div className="grid h-full place-items-center px-6 text-center">
+            <p className="type-display text-3xl" style={{ color: palette.accent }}>
+              That’s us.
+            </p>
+          </div>
+        )}
+        <AnimatePresence>
+          {scene.photos.map((ph, i) => {
+            if (i < gone) return null;
+            const depth = i - gone;
+            if (depth > 3) return null;
+            return (
+              <StudioHit key={i} field="photos" item={i} className="absolute inset-0">
+                <DeckCard index={i} depth={depth} onThrow={next} label={fill(ph.caption)} tint={palette.cream}>
+                  <span className="type-label text-[10px] opacity-50">
+                    No. {i + 1} of {scene.photos.length}
+                  </span>
+                  <div className="relative mt-3 min-h-0 flex-1">
+                    <div className="size-full overflow-hidden rounded-[1.1rem] bg-white">
+                      <PhotoFill src={ph.src} tone={ph.tone} alt={fill(ph.caption)} className="size-full" iconClassName="size-12" />
+                    </div>
+                    <Tape className="-right-3 -top-2 w-14 rotate-[28deg]" color={[palette.pink, palette.gold, palette.accent][i % 3]} />
+                  </div>
+                  <div className="mt-3">
+                    <p className="type-hand text-[1.35rem] leading-tight">{fill(ph.caption)}</p>
+                    {ph.date && <p className="type-hand mt-0.5 text-sm opacity-55">{ph.date}</p>}
+                  </div>
+                </DeckCard>
+              </StudioHit>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+      {left > 0 && !studio && (
+        <p className="type-label mt-6 tabular-nums opacity-60">
+          {gone + 1} / {scene.photos.length}
+        </p>
+      )}
+      <StudioPager count={scene.photos.length} field="photos" current={gone} />
+    </SceneShell>
   );
 }
 

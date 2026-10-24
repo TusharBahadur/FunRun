@@ -52,9 +52,7 @@ const layoutFor: Record<string, Layout> = {
   candle: "candle",
   "make-a-wish": "cakescrapbook",
   "the-party": "partychat",
-  "still-you": "filmstrip",
-  "our-map": "mapbrowser",
-  "written-in-the-stars": "celestialfan",
+  "paper-hearts": "scrapbook",
   "sealed-with-love": "waxenvelope",
   "midnight-notes": "midnightchat",
   "forever-yours": "foreverscrapbook",
@@ -93,6 +91,7 @@ const sceneArt: Record<Scene["type"], StickerId> = {
   meter: "heart",
   receipt: "chai",
   deck: "heart",
+  album: "bunny",
   coupon: "gift",
   jar: "chai",
   polaroids: "bunny",
@@ -167,6 +166,7 @@ function giftPhotos(scenes: Scene[], count: number): Photo[] {
   for (const s of scenes) {
     if (s.type === "spotlight") out.push({ caption: "", tone: s.tone ?? "rose", src: s.photo });
     if (s.type === "polaroids") out.push(...s.photos);
+    if (s.type === "album") out.push(...s.photos);
     if (s.type === "letter" && s.photo) out.push({ caption: "", tone: "rose", src: s.photo });
     if (s.type === "finale" && s.photos) out.push(...s.photos);
     if (s.type === "gallery") out.push(...s.photos);
@@ -193,7 +193,7 @@ function giftLines(scenes: Scene[]): string[] {
 
 function scenePhoto(scene: Scene): Photo | null {
   if (scene.type === "spotlight") return { caption: "", tone: scene.tone ?? "rose", src: scene.photo };
-  if (scene.type === "polaroids") return scene.photos[0] ?? null;
+  if (scene.type === "polaroids" || scene.type === "album") return scene.photos[0] ?? null;
   if (scene.type === "letter" && scene.photo) return { caption: "", tone: "rose", src: scene.photo };
   if (scene.type === "award" && scene.photo) return { caption: scene.engraving, tone: "rose", src: scene.photo };
   if (scene.type === "finale" && scene.photos?.length) return scene.photos[0];
@@ -736,7 +736,6 @@ function SiteLayout({ g }: { g: Gift }) {
   const countdown = scenes.find((s): s is Extract<Scene, { type: "countdown" }> => s.type === "countdown");
   const noticed = scenes.find((s): s is Extract<Scene, { type: "noticed" }> => s.type === "noticed");
   const photos = giftPhotos(scenes, 3);
-  const nav = ["Home", countdown ? "Countdown" : null, "Photos", "Letter"].filter(Boolean) as string[];
   const serif = "type-display font-semibold";
   return (
     <Stage style={{ background: `radial-gradient(90% 60% at 0% 0%, ${p.pink}, transparent 70%), radial-gradient(80% 60% at 100% 100%, ${p.accent}30, transparent 70%), ${p.bg}` }}>
@@ -750,14 +749,6 @@ function SiteLayout({ g }: { g: Gift }) {
         <div className="relative aspect-[4/3.2] overflow-hidden">
           <PhotoFill src={hero?.photo} tone={hero?.tone ?? "rose"} alt="" className="size-full" iconClassName="size-[8cqw]" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,0) 40%, rgba(0,0,0,.55))" }} />
-          <div className="absolute inset-x-[4cqw] top-[3cqw] flex items-center justify-between rounded-full bg-white/75 px-[2.6cqw] py-[1cqw] backdrop-blur-sm" style={{ color: p.ink }}>
-            <span className={cn(serif, "text-[2.3cqw]")}>{g.fill((hero?.title ?? story.recipient).replace(/\*/g, ""))}</span>
-            <span className="flex gap-[1.6cqw] font-mono text-[1.4cqw] uppercase opacity-70">
-              {nav.map((n) => (
-                <span key={n}>{n}</span>
-              ))}
-            </span>
-          </div>
           <p className="type-display absolute inset-x-0 top-[38%] text-center text-[8cqw] leading-none text-white drop-shadow">
             {unstar(g.fill(hero?.title ?? g.opening))}
           </p>
@@ -765,10 +756,10 @@ function SiteLayout({ g }: { g: Gift }) {
         </div>
         <div className="px-[4cqw] py-[3.5cqw]" style={{ backgroundColor: p.bg, color: p.fg }}>
           {countdown ? (
-            <div className="grid grid-cols-4 gap-[1.4cqw]">
+            <div className="mx-auto grid max-w-[70%] grid-cols-2 gap-[1.6cqw]">
               {["Days", "Hours", "Min", "Sec"].map((u, i) => (
-                <div key={u} className="rounded-[1.6cqw] border py-[1.6cqw] text-center" style={{ borderColor: `${p.ink}18`, backgroundColor: `${p.cream}` }}>
-                  <span className={cn(serif, "block text-[4cqw] leading-none")}>{["124", "08", "42", "17"][i]}</span>
+                <div key={u} className="flex aspect-square flex-col items-center justify-center rounded-[2cqw] border" style={{ borderColor: `${p.ink}18`, backgroundColor: `${p.cream}` }}>
+                  <span className={cn(serif, "block text-[5.2cqw] leading-none")}>{["124", "08", "42", "17"][i]}</span>
                   <span className="mt-[0.6cqw] block font-mono text-[1.3cqw] uppercase opacity-55">{u}</span>
                 </div>
               ))}
@@ -1028,11 +1019,11 @@ function SiteFlowVideo({ template }: { template: Template }) {
           {countdown && (
             <div className="rounded-xl p-[2.5cqw] text-center" style={{ backgroundColor: `${p.accent}20` }}>
               <span className="font-mono text-[1.6cqw] uppercase block opacity-60">Live Countdown</span>
-              <div className="grid grid-cols-4 gap-[1cqw] mt-[1cqw]">
+              <div className="mx-auto mt-[1.4cqw] grid max-w-[70%] grid-cols-2 gap-[1.2cqw]">
                 {["124", "08", "42", "17"].map((v, i) => (
-                  <div key={i} className="rounded-md bg-white py-[1cqw] text-center">
-                    <span className="font-mono font-bold text-[2.8cqw] block">{v}</span>
-                    <span className="text-[1.4cqw] uppercase opacity-50 block">{["days", "hrs", "min", "sec"][i]}</span>
+                  <div key={i} className="flex aspect-square flex-col items-center justify-center rounded-[1.4cqw] bg-white">
+                    <span className="font-mono font-bold text-[3.2cqw] block leading-none">{v}</span>
+                    <span className="text-[1.4cqw] uppercase opacity-50 block mt-[0.4cqw]">{["days", "hrs", "min", "sec"][i]}</span>
                   </div>
                 ))}
               </div>

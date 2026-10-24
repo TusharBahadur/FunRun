@@ -254,37 +254,22 @@ export function LightsScene({ scene, done, onDone }: SceneProps<S<"lights">>) {
   );
 }
 
-/* ───────────── Incoming call: pick up until it connects ───────────── */
+/* ───────────── Incoming call: slide to answer, then it connects ───────────── */
 
 export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
   const { fill, palette } = useStory();
-  const [knocks, setKnocks] = useState(done ? scene.knocks : 0);
-  const [shake, setShake] = useState(0);
   const caller = scene.caller ?? DEFAULT_CALLER;
   const party = scene.party ?? DEFAULT_PARTY;
   const callerSrc = stickerImage(caller);
-
-  function knock() {
-    if (done) return;
-    const n = knocks + 1;
-    setKnocks(n);
-    setShake((s) => s + 1);
-    if (n >= scene.knocks) {
-      setTimeout(() => {
-        onDone();
-      }, 350);
-    }
-  }
 
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done} layout="stack">
       <div className="relative">
         <GiftCall
           open={done}
-          shake={shake}
-          onKnock={knock}
-          knocks={knocks}
-          total={scene.knocks}
+          onAnswer={() => {
+            if (!done) onDone();
+          }}
           caller={caller}
           party={party}
           stickers={scene.stickers}
@@ -294,17 +279,6 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
             </StudioHit>
           }
         />
-        {!done && knocks > 0 && (
-          <motion.div
-            key={`t${knocks}`}
-            className="pointer-events-none absolute -right-4 top-6 size-14"
-            initial={{ opacity: 0, y: 12, scale: 0.4, rotate: -20 }}
-            animate={{ opacity: [0, 1, 1, 0], y: -28, scale: 1, rotate: 12 }}
-            transition={{ duration: 0.85 }}
-          >
-            <Sticker id="heart" className="size-14" />
-          </motion.div>
-        )}
       </div>
       <StudioAlso label="Who’s calling — before they pick up" field="caller">
         <div className="relative w-24 overflow-hidden rounded-[1.6rem]" style={{ backgroundColor: palette.cream }}>

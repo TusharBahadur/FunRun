@@ -1,10 +1,10 @@
 "use client";
 
-import { Phone } from "lucide-react";
+import { ChevronRight, Phone } from "lucide-react";
 import { motion } from "motion/react";
-import { useId, type ReactNode } from "react";
+import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { StudioHit, useStory } from "./scene-kit";
+import { capturePointer, StudioHit, useStory } from "./scene-kit";
 import { Sticker, stickerImage, type AnyStickerId, type StickerPlacement, type StickerSpot } from "./stickers";
 import type { StoryPalette } from "./types";
 
@@ -85,39 +85,31 @@ export function CallArt({
 
 export function GiftCall({
   open,
-  shake,
-  onKnock,
-  knocks,
-  total,
+  onAnswer,
   reveal,
   caller = DEFAULT_CALLER,
   party = DEFAULT_PARTY,
   stickers,
 }: {
   open: boolean;
-  shake: number;
-  onKnock: () => void;
-  knocks: number;
-  total: number;
+  onAnswer: () => void;
   reveal: ReactNode;
   caller?: AnyStickerId;
   party?: AnyStickerId;
   stickers?: StickerPlacement[];
 }) {
-  const { palette } = useStory();
-  const uid = useId().replace(/:/g, "");
+  const { palette, from } = useStory();
 
   return (
-    <div className="relative mx-auto w-[min(64vw,228px)]">
+    <div className="relative mx-auto w-[min(72vw,260px)]">
       {stickers?.map((s, i) => (
         <PhoneSticker key={`${s.at}-${i}`} placement={s} index={i} delay={0.08 + i * 0.12} />
       ))}
 
       <motion.div
         className="relative"
-        animate={!open && shake ? { rotate: [0, -7, 7, -5, 5, 0], y: [0, -6, 0] } : { rotate: 0, y: 0 }}
-        transition={{ duration: 0.42 }}
-        key={open ? "up" : `r${shake}`}
+        animate={open ? { rotate: 0, y: 0 } : { rotate: [0, -4, 4, -3, 3, 0], y: [0, -5, 0] }}
+        transition={open ? { duration: 0.3 } : { duration: 0.7, repeat: Infinity, repeatDelay: 0.85 }}
       >
         <div className="rounded-[2.15rem] p-[9px] pt-[11px]" style={shell(palette)}>
           <span aria-hidden className="mx-auto mb-2 block h-1.5 w-14 rounded-full" style={{ backgroundColor: `${palette.ink}28` }} />
@@ -137,43 +129,131 @@ export function GiftCall({
                 </div>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={onKnock}
-                aria-label={`Pick up (${knocks} of ${total})`}
-                className="absolute inset-0 outline-none"
-              >
+              <div className="absolute inset-0">
                 <StudioHit field="caller" as="span" className="absolute inset-0 block">
                   <ScreenFill id={caller} fit="cover" />
                 </StudioHit>
-                <span className="absolute inset-x-0 bottom-4 z-[1] grid place-items-center">
-                  <span className="relative grid size-[3.35rem] place-items-center">
-                    <motion.span
-                      aria-hidden
-                      className="absolute inset-0 rounded-full"
-                      style={{ border: `2px solid ${PICKUP}` }}
-                      animate={{ scale: [1, 1.55], opacity: [0.7, 0] }}
-                      transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
-                    />
-                    <span className="relative grid size-full place-items-center rounded-full" style={{ backgroundColor: PICKUP }}>
-                      <Phone className="size-6 text-paper" strokeWidth={2.4} />
-                    </span>
-                  </span>
-                </span>
-              </button>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/50" />
+                <div className="absolute inset-x-0 top-5 z-[1] px-3 text-center text-white">
+                  <p className="type-label text-[10px] tracking-[0.14em] opacity-80">Incoming call</p>
+                  <p className="type-display mt-1.5 text-[1.35rem] font-semibold leading-none">{from}</p>
+                  <p className="type-label mt-1.5 text-[9px] opacity-60">Mobile</p>
+                </div>
+              </div>
             )}
           </div>
           <span aria-hidden className="mx-auto mt-2.5 block h-1 w-10 rounded-full" style={{ backgroundColor: `${palette.ink}22` }} />
         </div>
       </motion.div>
 
-      <div className="mt-4 flex items-center justify-center gap-1.5" aria-hidden>
-        {Array.from({ length: total }).map((_, i) => (
-          <span key={`${uid}-${i}`} className="block size-7">
-            <Sticker id="heart" className={cn("size-7", i >= knocks && "opacity-25")} />
-          </span>
-        ))}
-      </div>
+      {!open && <SlideToAnswer onAnswer={onAnswer} />}
+    </div>
+  );
+}
+
+const THUMB = 48;
+
+function SlideToAnswer({ onAnswer }: { onAnswer: () => void }) {
+  const { palette } = useStory();
+  const track = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+  const [x, setX] = useState(0);
+  const [max, setMax] = useState(0);
+  const answered = useRef(false);
+
+  function measure() {
+    const el = track.current;
+    if (!el) return 0;
+    const next = Math.max(0, el.clientWidth - THUMB - 8);
+    setMax(next);
+    return next;
+  }
+
+  useEffect(() => {
+    const el = track.current;
+    if (!el) return;
+    measure();
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  function fromEvent(e: PointerEvent<HTMLDivElement>, span = max) {
+    const el = track.current;
+    if (!el) return 0;
+    const r = el.getBoundingClientRect();
+    return Math.min(span, Math.max(0, e.clientX - r.left - THUMB / 2 - 4));
+  }
+
+  function answer(span: number) {
+    if (answered.current) return;
+    answered.current = true;
+    setX(span);
+    onAnswer();
+  }
+
+  function release(nx: number, span: number) {
+    if (answered.current) return;
+    if (span > 0 && nx >= span * 0.78) {
+      answer(span);
+      return;
+    }
+    setX(0);
+  }
+
+  return (
+    <div
+      ref={track}
+      role="slider"
+      aria-label="Slide to answer"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={max ? Math.round((x / max) * 100) : 0}
+      className="relative mt-5 h-14 w-full touch-none select-none overflow-hidden rounded-full border"
+      style={{ backgroundColor: `${palette.cream}24`, borderColor: `${palette.cream}30` }}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key !== "Enter" && e.key !== " " && e.key !== "ArrowRight") return;
+        e.preventDefault();
+        answer(measure());
+      }}
+      onPointerDown={(e) => {
+        capturePointer(e);
+        dragging.current = true;
+        setX(fromEvent(e, measure()));
+      }}
+      onPointerMove={(e) => {
+        if (!dragging.current || answered.current) return;
+        setX(fromEvent(e));
+      }}
+      onPointerUp={(e) => {
+        if (!dragging.current) return;
+        dragging.current = false;
+        const span = measure();
+        release(fromEvent(e, span), span);
+      }}
+      onPointerCancel={() => {
+        dragging.current = false;
+        if (!answered.current) setX(0);
+      }}
+    >
+      <span
+        className="pointer-events-none absolute inset-0 flex items-center justify-center gap-0.5"
+        style={{ opacity: max ? Math.max(0, 1 - x / max) : 1 }}
+      >
+        <span className="type-label text-[11px] tracking-[0.12em] opacity-55">Slide to answer</span>
+        <ChevronRight className="size-3.5 opacity-40" strokeWidth={2.4} aria-hidden />
+        <ChevronRight className="-ml-2.5 size-3.5 opacity-25" strokeWidth={2.4} aria-hidden />
+      </span>
+      <motion.span
+        aria-hidden
+        className="absolute top-1 left-1 grid size-12 place-items-center rounded-full shadow-[0_8px_16px_-8px_rgba(27,18,21,.45)]"
+        style={{ backgroundColor: PICKUP }}
+        animate={{ x }}
+        transition={{ type: "spring", stiffness: 420, damping: 36, mass: 0.6 }}
+      >
+        <Phone className="size-5 text-paper" strokeWidth={2.4} />
+      </motion.span>
     </div>
   );
 }

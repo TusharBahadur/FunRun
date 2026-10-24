@@ -193,16 +193,16 @@ export function ActivationTimer({
           {/* Main Display: Ticking Countdown vs Formatted Date */}
           {viewMode === "countdown" ? (
             <div className="py-3">
-              <div className="grid grid-cols-4 gap-2 text-center">
+              <div className="mx-auto grid max-w-[14rem] grid-cols-2 gap-2 text-center">
                 {[
                   { val: timeLeft.days, unit: "days" },
                   { val: timeLeft.hours, unit: "hours" },
                   { val: timeLeft.minutes, unit: "mins" },
                   { val: timeLeft.seconds, unit: "secs" },
-                ].map((item, idx) => (
+                ].map((item) => (
                   <div
                     key={item.unit}
-                    className="flex flex-col items-center justify-center rounded-xl bg-cream/70 py-2 border border-line/40 shadow-2xs"
+                    className="flex aspect-square flex-col items-center justify-center rounded-xl bg-cream/70 border border-line/40 shadow-2xs"
                   >
                     <span
                       key={item.val}
@@ -392,7 +392,7 @@ export function RecipientUnlockCountdown({
       </h1>
 
       {/* Ticking Digital Block Countdown */}
-      <div className="mt-8 grid grid-cols-4 gap-3 sm:gap-4 max-w-md w-full">
+      <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 max-w-xs w-full">
         {[
           { val: timeLeft.days, label: "Days" },
           { val: timeLeft.hours, label: "Hours" },
@@ -401,15 +401,15 @@ export function RecipientUnlockCountdown({
         ].map((item) => (
           <div
             key={item.label}
-            className="flex flex-col items-center rounded-2xl bg-white/70 p-3 sm:p-4 shadow-sm backdrop-blur-xs border border-white/40"
+            className="flex aspect-square flex-col items-center justify-center rounded-2xl bg-white/70 p-3 sm:p-4 shadow-sm backdrop-blur-xs border border-white/40"
           >
             <span
               key={item.val}
-              className="font-mono text-2xl sm:text-4xl font-bold tracking-tight text-ink"
+              className="font-mono text-2xl sm:text-4xl font-bold tracking-tight text-ink leading-none"
             >
               {String(item.val).padStart(2, "0")}
             </span>
-            <span className="font-mono text-[10px] sm:text-xs uppercase tracking-wider opacity-60 mt-1">
+            <span className="font-mono text-[10px] sm:text-xs uppercase tracking-wider opacity-60 mt-2">
               {item.label}
             </span>
           </div>

@@ -29,8 +29,8 @@ export const birthdayStories = [
         candles: 3,
         reveal: "Almost midnight. *Your* midnight.",
         done: "One more minute…",
-        stickers: [{ id: "pin-004", at: "bl" }],
-        reaction: "pin-104",
+        stickers: [{ id: "gift", at: "bl" }],
+        reaction: "m-ahhh",
       },
       {
         type: "scratch",
@@ -40,8 +40,8 @@ export const birthdayStories = [
         reveal: "Happy birthday, {to}!! I was first, right?",
         sub: "From {from}. Screenshot this as proof.",
         done: "First. Obviously.",
-        stickers: [{ id: "pin-022", at: "tr", size: "s" }],
-        reaction: "pin-020",
+        stickers: [{ id: "m-speechless", at: "tr" }],
+        reaction: "m-kuchu-puchu",
       },
       {
         type: "spotlight",
@@ -56,7 +56,7 @@ export const birthdayStories = [
           "First wish of the year. Mine.",
         ],
         done: "Yeah. That’s you.",
-        stickers: [{ id: "pin-173", at: "tl", size: "s" }],
+        stickers: [{ id: "m-rose-kitten", at: "tl" }],
       },
       {
         type: "polaroids",
@@ -79,8 +79,11 @@ export const birthdayStories = [
         hint: "Tap each flame to blow it out",
         age: 27,
         done: "What did you wish for? Jk, don’t tell me.",
-        stickers: [{ id: "b-cake", at: "bl" }],
-        reaction: "pin-168",
+        stickers: [
+          { id: "b-cake", at: "bl" },
+          { id: "popper", at: "tr", size: "s" },
+        ],
+        reaction: "m-dance-cat",
       },
       {
         type: "letter",
@@ -91,8 +94,8 @@ export const birthdayStories = [
           "Those photos are some of my favourite days with you. We need more of those this year. 27 suits you, {to}. Now go to sleep. Or don’t. It’s your birthday.",
         ],
         signoff: "Love you, {from}",
-        photo: photo("chai-hands"),
-        stickers: [{ id: "b-hug-hearts", at: "bl" }],
+        photo: photo("cat"),
+        stickers: [{ id: "b-brain-bday", at: "bl" }],
       },
     ],
   }),
@@ -120,7 +123,7 @@ export const birthdayStories = [
         insideSub: "Keep going ↓",
         stickers: [
           { id: "b-flowers", at: "tr" },
-          { id: "b-tiny-heart", at: "bl", size: "s" },
+          { id: "m-glam-cat", at: "bl" },
         ],
         reaction: "pin-104",
       },
@@ -135,7 +138,7 @@ export const birthdayStories = [
         done: "No notes. Okay, four notes.",
         stickers: [
           { id: "crown", at: "tl", size: "s" },
-          { id: "m-flower-kitten", at: "br" },
+          { id: "m-kuchu-puchu", at: "br" },
         ],
       },
       {
@@ -153,7 +156,7 @@ export const birthdayStories = [
         ],
         done: "Don’t let it go to your head.",
         stickers: [
-          { id: "m-shy-monkey", at: "br" },
+          { id: "m-glam-cat", at: "br" },
           { id: "b-heart-peek", at: "tl", size: "s" },
         ],
         reaction: "pin-104",
@@ -172,7 +175,7 @@ export const birthdayStories = [
           "Everyone thinks they’re your favourite. That’s your superpower.",
         ],
         done: "I could keep going tbh.",
-        stickers: [{ id: "m-pleading", at: "tr" }],
+        stickers: [{ id: "m-lovesick", at: "tr" }],
         reaction: "m-heart-monkey",
       },
       {
@@ -201,7 +204,7 @@ export const birthdayStories = [
         done: "We need more of these. ASAP.",
         stickers: [
           { id: "chai", at: "bl", size: "s" },
-          { id: "m-cat-cuddle", at: "tr" },
+          { id: "m-pup-cuddle", at: "tr" },
         ],
         reaction: "pin-004",
       },
@@ -239,12 +242,12 @@ export const birthdayStories = [
     scenes: [
       {
         type: "knock",
-        eyebrow: "Incoming",
-        title: "Someone’s *calling.*",
-        hint: "Pick up 3 times",
+        eyebrow: "Incoming call",
+        title: "{from} is *calling.*",
+        hint: "It’s ringing.",
         knocks: 3,
         reveal: "SURPRISE!! Everyone’s here.",
-        done: "Get in here, birthday girl.",
+        done: "You’re on the line.",
         caller: "m-scream-cat",
         party: "m-dance-cat",
         stickers: [
@@ -269,7 +272,7 @@ export const birthdayStories = [
         ],
         total: "Paid in yelling. GST extra.",
         done: "Keep the slip. It’s proof.",
-        stickers: [{ id: "m-hat-dog", at: "tr" }],
+        stickers: [{ id: "m-speechless", at: "tr" }],
         reaction: "m-bow-down",
       },
       {
@@ -283,7 +286,7 @@ export const birthdayStories = [
           { q: "How old is {to} today?", options: ["21 forever", "27", "Don’t ask"], reply: "We’ll go with “don’t ask”." },
         ],
         done: "Okay, you passed.",
-        stickers: [{ id: "m-side-eye", at: "tr" }],
+        stickers: [{ id: "cat", at: "tr" }],
         reaction: "m-bow-down",
       },
       {
@@ -294,8 +297,8 @@ export const birthdayStories = [
         label: "Cheer-o-meter",
         levels: ["Polite clapping", "Whistles", "The dhol is out", "Neighbours complaining", "Baraat level"],
         done: "The whole building knows it’s your birthday now.",
-        stickers: [{ id: "b-besties", at: "tl", size: "s" }],
-        reaction: "pin-020",
+        stickers: [{ id: "m-scream-cat", at: "tl" }],
+        reaction: "m-kuchu-puchu",
       },
       {
         type: "wishes",
@@ -333,8 +336,8 @@ export const birthdayStories = [
         photo: photo("maya-portrait"),
         engraving: "{to} · Best Human of 2026",
         done: "Speech! Speech!",
-        stickers: [{ id: "crown", at: "tl", size: "s" }],
-        reaction: "pin-104",
+        stickers: [{ id: "gift", at: "tl" }],
+        reaction: "m-ahhh",
       },
       {
         type: "polaroids",
@@ -372,7 +375,7 @@ export const birthdayStories = [
         ],
         signoff: "Love you, {from}",
         photo: photo("chai-cheers"),
-        stickers: [{ id: "b-hug-hearts", at: "bl" }],
+        stickers: [{ id: "m-flower-cat", at: "bl" }],
       },
     ],
   }),

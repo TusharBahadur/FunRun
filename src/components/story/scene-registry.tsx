@@ -5,9 +5,9 @@ import type { SceneProps } from "./scene-kit";
 import { CakeScene, DandelionScene, MeterScene } from "./scenes/feelings";
 import { AwardScene, BouquetScene, MapScene, MatchScene, QuestionScene, QuizScene, RingboxScene, StarsScene } from "./scenes/games";
 import { KnockScene, LightsScene, ScratchScene, SealScene, UnwrapScene } from "./scenes/openers";
-import { asPage, CountdownSection, GallerySection, HeroSection, NoticedSection, PlaylistSection } from "./scenes/site";
+import { asPage, CountdownSection, GallerySection, HeroSection, NoticedSection, PlaylistPage } from "./scenes/site";
 import { ComplimentsScene, SpotlightScene } from "./scenes/personal";
-import { CouponScene, DeckScene, JarScene, PolaroidsScene, ReceiptScene } from "./scenes/paper";
+import { AlbumScene, CouponScene, DeckScene, JarScene, PolaroidsScene, ReceiptScene } from "./scenes/paper";
 import { FinaleScene, LetterScene, NumbersScene, VoiceScene, WishesScene } from "./scenes/reading";
 import type { SceneType } from "./types";
 
@@ -26,6 +26,7 @@ export const SCENES: Record<SceneType, ComponentType<SceneProps<any>>> = {
   meter: MeterScene,
   receipt: ReceiptScene,
   deck: DeckScene,
+  album: AlbumScene,
   coupon: CouponScene,
   jar: JarScene,
   polaroids: PolaroidsScene,
@@ -43,9 +44,9 @@ export const SCENES: Record<SceneType, ComponentType<SceneProps<any>>> = {
   voice: VoiceScene,
   finale: FinaleScene,
   hero: asPage(HeroSection, true),
-  countdown: asPage(CountdownSection),
+  countdown: asPage(CountdownSection, true),
   noticed: asPage(NoticedSection),
   gallery: asPage(GallerySection),
-  playlist: asPage(PlaylistSection),
+  playlist: PlaylistPage,
 };
 

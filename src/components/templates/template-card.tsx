@@ -22,13 +22,14 @@ function features(template: Template): { icon: LucideIcon; label: string }[] {
     return list;
   }
   const f = storyFacts(scenes);
-  const hasPhotos = scenes.some((s) => s.type === "spotlight" || s.type === "polaroids" || (s.type === "letter" && s.photo));
+  const hasPhotos = scenes.some((s) => s.type === "spotlight" || s.type === "polaroids" || s.type === "album" || s.type === "gallery" || (s.type === "letter" && s.photo));
   const list: { icon: LucideIcon; label: string }[] = [
     { icon: Layers, label: `${f.pages} pages` },
     { icon: Gamepad2, label: `${f.games} mini-games` },
   ];
   if (f.wishes) list.push({ icon: Users, label: "Friends join in" });
   else if (f.voice) list.push({ icon: Mic, label: "Voice note" });
+  else if (scenes.some((s) => s.type === "playlist")) list.push({ icon: Music, label: "Your songs" });
   else if (hasPhotos) list.push({ icon: Camera, label: "Your photos" });
   return list;
 }

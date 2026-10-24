@@ -78,6 +78,15 @@ export const palettes = {
     gold: "#e8b858",
     ink: "#243044",
   },
+  notebook: {
+    bg: "#faf4ec",
+    fg: "#4a2c28",
+    accent: "#e25b6a",
+    cream: "#fffaf5",
+    pink: "#ffd4dc",
+    gold: "#e8b45c",
+    ink: "#4a2c28",
+  },
 } satisfies Record<string, BirthdayPalette>;
 
 export type ThemeId = keyof typeof palettes;
@@ -91,6 +100,7 @@ export const themeNames: Record<ThemeId, string> = {
   taro: "Taro milk",
   cocoa: "Hot cocoa",
   moon: "Moon milk",
+  notebook: "Notebook",
 };
 
 export const themeList = (Object.keys(palettes) as ThemeId[]).map((id) => ({

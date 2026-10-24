@@ -35,7 +35,7 @@ export const bestFriendsStories = [
         tone: "sun",
         tags: ["Knows my order without asking", "Roasts me and then pays for food", "Shows up when the text is just ‘here?’"],
         done: "Yeah. That’s him.",
-        stickers: [{ id: "pin-006", at: "br" }],
+        stickers: [{ id: "m-cat-kiss", at: "br" }],
       },
       {
         type: "coupon",
@@ -96,8 +96,8 @@ export const bestFriendsStories = [
         taps: 3,
         inside: "We were at mine. Watching a match. That’s the story.",
         insideSub: "Stick to it.",
-        stickers: [{ id: "pin-019", at: "bl" }],
-        reaction: "pin-029",
+        stickers: [{ id: "m-scream-cat", at: "bl" }],
+        reaction: "m-ahhh",
       },
       {
         type: "quiz",
@@ -110,7 +110,7 @@ export const bestFriendsStories = [
           { q: "Who’s the bad influence?", options: ["Me", "Him", "Both, equally"], reply: "The jury (his Maa) says both." },
         ],
         done: "Passed. Barely. Proud of us.",
-        stickers: [{ id: "pin-021", at: "tr" }],
+        stickers: [{ id: "m-speechless", at: "tr" }],
         reaction: "m-bow-down",
       },
       {
@@ -258,7 +258,7 @@ export const bestFriendsStories = [
         title: "I’m not *repeating it.*",
         transcript: "{to}, you’re my person. That’s the whole speech. Happy Best Friends Day. Come over.",
         seconds: 6,
-        stickers: [{ id: "m-penguin", at: "bl" }],
+        stickers: [{ id: "m-kuchu-puchu", at: "bl" }],
       },
       {
         type: "polaroids",

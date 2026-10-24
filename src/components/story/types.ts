@@ -92,6 +92,7 @@ export type Scene =
   // Cards, paper and keepsakes
   | ({ type: "receipt" } & Heading & { store: string; items: { name: string; qty: string }[]; total: string })
   | ({ type: "deck" } & Heading & { cards: string[] })
+  | ({ type: "album" } & Heading & { photos: Photo[] })
   | ({ type: "coupon" } & Heading & { offer: string; terms: string })
   | ({ type: "jar" } & Heading & { notes: string[] })
   | ({ type: "polaroids" } & Heading & { photos: Photo[] })
@@ -122,6 +123,8 @@ export type Story = {
   /** Their song, if they uploaded a file or pasted a link. Otherwise the music-box melody plays. */
   track?: Track;
   palette: StoryPalette;
+  /** Graph-paper grid behind the pages. Cute, stationery, notebook. */
+  paper?: boolean;
   /** Highlight-font mood (see accent-moods.ts). Defaults to classic. */
   accentFont?: AccentFont;
   /** Headline, letter and caption font (see gift-fonts.ts). Defaults to classic. */

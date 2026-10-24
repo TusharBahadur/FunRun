@@ -22,6 +22,7 @@ type StoryTemplateInput = {
   recipient: string;
   sender: string;
   melody: "birthday" | "lullaby" | "waltz" | "sunny";
+  paper?: boolean;
   scenes: Scene[];
 };
 
@@ -42,7 +43,7 @@ export function storyTemplate(t: StoryTemplateInput): Template {
     experience: "story",
     tier: t.tier,
     level: t.level,
-    story: { recipient: t.recipient, sender: t.sender, melody: t.melody, palette, scenes: t.scenes },
+    story: { recipient: t.recipient, sender: t.sender, melody: t.melody, palette, paper: t.paper, scenes: t.scenes },
   };
 }
 

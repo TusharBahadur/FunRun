@@ -130,7 +130,7 @@ export function ComplimentsScene({ scene, done, onDone }: SceneProps<S<"complime
 
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
-      <div className="mx-auto grid w-fit grid-cols-2 justify-items-center gap-x-5 gap-y-5 sm:grid-cols-3">
+      <div className="mx-auto grid w-fit grid-cols-2 justify-items-center gap-x-5 gap-y-8 sm:grid-cols-3">
         {scene.bubbles.map((b, i) => (
           <StudioHit
             key={i}
@@ -138,7 +138,7 @@ export function ComplimentsScene({ scene, done, onDone }: SceneProps<S<"complime
             item={i}
             className={cn(
               "relative grid place-items-center",
-              popped[i] ? "w-[9.75rem] rounded-2xl" : "size-28 sm:size-32",
+              popped[i] ? "w-[9.75rem] rounded-2xl" : "h-36 w-28 sm:h-40 sm:w-32",
             )}
           >
             <AnimatePresence mode="popLayout" initial={false}>
@@ -158,7 +158,7 @@ export function ComplimentsScene({ scene, done, onDone }: SceneProps<S<"complime
                   key="bubble"
                   type="button"
                   onClick={() => pop(i)}
-                  aria-label="Pop this bubble"
+                  aria-label="Pop this balloon"
                   exit={{ scale: 1.6, opacity: 0, transition: { duration: 0.25 } }}
                   animate={{ y: [0, -8, 0], x: [0, i % 2 ? 3 : -3, 0] }}
                   transition={{ duration: 3 + (i % 3) * 0.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
@@ -170,6 +170,20 @@ export function ComplimentsScene({ scene, done, onDone }: SceneProps<S<"complime
                   }}
                 >
                   <Heart className="size-6 fill-current" style={{ color: palette.cream }} />
+                  <span
+                    aria-hidden
+                    className="absolute -bottom-2 left-1/2 size-3 -translate-x-1/2 rotate-45 rounded-[2px]"
+                    style={{ background: palette.accent }}
+                  />
+                  <svg aria-hidden viewBox="0 0 12 26" className="absolute -bottom-11 left-1/2 h-10 w-3 -translate-x-1/2">
+                    <path
+                      d="M6 0 C 2 8 10 12 6 18 C 3 24 9 26 6 26"
+                      fill="none"
+                      stroke={palette.ink}
+                      strokeOpacity={0.28}
+                      strokeWidth={1.5}
+                    />
+                  </svg>
                 </motion.button>
               )}
             </AnimatePresence>

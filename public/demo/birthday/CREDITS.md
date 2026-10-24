@@ -11,6 +11,7 @@ replace them with their own photos.
 | saree-laughs.jpg | https://unsplash.com/photos/1787295779676-181b3d5b55dd |
 | maggi-3am.jpg | https://unsplash.com/photos/1638591050340-bb9c1df12af0 |
 | pink-cake.jpg | https://unsplash.com/photos/1694043325785-d841a964257f |
-| chai-hands.jpg | https://unsplash.com/photos/1546863778-5cad4410b247 |
+| cat.jpg | TyniTales Pinterest board (same as stickers/board/05.jpg) |
+| chai-hands.jpg | Alias of cat.jpg so older saved drafts still load |
 | night-sky.jpg | https://unsplash.com/photos/1759738080643-44944609bc84 |
 | party-girls.jpg | https://unsplash.com/photos/1720094920161-45e272bb1c79 |

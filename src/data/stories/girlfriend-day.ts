@@ -95,7 +95,7 @@ export const girlfriendDayStories = [
         taps: 3,
         inside: "Membership card #001: {from}",
         insideSub: "Founding member. Only member.",
-        stickers: [{ id: "pin-006", at: "bl" }],
+        stickers: [{ id: "m-glam-cat", at: "bl" }],
         reaction: "m-ahhh",
       },
       {
@@ -186,7 +186,7 @@ export const girlfriendDayStories = [
         type: "knock",
         eyebrow: "Red carpet",
         title: "Your car’s *here.*",
-        hint: "Pick up 3 times",
+        hint: "It’s ringing.",
         knocks: 3,
         reveal: "Cameras everywhere. Walk slow.",
         done: "The paparazzi are losing it.",
@@ -221,7 +221,7 @@ export const girlfriendDayStories = [
           { value: 48, label: "playlists made for me" },
           { value: 1, label: "very lucky boyfriend" },
         ],
-        stickers: [{ id: "m-hat-dog", at: "tr" }],
+        stickers: [{ id: "m-flower-cat", at: "tr" }],
       },
       {
         type: "receipt",
@@ -237,7 +237,7 @@ export const girlfriendDayStories = [
         ],
         total: "Paid in hugs, forever",
         done: "I’ll be paying this off my whole life.",
-        stickers: [{ id: "m-side-eye", at: "br" }],
+        stickers: [{ id: "m-glam-cat", at: "br" }],
         reaction: "m-bow-down",
       },
       {
@@ -267,7 +267,7 @@ export const girlfriendDayStories = [
         title: "My speech. *Don’t laugh.*",
         transcript: "{to}, thank you for being the best girlfriend in the whole universe. I’m so lucky. Happy Girlfriend’s Day!",
         seconds: 9,
-        stickers: [{ id: "m-penguin", at: "bl" }],
+        stickers: [{ id: "m-kuchu-puchu", at: "bl" }],
       },
       {
         type: "polaroids",
@@ -292,7 +292,7 @@ export const girlfriendDayStories = [
         ],
         signoff: "Your #1 fan, {from}",
         photo: photo("saree-laughs"),
-        stickers: [{ id: "b-hug-hearts", at: "bl" }],
+        stickers: [{ id: "m-rose-kitten", at: "bl" }],
       },
     ],
   }),

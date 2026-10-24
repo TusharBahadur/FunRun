@@ -175,7 +175,18 @@ function PagesPlayer({
       <div
         data-gift-font={giftFace["data-gift-font"]}
         className="relative isolate min-h-svh overflow-x-hidden transition-colors duration-700"
-        style={{ backgroundColor: palette.bg, color: palette.fg, ...accentMoodVars(story.accentFont ?? "classic"), ...giftFace.style }}
+        style={{
+          backgroundColor: palette.bg,
+          color: palette.fg,
+          ...(story.paper
+            ? {
+                backgroundImage: `linear-gradient(${palette.accent}1f 1px, transparent 1px), linear-gradient(90deg, ${palette.accent}1f 1px, transparent 1px)`,
+                backgroundSize: "28px 28px",
+              }
+            : {}),
+          ...accentMoodVars(story.accentFont ?? "classic"),
+          ...giftFace.style,
+        }}
       >
         <Confetti ref={confetti} colors={[palette.accent, palette.gold, palette.pink, palette.cream, palette.fg]} />
 

@@ -8,7 +8,7 @@ import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
 import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { playHtmlAudio, playTrackAudio, trackHref, trackSrc, getTrackPlayable, type Stopper } from "../gift-music";
-import { StudioHit, TurnButton, useStudioEdit, useStory, type SceneProps } from "../scene-kit";
+import { SceneShell, StudioHit, TurnButton, useStudioEdit, useStory, type SceneProps } from "../scene-kit";
 import type { Scene, Track } from "../types";
 
 type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
@@ -98,7 +98,7 @@ export function HeroSection({ scene }: SceneProps<S<"hero">>) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 1, ease: EASE_OUT }}
-          className="type-display absolute bottom-32 left-5 right-16 text-[clamp(2rem,8vw,4.5rem)] font-semibold text-white md:bottom-24 md:left-10 md:right-10"
+          className="type-display absolute bottom-20 left-5 right-16 text-[clamp(2rem,8vw,4.5rem)] font-semibold text-white md:bottom-16 md:left-10 md:right-10"
         >
           {fill(scene.subtitle)}
         </motion.p>
@@ -121,6 +121,34 @@ function parts(target: number, now: number) {
   };
 }
 
+/** Little 4-point stars around a timer cell — same sparkle as the square countdown. */
+function SparkBurst({ color }: { color: string }) {
+  const marks = [
+    { className: "-left-1 top-[12%] size-5", delay: "0s" },
+    { className: "-right-1 top-[18%] size-3.5", delay: "0.4s" },
+    { className: "left-[8%] -bottom-1 size-3", delay: "0.8s" },
+    { className: "-right-0.5 bottom-[16%] size-6", delay: "0.2s" },
+    { className: "right-[30%] top-[6%] size-2", delay: "1s" },
+  ];
+  return (
+    <span aria-hidden className="pointer-events-none absolute inset-0 overflow-visible">
+      {marks.map((m) => (
+        <svg
+          key={m.className}
+          viewBox="0 0 24 24"
+          className={cn("absolute animate-float", m.className)}
+          style={{ color, animationDelay: m.delay }}
+        >
+          <path
+            fill="currentColor"
+            d="M12 0c.35 4.6 2.3 9 5.5 12C14.3 15 12.35 19.4 12 24c-.35-4.6-2.3-9-5.5-12C9.7 9 11.65 4.6 12 0Z"
+          />
+        </svg>
+      ))}
+    </span>
+  );
+}
+
 export function CountdownSection({ scene }: SceneProps<S<"countdown">>) {
   const { palette, fill } = useStory();
   const target = new Date(`${scene.date}T00:00:00`).getTime();
@@ -137,33 +165,38 @@ export function CountdownSection({ scene }: SceneProps<S<"countdown">>) {
   const p = now === null ? null : parts(target, now);
   const label = Number.isNaN(target) ? scene.date : new Date(target).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
   const units = [
-    { label: "Days", value: p?.days },
-    { label: "Hours", value: p?.hours },
-    { label: "Minutes", value: p?.minutes },
-    { label: "Seconds", value: p?.seconds },
+    { label: "Days", value: p?.days, sparkle: false },
+    { label: "Hours", value: p?.hours, sparkle: false },
+    { label: "Minutes", value: p?.minutes, sparkle: true },
+    { label: "Seconds", value: p?.seconds, sparkle: true },
   ];
   return (
-    <section className="mx-auto flex min-h-svh w-full max-w-3xl items-center px-5 pb-32 pt-16">
-      <motion.div {...rise}>
+    <section className="mx-auto flex min-h-svh w-full max-w-3xl items-center px-5 py-16">
+      <motion.div {...rise} className="w-full">
         <Glass className="px-6 py-10 text-center md:px-12 md:py-14">
           <StudioHit field="eyebrow" className="mx-auto w-fit">
             <p className="type-label opacity-60">{fill(scene.eyebrow ?? (p?.future === false ? "It’s been" : "Counting down to"))}</p>
           </StudioHit>
-          <StudioHit field="date" className="mx-auto mt-7 w-fit">
-            <h2 className="type-display text-[clamp(2.4rem,9vw,4.6rem)] font-semibold">{label}</h2>
+          <StudioHit field="date" className="mx-auto mt-4 w-fit">
+            <h2 className="type-display text-[clamp(1.6rem,5.5vw,2.4rem)] font-semibold">{label}</h2>
           </StudioHit>
-          <div className="mt-8 grid grid-cols-4 gap-2 md:gap-4">
+          <div className="mx-auto mt-8 grid max-w-[22rem] grid-cols-2 gap-3">
             {units.map((u) => (
-              <div key={u.label} className="rounded-2xl border px-1 py-4 md:py-6" style={{ borderColor: `${palette.ink}14`, backgroundColor: `${palette.cream}cc` }}>
-                <span className="type-display block text-[clamp(1.6rem,6vw,2.8rem)] font-semibold tabular-nums">
+              <div
+                key={u.label}
+                className="relative flex aspect-square flex-col items-center justify-center rounded-[1.6rem] border"
+                style={{ borderColor: `${palette.ink}12`, backgroundColor: `${palette.cream}` }}
+              >
+                {u.sparkle && <SparkBurst color={palette.pink} />}
+                <span className="type-display relative text-[clamp(2.2rem,9vw,3.2rem)] font-semibold tabular-nums leading-none">
                   {u.value === undefined ? "–" : String(u.value).padStart(2, "0")}
                 </span>
-                <span className="type-label mt-2 block text-[9px] opacity-55 md:text-[10px]">{u.label}</span>
+                <span className="type-label relative mt-2 text-[10px] opacity-50">{u.label}</span>
               </div>
             ))}
           </div>
           <StudioHit field="title" className="mx-auto mt-8 w-fit">
-            <p className="type-display text-xl opacity-80" style={{ color: palette.accent }}>
+            <p className="type-display text-xl" style={{ color: palette.accent }}>
               <Accented text={fill(scene.title)} color={palette.accent} face="sans" />
             </p>
           </StudioHit>
@@ -380,6 +413,43 @@ function SongPlayButton({
     >
       <Play className="ml-0.5 size-5 fill-current" />
     </a>
+  );
+}
+
+/** Compact playlist for page-by-page gifts: three song cards, play or upload. */
+export function PlaylistPage({ scene, done }: SceneProps<S<"playlist">>) {
+  const { palette, fill } = useStory();
+  return (
+    <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} done={done} layout="stack">
+      <div className="flex w-[min(92vw,380px)] flex-col gap-3">
+        {scene.songs.map((song, i) => (
+          <StudioHit key={i} field="songs" item={i}>
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, duration: 0.45, ease: EASE_OUT }}
+              className="flex items-center gap-3 rounded-[1.35rem] p-2.5 pr-3 shadow-[0_14px_28px_-20px_rgba(27,18,21,.45)]"
+              style={{ backgroundColor: palette.cream, color: palette.ink }}
+            >
+              <div className="size-16 shrink-0 overflow-hidden rounded-[1rem]">
+                <PhotoFill src={song.src} tone={song.tone} alt="" className="size-full" iconClassName="size-6" />
+              </div>
+              <div className="min-w-0 flex-1 text-left">
+                <p className="type-label text-[10px] opacity-50">{String(i + 1).padStart(2, "0")}</p>
+                <h3 className="type-display truncate text-lg font-semibold leading-tight">{song.title}</h3>
+                <p className="mt-0.5 truncate text-sm opacity-60">{fill(song.note)}</p>
+              </div>
+              <SongPlayButton
+                song={song}
+                title={song.title}
+                className="grid size-11 shrink-0 place-items-center rounded-full"
+                style={{ backgroundColor: palette.accent, color: palette.cream }}
+              />
+            </motion.div>
+          </StudioHit>
+        ))}
+      </div>
+    </SceneShell>
   );
 }
 

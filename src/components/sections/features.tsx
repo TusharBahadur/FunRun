@@ -139,10 +139,10 @@ function Countdown() {
         <span className="size-1.5 animate-pulse rounded-full bg-rose" />
         Unlocks on Valentine’s Day, 9:00 AM
       </p>
-      <div className="grid grid-cols-4 gap-2 sm:gap-3">
+      <div className="mx-auto grid w-[11rem] grid-cols-2 gap-1.5">
         {units.map((u) => (
-          <div key={u.label} className="rounded-2xl bg-cream px-2 py-4 text-center">
-            <div className="relative h-[clamp(2.2rem,5vw,3.5rem)] overflow-hidden font-mono text-[clamp(1.8rem,4.2vw,3rem)] font-medium leading-none tabular-nums tracking-tight">
+          <div key={u.label} className="flex aspect-square flex-col items-center justify-center rounded-xl bg-cream px-1">
+            <div className="relative h-7 w-full overflow-hidden font-mono text-xl font-medium leading-none tabular-nums tracking-tight">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.span
                   key={u.value ?? "x"}

@@ -21,6 +21,22 @@ export type Draft = {
 
 const key = (id: string) => `tynitales:studio:${id}`;
 
+/** Demo photos we retired. Old drafts still store the old path. */
+const PHOTO_MOVES: Record<string, string> = {
+  "/demo/birthday/chai-hands.jpg": "/demo/birthday/cat.jpg",
+};
+
+function migratePhotos(d: Draft): Draft {
+  let json = JSON.stringify(d);
+  let changed = false;
+  for (const [from, to] of Object.entries(PHOTO_MOVES)) {
+    if (!json.includes(from)) continue;
+    json = json.replaceAll(from, to);
+    changed = true;
+  }
+  return changed ? (JSON.parse(json) as Draft) : d;
+}
+
 export function draftIdFor(slug: string) {
   return `draft-${slug}`;
 }
@@ -29,7 +45,10 @@ export function loadDraft(id: string): Draft | null {
   try {
     const raw = localStorage.getItem(key(id));
     const d = raw ? (JSON.parse(raw) as Draft) : null;
-    return d?.v === 1 ? d : null;
+    if (d?.v !== 1) return null;
+    const migrated = migratePhotos(d);
+    if (migrated !== d) saveDraft(migrated);
+    return migrated;
   } catch {
     return null;
   }

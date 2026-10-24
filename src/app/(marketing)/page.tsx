@@ -21,7 +21,7 @@ export default async function HomePage() {
     <>
       <Preloader />
       <main>
-        <Hero featured={pick(["sealed-with-love", "make-a-wish", "written-in-the-stars", "for-maa"])} />
+        <Hero featured={pick(["sealed-with-love", "make-a-wish", "our-corner", "for-maa"])} />
         <MarqueeBand />
         <Statement />
         <HowItWorks previews={pick(["candle", "make-a-wish", "sealed-with-love"])} />

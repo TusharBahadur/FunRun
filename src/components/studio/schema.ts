@@ -96,7 +96,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     name: "Incoming call",
     category: "Openers",
     icon: PhoneCall,
-    blurb: "Answer the call. It takes a few rings — then the surprise picks up.",
+    blurb: "An incoming call. Slide to answer — then the surprise picks up.",
     fields: [
       ...heading,
       { key: "reveal", label: "What they say", kind: "text", max: 250 },
@@ -105,9 +105,9 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     ],
     create: () => ({
       type: "knock",
-      eyebrow: "Incoming",
-      title: "Someone’s *calling.*",
-      hint: "Pick up 3 times",
+      eyebrow: "Incoming call",
+      title: "{from} is *calling.*",
+      hint: "It’s ringing.",
       knocks: 3,
       reveal: "SURPRISE!! It’s me.",
       caller: "m-scream-cat",
@@ -246,12 +246,12 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     create: () => ({ type: "spotlight", eyebrow: "Look who it is", title: "The *star* of the day.", hint: "Tap the photo", tone: "rose", tags: ["Best laugh in any room", "Gives the best hugs", "Secretly hilarious"] }),
   },
   compliments: {
-    name: "Pop the compliments",
+    name: "Pop the balloons",
     category: "About them",
     icon: Heart,
-    blurb: "Floating bubbles; each one pops into a compliment.",
+    blurb: "Floating balloons; each one pops into a compliment.",
     fields: [...heading, { key: "bubbles", label: "Compliments", kind: "strings", itemLabel: "Compliment", max: 9, charMax: 300 }],
-    create: () => ({ type: "compliments", eyebrow: "Facts only", title: "Things I never *say enough.*", hint: "Pop every bubble", bubbles: ["You make hard days lighter.", "Your taste in music? Elite.", "You always know what to say."] }),
+    create: () => ({ type: "compliments", eyebrow: "Facts only", title: "Things I never *say enough.*", hint: "Pop every balloon", bubbles: ["You make hard days lighter.", "Your taste in music? Elite.", "You always know what to say."] }),
   },
   dandelion: {
     name: "Make a wish",
@@ -309,6 +309,40 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     blurb: "Swipe through a stack of cards.",
     fields: [...heading, { key: "cards", label: "Cards", kind: "strings", itemLabel: "Card", max: 10, charMax: 400 }],
     create: () => ({ type: "deck", eyebrow: "Reasons", title: "Why it’s *you.*", hint: "Swipe or tap each card", cards: ["Your laugh.", "Your kindness.", "Everything else."] }),
+  },
+  album: {
+    name: "Photo stack",
+    category: "Paper & keepsakes",
+    icon: Images,
+    blurb: "Swipe through a stack of photo cards, each with a caption.",
+    fields: [
+      ...heading,
+      {
+        key: "photos",
+        label: "Photos",
+        kind: "list",
+        itemLabel: "Photo",
+        max: 8,
+        item: [
+          { key: "caption", label: "Caption", kind: "text", max: 30 },
+          { key: "date", label: "Date", kind: "text", max: 16, placeholder: "e.g. Dec ’24" },
+          { key: "tone", label: "Placeholder colour", kind: "select", options: tones },
+        ],
+        newItem: () => ({ caption: "A good day", tone: "sun" }),
+        title: (i) => String(i.caption || "Photo"),
+      },
+    ],
+    create: () => ({
+      type: "album",
+      eyebrow: "From the camera roll",
+      title: "Look at *us.*",
+      hint: "Swipe or tap each card",
+      photos: [
+        { caption: "That day", tone: "sun" },
+        { caption: "Us", tone: "rose" },
+        { caption: "This one", tone: "dusk" },
+      ],
+    }),
   },
   coupon: {
     name: "Coupon",

@@ -27,7 +27,7 @@ export const ourCorner = siteTemplate({
       eyebrow: "{to} & {from}",
       title: "Three years, *still us.*",
       subtitle: "my favourite person",
-      photo: photo("chai-hands"),
+      photo: photo("cat"),
       tone: "dusk",
     },
     {
@@ -52,7 +52,7 @@ export const ourCorner = siteTemplate({
       eyebrow: "Our tiny archive",
       title: "Three years of photos and I still can’t *pick a favourite.*",
       photos: [
-        { caption: "Chai for two", date: "Every day", tone: "dusk", src: photo("chai-hands") },
+        { caption: "Us, honestly", date: "Every day", tone: "dusk", src: photo("cat") },
         { caption: "Lonavala, in the rain", date: "Jul ’23", tone: "leaf", src: photo("misty-chai") },
         { caption: "Basically us", date: "Always", tone: "rose", src: board("07.jpg") },
         { caption: "These two", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
@@ -144,7 +144,7 @@ export const justForYou = siteTemplate({
         "You’re the calmest place I know. You make ordinary days feel like they matter. I love you, and I wanted you to have somewhere to come back to when you need reminding.",
       ],
       signoff: "Yours, {from}",
-      photo: photo("chai-hands"),
+      photo: photo("cat"),
     },
   ],
 });
@@ -337,7 +337,7 @@ export const hisPage = siteTemplate({
       title: "Approved by {to}. *Mostly.*",
       songs: [
         { title: "Ilahi", note: "his road trip song, no skipping", tone: "sun", src: photo("road-trip") },
-        { title: "Tum Se Hi", note: "this one’s from me", tone: "rose", src: photo("chai-hands") },
+        { title: "Tum Se Hi", note: "this one’s from me", tone: "rose", src: photo("cat") },
       ],
     },
     {
