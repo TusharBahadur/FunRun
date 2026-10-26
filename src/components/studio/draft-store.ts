@@ -14,8 +14,11 @@ export type Draft = {
   base?: string;
   /** Uploaded images, reusable across scenes. */
   assets: { id: string; name: string; src: string }[];
-  /** Set once "Make it live" is completed on this device. */
-  live?: { link: string; unlockAt?: string; publishedAt: string; paid: false };
+  /**
+   * Set once "Make it live" is done. `slug` is the real online link
+   * (/for/<slug>); older drafts made before gifts went online don't have one.
+   */
+  live?: { link: string; slug?: string; unlockAt?: string; expiresAt?: string; publishedAt: string; paid: false };
   updatedAt: string;
 };
 

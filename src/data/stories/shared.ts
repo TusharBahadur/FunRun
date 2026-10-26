@@ -1,12 +1,17 @@
 import type { Scene, StoryLevel, StoryPalette } from "@/components/story/types";
-import type { OccasionId } from "@/config/site";
+import { giftPricing, type OccasionId } from "@/config/site";
 import type { Motif, Template } from "@/data/templates";
 import { palettes } from "@/data/themes";
+import { asset } from "@/lib/assets";
 
 export { palettes };
 
-/** Prices follow the three levels used everywhere: ₹99, ₹149, ₹179. */
-export const levelPrice: Record<StoryLevel, number> = { little: 9900, classic: 14900, grand: 17900 };
+/** Every level costs the same; levels only change how much is in the gift. */
+export const levelPrice: Record<StoryLevel, number> = {
+  little: giftPricing.pricePaise,
+  classic: giftPricing.pricePaise,
+  grand: giftPricing.pricePaise,
+};
 
 type StoryTemplateInput = {
   slug: string;
@@ -47,10 +52,10 @@ export function storyTemplate(t: StoryTemplateInput): Template {
   };
 }
 
-/** Demo photos in /public/demo/birthday (Unsplash). Senders swap in their own. */
-export const demoPhoto = (name: string) => `/demo/birthday/${name}.jpg`;
+/** Demo photos in assets/photos (Unsplash). Senders swap in their own. */
+export const demoPhoto = (name: string) => asset(`photos/${name}.jpg`);
 
-type SiteTemplateInput = Omit<StoryTemplateInput, "level" | "tier"> & { pricePaise: number };
+type SiteTemplateInput = Omit<StoryTemplateInput, "level" | "tier">;
 
 /** A website-style gift: one long scrolling page instead of a game per page. */
 export function siteTemplate(t: SiteTemplateInput): Template {
@@ -60,7 +65,7 @@ export function siteTemplate(t: SiteTemplateInput): Template {
     name: t.name,
     occasion: t.occasion,
     description: t.description,
-    pricePaise: t.pricePaise,
+    pricePaise: giftPricing.pricePaise,
     isNew: t.isNew ?? true,
     palette: { bg: palette.bg, fg: palette.fg, accent: palette.accent },
     experiencePalette: { cream: palette.cream, pink: palette.pink, gold: palette.gold, ink: palette.ink },

@@ -331,7 +331,6 @@ export function RecipientUnlockCountdown({
     totalMs: number;
   }>({ days: 0, hours: 0, minutes: 0, seconds: 0, totalMs: 1 });
 
-  const [taps, setTaps] = useState<{ id: number; x: number; y: number }[]>([]);
 
   useEffect(() => {
     const tick = () => {
@@ -358,41 +357,20 @@ export function RecipientUnlockCountdown({
     return () => clearInterval(interval);
   }, [opensAt, onUnlock]);
 
-  // Micro-interaction: Tapping creates floating hearts while waiting
-  const handleTap = (e: React.MouseEvent) => {
-    const id = Date.now();
-    setTaps((prev) => [...prev.slice(-10), { id, x: e.clientX, y: e.clientY }]);
-    setTimeout(() => {
-      setTaps((prev) => prev.filter((t) => t.id !== id));
-    }, 1500);
-  };
-
   return (
-    <div
-      onClick={handleTap}
-      className="relative flex flex-col items-center justify-center p-6 text-center select-none cursor-pointer"
-    >
-      {/* Floating Hearts spawned on tap */}
-      {taps.map((t) => (
-        <span
-          key={t.id}
-          className="pointer-events-none fixed z-50 text-2xl animate-float-up"
-          style={{ left: t.x - 12, top: t.y - 12 }}
-        >
-          ❤️
-        </span>
-      ))}
+    <div className="relative flex flex-col items-center justify-center p-6 text-center select-none">
+      <WaitingSky accent={accentColor} />
 
-      <p className="type-label opacity-70 tracking-widest uppercase text-xs">
+      <p className="type-label relative opacity-70 tracking-widest uppercase text-xs">
         A Surprise For {recipientName}
       </p>
 
-      <h1 className="type-display mt-3 text-4xl sm:text-5xl font-semibold">
+      <h1 className="type-display relative mt-3 text-4xl sm:text-5xl font-semibold">
         Unlocks In <span className="font-semibold" style={{ color: accentColor }}>...</span>
       </h1>
 
       {/* Ticking Digital Block Countdown */}
-      <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 max-w-xs w-full">
+      <div className="relative mt-8 grid grid-cols-2 gap-3 sm:gap-4 max-w-xs w-full">
         {[
           { val: timeLeft.days, label: "Days" },
           { val: timeLeft.hours, label: "Hours" },
@@ -416,13 +394,61 @@ export function RecipientUnlockCountdown({
         ))}
       </div>
 
-      {/* Micro-interaction hint */}
-      <p className="mt-8 text-sm opacity-60">
-        Tap the screen to send warm wishes while waiting 💖
-      </p>
-      <p className="type-label mt-2 text-[10px] opacity-40">
+      <p className="type-label relative mt-8 text-[10px] opacity-40">
         Opens {opensAt.toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" })}
       </p>
+    </div>
+  );
+}
+
+/*
+ * The waiting screen's backdrop: soft glowing blobs that breathe, and hearts
+ * and sparkles drifting up like balloons. Positions are fixed so every visit
+ * looks the same and nothing random runs during render.
+ */
+const floaters = [
+  { left: 6, size: 22, dur: 14, delay: 0, glyph: "♥" },
+  { left: 16, size: 14, dur: 18, delay: 4, glyph: "✦" },
+  { left: 27, size: 30, dur: 16, delay: 9, glyph: "♥" },
+  { left: 38, size: 12, dur: 20, delay: 2, glyph: "✦" },
+  { left: 49, size: 18, dur: 15, delay: 6, glyph: "♥" },
+  { left: 58, size: 26, dur: 19, delay: 11, glyph: "♥" },
+  { left: 67, size: 12, dur: 17, delay: 1, glyph: "✦" },
+  { left: 76, size: 20, dur: 14, delay: 7, glyph: "♥" },
+  { left: 85, size: 14, dur: 21, delay: 3, glyph: "✦" },
+  { left: 93, size: 24, dur: 16, delay: 12, glyph: "♥" },
+  { left: 21, size: 16, dur: 22, delay: 14, glyph: "♥" },
+  { left: 63, size: 16, dur: 23, delay: 16, glyph: "✦" },
+];
+
+function WaitingSky({ accent = "#e23b54" }: { accent?: string }) {
+  return (
+    <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
+      {[
+        { x: "15%", y: "20%", s: 340, d: 9 },
+        { x: "80%", y: "30%", s: 280, d: 11 },
+        { x: "50%", y: "85%", s: 380, d: 13 },
+      ].map((b, i) => (
+        <motion.span
+          key={i}
+          className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+          style={{ left: b.x, top: b.y, width: b.s, height: b.s, backgroundColor: accent }}
+          animate={{ opacity: [0.1, 0.22, 0.1], scale: [1, 1.15, 1] }}
+          transition={{ duration: b.d, repeat: Infinity, ease: "easeInOut" }}
+        />
+      ))}
+      {floaters.map((f, i) => (
+        <motion.span
+          key={i}
+          className="absolute bottom-0 leading-none"
+          style={{ left: `${f.left}%`, fontSize: f.size, color: accent }}
+          initial={{ y: "10vh", opacity: 0 }}
+          animate={{ y: "-110vh", opacity: [0, 0.55, 0.55, 0], x: [0, 14, -10, 6], rotate: [-10, 10, -6, 8] }}
+          transition={{ duration: f.dur, delay: f.delay, repeat: Infinity, ease: "linear" }}
+        >
+          {f.glyph}
+        </motion.span>
+      ))}
     </div>
   );
 }

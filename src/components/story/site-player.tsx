@@ -98,7 +98,9 @@ export function SitePlayer({
         className="relative isolate min-h-svh overflow-x-clip"
         style={{
           color: palette.fg,
-          background: `radial-gradient(80% 50% at 0% 30%, ${palette.pink}55, transparent 70%), radial-gradient(70% 50% at 100% 70%, ${palette.accent}22, transparent 70%), ${palette.bg}`,
+          background: story.paper
+            ? `linear-gradient(${palette.accent}1f 1px, transparent 1px) 0 0 / 28px 28px, linear-gradient(90deg, ${palette.accent}1f 1px, transparent 1px) 0 0 / 28px 28px, ${palette.bg}`
+            : `radial-gradient(80% 50% at 0% 30%, ${palette.pink}55, transparent 70%), radial-gradient(70% 50% at 100% 70%, ${palette.accent}22, transparent 70%), ${palette.bg}`,
           ...accentMoodVars(story.accentFont ?? "classic"),
           ...giftFace.style,
         }}

@@ -71,13 +71,23 @@ export function LookSettings({ draft, edit, fold }: { draft: Draft; edit: Edit; 
               key={t.id}
               type="button"
               aria-pressed={on}
-              onClick={() => setStory({ palette: t.palette }, "theme")}
+              // Notebook is the one theme that also brings the graph-paper pages.
+              onClick={() => setStory({ palette: t.palette, paper: t.id === "notebook" }, "theme")}
               className={cn(
                 "overflow-hidden rounded-2xl border text-left",
                 on ? "border-ink" : "border-line",
               )}
             >
-              <span className="relative block h-[4.75rem] overflow-hidden px-2.5 pt-2.5" style={{ backgroundColor: t.palette.bg }}>
+              <span
+                className="relative block h-[4.75rem] overflow-hidden px-2.5 pt-2.5"
+                style={{
+                  backgroundColor: t.palette.bg,
+                  ...(t.id === "notebook" && {
+                    backgroundImage: `linear-gradient(${t.palette.accent}22 1px, transparent 1px), linear-gradient(90deg, ${t.palette.accent}22 1px, transparent 1px)`,
+                    backgroundSize: "10px 10px",
+                  }),
+                }}
+              >
                 <span className="absolute -right-3 -top-4 size-12 rounded-full" style={{ backgroundColor: t.palette.pink }} />
                 <span
                   className="relative block rounded-xl px-2.5 py-2 shadow-[0_8px_16px_-12px_rgba(27,18,21,.45)]"

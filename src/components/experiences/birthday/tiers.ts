@@ -73,7 +73,7 @@ export const birthdayTiers: Record<BirthdayTierId, BirthdayTier> = {
   wish: {
     id: "wish",
     name: "Make a Wish",
-    pricePaise: 14900,
+    pricePaise: 9900,
     pitch: "A birthday story about them.",
     features: {
       unwrap: true,
@@ -103,7 +103,7 @@ export const birthdayTiers: Record<BirthdayTierId, BirthdayTier> = {
   party: {
     id: "party",
     name: "The Party",
-    pricePaise: 17900,
+    pricePaise: 9900,
     pitch: "Everyone who loves them, in one gift.",
     features: {
       unwrap: true,

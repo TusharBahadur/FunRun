@@ -75,7 +75,7 @@ export function Hero({ featured }: { featured: Template[] }) {
         mx.set((e.clientX - r.left) / r.width - 0.5);
         my.set((e.clientY - r.top) / r.height - 0.5);
       }}
-      className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-5 pb-20 pt-32"
+      className="relative flex min-h-[88svh] flex-col items-center justify-center overflow-hidden px-5 pb-6 pt-32"
     >
       {/* Ambient glow */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -107,20 +107,7 @@ export function Hero({ featured }: { featured: Template[] }) {
         style={{ y: titleY, opacity: titleOpacity, scale: titleScale }}
         className="relative z-10 flex flex-col items-center text-center"
       >
-        <motion.span
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: INTRO_DELAY, duration: 0.8, ease: EASE_OUT }}
-          className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-paper/60 px-3.5 py-1.5 type-label text-ink/70 backdrop-blur"
-        >
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-rose opacity-60" />
-            <span className="relative inline-flex size-2 rounded-full bg-rose" />
-          </span>
-          Digital gifts for the people you love
-        </motion.span>
-
-        <h1 className="mt-7 text-[clamp(2.6rem,10.5vw,9.5rem)] type-display">
+        <h1 className="text-[clamp(2.6rem,min(8vw,11svh),7.5rem)] type-display">
           <span className="block font-semibold">
             <SplitText text="Say" delay={INTRO_DELAY + 0.05} />
           </span>

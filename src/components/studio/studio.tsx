@@ -3,16 +3,19 @@
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowLeft, Check, ChevronDown, Eye, LayoutGrid, Loader2, Redo2, RotateCcw, Undo2, UserRound, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { StudioFrameMessage } from "@/app/studio/frame/page";
 import type { SceneType, Story } from "@/components/story/types";
 import type { Template } from "@/lib/templates";
 import { bindStoryNames, storyWithNames, type GiftNames } from "@/lib/gift-names";
+import { useUser } from "@/lib/supabase/browser";
+import { useProfile } from "@/lib/supabase/profile";
 import { formatInr } from "@/lib/utils";
 import { AddSection } from "./add-section";
 import { Canvas, type DeviceMode } from "./canvas";
 import { ChangeDesign } from "./change-design";
-import { Checkout } from "./checkout";
+import { Checkout, hasPendingPublish } from "./checkout";
 import { freshDraft, loadDraft, useDraft, type Draft } from "./draft-store";
 import { ImageCropProvider } from "./image-crop";
 import { Inspector, type Selection } from "./inspector";
@@ -74,7 +77,17 @@ export function Studio({
   const [preview, setPreview] = useState(false);
   const [names, setNames] = useState<"first" | "edit" | null>(null);
   const [designsOpen, setDesignsOpen] = useState(false);
+  const router = useRouter();
+  // Signed-in senders get their saved sign-off in the "From" line of new gifts.
+  const { profile } = useProfile(useUser());
   const wide = useMinLg();
+
+  // Back from Google sign-in mid-checkout: reopen it where they left off.
+  useEffect(() => {
+    if (!hasPendingPublish(initial.id)) return;
+    const id = window.setTimeout(() => setCheckout(true), 300);
+    return () => window.clearTimeout(id);
+  }, [initial.id]);
 
   // A fresh gift starts by asking who it's for; a saved draft already knows.
   useEffect(() => {
@@ -311,9 +324,9 @@ export function Studio({
           <Eye className="size-4" /> Preview
         </button>
         <button type="button" onClick={() => setCheckout(true)} className="flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-rose-deep pl-3 pr-1.5 text-sm font-medium text-paper hover:bg-rose sm:pl-4">
-          <span className="sm:hidden">{draft.live ? "Live" : "Publish"}</span>
-          <span className="hidden sm:inline">{draft.live ? "Live" : "Make it live"}</span>
-          <span className="rounded-full bg-paper/20 px-2 py-0.5 text-xs">{formatInr(template.pricePaise)}</span>
+          <span className="sm:hidden">{draft.live?.slug ? "Share" : "Publish"}</span>
+          <span className="hidden sm:inline">{draft.live?.slug ? "Share link" : "Make it live"}</span>
+          {!draft.live?.slug && <span className="rounded-full bg-paper/20 px-2 py-0.5 text-xs">{formatInr(template.pricePaise)}</span>}
         </button>
       </header>
 
@@ -388,7 +401,7 @@ export function Studio({
       <NamesDialog
         open={names !== null}
         to={names === "edit" ? draft.story.recipient : ""}
-        from={names === "edit" ? draft.story.sender : ""}
+        from={names === "edit" ? draft.story.sender : (profile?.sign_off ?? "")}
         accent={draft.story.palette.accent}
         submitLabel={names === "edit" ? "Save" : "Start editing"}
         onSave={saveNames}
@@ -399,9 +412,14 @@ export function Studio({
         open={checkout}
         onClose={() => setCheckout(false)}
         draft={draft}
+        templateSlug={template.slug}
         templateName={template.name}
         pricePaise={template.pricePaise}
-        onPublished={(live) => edit({ ...draft, live })}
+        onPublished={(live) => {
+          // The gift is out: clear the editor for next time and go to its own page.
+          reset(freshDraft(template.slug, initial.name, template.story));
+          router.push(`/sent/${live.slug}`);
+        }}
       />
 
       {/* Full-screen preview: plays exactly like the real gift */}

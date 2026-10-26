@@ -1,16 +1,16 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { SplitText } from "@/components/motion/split-text";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { sceneLabels } from "@/components/story/labels";
 import { LevelCompare } from "@/components/templates/level-compare";
+import { ButtonLinkWithNames, NamesBanner } from "@/components/templates/with-names";
 import { TemplatePreview } from "@/components/templates/template-preview";
 import { birthdayTiers } from "@/components/experiences/birthday/tiers";
-import { ButtonLink } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { occasions } from "@/config/site";
+import { occasions, siteConfig } from "@/config/site";
 import { getTemplateBySlug, getTemplates } from "@/lib/templates";
 import { formatInr } from "@/lib/utils";
 
@@ -22,25 +22,29 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/templates/[slug]">): Promise<Metadata> {
   const template = await getTemplateBySlug((await params).slug);
   if (!template) return {};
-  return { title: template.name, description: template.description };
+  const occasion = occasions.find((o) => o.id === template.occasion);
+  const title = `${template.name}: ${occasion?.label ?? "Gift"} template`;
+  return {
+    title,
+    description: template.description,
+    alternates: { canonical: `/templates/${template.slug}` },
+    openGraph: { title, description: template.description, url: `/templates/${template.slug}`, type: "website" },
+  };
 }
 
-export default function TemplatePage({ params, searchParams }: PageProps<"/templates/[slug]">) {
+export default function TemplatePage({ params }: PageProps<"/templates/[slug]">) {
+  // Every template is pre-built, so this boundary never shows; it lets navigation start instantly.
   return (
     <Suspense fallback={<main className="min-h-svh" />}>
-      <TemplateDetail params={params} searchParams={searchParams} />
+      <TemplateDetail params={params} />
     </Suspense>
   );
 }
 
-async function TemplateDetail({ params, searchParams }: Pick<PageProps<"/templates/[slug]">, "params" | "searchParams">) {
+async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "params">) {
   const { slug } = await params;
   const template = await getTemplateBySlug(slug);
   if (!template) notFound();
-
-  const sp = await searchParams;
-  const toName = typeof sp?.to === "string" ? sp.to : undefined;
-  const fromName = typeof sp?.from === "string" ? sp.from : undefined;
 
   const occasion = occasions.find((o) => o.id === template.occasion);
   const price = formatInr(template.pricePaise);
@@ -48,28 +52,33 @@ async function TemplateDetail({ params, searchParams }: Pick<PageProps<"/templat
   const siblings = template.level ? await getTemplates({ occasion: template.occasion }) : [];
   const steps = template.story ? template.story.scenes.map((s) => sceneLabels[s.type]) : (tier?.highlights ?? []);
 
-  const queryStr = toName || fromName ? `?${new URLSearchParams({ ...(toName ? { to: toName } : {}), ...(fromName ? { from: fromName } : {}) }).toString()}` : "";
+  // Product data so search results can show the name, price and image.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: template.name,
+    description: template.description,
+    category: `${occasion?.label ?? "Gift"} digital gift`,
+    url: `${siteConfig.url}/templates/${template.slug}`,
+    image: `${siteConfig.url}/templates/${template.slug}/opengraph-image`,
+    brand: { "@type": "Brand", name: siteConfig.name },
+    offers: {
+      "@type": "Offer",
+      price: (template.pricePaise / 100).toFixed(2),
+      priceCurrency: "INR",
+      availability: "https://schema.org/InStock",
+      url: `${siteConfig.url}/templates/${template.slug}`,
+    },
+  };
 
   return (
     <main className="mx-auto max-w-7xl px-5 pb-32 pt-32 md:pt-40">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Link href="/templates" className="type-label text-muted hover:text-ink">
         ← All templates
       </Link>
 
-      {/* Personalized names banner */}
-      {(toName || fromName) && (
-        <div
-          className="mt-6 flex items-center gap-3 rounded-2xl border px-5 py-3.5 shadow-xs"
-          style={{ borderColor: `${template.palette.accent}44`, backgroundColor: `${template.palette.accent}0a` }}
-        >
-          <span className="type-label text-muted">Personalized for</span>
-          <span className="font-serif text-lg">
-            {toName && <><span className="font-semibold" style={{ color: template.palette.accent }}>{toName}</span></>}
-            {toName && fromName && <span className="mx-1.5 text-muted">from</span>}
-            {fromName && <span className="font-semibold">{fromName}</span>}
-          </span>
-        </div>
-      )}
+      <NamesBanner accent={template.palette.accent} />
 
       <div className="mt-10 grid items-start gap-12 md:grid-cols-12 md:gap-16">
         <div className="md:col-span-5">
@@ -87,22 +96,18 @@ async function TemplateDetail({ params, searchParams }: Pick<PageProps<"/templat
 
           <div className="mt-10 flex flex-wrap items-center gap-3">
             {template.experience ? (
-              <ButtonLink href={`/preview/${template.slug}${queryStr}`} size="lg">
+              <ButtonLinkWithNames href={`/preview/${template.slug}`} size="lg">
                 Preview the gift
-              </ButtonLink>
+              </ButtonLinkWithNames>
             ) : (
               <span className="type-label rounded-full border border-line px-5 py-4 text-muted">
                 Full preview coming soon
               </span>
             )}
             {template.story ? (
-              <ButtonLink
-                href={`/studio/${template.slug}${queryStr}`}
-                variant="rose"
-                size="lg"
-              >
+              <ButtonLinkWithNames href={`/studio/${template.slug}`} variant="rose" size="lg">
                 Make it yours · {price}
-              </ButtonLink>
+              </ButtonLinkWithNames>
             ) : (
               <span className="type-label ml-2 text-muted">{price} · Personalizing opens soon</span>
             )}

@@ -31,7 +31,7 @@ export interface Template {
   tier?: BirthdayTierId;
   /** Extra colours the full experience needs beyond the card palette. */
   experiencePalette?: { cream: string; pink: string; gold: string; ink: string };
-  /** Story templates: which price level (₹99 / ₹149 / ₹179) and the scenes. */
+  /** Story templates: which size (little / classic / grand; all ₹99) and the scenes. */
   level?: StoryLevel;
   story?: Story;
 }

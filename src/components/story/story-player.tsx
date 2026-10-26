@@ -27,6 +27,8 @@ type PlayerProps = {
   onIndexChange?: (index: number) => void;
   /** Studio: tap copy in the gift to select the matching field. */
   studio?: StudioEdit;
+  /** Shown inside another page (the home-page showcase): don't scroll the page or take over the arrow keys. */
+  embedded?: boolean;
 };
 
 /** Plays a gift: page by page (the games), or as one scrolling website. */
@@ -50,6 +52,7 @@ function PagesPlayer({
   unlocked = false,
   onIndexChange,
   studio,
+  embedded = false,
 }: PlayerProps) {
   const scenes = useMemo(
     () => story.scenes.filter((s) => !s.hidden && s.type !== "finale"),
@@ -91,19 +94,20 @@ function PagesPlayer({
       window.speechSynthesis?.cancel();
       setIndex(to);
       onIndexChange?.(to);
-      window.scrollTo({ top: 0 });
+      if (!embedded) window.scrollTo({ top: 0 });
     },
-    [done, index, scenes.length, unlocked, onIndexChange],
+    [done, index, scenes.length, unlocked, onIndexChange, embedded],
   );
 
   useEffect(() => {
+    if (embedded) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") go(index + 1);
       if (e.key === "ArrowLeft") go(index - 1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [go, index]);
+  }, [go, index, embedded]);
 
   const safeIndex = Math.max(0, Math.min(index, scenes.length - 1));
   const scene = scenes[safeIndex] as Scene | undefined;
@@ -131,11 +135,11 @@ function PagesPlayer({
         setDone(initialDone(scenes));
         setIndex(0);
         setRun((r) => r + 1);
-        window.scrollTo({ top: 0 });
+        if (!embedded) window.scrollTo({ top: 0 });
       },
       slug,
     }),
-    [palette, story.recipient, story.sender, playSong, scenes, slug],
+    [palette, story.recipient, story.sender, playSong, scenes, slug, embedded],
   );
 
   useEffect(() => {

@@ -9,7 +9,7 @@ import { girlfriendDayStories } from "./girlfriend-day";
 import { loveLetterStories } from "./love-letter";
 import { birthdayPage, fanPage, hisPage, justForYou, ourCorner } from "./sites";
 
-/** The playable templates: game stories per occasion (usually ₹99 / ₹149 / ₹179), plus website-style gifts. */
+/** The playable templates: game stories per occasion (little / classic / grand, all ₹99), plus website-style gifts. */
 export const storyTemplates = [
   ...birthdayStories,
   birthdayPage,

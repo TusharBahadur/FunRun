@@ -15,6 +15,24 @@ const nextConfig: NextConfig = {
     "*.ngrok.io",
   ],
   partialPrefetching: true,
+  // Fingerprinted images (scripts/build-assets.mjs): a file's name changes when
+  // its content does, so browsers and the CDN can keep them forever.
+  // Old gallery links used ?occasion=; each occasion now has its own static page.
+  async redirects() {
+    return [
+      {
+        source: "/templates",
+        has: [{ type: "query", key: "occasion", value: "(?<occasion>[a-z-]+)" }],
+        destination: "/templates/for/:occasion",
+        permanent: true,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      { source: "/a/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }] },
+    ];
+  },
   turbopack: {
     rules: {
       "*.css": {

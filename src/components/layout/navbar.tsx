@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import { siteConfig } from "@/config/site";
+import { peekSignedInUser, type PeekedUser } from "@/lib/session-peek";
 import { EASE_IN_OUT, EASE_OUT, INTRO_DELAY } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -16,13 +17,24 @@ const menuItems = [{ label: "Home", href: "/" }, ...siteConfig.nav];
 export function Navbar() {
   const pathname = usePathname();
   const { scrollY } = useScroll();
-  const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [me, setMe] = useState<PeekedUser | null>(null);
+
+  // Signed in? Read from saved session so marketing pages don't load the auth library.
+  useEffect(() => {
+    const refresh = () => setMe(peekSignedInUser());
+    const id = setTimeout(refresh, 0);
+    window.addEventListener("tynitales:auth", refresh);
+    window.addEventListener("storage", refresh); // signed in or out in another tab
+    return () => {
+      clearTimeout(id);
+      window.removeEventListener("tynitales:auth", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, [pathname]);
 
   useMotionValueEvent(scrollY, "change", (v) => {
-    const prev = scrollY.getPrevious() ?? 0;
-    setHidden(v > prev && v > 240);
     setScrolled(v > 24);
   });
 
@@ -45,11 +57,8 @@ export function Navbar() {
         transition={{ duration: 0.9, ease: EASE_OUT, delay: pathname === "/" ? INTRO_DELAY : 0 }}
         className="fixed inset-x-0 top-0 z-50"
       >
-        <motion.div
-          animate={{ y: hidden && !open ? "-130%" : "0%" }}
-          transition={{ duration: 0.5, ease: EASE_OUT }}
-          className="mx-auto max-w-7xl px-3 pt-3 sm:px-5"
-        >
+        {/* Always on screen: it stays put while the page scrolls. */}
+        <div className="mx-auto max-w-7xl px-3 pt-3 sm:px-5">
           <nav
             className={cn(
               "flex items-center justify-between rounded-full border transition-all duration-500 ease-out-expo",
@@ -63,6 +72,30 @@ export function Navbar() {
               className={cn("transition-colors duration-500", open && "text-cream md:text-ink")}
             />
 
+            {/* Wide screens: every page is one click away, no menu needed. */}
+            <ul className="hidden items-center gap-1 lg:flex">
+              {menuItems
+                .filter((item) => item.href !== "/profile")
+                .map((item) => {
+                  const active = item.href === pathname;
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={resolve(item.href)}
+                        aria-current={active ? "page" : undefined}
+                        className={cn(
+                          "relative rounded-full px-3.5 py-2 text-sm transition-colors duration-300",
+                          active ? "text-ink" : "text-ink/65 hover:text-ink",
+                        )}
+                      >
+                        {item.label}
+                        {active && <span aria-hidden className="absolute inset-x-3.5 -bottom-0.5 h-px bg-rose" />}
+                      </Link>
+                    </li>
+                  );
+                })}
+            </ul>
+
             <div className="flex items-center gap-2">
               <ButtonLink
                 href="/templates"
@@ -71,6 +104,29 @@ export function Navbar() {
               >
                 Start gifting
               </ButtonLink>
+              {!me && (
+                <Link href="/sign-in" className="hidden h-10 items-center rounded-full px-3.5 text-sm text-ink/65 transition-colors hover:text-ink lg:inline-flex">
+                  Sign in
+                </Link>
+              )}
+              {me && (
+                <Link
+                  href="/profile"
+                  aria-label="Your profile"
+                  title={me.name ?? "Your profile"}
+                  className={cn(
+                    "grid size-10 place-items-center overflow-hidden rounded-full border border-ink/10 bg-wine text-sm font-semibold text-cream transition-opacity",
+                    open && "pointer-events-none opacity-0",
+                  )}
+                >
+                  {me.avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={me.avatar} alt="" referrerPolicy="no-referrer" className="size-full object-cover" />
+                  ) : (
+                    (me.name ?? me.email ?? "?").slice(0, 1).toUpperCase()
+                  )}
+                </Link>
+              )}
               <button
                 type="button"
                 onClick={() => setOpen((o) => !o)}
@@ -78,7 +134,7 @@ export function Navbar() {
                 aria-expanded={open}
                 aria-controls="site-menu"
                 className={cn(
-                  "type-label flex h-10 items-center gap-3 rounded-full border pl-4 pr-3.5 backdrop-blur-xl transition-colors duration-500",
+                  "type-label flex h-10 items-center gap-3 rounded-full border pl-4 pr-3.5 backdrop-blur-xl transition-colors duration-500 lg:hidden",
                   open
                     ? "border-cream/15 bg-cream/10 text-cream"
                     : "border-ink/10 bg-paper/70 text-ink hover:bg-paper",
@@ -89,7 +145,7 @@ export function Navbar() {
               </button>
             </div>
           </nav>
-        </motion.div>
+        </div>
       </motion.header>
 
       <AnimatePresence>
@@ -124,7 +180,8 @@ export function Navbar() {
               <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 size-[30rem] rounded-full bg-[radial-gradient(closest-side,rgb(226_59_84/0.35),transparent)]" />
               <div aria-hidden className="pointer-events-none absolute -bottom-32 -left-20 size-[28rem] rounded-full bg-[radial-gradient(closest-side,rgb(90_26_43/0.6),transparent)]" />
 
-              <nav className="relative flex flex-1 flex-col justify-center">
+              {/* A size container: menu words scale to the panel, so the longest one always fits. */}
+              <nav className="@container relative flex flex-1 flex-col justify-center">
                 <ul className="flex flex-col items-end text-right">
                   {menuItems.map((item, i) => {
                     const active = item.href === pathname;
@@ -146,7 +203,7 @@ export function Navbar() {
                             </span>
                             <span
                               className={cn(
-                                "whitespace-nowrap font-serif text-[clamp(2.9rem,4.4vw,4.75rem)] uppercase leading-[0.92] tracking-[-0.01em] transition-colors duration-300 group-hover:text-blush",
+                                "whitespace-nowrap font-serif text-[min(4.75rem,12cqi)] uppercase leading-[0.92] tracking-[-0.01em] transition-colors duration-300 group-hover:text-blush",
                                 active ? "text-blush" : "text-cream",
                               )}
                             >
@@ -175,11 +232,11 @@ export function Navbar() {
                   <ArrowUpRight className="size-3.5" /> Start gifting
                 </Link>
                 <Link
-                  href="/sign-in"
+                  href={me ? "/profile" : "/sign-in"}
                   onClick={() => setOpen(false)}
                   className="type-label flex items-center gap-2 text-cream/80 hover:text-cream"
                 >
-                  <UserRound className="size-3.5" /> Sign in
+                  <UserRound className="size-3.5" /> {me ? "Your profile" : "Sign in"}
                 </Link>
               </motion.div>
             </motion.aside>

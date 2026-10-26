@@ -6,128 +6,86 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SplitText } from "@/components/motion/split-text";
 import { Typewriter } from "@/components/motion/typewriter";
 import { TemplatePreview } from "@/components/templates/template-preview";
+import { ButtonLink } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { EASE_OUT } from "@/lib/motion";
 import type { Template } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
 export function HowItWorks({ previews }: { previews: Template[] }) {
-  const [active, setActive] = useState(0);
-
-  const steps: { n: string; title: string; body: string; visual: ReactNode }[] = [
+  const steps: Step[] = [
     {
-      n: "01",
+      n: 1,
+      time: "About a minute",
       title: "Pick a template",
-      body: "Browse designs crafted for every kind of love — from first dates to fiftieth anniversaries.",
+      body: "Choose one for the occasion. It comes already filled in, so you see exactly what they’ll get.",
       visual: <PickVisual previews={previews} />,
     },
     {
-      n: "02",
-      title: "Make it yours",
-      body: "Write your note, add photos, a voice memo or the song that’s undeniably yours.",
+      n: 2,
+      time: "A few minutes",
+      title: "Add your words & photos",
+      body: "Put in their name, write your note, swap in your photos and a song. Preview it any time.",
       visual: <WriteVisual />,
     },
     {
-      n: "03",
-      title: "Send the feeling",
-      body: "Share a private link instantly, or schedule it to open at exactly the right moment.",
+      n: 3,
+      time: "Instantly",
+      title: "Send the link",
+      body: "Share a private link on WhatsApp, or set it to open at midnight on the day.",
       visual: <SendVisual />,
     },
   ];
 
   return (
-    <section id="how" className="mx-auto max-w-7xl scroll-mt-24 px-5 pb-28 md:pb-44">
-      <div className="grid gap-14 md:grid-cols-12">
-        <div className="md:sticky md:top-32 md:col-span-5 md:self-start">
-          <Eyebrow index="02">How it works</Eyebrow>
-          <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
-            <SplitText text="Three small steps to" />{" "}
-            <SplitText
-              text="someone’s whole heart."
-              className="type-accent text-rose"
-              delay={0.2}
-            />
-          </h2>
-          <p className="type-copy mt-6 max-w-sm text-muted">
-            No design skills, no apps to install. If you can write a text message, you can make
-            something unforgettable.
-          </p>
+    <section id="how" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-14 md:py-20">
+      <div className="mx-auto max-w-2xl text-center">
+        <Eyebrow className="justify-center">
+          How it works
+        </Eyebrow>
+        <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
+          <SplitText text="Ready in" /> <SplitText text="five minutes." className="type-accent text-rose" delay={0.15} />
+        </h2>
+        <p className="type-copy mx-auto mt-5 max-w-md text-muted">No design skills, no app to install. If you can send a text, you can make one.</p>
+      </div>
 
-          <div className="mt-14 hidden items-end gap-5 md:flex">
-            <div className="relative h-[6rem] w-[8.5rem] overflow-hidden text-[6rem] font-bold leading-none tracking-[-0.06em]">
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.span
-                  key={active}
-                  className="absolute inset-0"
-                  initial={{ y: "100%" }}
-                  animate={{ y: "0%" }}
-                  exit={{ y: "-100%" }}
-                  transition={{ duration: 0.6, ease: EASE_OUT }}
-                >
-                  {steps[active].n}
-                </motion.span>
-              </AnimatePresence>
+      <ol className="relative mt-12 md:mt-16 grid gap-6 md:grid-cols-3">
+        {/* The thread joining the three steps */}
+        <span aria-hidden className="absolute left-[16.6%] right-[16.6%] top-[18px] hidden h-px bg-line md:block" />
+        {steps.map((step, i) => (
+          <motion.li
+            key={step.n}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-10% 0px" }}
+            transition={{ duration: 0.8, ease: EASE_OUT, delay: i * 0.12 }}
+            className="relative flex flex-col"
+          >
+            <span className="relative z-10 mx-auto grid size-9 place-items-center rounded-full bg-ink text-sm font-semibold text-paper ring-8 ring-cream">
+              {step.n}
+            </span>
+            <div className="mt-6 flex flex-1 flex-col rounded-[2rem] border border-line bg-paper p-3">
+              <div className="relative h-56 overflow-hidden rounded-[1.5rem] bg-cream">{step.visual}</div>
+              <div className="p-5 pt-6">
+                <p className="type-label text-[10px] text-rose-deep">{step.time}</p>
+                <h3 className="type-heading mt-2 text-2xl">{step.title}</h3>
+                <p className="type-copy mt-3 text-muted">{step.body}</p>
+              </div>
             </div>
-            <div className="mb-4 flex flex-col gap-2">
-              {steps.map((s, i) => (
-                <span
-                  key={s.n}
-                  className={cn(
-                    "h-1 rounded-full transition-all duration-500 ease-out-expo",
-                    i === active ? "w-10 bg-rose" : "w-4 bg-ink/15",
-                  )}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+          </motion.li>
+        ))}
+      </ol>
 
-        <div className="flex flex-col gap-6 md:col-span-6 md:col-start-7">
-          {steps.map((step, i) => (
-            <StepCard key={step.n} step={step} index={i} setActive={setActive} />
-          ))}
-        </div>
+      <div className="mt-12 md:mt-16 flex justify-center">
+        <ButtonLink href="/templates" variant="rose" size="lg">
+          Pick a template
+        </ButtonLink>
       </div>
     </section>
   );
 }
 
-function StepCard({
-  step,
-  index,
-  setActive,
-}: {
-  step: { n: string; title: string; body: string; visual: ReactNode };
-  index: number;
-  setActive: (i: number) => void;
-}) {
-  const ref = useRef<HTMLElement>(null);
-  const centered = useInView(ref, { margin: "-45% 0px -45% 0px" });
-
-  useEffect(() => {
-    if (centered) setActive(index);
-  }, [centered, index, setActive]);
-
-  return (
-    <motion.article
-      ref={ref}
-      initial={{ opacity: 0, y: 60 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10% 0px" }}
-      transition={{ duration: 1, ease: EASE_OUT }}
-      className="rounded-[2rem] border border-line bg-paper p-3"
-    >
-      <div className="relative h-72 overflow-hidden rounded-[1.5rem] bg-cream">{step.visual}</div>
-      <div className="flex gap-5 p-5 pt-6">
-        <span className="mt-2 font-mono text-xs text-rose-deep">{step.n}</span>
-        <div>
-          <h3 className="type-heading text-2xl">{step.title}</h3>
-          <p className="type-copy mt-3 text-muted">{step.body}</p>
-        </div>
-      </div>
-    </motion.article>
-  );
-}
+type Step = { n: number; time: string; title: string; body: string; visual: ReactNode };
 
 function PickVisual({ previews }: { previews: Template[] }) {
   const ref = useRef<HTMLDivElement>(null);

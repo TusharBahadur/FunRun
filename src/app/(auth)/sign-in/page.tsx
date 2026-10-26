@@ -1,23 +1,17 @@
 import type { Metadata } from "next";
-import { ButtonLink } from "@/components/ui/button";
+import { SignInCard } from "@/components/profile/sign-in-card";
 import { Logo } from "@/components/ui/logo";
 
-export const metadata: Metadata = { title: "Sign in" };
+export const metadata: Metadata = { title: "Sign in", robots: { index: false } };
 
-// Placeholder — the auth flow (e.g. Better Auth) lands in this route group.
 export default function SignInPage() {
   return (
     <main className="grid min-h-svh place-items-center px-5">
-      <div className="w-full max-w-md rounded-[2rem] border border-line bg-paper p-10 text-center">
+      <div className="w-full max-w-md text-center">
         <Logo className="text-4xl" />
-        <h1 className="type-display mt-8 text-5xl">Accounts are almost here.</h1>
-        <p className="type-copy mt-5 text-muted">
-          Soon you’ll be able to save drafts, track who opened your gifts, and keep every note
-          you’ve ever sent.
-        </p>
-        <ButtonLink href="/" className="mt-8">
-          Back home
-        </ButtonLink>
+        <div className="mt-8">
+          <SignInCard next="/profile" />
+        </div>
       </div>
     </main>
   );

@@ -38,6 +38,12 @@ No test framework is set up.
 - **Template previews** (`components/templates/template-preview.tsx`) are pure SVG/CSS renderings driven by each template's `palette`, `motif` and `preview` text, sized with container query units (`cqw`).
 - Import alias: `@/*` → `src/*`.
 
+## Data & assets (read before touching stickers, photos or scenes)
+
+- Where each kind of data lives, and the rules that keep published gifts unchanged, are in README → "Where data lives". Short version: never edit a published-asset in place; images are fingerprinted (`npm run assets`), board stickers are pinned `id@hash` at publish, sticker ids are permanent (retire, don't delete), and scene rendering changes need a `GIFT_SCHEMA_VERSION` bump.
+- Template image paths go through `asset()` in `src/lib/assets.ts` (server-only; never import it from a client component).
+- Marketing and template pages must stay static: don't read `searchParams` or cookies in them. Read `?to`/`?from` in the browser (`components/templates/with-names.tsx`).
+
 ## Planned (from README)
 
 Each of these has a reserved place in the codebase:

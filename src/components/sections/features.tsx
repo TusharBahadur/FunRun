@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils";
 
 export function Features() {
   return (
-    <section id="features" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-28 md:py-40">
-      <div className="mb-14 grid gap-6 md:grid-cols-12 md:items-end">
+    <section id="features" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-14 md:py-20">
+      <div className="mb-12 md:mb-16 grid gap-6 md:grid-cols-12 md:items-end">
         <div className="md:col-span-7">
-          <Eyebrow index="04">Details</Eyebrow>
+          <Eyebrow>Details</Eyebrow>
           <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
             <SplitText text="Every detail," />{" "}
             <SplitText
@@ -64,8 +64,8 @@ export function Features() {
         <BentoCard
           index={4}
           className="md:col-span-2"
-          title="Yours forever"
-          body="Gifts never expire. Revisit them for years."
+          title="Yours for 60 days"
+          body="The link stays open for 60 days after it unlocks, so they can replay it again and again."
         >
           <InfinityDraw />
         </BentoCard>

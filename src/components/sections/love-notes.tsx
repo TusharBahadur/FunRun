@@ -8,9 +8,9 @@ import { cn } from "@/lib/utils";
 export function LoveNotes({ notes }: { notes: LoveNote[] }) {
   const half = Math.ceil(notes.length / 2);
   return (
-    <section id="love-notes" className="scroll-mt-24 overflow-hidden py-28 md:py-36">
-      <div className="mx-auto mb-16 flex max-w-7xl flex-col items-center px-5 text-center">
-        <Eyebrow index="05">Love notes</Eyebrow>
+    <section id="love-notes" className="scroll-mt-24 overflow-hidden py-14 md:py-20">
+      <div className="mx-auto mb-12 md:mb-16 flex max-w-7xl flex-col items-center px-5 text-center">
+        <Eyebrow>Love notes</Eyebrow>
         <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
           <SplitText text="Words that" />{" "}
           <SplitText

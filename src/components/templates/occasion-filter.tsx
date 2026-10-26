@@ -15,7 +15,7 @@ export function OccasionFilter({ active }: { active?: OccasionId }) {
         return (
           <Link
             key={o.label}
-            href={o.id ? `/templates?occasion=${o.id}` : "/templates"}
+            href={o.id ? `/templates/for/${o.id}` : "/templates"}
             scroll={false}
             className={cn(
               "relative shrink-0 rounded-full border border-ink/10 px-4 py-2 text-sm transition-colors duration-300",

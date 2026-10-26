@@ -3,12 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "assets": "node scripts/build-assets.mjs",
+    "predev": "node scripts/build-assets.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/build-assets.mjs --check",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "clsx": "^2.1.1",
     "lenis": "^1.3.26",
     "lucide-react": "^1.55.0",

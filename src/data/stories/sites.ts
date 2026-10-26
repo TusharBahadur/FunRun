@@ -1,3 +1,4 @@
+import { asset } from "@/lib/assets";
 import { demoPhoto as photo, palettes, siteTemplate } from "./shared";
 
 /*
@@ -6,7 +7,7 @@ import { demoPhoto as photo, palettes, siteTemplate } from "./shared";
  * the stories: write it the way the sender would actually say it.
  */
 
-const board = (file: string) => `/stickers/board/${file}`;
+const board = (file: string) => asset(`stickers/${file}`);
 
 /* ── Anniversary ── */
 export const ourCorner = siteTemplate({
@@ -14,7 +15,6 @@ export const ourCorner = siteTemplate({
   name: "Our Corner",
   occasion: "anniversary",
   description: "A little website about the two of you: a photo hero, a live countdown, things you’ve noticed, your photos, your songs and a letter.",
-  pricePaise: 14900,
   palette: palettes.blueberry,
   motif: "hearts",
   preview: { kicker: "Our website", title: "Made us a tiny website. Don’t laugh.", signoff: "A scrolling page · 6 sections" },
@@ -89,7 +89,6 @@ export const justForYou = siteTemplate({
   name: "Just For You",
   occasion: "love",
   description: "A love letter as a website: their photo up top, the little things you’ve noticed, your favourite pictures, your songs and the letter.",
-  pricePaise: 14900,
   palette: palettes.strawberry,
   motif: "hearts",
   preview: { kicker: "A website, for you", title: "Couldn’t fit it in a text, so I made a website.", signoff: "A scrolling page · 5 sections" },
@@ -155,7 +154,6 @@ export const birthdayPage = siteTemplate({
   name: "Birthday Page",
   occasion: "birthday",
   description: "A birthday website: their photo up top, a counter of every day they’ve been around, the things you love about them, photos, songs and a letter.",
-  pricePaise: 14900,
   palette: palettes.peach,
   motif: "cake",
   preview: { kicker: "Happy birthday", title: "You get a whole website this year. Don’t get used to it.", signoff: "A scrolling page · 6 sections" },
@@ -229,7 +227,6 @@ export const fanPage = siteTemplate({
   name: "Fan Page",
   occasion: "girlfriend-day",
   description: "A fan website for her: her photo up top, verified facts about her, a gallery, her playlist and a fan letter.",
-  pricePaise: 14900,
   palette: palettes.taro,
   motif: "stars",
   preview: { kicker: "Official fan page", title: "Every celebrity has a fan page. So now you do too.", signoff: "A scrolling page · 5 sections" },
@@ -294,7 +291,6 @@ export const hisPage = siteTemplate({
   name: "His Page",
   occasion: "boyfriend-day",
   description: "A fan website for him: his photo up top, verified facts, a gallery, his playlist and a letter.",
-  pricePaise: 14900,
   palette: palettes.peach,
   motif: "sun",
   preview: { kicker: "Official fan page", title: "Every celebrity has a fan page. So now you do too.", signoff: "A scrolling page · 5 sections" },

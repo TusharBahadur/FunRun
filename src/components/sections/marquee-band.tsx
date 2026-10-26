@@ -37,7 +37,7 @@ function Row() {
 /** A quiet, single-line ticker of occasions that drifts faster as you scroll. */
 export function MarqueeBand() {
   return (
-    <section aria-label="Occasions" className="mx-auto max-w-7xl px-5">
+    <section aria-label="Occasions" className="mx-auto max-w-7xl px-5 py-14 md:py-20">
       <div className="border-y border-line py-7 text-[clamp(1.35rem,2.4vw,2rem)] uppercase leading-none tracking-[-0.03em] [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
         <VelocityMarquee baseVelocity={1.2} skew={false}>
           <Row />

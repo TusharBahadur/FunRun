@@ -16,7 +16,7 @@ const hearts = Array.from({ length: 16 }, (_, i) => ({
 
 export function CallToAction() {
   return (
-    <section className="px-3 pb-3 sm:px-5">
+    <section className="px-3 pb-3 pt-14 sm:px-5 md:pt-20">
       <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] bg-rose-deep px-6 py-28 text-center text-paper md:py-40">
         <div aria-hidden className="pointer-events-none absolute inset-0">
           {hearts.map((h, i) => (

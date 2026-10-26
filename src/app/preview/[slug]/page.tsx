@@ -14,7 +14,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/preview/[slug]">): Promise<Metadata> {
   const template = await getTemplateBySlug((await params).slug);
-  return { title: template ? `Preview · ${template.name}` : "Preview" };
+  return { title: template ? `Preview · ${template.name}` : "Preview", robots: { index: false }, alternates: { canonical: `/templates/${(await params).slug}` } };
 }
 
 export default function PreviewPage({ params, searchParams }: PageProps<"/preview/[slug]">) {

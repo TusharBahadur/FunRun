@@ -12,7 +12,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/studio/[slug]">): Promise<Metadata> {
   const template = await getTemplateBySlug((await params).slug);
-  return { title: template ? `Studio · ${template.name}` : "Studio" };
+  return { title: template ? `Studio · ${template.name}` : "Studio", robots: { index: false } };
 }
 
 export default function StudioPage({ params, searchParams }: PageProps<"/studio/[slug]">) {
