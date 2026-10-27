@@ -125,13 +125,17 @@ function reducer(h: History, a: Action): History {
 }
 
 /** The studio's working copy: edit, undo, redo, and autosave on this device. */
-export function useDraft(initial: Draft) {
+export function useDraft(initial: Draft, resume: () => boolean = () => false) {
   const [h, dispatch] = useReducer(reducer, { past: [], present: initial, future: [], lastPush: 0 });
   const [saved, setSaved] = useState<"saved" | "saving" | "failed">("saved");
   const dirty = useRef(false);
+  const resumeRef = useRef(resume);
 
-  // Pick up an earlier draft of this template from this device.
+  // The studio opens on the template exactly as Preview shows it. An earlier
+  // draft is only picked up automatically when asked (e.g. back from sign-in
+  // mid-checkout); otherwise the studio offers it as a choice.
   useEffect(() => {
+    if (!resumeRef.current()) return;
     const existing = loadDraft(initial.id);
     if (existing) dispatch({ type: "replace", draft: existing });
   }, [initial.id]);

@@ -87,7 +87,7 @@ export const familyStories = [
     occasion: "family",
     level: "little",
     description: "Measure his cool, print the bill he always pays, shake out his famous lines, hand over a chai-and-cricket coupon.",
-    palette: palettes.cocoa,
+    palette: palettes.matcha,
     motif: "sun",
     preview: { kicker: "For Papa", title: "Papa, I made you something. Don’t make a joke about it.", signoff: "6 little pages" },
     recipient: "Papa",

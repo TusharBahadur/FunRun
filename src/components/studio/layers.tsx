@@ -37,7 +37,7 @@ export function LeftPanel({
 }) {
   const [tab, setTab] = useState<"layers" | "assets">("layers");
   return (
-    <aside className="flex w-[280px] shrink-0 flex-col border-r border-line bg-cream">
+    <aside data-tour="pages" className="flex w-[280px] shrink-0 flex-col border-r border-line bg-cream">
       <div className="flex gap-1 p-2">
         {(["layers", "assets"] as const).map((t) => (
           <button
@@ -55,7 +55,7 @@ export function LeftPanel({
       </div>
       {tab === "layers" && (
         <div className="border-t border-line p-2">
-          <button type="button" onClick={onAddSection} className="flex w-full items-center justify-center gap-2 rounded-xl bg-paper py-2.5 text-sm font-medium hover:bg-white">
+          <button type="button" data-tour="add" onClick={onAddSection} className="flex w-full items-center justify-center gap-2 rounded-xl bg-paper py-2.5 text-sm font-medium hover:bg-white">
             <Plus className="size-4" /> Add section
           </button>
         </div>
@@ -74,6 +74,7 @@ function Layers({ draft, sel, setSel, edit }: { draft: Draft; sel: Selection; se
       <button
         type="button"
         onClick={() => setSel({ scene: LOOK, item: null, field: null })}
+        data-tour="look"
         className={cn(
           "flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm",
           isLook(sel.scene) ? "bg-paper font-medium shadow-sm" : "hover:bg-paper/60",

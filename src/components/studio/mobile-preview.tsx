@@ -45,6 +45,7 @@ export function MobilePreview({
     <div className="bg-[#efe8dc] px-3 pb-2 pt-3">
       <div ref={box} className="mx-auto w-full">
         <div
+          data-tour="m-preview"
           className="relative mx-auto overflow-hidden rounded-[1.35rem] bg-paper shadow-[0_18px_40px_-24px_rgba(27,18,21,.55)] ring-2 ring-ink/80"
           style={{ width: W * scale, height: H * scale, opacity: hidden ? 0.55 : 1 }}
         >
@@ -70,6 +71,7 @@ export function MobilePreview({
         <button
           type="button"
           onClick={onPreview}
+          data-tour="m-play"
           className="flex h-7 items-center gap-1.5 rounded-full bg-ink px-3 text-xs font-medium text-paper hover:bg-ink/85"
         >
           <Play className="size-3 fill-current" /> Preview

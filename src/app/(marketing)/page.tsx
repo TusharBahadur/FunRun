@@ -33,7 +33,7 @@ export default async function HomePage() {
         <FeaturedTemplates templates={featured} total={templates.length} />
         <MarqueeBand />
         <HowItWorks previews={pick(["candle", "make-a-wish", "sealed-with-love"])} />
-        <Showcase templates={pick(["make-a-wish", "midnight-notes", "still-you", "little-sorry"])} total={templates.length} />
+        <Showcase templates={pick(["little-sorry", "our-map", "white-flag", "paper-hearts", "make-it-right"])} total={templates.length} />
         <Features />
         <LoveNotes notes={loveNotes} />
         <CallToAction />

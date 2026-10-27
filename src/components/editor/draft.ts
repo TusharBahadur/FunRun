@@ -50,7 +50,7 @@ export type Theme = { id: string; name: string; palette: BirthdayPalette };
 
 export const themes: Theme[] = themeList;
 
-const tierTheme: Record<BirthdayTierId, string> = { candle: "honey", wish: "strawberry", party: "moon" };
+const tierTheme: Record<BirthdayTierId, string> = { candle: "honey", wish: "strawberry", party: "peach" };
 
 export function defaultDraft(tier: BirthdayTierId = "wish"): Draft {
   const demo = demoBirthdayGift;

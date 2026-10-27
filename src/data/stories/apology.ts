@@ -10,7 +10,7 @@ export const apologyStories = [
     occasion: "apology",
     level: "little",
     description: "Pick up first, fill the sorry-meter, take a peace-offering coupon, read the real apology.",
-    palette: palettes.matcha,
+    palette: palettes.strawberry,
     motif: "hearts",
     preview: { kicker: "I messed up", title: "Pick up. I brought momos.", signoff: "5 little pages" },
     ...people,

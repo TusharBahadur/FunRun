@@ -321,7 +321,7 @@ export const anniversaryStories = [
     occasion: "anniversary",
     level: "grand",
     description: "Draw your constellation, beat the odds, print your year, hear from family, then wish on a star.",
-    palette: palettes.moon,
+    palette: palettes.blueberry,
     motif: "stars",
     preview: { kicker: "Our anniversary", title: "8 billion people and I got you. Lucky.", signoff: "8 pages · family inside" },
     ...people,

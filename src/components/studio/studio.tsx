@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, Check, ChevronDown, Eye, LayoutGrid, Loader2, Redo2, RotateCcw, Undo2, UserRound, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, CircleHelp, Eye, LayoutGrid, Loader2, Redo2, RotateCcw, Undo2, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -26,6 +26,7 @@ import { MobilePreview } from "./mobile-preview";
 import { NamesDialog } from "./names-dialog";
 import { deleteSelected, insertScene, updateScene } from "./ops";
 import { sceneSchemas } from "./schema";
+import { StudioTour, tourSeen, type TourStep } from "./tour";
 
 export type StudioTemplate = { slug: string; name: string; pricePaise: number; story: Story };
 
@@ -43,7 +44,9 @@ export function Studio({
   askNames?: boolean;
 }) {
   const initial = useMemo(() => freshDraft(template.slug, `${template.name} for ${template.story.recipient}`, template.story), [template]);
-  const { draft, edit, undo, redo, reset, canUndo, canRedo, saved } = useDraft(initial);
+  const { draft, edit, undo, redo, reset, canUndo, canRedo, saved } = useDraft(initial, () => hasPendingPublish(initial.id));
+  // A draft from an earlier visit: offered, never loaded behind their back.
+  const [resumable, setResumable] = useState<Draft | null>(null);
 
   const save = useCallback(
     (next: Draft, tag?: string) => {
@@ -81,6 +84,13 @@ export function Studio({
   // Signed-in senders get their saved sign-off in the "From" line of new gifts.
   const { profile } = useProfile(useUser());
   const wide = useMinLg();
+  const [tour, setTour] = useState(false);
+  // First visit: once the names are in, show them around.
+  useEffect(() => {
+    if (names !== null || resumable || wide === null || tourSeen()) return;
+    const id = window.setTimeout(() => setTour(true), 900);
+    return () => window.clearTimeout(id);
+  }, [names, resumable, wide]);
 
   // Back from Google sign-in mid-checkout: reopen it where they left off.
   useEffect(() => {
@@ -88,6 +98,17 @@ export function Studio({
     const id = window.setTimeout(() => setCheckout(true), 300);
     return () => window.clearTimeout(id);
   }, [initial.id]);
+
+  // Found an earlier draft of this template? Offer it (unless it's already open, or untouched).
+  useEffect(() => {
+    if (hasPendingPublish(initial.id)) return;
+    const saved = loadDraft(initial.id);
+    if (!saved || saved.live?.slug) return;
+    const same = JSON.stringify(saved.story) === JSON.stringify(initial.story) && saved.name === initial.name;
+    if (same) return;
+    const id = window.setTimeout(() => setResumable(saved), 0);
+    return () => window.clearTimeout(id);
+  }, [initial]);
 
   // A fresh gift starts by asking who it's for; a saved draft already knows.
   useEffect(() => {
@@ -234,9 +255,11 @@ export function Studio({
         <Link href={`/templates/${template.slug}`} aria-label="Back to the template" className="grid size-9 place-items-center rounded-lg hover:bg-paper">
           <ArrowLeft className="size-4" />
         </Link>
-        <TopButton label="Undo (⌘Z)" onClick={undo} disabled={!canUndo}>
-          <Undo2 className="size-4" />
-        </TopButton>
+        <span data-tour="undo" className="flex">
+          <TopButton label="Undo (⌘Z)" onClick={undo} disabled={!canUndo}>
+            <Undo2 className="size-4" />
+          </TopButton>
+        </span>
         <span className="hidden items-center sm:flex">
           <TopButton label="Redo (⇧⌘Z)" onClick={redo} disabled={!canRedo}>
             <Redo2 className="size-4" />
@@ -258,6 +281,7 @@ export function Studio({
             type="button"
             onClick={() => setDesignsOpen(true)}
             aria-label="Change design"
+            data-tour="design"
             className="flex h-9 items-center gap-1.5 rounded-lg px-2 text-sm font-medium hover:bg-paper sm:rounded-full sm:border sm:border-line sm:px-3"
           >
             <LayoutGrid className="size-4 shrink-0" />
@@ -270,6 +294,7 @@ export function Studio({
             type="button"
             onClick={() => setNames("edit")}
             aria-label={`Names: for ${draft.story.recipient}, from ${draft.story.sender}`}
+            data-tour="names"
             className="flex h-9 min-w-0 items-center gap-1 rounded-full px-2 text-sm font-medium hover:bg-paper sm:hidden"
           >
             <UserRound className="size-3.5 shrink-0 text-muted" />
@@ -282,7 +307,7 @@ export function Studio({
             aria-label="Gift name"
             className="hidden w-full max-w-[280px] truncate rounded-lg bg-transparent px-2 py-1 text-center text-sm font-medium outline-none hover:bg-paper focus:bg-paper sm:block"
           />
-          <span className="hidden sm:inline-flex">
+          <span data-tour="names" className="hidden sm:inline-flex">
             <TopButton label={`Names: for ${draft.story.recipient}, from ${draft.story.sender}`} onClick={() => setNames("edit")}>
               <UserRound className="size-4" />
             </TopButton>
@@ -309,6 +334,7 @@ export function Studio({
             setRun((r) => r + 1);
           }}
           aria-label="Preview"
+          data-tour="preview"
           className="grid size-9 place-items-center rounded-full border border-line hover:bg-paper sm:hidden"
         >
           <Eye className="size-4" />
@@ -319,16 +345,43 @@ export function Studio({
             setPreview(true);
             setRun((r) => r + 1);
           }}
+          data-tour="preview"
           className="hidden h-9 items-center gap-1.5 rounded-full border border-line px-4 text-sm hover:bg-paper sm:flex"
         >
           <Eye className="size-4" /> Preview
         </button>
-        <button type="button" onClick={() => setCheckout(true)} className="flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-rose-deep pl-3 pr-1.5 text-sm font-medium text-paper hover:bg-rose sm:pl-4">
+        <TopButton label="Show me around" onClick={() => setTour(true)}>
+          <CircleHelp className="size-4" />
+        </TopButton>
+        <button type="button" data-tour="publish" onClick={() => setCheckout(true)} className="flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-rose-deep pl-3 pr-1.5 text-sm font-medium text-paper hover:bg-rose sm:pl-4">
           <span className="sm:hidden">{draft.live?.slug ? "Share" : "Publish"}</span>
           <span className="hidden sm:inline">{draft.live?.slug ? "Share link" : "Make it live"}</span>
           {!draft.live?.slug && <span className="rounded-full bg-paper/20 px-2 py-0.5 text-xs">{formatInr(template.pricePaise)}</span>}
         </button>
       </header>
+
+      {resumable && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line bg-paper px-4 py-2.5 text-sm">
+          <p className="flex-1">
+            You started a version of this gift on {new Date(resumable.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+            {resumable.story.recipient ? ` for ${resumable.story.recipient}` : ""}.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              reset(resumable);
+              setResumable(null);
+              setSel({ scene: 0, item: null });
+            }}
+            className="h-8 rounded-full bg-ink px-4 text-paper"
+          >
+            Continue it
+          </button>
+          <button type="button" onClick={() => setResumable(null)} className="h-8 rounded-full border border-line px-4 hover:bg-cream">
+            Start fresh
+          </button>
+        </div>
+      )}
 
       {outdated && (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line bg-paper px-4 py-2.5 text-sm">
@@ -356,7 +409,7 @@ export function Studio({
             <div className="flex min-h-0 min-w-0 flex-1 flex-col">
               <Canvas frames={frames} device={device} setDevice={setDevice} sceneLabel={sceneLabel} hidden={!!scenes[sceneIdx]?.hidden} onReplay={() => setRun((r) => r + 1)} />
             </div>
-            <aside data-lenis-prevent className="hidden w-[340px] shrink-0 overflow-y-auto border-l border-line bg-cream lg:block">
+            <aside data-lenis-prevent data-tour="inspector" className="hidden w-[340px] shrink-0 overflow-y-auto border-l border-line bg-cream lg:block">
               <Inspector draft={draft} sel={sel} setSel={setSel} edit={save} />
             </aside>
           </div>
@@ -375,7 +428,9 @@ export function Studio({
               <div className="sticky top-0 z-20">
                 <PageSwitcher draft={draft} sel={sel} setSel={setSel} onAddSection={() => setAdding(true)} />
               </div>
-              <MobileEditor draft={draft} edit={save} sel={sel} setSel={setSel} />
+              <div data-tour="m-editor">
+                <MobileEditor draft={draft} edit={save} sel={sel} setSel={setSel} />
+              </div>
             </div>
           </div>
         )}
@@ -422,6 +477,8 @@ export function Studio({
         }}
       />
 
+      <StudioTour open={tour} onClose={() => setTour(false)} steps={tourSteps(wide === true, formatInr(template.pricePaise), designs.length > 0)} />
+
       {/* Full-screen preview: plays exactly like the real gift */}
       <AnimatePresence>
         {preview && (
@@ -443,6 +500,138 @@ export function Studio({
       </div>
     </ImageCropProvider>
   );
+}
+
+/** The walk-through: what each part of the editor does, in the order you'd use it. */
+function tourSteps(wide: boolean, price: string, canChangeDesign: boolean): TourStep[] {
+  const b = (t: string) => <b className="font-semibold text-ink">{t}</b>;
+  const welcome: TourStep = {
+    title: "Let’s make it yours",
+    body: (
+      <>
+        This is your gift, already filled in. Change any words, photos and stickers, and add or remove pages. It takes about 5 minutes. Want a quick look around first? It takes 30 seconds.
+      </>
+    ),
+  };
+  const names: TourStep = {
+    target: "names",
+    title: "Who it’s for",
+    body: <>Their name and how you sign off. These show up all through the gift, so you only need to type them once.</>,
+  };
+  const design: TourStep[] = canChangeDesign
+    ? [
+        {
+          target: "design",
+          title: "Try another design",
+          body: <>Same occasion, a different set of pages and games. Your names come with you, so switching is safe.</>,
+        },
+      ]
+    : [];
+  const undo: TourStep = {
+    target: "undo",
+    title: "Nothing is permanent",
+    body: wide ? (
+      <>
+        Undo anything with {b("⌘Z")} (redo with {b("⇧⌘Z")}). Your gift saves on this device as you go, so you can close the tab and come back later.
+      </>
+    ) : (
+      <>Tap undo to take back the last change. Your gift saves on this phone as you go, so you can leave and come back later.</>
+    ),
+  };
+  const preview: TourStep = {
+    target: wide ? "preview" : "m-play",
+    title: "Watch it like they will",
+    body: <>{b("Preview")} plays the whole gift full screen, start to finish, exactly as they’ll see it. Use it before you send.</>,
+  };
+  const publish: TourStep = {
+    target: "publish",
+    title: wide ? "Make it live" : "Publish",
+    body: (
+      <>
+        When it’s ready: one price ({b(price)}), no subscription. Pick the exact moment it opens and you get a {b("private link only they can open")}. It stays live for 60 days.
+      </>
+    ),
+  };
+
+  if (wide) {
+    return [
+      welcome,
+      {
+        target: "pages",
+        title: "Your pages",
+        body: (
+          <>
+            Each row is one moment they tap through, in order. Click a page to edit it, {b("drag")} to reorder, use the {b("eye")} to hide one, and open the arrow to see its words, photos and stickers. {b("Assets")} keeps every photo you’ve added.
+          </>
+        ),
+      },
+      {
+        target: "add",
+        title: "Add a page",
+        body: <>Add a quiz, a photo album, love coupons, a countdown and more. New pages come in right after the one you’re on.</>,
+      },
+      {
+        target: "look",
+        title: "The look",
+        body: <>Colours, fonts and names for the whole gift. Pick a theme here and every page changes with it.</>,
+      },
+      {
+        target: "canvas",
+        title: "The live gift",
+        body: (
+          <>
+            This is the real thing, not a mock-up. {b("Click any line or photo")} on it to edit it straight away. You can play the games here too.
+          </>
+        ),
+      },
+      {
+        target: "toolbar",
+        title: "Every screen size",
+        body: <>See it on a phone, a laptop or both, zoom in and out, and replay the page’s animation after a change.</>,
+      },
+      {
+        target: "inspector",
+        title: "Edit the page",
+        body: <>Everything on the selected page: words, photos, stickers, quiz answers and coupons. Changes show on the gift as you type.</>,
+      },
+      names,
+      ...design,
+      undo,
+      preview,
+      publish,
+    ];
+  }
+  return [
+    welcome,
+    {
+      target: "m-preview",
+      title: "The live gift",
+      body: (
+        <>
+          This is the real thing, not a mock-up. {b("Tap any line or photo")} on it and you’ll jump straight to editing it.
+        </>
+      ),
+    },
+    {
+      target: "m-pages",
+      title: "Your pages",
+      body: (
+        <>
+          Use the {b("arrows")} to move between pages. Tap the page name to see them all, or to {b("add a new page")} like a quiz, an album or coupons. The first one, {b("Look")}, sets the colours and fonts.
+        </>
+      ),
+    },
+    {
+      target: "m-editor",
+      title: "Edit the page",
+      body: <>Scroll down to edit the words, photos and stickers on this page. Changes show on the gift above straight away.</>,
+    },
+    preview,
+    names,
+    ...design,
+    undo,
+    publish,
+  ];
 }
 
 /** null until measured, so the first paint can follow the CSS breakpoint. */

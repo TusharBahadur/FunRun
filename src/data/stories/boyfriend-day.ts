@@ -177,7 +177,7 @@ export const boyfriendDayStories = [
     occasion: "boyfriend-day",
     level: "grand",
     description: "A red-carpet entrance, a polaroid of him, his year in numbers, an invoice of everything he does, a memory game and friends’ speeches.",
-    palette: palettes.cocoa,
+    palette: palettes.blueberry,
     motif: "stars",
     preview: { kicker: "Awards night", title: "You won. Everyone voted. It wasn’t close.", signoff: "8 pages · friends inside" },
     ...people,

@@ -1,19 +1,21 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { Check, Clock, Lock, PenLine } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { boardStickerIds, drawnStickerIds, Sticker, type AnyStickerId } from "@/components/story/stickers";
 import { StoryPlayer } from "@/components/story/story-player";
-import { TemplatePreview } from "@/components/templates/template-preview";
 import { occasions } from "@/config/site";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { EASE_OUT } from "@/lib/motion";
 import type { Template } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
-/** How long each gift plays before the next one slides in (unless someone's playing with it). */
-const SLIDE_MS = 7000;
+/** How long each gift plays before the stack turns to the next (unless someone's playing with it). */
+const SLIDE_MS = 4000;
+/** How long one turn of the stack takes. */
+const TURN_S = 1;
 /** The gift is laid out at a real phone size, then scaled down to fit the frame. */
 const PHONE_W = 390;
 const PHONE_H = 844;
@@ -36,14 +38,19 @@ const perks = {
 export function Showcase({ templates, total }: { templates: Template[]; total: number }) {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  // Counts every turn without wrapping, so the notes keep taking turns in order
+  // even though there are more gifts than notes.
+  const [turn, setTurn] = useState(0);
+  const go = (next: number) => {
+    setI(next);
+    setTurn((t) => t + 1);
+  };
   const n = templates.length;
   const current = templates[i];
-  const prev = templates[(i - 1 + n) % n];
-  const next = templates[(i + 1) % n];
 
   useEffect(() => {
     if (paused) return;
-    const id = setTimeout(() => setI((x) => (x + 1) % n), SLIDE_MS);
+    const id = setTimeout(() => go((i + 1) % n), SLIDE_MS);
     return () => clearTimeout(id);
   }, [i, paused, n]);
 
@@ -78,40 +85,19 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
         </ul>
       </div>
 
-      <div className="relative mx-auto mt-12 grid max-w-6xl items-center gap-10 lg:grid-cols-[1fr_auto_1fr]">
-        <Perks items={perks.left} align="end" className="order-2 lg:order-1" />
+      <div className="relative mx-auto mt-12 grid max-w-7xl items-center gap-10 lg:grid-cols-[1fr_auto_1fr] lg:gap-4">
+        <Perks items={perks.left} align="end" beat={turn} tint={current.palette} className="order-2 lg:order-1" />
 
         {/* The phones */}
-        <div className="relative order-1 mx-auto h-[620px] w-[340px] sm:w-[420px] lg:order-2">
-          <FloatingSticker id="heart" className="-left-6 top-2 size-16 sm:-left-10" delay={0} />
-          <FloatingSticker id="pin-151" className="-right-4 top-24 size-20 sm:-right-12" delay={0.6} />
-          <FloatingSticker id="cat" className="-left-2 bottom-24 size-20 sm:-left-14" delay={1.2} />
-          <FloatingSticker id="b-flowers" className="-right-2 bottom-6 size-16 sm:-right-8" delay={1.8} />
-          <SidePhone template={prev} side="left" onClick={() => setI((i - 1 + n) % n)} />
-          <SidePhone template={next} side="right" onClick={() => setI((i + 1) % n)} />
-
-          <div
-            className="absolute left-1/2 top-0 z-20 h-[600px] w-[278px] -translate-x-1/2 overflow-hidden rounded-[2.6rem] border-[7px] border-[#2a2326] bg-[#2a2326] shadow-[0_40px_70px_-30px_rgba(27,18,21,0.65)]"
-            onPointerDown={() => setPaused(true)}
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-          >
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.div
-                key={current.slug}
-                className="absolute inset-0"
-                initial={{ x: 60, opacity: 0, scale: 0.96 }}
-                animate={{ x: 0, opacity: 1, scale: 1 }}
-                exit={{ x: -60, opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.6, ease: EASE_OUT }}
-              >
-                <LivePhone template={current} />
-              </motion.div>
-            </AnimatePresence>
-          </div>
+        <div className="relative order-1 mx-auto h-[620px] w-[340px] sm:w-[440px] lg:order-2 lg:w-[600px]">
+          <FloatingSticker id="b-capy-kiss" className="-left-6 top-2 size-16 sm:-left-10" delay={0} />
+          <FloatingSticker id="b-frog-kiss" className="-right-4 top-24 size-20 sm:-right-12" delay={0.6} />
+          <FloatingSticker id="m-flower-kitten" className="-left-2 bottom-24 size-20 sm:-left-14" delay={1.2} />
+          <FloatingSticker id="b-love-duck" className="-right-2 bottom-6 size-16 sm:-right-8" delay={1.8} />
+          <Revolver templates={templates} index={i} onPick={go} onPause={setPaused} />
         </div>
 
-        <Perks items={perks.right} align="start" className="order-3" />
+        <Perks items={perks.right} align="start" beat={turn} tint={current.palette} className="order-3" />
       </div>
 
       {/* Which gift is playing, and where we are in the loop */}
@@ -122,7 +108,7 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
               key={t.slug}
               type="button"
               aria-label={`Show ${t.name}`}
-              onClick={() => setI(j)}
+              onClick={() => go(j)}
               className={cn("h-1.5 rounded-full transition-all duration-500", j === i ? "w-8 bg-rose" : "w-4 bg-ink/15 hover:bg-ink/30")}
             />
           ))}
@@ -165,49 +151,161 @@ function LivePhone({ template }: { template: Template }) {
   );
 }
 
-function SidePhone({ template, side, onClick }: { template: Template; side: "left" | "right"; onClick: () => void }) {
-  const left = side === "left";
+type Slot = "center" | "left" | "right" | "back";
+
+/**
+ * The phones sit on a little turntable: on each turn the right phone swings
+ * to the front, the front one to the left, the left one round the back, and
+ * the one at the back comes out on the right.
+ */
+function Revolver({
+  templates,
+  index,
+  onPick,
+  onPause,
+}: {
+  templates: Template[];
+  index: number;
+  onPick: (i: number) => void;
+  onPause: (p: boolean) => void;
+}) {
+  const n = templates.length;
+  const narrow = useMediaQuery("(max-width: 639px)");
+  const reach = narrow ? 92 : 150;
+  // Flat transforms only (no 3D): far smoother with a whole gift inside the phone.
+  const slots: Record<Slot, { x: number; y: number; rotate: number; scale: number; opacity: number; zIndex: number }> = {
+    center: { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, zIndex: 30 },
+    right: { x: reach, y: 34, rotate: 8, scale: 0.86, opacity: 1, zIndex: 10 },
+    left: { x: -reach, y: 34, rotate: -8, scale: 0.86, opacity: 1, zIndex: 10 },
+    back: { x: 0, y: 40, rotate: 0, scale: 0.72, opacity: 0, zIndex: 0 },
+  };
+
+
   return (
-    <motion.button
-      type="button"
-      onClick={onClick}
-      aria-label={`Show ${template.name}`}
-      key={template.slug}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className={cn(
-        "absolute top-10 z-10 h-[520px] w-[240px] overflow-hidden rounded-[2.3rem] border-[6px] border-[#2a2326] bg-[#2a2326] shadow-[0_30px_50px_-30px_rgba(27,18,21,0.55)] transition-transform duration-500 hover:scale-[1.02]",
-        left ? "left-0 origin-bottom-right -rotate-[9deg]" : "right-0 origin-bottom-left rotate-[9deg]",
-      )}
-    >
-      <div className="grid size-full place-items-center rounded-[1.9rem]" style={{ backgroundColor: template.palette.bg }}>
-        <TemplatePreview template={template} className="w-[88%] rounded-2xl" />
-      </div>
-    </motion.button>
+    <div className="absolute inset-0">
+      {templates.map((t, j) => {
+        const off = (j - index + n) % n;
+        const slot: Slot = off === 0 ? "center" : off === 1 ? "right" : off === n - 1 ? "left" : "back";
+        const front = slot === "center";
+        return (
+          <motion.div
+            key={t.slug}
+            className="absolute left-1/2 top-0 -ml-[139px] h-[600px] w-[278px] will-change-transform"
+            initial={false}
+            animate={slots[slot]}
+            // Stacking order changes instantly, so the incoming phone glides over the outgoing one.
+            transition={{ duration: TURN_S, ease: [0.22, 1, 0.36, 1], zIndex: { duration: 0 } }}
+            onPointerDown={front ? () => onPause(true) : undefined}
+            onMouseEnter={front ? () => onPause(true) : undefined}
+            onMouseLeave={front ? () => onPause(false) : undefined}
+          >
+            <div
+              className={cn(
+                "relative size-full overflow-hidden rounded-[2.6rem] border-[7px] border-[#2a2326] bg-[#2a2326] transition-shadow duration-700",
+                front ? "shadow-[0_40px_70px_-30px_rgba(27,18,21,0.65)]" : "shadow-[0_30px_50px_-30px_rgba(27,18,21,0.5)]",
+              )}
+            >
+              {/* The three phones you can see all play their real first page; the hidden one rests. */}
+              {slot !== "back" && (
+                <div className={cn("size-full", !front && "pointer-events-none")} inert={!front}>
+                  <LivePhone template={t} />
+                </div>
+              )}
+              {!front && slot !== "back" && (
+                <button
+                  type="button"
+                  onClick={() => onPick(j)}
+                  aria-label={`Show ${t.name}`}
+                  className="absolute inset-0 rounded-[2rem]"
+                />
+              )}
+            </div>
+          </motion.div>
+        );
+      })}
+    </div>
   );
 }
 
-function Perks({ items, align, className }: { items: { icon: typeof Check; label: string }[]; align: "start" | "end"; className?: string }) {
+/**
+ * The notes pinned beside the phones. Each time the stack turns, the next note
+ * springs forward in the colour of the gift that just landed: 1, 2, 3, 4, 1, …
+ */
+function Perks({
+  items,
+  align,
+  beat,
+  tint,
+  className,
+}: {
+  items: { icon: typeof Check; label: string }[];
+  align: "start" | "end";
+  beat: number;
+  tint: { bg: string; accent: string };
+  className?: string;
+}) {
+  const side = align === "end" ? 0 : items.length;
   return (
-    <ul className={cn("flex flex-wrap justify-center gap-3 lg:flex-col", align === "end" ? "lg:items-end" : "lg:items-start", className)}>
-      {items.map(({ icon: Icon, label }, k) => (
-        <motion.li
-          key={label}
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: EASE_OUT, delay: 0.1 * k }}
-          style={{ rotate: `${k % 2 ? 1.5 : -1.5}deg` }}
-          className="relative flex max-w-[16rem] items-center gap-3 rounded-md bg-paper px-4 py-3.5 text-[15px] shadow-[0_12px_28px_-16px_rgba(27,18,21,0.4)]"
-        >
-          <span aria-hidden className="absolute -top-2 left-1/2 h-4 w-14 -translate-x-1/2 rotate-[-3deg] bg-blush/80" />
-          <span className="grid size-6 shrink-0 place-items-center rounded-full bg-blush text-rose-deep">
-            <Icon className="size-3.5" />
-          </span>
-          {label}
-        </motion.li>
-      ))}
+    <ul className={cn("relative z-30 flex flex-wrap justify-center gap-4 lg:flex-col lg:gap-6", align === "end" ? "lg:items-end" : "lg:items-start", className)}>
+      {items.map(({ icon: Icon, label }, k) => {
+        const on = (side + k) % 4 === beat % 4;
+        const tilt = k % 2 ? 2 : -2;
+        return (
+          <motion.li
+            key={label}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: EASE_OUT, delay: 0.1 * k }}
+            className="relative w-full max-w-[15rem]"
+          >
+            <motion.div
+              animate={
+                on
+                  ? { y: -10, scale: 1.08, rotate: -tilt * 1.5, backgroundColor: tint.bg }
+                  : { y: 0, scale: 1, rotate: tilt, backgroundColor: "#fffdf9" }
+              }
+              transition={
+                on
+                  ? { type: "spring", stiffness: 420, damping: 11, mass: 0.9, delay: TURN_S * 0.5, backgroundColor: { duration: 0.4, delay: TURN_S * 0.5 } }
+                  : { type: "spring", stiffness: 260, damping: 24 }
+              }
+              className={cn(
+                "relative flex items-center gap-3 rounded-lg border border-ink/5 px-4 py-4 text-[15px] font-medium leading-snug text-ink transition-shadow duration-500",
+                on ? "shadow-[0_22px_40px_-18px_rgba(27,18,21,0.55)]" : "shadow-[0_10px_24px_-14px_rgba(27,18,21,0.35)]",
+              )}
+            >
+              <span aria-hidden className="absolute -top-2.5 left-1/2 h-5 w-16 -translate-x-1/2 rotate-[-4deg] bg-blush/90" />
+              <motion.span
+                animate={on ? { rotate: [0, -18, 14, -8, 0], scale: [1, 1.25, 1] } : { rotate: 0, scale: 1 }}
+                transition={{ duration: 0.7, delay: TURN_S * 0.55 }}
+                className="grid size-8 shrink-0 place-items-center rounded-full text-white"
+                style={{ backgroundColor: on ? tint.accent : "#e7a3b1" }}
+              >
+                <Icon className="size-4" />
+              </motion.span>
+              {label}
+              {/* a little burst of hearts as it pops */}
+              {on && (
+                <span key={`burst-${beat}`} aria-hidden className="pointer-events-none absolute inset-0">
+                  {[-50, -15, 20, 55].map((dx, m) => (
+                    <motion.span
+                      key={m}
+                      className="absolute left-1/2 top-0 text-sm"
+                      style={{ color: tint.accent }}
+                      initial={{ x: 0, y: 0, opacity: 0, scale: 0.4 }}
+                      animate={{ x: dx * 1.6, y: [-4, -38 - (m % 2) * 14], opacity: [0, 1, 0], scale: [0.4, 1.1, 0.8] }}
+                      transition={{ duration: 0.9, ease: "easeOut", delay: TURN_S * 0.5 + m * 0.05 }}
+                    >
+                      {m % 2 ? "✦" : "♥"}
+                    </motion.span>
+                  ))}
+                </span>
+              )}
+            </motion.div>
+          </motion.li>
+        );
+      })}
     </ul>
   );
 }

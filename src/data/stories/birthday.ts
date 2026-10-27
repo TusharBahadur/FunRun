@@ -235,7 +235,7 @@ export const birthdayStories = [
     level: "grand",
     tier: "party",
     description: "A surprise party in a link: friends on the call, the bill for the night, party games, everyone’s wishes and the cake.",
-    palette: palettes.moon,
+    palette: palettes.peach,
     motif: "stars",
     preview: { kicker: "Surprise!!", title: "Everyone showed up for you.", signoff: "9 pages · friends inside" },
     ...people,

@@ -90,7 +90,7 @@ export function Canvas({
   }, []);
 
   return (
-    <div className="relative min-h-0 flex-1">
+    <div data-tour="canvas" className="relative min-h-0 flex-1">
       <div
         ref={scroller}
         data-lenis-prevent
@@ -151,7 +151,7 @@ export function Canvas({
       </div>
 
       {/* Toolbar */}
-      <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-2xl border border-line bg-paper/95 p-1.5 text-sm shadow-nav backdrop-blur">
+      <div data-tour="toolbar" className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-2xl border border-line bg-paper/95 p-1.5 text-sm shadow-nav backdrop-blur">
         <ToolButton active={tool === "select"} label="Select and play (V)" onClick={() => setTool("select")}>
           <MousePointer2 className="size-4" />
         </ToolButton>

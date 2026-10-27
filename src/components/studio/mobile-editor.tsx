@@ -148,7 +148,7 @@ export function PageSwitcher({
   }
 
   return (
-    <div ref={listRef} className="border-t border-ink/10 bg-[#efe8dc]">
+    <div ref={listRef} data-tour="m-pages" className="border-t border-ink/10 bg-[#efe8dc]">
       <div className="flex items-center gap-1 px-1.5 py-1.5">
         <button
           type="button"

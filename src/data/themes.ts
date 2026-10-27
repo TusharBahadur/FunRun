@@ -60,24 +60,6 @@ export const palettes = {
     gold: "#d4a84a",
     ink: "#3a2846",
   },
-  cocoa: {
-    bg: "#3a2824",
-    fg: "#f7ece6",
-    accent: "#e07060",
-    cream: "#fff3eb",
-    pink: "#e8c0b4",
-    gold: "#d4a050",
-    ink: "#3a2824",
-  },
-  moon: {
-    bg: "#243044",
-    fg: "#f3eef6",
-    accent: "#e070a0",
-    cream: "#fff5fa",
-    pink: "#f0c0d4",
-    gold: "#e8b858",
-    ink: "#243044",
-  },
   notebook: {
     bg: "#faf4ec",
     fg: "#4a2c28",
@@ -98,8 +80,6 @@ export const themeNames: Record<ThemeId, string> = {
   blueberry: "Blueberry yogurt",
   peach: "Peach soda",
   taro: "Taro milk",
-  cocoa: "Hot cocoa",
-  moon: "Moon milk",
   notebook: "Notebook",
 };
 
