@@ -240,13 +240,10 @@ body {
       background-color 200ms ease,
       color 200ms ease;
   }
-  @media (hover: hover) {
-    .btn:hover:not(:disabled):not([aria-disabled="true"]) {
-      transform: translateY(-1px);
-    }
-  }
+  /* Subtle on purpose: hover just shifts the colour (see each variant);
+     a press gives a tiny squeeze. No lifting or bouncing. */
   .btn:active:not(:disabled):not([aria-disabled="true"]) {
-    transform: scale(0.97);
+    transform: scale(0.985);
     transition-duration: 80ms;
   }
   .btn:focus-visible {

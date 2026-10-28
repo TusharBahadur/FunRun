@@ -1,7 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import type { ComponentProps } from "react";
-import { RollText } from "@/components/ui/roll-text";
 import { cn } from "@/lib/utils";
 
 /** The look lives in globals.css (.btn): solid rose pills for the main action, light pills for the rest. */
@@ -51,18 +50,17 @@ export function ButtonLink({
         className,
       )}
     >
-      <RollText>{children}</RollText>
+      {children}
       {icon && (
-        <span
+        // A quiet nudge towards where it's going, nothing more.
+        <ArrowUpRight
+          aria-hidden
           className={cn(
-            "relative grid shrink-0 place-items-center overflow-hidden rounded-full",
+            "shrink-0 transition-transform duration-300 ease-out group-hover:-translate-y-px group-hover:translate-x-px",
             sizes[size].icon,
             iconVariants[variant],
           )}
-        >
-          <ArrowUpRight className="size-4 transition-transform duration-500 ease-out-expo group-hover:translate-x-6 group-hover:-translate-y-6" />
-          <ArrowUpRight className="absolute size-4 -translate-x-6 translate-y-6 transition-transform duration-500 ease-out-expo group-hover:translate-x-0 group-hover:translate-y-0" />
-        </span>
+        />
       )}
     </Link>
   );

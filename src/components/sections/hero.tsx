@@ -2,7 +2,6 @@
 
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
-import { Magnetic } from "@/components/motion/magnetic";
 import { RotatingWords } from "@/components/motion/rotating-words";
 import { SplitText } from "@/components/motion/split-text";
 import { TemplatePreview } from "@/components/templates/template-preview";
@@ -78,11 +77,9 @@ export function Hero({ featured }: { featured: Template[] }) {
           className="tt-css-reveal mt-8 flex flex-col items-center gap-3 sm:flex-row md:mt-10"
           style={{ animation: `tt-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${INTRO_DELAY + 0.75}s both` }}
         >
-          <Magnetic>
-            <ButtonLink href="/templates" size="lg">
-              Browse templates
-            </ButtonLink>
-          </Magnetic>
+          <ButtonLink href="/templates" size="lg">
+            Browse templates
+          </ButtonLink>
           <ButtonLink href="#how" variant="ghost" size="lg" icon={false}>
             See how it works
           </ButtonLink>

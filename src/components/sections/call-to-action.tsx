@@ -2,7 +2,6 @@
 
 import { motion } from "motion/react";
 import { Heart } from "lucide-react";
-import { Magnetic } from "@/components/motion/magnetic";
 import { SplitText } from "@/components/motion/split-text";
 import { ButtonLink } from "@/components/ui/button";
 
@@ -48,11 +47,9 @@ export function CallToAction() {
             Pick a template, pour your heart in, and send it in the next ten minutes.
           </p>
           <div className="mt-8 md:mt-10">
-            <Magnetic>
-              <ButtonLink href="/templates" variant="light" size="lg">
-                Start gifting
-              </ButtonLink>
-            </Magnetic>
+            <ButtonLink href="/templates" variant="light" size="lg">
+              Start gifting
+            </ButtonLink>
           </div>
         </div>
       </div>
