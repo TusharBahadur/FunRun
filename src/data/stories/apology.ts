@@ -259,9 +259,9 @@ export const apologyStories = [
         title: "We’re *good* at this.",
         hint: "Tap each photo",
         photos: [
-          { caption: "Terrace chai", date: "Mar ’25", tone: "dusk", src: photo("chai-cheers") },
+          { caption: "Our two babies", date: "Mar ’25", tone: "dusk", src: photo("road-trip") },
           { caption: "That rainy walk", date: "Jul ’24", tone: "leaf", src: photo("misty-chai") },
-          { caption: "3am Maggi", date: "Too many", tone: "sun", src: photo("maggi-3am") },
+          { caption: "Lazy Sundays", date: "Too many", tone: "sun", src: photo("cat") },
         ],
         done: "Let’s go back to this.",
         reaction: "m-heart-eyes",

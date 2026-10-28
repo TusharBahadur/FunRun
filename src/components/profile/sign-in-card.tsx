@@ -15,16 +15,16 @@ export function SignInCard({ next }: { next: string }) {
   }, [user, next, router]);
 
   return (
-    <div className="mx-auto w-full max-w-md rounded-[2rem] border border-line bg-paper p-10 text-center shadow-card">
-      <h2 className="type-display text-4xl">
+    <div className="mx-auto w-full max-w-md rounded-[2rem] border border-line bg-paper px-6 py-9 text-center shadow-card sm:p-10">
+      <h2 className="type-display text-[2rem] leading-tight sm:text-4xl">
         Your gifts, <span className="type-accent text-rose">all in one place.</span>
       </h2>
-      <p className="type-copy mt-4 text-muted">Sign in to see every gift you’ve made, who’s opened them, and when each link closes.</p>
+      <p className="type-copy mt-4 text-muted">Sign in to see every gift you’ve made, who’s opened them, and make changes for 7 days after sending.</p>
       <button
         type="button"
         disabled={user === undefined}
         onClick={() => signInWithGoogle().catch(() => setError("Couldn't open Google sign-in. Please try again."))}
-        className="mt-8 flex h-14 w-full items-center justify-center gap-3 rounded-full border border-line bg-cream font-medium shadow-sm transition-colors hover:bg-white disabled:opacity-40"
+        className="btn btn-paper mt-8 flex h-14 w-full items-center justify-center gap-3"
       >
         <GoogleMark /> Continue with Google
       </button>

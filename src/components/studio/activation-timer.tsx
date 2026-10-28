@@ -268,7 +268,7 @@ export function ActivationTimer({
             <button
               type="button"
               onClick={handleTestUnlock}
-              className="flex items-center gap-1 rounded-full bg-ink px-2.5 py-1 text-[11px] font-medium text-paper transition-all hover:scale-105 active:scale-95 shadow-xs"
+              className="btn btn-ink flex items-center gap-1 px-2.5 py-1 text-[11px]"
             >
               {testUnlocked ? (
                 <>

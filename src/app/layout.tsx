@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Mono, Inter_Tight, Kalam } from "next/font/google";
-import { Suspense } from "react";
-import { Cursor } from "@/components/motion/cursor";
 import { Providers } from "@/components/providers";
 import { giftFontVariables } from "@/components/story/gift-font-faces";
 import { siteConfig } from "@/config/site";
@@ -69,10 +67,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-svh bg-cream font-sans text-ink">
         <Providers>{children}</Providers>
-        {/* The cursor reads the URL, so it can't block pages from pre-rendering. */}
-        <Suspense fallback={null}>
-          <Cursor />
-        </Suspense>
         <div
           aria-hidden
           className="grain pointer-events-none fixed inset-0 z-[70] opacity-[0.05]"

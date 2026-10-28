@@ -65,8 +65,8 @@ export const birthdayStories = [
         hint: "Tap each photo",
         photos: [
           { caption: "These two!!", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
-          { caption: "Chai & gossip", date: "Every evening", tone: "dusk", src: photo("chai-cheers") },
-          { caption: "3am Maggi club", date: "Too many nights", tone: "night", src: photo("maggi-3am") },
+          { caption: "The cake", date: "Every year", tone: "dusk", src: photo("pink-cake") },
+          { caption: "Nap club", date: "Too many naps", tone: "night", src: photo("cat") },
         ],
         done: "We need more of these this year.",
         stickers: [{ id: "chai", at: "bl", size: "s" }],
@@ -123,7 +123,7 @@ export const birthdayStories = [
         insideSub: "Keep going ↓",
         stickers: [
           { id: "b-flowers", at: "tr" },
-          { id: "m-glam-cat", at: "bl" },
+          { id: "m-flower-kitten", at: "bl" },
         ],
         reaction: "pin-104",
       },
@@ -156,7 +156,7 @@ export const birthdayStories = [
         ],
         done: "Don’t let it go to your head.",
         stickers: [
-          { id: "m-glam-cat", at: "br" },
+          { id: "m-shy-cat", at: "br" },
           { id: "b-heart-peek", at: "tl", size: "s" },
         ],
         reaction: "pin-104",
@@ -179,6 +179,19 @@ export const birthdayStories = [
         reaction: "m-heart-monkey",
       },
       {
+        type: "cake",
+        eyebrow: "Candles first",
+        title: "Blow them out. *All 27.* (Okay, two.)",
+        hint: "Tap each flame to blow it out",
+        age: 27,
+        done: "Smoke and everything. Now the real wish.",
+        stickers: [
+          { id: "b-cake", at: "bl" },
+          { id: "popper", at: "tr", size: "s" },
+        ],
+        reaction: "m-dance-cat",
+      },
+      {
         type: "dandelion",
         eyebrow: "Your turn",
         title: "Make a wish. *Just for you.*",
@@ -197,9 +210,9 @@ export const birthdayStories = [
         hint: "Tap each photo",
         photos: [
           { caption: "These two!!", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
-          { caption: "Chai & gossip", date: "Every evening", tone: "dusk", src: photo("chai-cheers") },
+          { caption: "The cake", date: "Every year", tone: "dusk", src: photo("pink-cake") },
           { caption: "Cousin’s wedding", date: "Nov ’24", tone: "rose", src: photo("saree-laughs") },
-          { caption: "3am Maggi club", date: "Too many nights", tone: "night", src: photo("maggi-3am") },
+          { caption: "Nap club", date: "Too many naps", tone: "night", src: photo("cat") },
         ],
         done: "We need more of these. ASAP.",
         stickers: [
@@ -218,7 +231,7 @@ export const birthdayStories = [
           "Say yes to the trip this year. Finish the painting. Let people spoil you a bit. Happy birthday, {to}.",
         ],
         signoff: "Love you lots, {from}",
-        photo: photo("chai-cheers"),
+        photo: photo("road-trip"),
         stickers: [
           { id: "b-cheek", at: "bl" },
           { id: "b-melting", at: "tr", size: "s" },
@@ -374,7 +387,7 @@ export const birthdayStories = [
           "Happy birthday, {to}. I’m really glad you exist. Come find me when the cake’s gone.",
         ],
         signoff: "Love you, {from}",
-        photo: photo("chai-cheers"),
+        photo: photo("road-trip"),
         stickers: [{ id: "m-flower-cat", at: "bl" }],
       },
     ],

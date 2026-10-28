@@ -70,7 +70,7 @@ export const bestFriendsStories = [
           "Thanks for getting me. Even when I’m being weird on purpose.",
         ],
         signoff: "Your problem, {from}",
-        photo: photo("chai-cheers"),
+        photo: photo("road-trip"),
         stickers: [{ id: "b-hug-hearts", at: "bl" }],
       },
     ],
@@ -154,7 +154,7 @@ export const bestFriendsStories = [
         photos: [
           { caption: "Park day", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
           { caption: "Chai alibi", date: "Weekly", tone: "dusk", src: photo("misty-chai") },
-          { caption: "2am, no plan", date: "Mar ’25", tone: "rose", src: photo("maggi-3am") },
+          { caption: "Nap, no plan", date: "Mar ’25", tone: "rose", src: photo("cat") },
         ],
         done: "Framing the crimes.",
         reaction: "m-heart-monkey",

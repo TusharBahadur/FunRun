@@ -37,7 +37,7 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
             <Logo className="text-4xl" />
-            <p className="type-copy mt-5 max-w-xs text-cream/55">
+            <p className="type-copy mt-5 max-w-xs text-cream/75">
               Beautiful digital gifts for the people who matter most.
             </p>
           </div>
@@ -49,7 +49,7 @@ export function Footer() {
               <ul className="mt-5 space-y-3">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <Link href={link.href} className="group text-cream/80 hover:text-cream">
+                    <Link href={link.href} className="group whitespace-nowrap text-cream/80 hover:text-cream">
                       <RollText>{link.label}</RollText>
                     </Link>
                   </li>

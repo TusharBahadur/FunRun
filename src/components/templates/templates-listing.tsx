@@ -14,15 +14,17 @@ export async function TemplatesListing({ occasion }: { occasion?: OccasionId }) 
 
   return (
     <main className="mx-auto max-w-7xl px-5 pb-32 pt-32 md:pt-40">
-      <h1 className="text-[clamp(2.4rem,5vw,4.5rem)] type-display">
-        {label ?? "All"} <span className="type-accent text-rose">templates.</span>
-      </h1>
-
-      <div className="mb-12 mt-10 flex flex-col gap-6 border-b border-line pb-8 md:flex-row md:items-center md:justify-between">
-        <OccasionFilter active={occasion} />
-        <p className="type-label shrink-0 text-muted">
-          {templates.length} {templates.length === 1 ? "template" : "templates"}
+      <div className="flex items-end justify-between gap-4">
+        <h1 className="text-[clamp(2.4rem,5vw,4.5rem)] type-display">
+          {label ?? "All"} <span className="type-accent text-rose">templates.</span>
+        </h1>
+        <p className="mb-2 shrink-0 text-sm text-muted md:mb-4">
+          {templates.length} {templates.length === 1 ? "design" : "designs"}
         </p>
+      </div>
+
+      <div className="mb-8 mt-6 md:mb-12 md:mt-8">
+        <OccasionFilter active={occasion} />
       </div>
       <TemplateGrid templates={templates} />
     </main>

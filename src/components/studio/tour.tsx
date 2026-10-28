@@ -202,7 +202,7 @@ export function StudioTour({ steps, open, onClose }: { steps: TourStep[]; open: 
                       type="button"
                       onClick={() => setAt((a) => a - 1)}
                       aria-label="Back"
-                      className="grid size-11 place-items-center rounded-full border border-line hover:bg-cream"
+                      className="btn btn-paper grid size-11 place-items-center"
                     >
                       <ArrowLeft className="size-4" />
                     </button>
@@ -210,7 +210,7 @@ export function StudioTour({ steps, open, onClose }: { steps: TourStep[]; open: 
                   <button
                     type="button"
                     onClick={() => (last ? close() : setAt((a) => a + 1))}
-                    className="flex h-11 items-center gap-1.5 rounded-full bg-rose-deep px-5 text-sm font-medium text-paper hover:bg-rose"
+                    className="btn btn-rose flex h-11 items-center gap-1.5 px-5 text-sm"
                   >
                     {at === 0 ? "Show me" : last ? "Start making" : "Next"}
                     {!last && <ArrowRight className="size-4" />}

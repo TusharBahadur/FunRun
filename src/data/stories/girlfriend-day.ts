@@ -95,7 +95,7 @@ export const girlfriendDayStories = [
         taps: 3,
         inside: "Membership card #001: {from}",
         insideSub: "Founding member. Only member.",
-        stickers: [{ id: "m-glam-cat", at: "bl" }],
+        stickers: [{ id: "m-rose-kitten", at: "bl" }],
         reaction: "m-ahhh",
       },
       {
@@ -149,8 +149,8 @@ export const girlfriendDayStories = [
         hint: "Tap each photo",
         photos: [
           { caption: "That wedding look", date: "Nov ’24", tone: "rose", src: photo("saree-laughs") },
-          { caption: "Girls’ night", date: "Mar ’25", tone: "dusk", src: photo("party-girls") },
-          { caption: "Chai break", date: "Every day", tone: "sun", src: photo("chai-cheers") },
+          { caption: "Birthday cake", date: "Mar ’25", tone: "dusk", src: photo("pink-cake") },
+          { caption: "Cuddle break", date: "Every day", tone: "sun", src: photo("road-trip") },
         ],
         done: "Framing every single one.",
         reaction: "m-heart-monkey",
@@ -237,7 +237,7 @@ export const girlfriendDayStories = [
         ],
         total: "Paid in hugs, forever",
         done: "I’ll be paying this off my whole life.",
-        stickers: [{ id: "m-glam-cat", at: "br" }],
+        stickers: [{ id: "m-cat-cuddle", at: "br" }],
         reaction: "m-bow-down",
       },
       {

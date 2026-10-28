@@ -9,8 +9,8 @@ export function LoveNotes({ notes }: { notes: LoveNote[] }) {
   const half = Math.ceil(notes.length / 2);
 
   return (
-    <section id="love-notes" className="scroll-mt-24 overflow-hidden py-16 md:py-24">
-      <div className="mx-auto mb-12 flex max-w-7xl flex-col items-center px-5 text-center md:mb-16">
+    <section id="love-notes" className="scroll-mt-24 overflow-hidden py-14 md:py-20">
+      <div className="mx-auto mb-8 flex max-w-7xl flex-col items-center px-5 text-center md:mb-16">
         <Eyebrow>Real DMs & Reactions</Eyebrow>
         <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
           <SplitText text="Straight from" />{" "}
@@ -26,7 +26,7 @@ export function LoveNotes({ notes }: { notes: LoveNote[] }) {
         </p>
       </div>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3 sm:gap-6">
         {/* Row 1 - Marquee left */}
         <Marquee duration={50}>
           {notes.slice(0, half).map((note) => (

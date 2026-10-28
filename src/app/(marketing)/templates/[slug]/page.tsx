@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { SplitText } from "@/components/motion/split-text";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { sceneLabels } from "@/components/story/labels";
-import { LevelCompare } from "@/components/templates/level-compare";
 import { ButtonLinkWithNames, NamesBanner } from "@/components/templates/with-names";
 import { TemplatePreview } from "@/components/templates/template-preview";
 import { birthdayTiers } from "@/components/experiences/birthday/tiers";
@@ -49,7 +48,6 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
   const occasion = occasions.find((o) => o.id === template.occasion);
   const price = formatInr(template.pricePaise);
   const tier = template.tier ? birthdayTiers[template.tier] : null;
-  const siblings = template.level ? await getTemplates({ occasion: template.occasion }) : [];
   const steps = template.story ? template.story.scenes.map((s) => sceneLabels[s.type]) : (tier?.highlights ?? []);
 
   // Product data so search results can show the name, price and image.
@@ -72,7 +70,7 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
   };
 
   return (
-    <main className="mx-auto max-w-7xl px-5 pb-32 pt-32 md:pt-40">
+    <main className="mx-auto max-w-7xl px-5 pb-36 pt-24 md:pb-32 md:pt-40">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Link href="/templates" className="type-label text-muted hover:text-ink">
         ← All templates
@@ -80,8 +78,8 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
 
       <NamesBanner accent={template.palette.accent} />
 
-      <div className="mt-10 grid items-start gap-12 md:grid-cols-12 md:gap-16">
-        <div className="md:col-span-5">
+      <div className="mt-6 grid items-start gap-8 md:mt-10 md:grid-cols-12 md:gap-16">
+        <div className="mx-auto w-[78%] max-w-sm md:col-span-5 md:w-auto md:max-w-none">
           <TiltCard className="rounded-[1.75rem] shadow-[0_40px_80px_-40px_rgba(27,18,21,0.5)]">
             <TemplatePreview template={template} />
           </TiltCard>
@@ -89,12 +87,12 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
 
         <div className="md:col-span-7 md:pt-6">
           <Eyebrow>{occasion?.label}</Eyebrow>
-          <h1 className="type-display mt-5 text-[clamp(3rem,8vw,6rem)] font-normal">
+          <h1 className="type-display mt-3 text-[clamp(2.6rem,8vw,6rem)] font-normal md:mt-5">
             <SplitText text={template.name} className="type-accent" />
           </h1>
-          <p className="type-copy mt-6 max-w-md text-muted">{template.description}</p>
+          <p className="type-copy mt-4 max-w-md text-muted md:mt-6">{template.description}</p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-3">
+          <div className="mt-10 hidden flex-wrap items-center gap-3 md:flex">
             {template.experience ? (
               <ButtonLinkWithNames href={`/preview/${template.slug}`} size="lg">
                 Preview the gift
@@ -115,7 +113,7 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
 
           {steps.length > 0 && (
             <>
-              <p className="type-label mt-16 text-muted">
+              <p className="type-label mt-10 text-muted md:mt-16">
                 {template.story?.format === "site"
                   ? `One scrolling page, ${steps.length} sections`
                   : template.story
@@ -135,7 +133,24 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
         </div>
       </div>
 
-      {template.level && <LevelCompare current={template} siblings={siblings} />}
+
+      {/* Phones: the actions stay in reach at the bottom of the screen. */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-cream/90 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-3 backdrop-blur-md md:hidden">
+        <div className="mx-auto flex max-w-md items-center gap-2.5">
+          {template.experience && (
+            <ButtonLinkWithNames href={`/preview/${template.slug}`} variant="light" icon={false} className="h-12 px-5">
+              Preview
+            </ButtonLinkWithNames>
+          )}
+          {template.story ? (
+            <ButtonLinkWithNames href={`/studio/${template.slug}`} variant="rose" className="h-12 flex-1">
+              Make it yours · {price}
+            </ButtonLinkWithNames>
+          ) : (
+            <span className="type-label flex-1 text-center text-muted">{price} · Personalizing opens soon</span>
+          )}
+        </div>
+      </div>
     </main>
   );
 }

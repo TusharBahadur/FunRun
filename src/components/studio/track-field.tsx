@@ -168,7 +168,7 @@ export function TrackField({
               <button
                 type="button"
                 onClick={toggleTest}
-                className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-paper hover:bg-ink/80 transition-colors shrink-0"
+                className="btn btn-ink flex items-center gap-1.5 px-3 py-1.5 text-xs shrink-0"
               >
                 {testing ? <Pause className="size-3.5 fill-current" /> : <Play className="size-3.5 fill-current ml-0.5" />}
                 {testing ? "Stop" : "Test audio"}
@@ -183,7 +183,7 @@ export function TrackField({
           Or upload a file
         </p>
         <div className="mt-2 flex items-center gap-3">
-          <label className={cn("inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-paper px-4 font-medium", roomy ? "h-12 text-sm" : "h-10 text-sm")}>
+          <label className={cn("btn btn-paper inline-flex items-center gap-2 px-4", roomy ? "h-12 text-sm" : "h-10 text-sm")}>
             <Upload className="size-4" />
             {track.file ? "Replace file" : "Choose audio"}
             <input
@@ -243,7 +243,7 @@ export function TrackField({
             <button
               type="button"
               onClick={toggleTest}
-              className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-paper hover:bg-ink/80 transition-colors shrink-0"
+              className="btn btn-ink flex items-center gap-1.5 px-3 py-1.5 text-xs shrink-0"
             >
               {testing ? <Pause className="size-3.5 fill-current" /> : <Play className="size-3.5 fill-current ml-0.5" />}
               {testing ? "Stop" : "Test audio"}

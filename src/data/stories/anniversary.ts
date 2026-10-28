@@ -197,7 +197,7 @@ export const anniversaryStories = [
           { q: "How I won over your maa?", options: ["My charm, obviously", "The gulab jamun", "I still haven’t"], reply: "Gulab jamun. Pretty sure. Don’t test it." },
         ],
         done: "You were there. I was gone the second you laughed.",
-        stickers: [{ id: "m-glam-cat", at: "tr" }],
+        stickers: [{ id: "m-ily-cat", at: "tr" }],
         reaction: "m-dance-cat",
       },
       {

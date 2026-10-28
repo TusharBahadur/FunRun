@@ -115,7 +115,9 @@ export function Navbar() {
                   aria-label="Your profile"
                   title={me.name ?? "Your profile"}
                   className={cn(
-                    "grid size-10 place-items-center overflow-hidden rounded-full border border-ink/10 bg-wine text-sm font-semibold text-cream transition-opacity",
+                    // Only on desktop, where there's no menu. Phones and tablets
+                    // reach the profile from inside the menu.
+                    "hidden size-10 place-items-center overflow-hidden rounded-full border border-ink/10 bg-wine text-sm font-semibold text-cream transition-opacity lg:grid",
                     open && "pointer-events-none opacity-0",
                   )}
                 >
@@ -182,7 +184,7 @@ export function Navbar() {
 
               {/* A size container: menu words scale to the panel, so the longest one always fits. */}
               <nav className="@container relative flex flex-1 flex-col justify-center">
-                <ul className="flex flex-col items-end text-right">
+                <ul className="flex flex-col items-end gap-3 text-right sm:gap-2">
                   {menuItems.map((item, i) => {
                     const active = item.href === pathname;
                     return (
@@ -196,7 +198,7 @@ export function Navbar() {
                           <Link
                             href={resolve(item.href)}
                             onClick={() => setOpen(false)}
-                            className="group flex items-baseline justify-end gap-4 py-0.5"
+                            className="group flex items-baseline justify-end gap-4 py-1"
                           >
                             <span className="type-label text-[10px] text-cream/35 transition-colors group-hover:text-rose">
                               {String(i + 1).padStart(2, "0")}

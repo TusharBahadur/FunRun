@@ -4,25 +4,26 @@ import type { ComponentProps } from "react";
 import { RollText } from "@/components/ui/roll-text";
 import { cn } from "@/lib/utils";
 
+/** The look lives in globals.css (.btn): solid rose pills for the main action, light pills for the rest. */
 const variants = {
-  primary: "bg-ink text-paper hover:bg-ink-soft",
+  primary: "btn-ink",
   // rose-deep keeps cream labels above 4.5:1 contrast (plain rose is 3.97:1).
-  rose: "bg-rose-deep text-paper hover:bg-wine",
-  light: "bg-paper text-ink hover:bg-white",
-  ghost: "text-ink hover:bg-ink/5",
+  rose: "btn-rose",
+  light: "btn-paper",
+  ghost: "btn-ghost",
 } as const;
 
 const iconVariants = {
-  primary: "bg-paper/12",
-  rose: "bg-paper/15",
-  light: "bg-ink text-paper",
-  ghost: "bg-ink/6",
+  primary: "",
+  rose: "",
+  light: "",
+  ghost: "",
 } as const;
 
 const sizes = {
-  sm: { base: "h-10 gap-2 pl-4 pr-1.5 text-sm", icon: "size-7" },
-  md: { base: "h-12 gap-3 pl-5 pr-1.5 text-sm", icon: "size-9" },
-  lg: { base: "h-14 gap-4 pl-7 pr-2 text-base", icon: "size-10" },
+  sm: { base: "h-10 gap-1.5 px-5 text-sm", icon: "size-4" },
+  md: { base: "h-12 gap-2 px-6 text-[15px]", icon: "size-4" },
+  lg: { base: "h-14 gap-2 px-8 text-base", icon: "size-5" },
 } as const;
 
 type ButtonLinkProps = ComponentProps<typeof Link> & {
@@ -43,7 +44,7 @@ export function ButtonLink({
     <Link
       {...props}
       className={cn(
-        "group relative inline-flex items-center justify-center rounded-full font-medium tracking-tight transition-colors duration-300",
+        "btn group",
         variants[variant],
         sizes[size].base,
         !icon && "px-6",

@@ -38,34 +38,19 @@ export class NeedsSignIn extends Error {
   }
 }
 
-export type Published = { slug: string; unlockAt: string; expiresAt: string };
+export type Published = { slug: string; unlockAt: string; editUntil: string; hasPassword: boolean };
 
 /**
- * Makes a gift live: uploads its photos and songs (which live inside the draft
- * as data URLs), swaps in their web links, then saves the gift and gets its link.
+ * Gets a gift ready to save: drops hidden pages, pins stickers to today's
+ * exact image, and uploads photos and songs (which live inside the draft as
+ * data URLs), swapping in their web links.
  */
-export async function publishGift({
-  templateSlug,
-  name,
-  story,
-  link,
-  unlockAt,
-  onProgress,
-}: {
-  templateSlug: string;
-  name: string;
-  story: Story;
-  link: string;
-  unlockAt?: string;
-  onProgress?: (done: number, total: number) => void;
-}): Promise<Published> {
+async function prepareStory(story: Story, onProgress?: (done: number, total: number) => void) {
   const supabase = getSupabase();
   const { data } = await supabase.auth.getSession();
   const userId = data.session?.user.id;
   if (!userId) throw new NeedsSignIn();
 
-  // Hidden pages never show, so don't upload their photos. Board stickers are
-  // pinned to today's exact image, so later sticker edits never change this gift.
   const finalStory: Story = mapStrings({ ...story, scenes: story.scenes.filter((s) => !s.hidden) }, pinSticker);
 
   const inline = new Set<string>();
@@ -90,24 +75,70 @@ export async function publishGift({
 
   const token = await accessToken();
   if (!token) throw new NeedsSignIn();
+  return { story: mapStrings(finalStory, (v) => links.get(v) ?? v), folder: files.length ? folder : undefined, token };
+}
 
-  const res = await fetch("/api/gifts", {
-    method: "POST",
+async function send(url: string, method: "POST" | "PATCH", token: string, body: unknown, fallback: string): Promise<Published> {
+  const res = await fetch(url, {
+    method,
     headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-    body: JSON.stringify({
-      templateSlug,
-      name,
-      link,
-      unlockAt,
-      mediaFolder: files.length ? folder : undefined,
-      schemaVersion: GIFT_SCHEMA_VERSION,
-      story: mapStrings(finalStory, (v) => links.get(v) ?? v),
-    }),
+    body: JSON.stringify(body),
   });
   const json = (await res.json().catch(() => ({}))) as Partial<Published> & { error?: string };
   if (res.status === 401) throw new NeedsSignIn();
-  if (!res.ok || !json.slug) throw new Error(json.error ?? "Couldn't make the gift live. Please try again.");
+  if (!res.ok || !json.slug) throw new Error(json.error ?? fallback);
   return json as Published;
+}
+
+/** Makes a gift live and gets its link. `password` is optional. */
+export async function publishGift({
+  templateSlug,
+  name,
+  story,
+  link,
+  unlockAt,
+  password,
+  onProgress,
+}: {
+  templateSlug: string;
+  name: string;
+  story: Story;
+  link: string;
+  unlockAt?: string;
+  password?: string;
+  onProgress?: (done: number, total: number) => void;
+}): Promise<Published> {
+  const ready = await prepareStory(story, onProgress);
+  return send(
+    "/api/gifts",
+    "POST",
+    ready.token,
+    { templateSlug, name, link, unlockAt, password: password || undefined, mediaFolder: ready.folder, schemaVersion: GIFT_SCHEMA_VERSION, story: ready.story },
+    "Couldn't make the gift live. Please try again.",
+  );
+}
+
+/**
+ * Saves changes to a gift that's already live (allowed for 7 days). The link
+ * stays the same. `password`: undefined keeps it, null removes it, a string sets it.
+ */
+export async function updateGift({
+  slug,
+  name,
+  story,
+  unlockAt,
+  password,
+  onProgress,
+}: {
+  slug: string;
+  name: string;
+  story: Story;
+  unlockAt?: string;
+  password?: string | null;
+  onProgress?: (done: number, total: number) => void;
+}): Promise<Published> {
+  const ready = await prepareStory(story, onProgress);
+  return send(`/api/gifts/${slug}`, "PATCH", ready.token, { name, unlockAt, password, story: ready.story }, "Couldn't save your changes. Please try again.");
 }
 
 function collectDataUrls(value: unknown, out: Set<string>) {

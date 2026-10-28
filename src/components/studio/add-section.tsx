@@ -1,9 +1,9 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { useState } from "react";
 import type { SceneType, StoryPalette } from "@/components/story/types";
+import { Sheet } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { categoryOrder, sceneSchemas, type SceneCategory } from "./schema";
 
@@ -27,25 +27,7 @@ export function AddSection({
   const shown = allTypes.filter((t) => cat === "All" || sceneSchemas[t].category === cat);
 
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          className="fixed inset-0 z-[80] grid place-items-center bg-ink/30 p-4 backdrop-blur-[2px]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-        >
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Add section"
-            className="flex h-[min(86vh,680px)] w-[min(96vw,980px)] flex-col overflow-hidden rounded-[1.6rem] bg-cream shadow-float"
-            initial={{ y: 20, scale: 0.98 }}
-            animate={{ y: 0, scale: 1 }}
-            exit={{ y: 20, scale: 0.98 }}
-            onClick={(e) => e.stopPropagation()}
-          >
+    <Sheet open={open} onClose={onClose} label="Add section" scroll={false} width="w-[min(96vw,980px)]" className="h-[88svh] sm:h-[min(86vh,680px)]">
             <div className="flex items-start justify-between border-b border-line px-6 py-4">
               <div>
                 <p className="font-semibold">Add section</p>
@@ -99,9 +81,6 @@ export function AddSection({
                 </div>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    </Sheet>
   );
 }

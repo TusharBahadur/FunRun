@@ -267,10 +267,10 @@ export const loveLetterStories = [
         title: "The *pics.*",
         hint: "Tap each photo",
         photos: [
-          { caption: "Cutting chai", date: "First date", tone: "dusk", src: photo("chai-cheers") },
+          { caption: "Cuddle buddies", date: "First date", tone: "dusk", src: photo("road-trip") },
           { caption: "Monsoon walk", date: "Jul ’24", tone: "leaf", src: photo("misty-chai") },
           { caption: "Stars on the roof", date: "Dec ’24", tone: "night", src: photo("night-sky") },
-          { caption: "Late-night Maggi", date: "Always", tone: "sun", src: photo("maggi-3am") },
+          { caption: "Sleepy Sundays", date: "Always", tone: "sun", src: photo("cat") },
         ],
         done: "My whole camera roll is you.",
         stickers: [{ id: "chai", at: "bl", size: "s" }],

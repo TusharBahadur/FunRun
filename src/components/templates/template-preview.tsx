@@ -8,9 +8,12 @@ import { StoryMockup } from "./story-mockup";
 export function TemplatePreview({
   template,
   className,
+  compact = false,
 }: {
   template: Template;
   className?: string;
+  /** Fill a frame that isn't 3:4 without cropping (see StoryMockup). */
+  compact?: boolean;
 }) {
   return (
     <div
@@ -19,7 +22,7 @@ export function TemplatePreview({
         className,
       )}
     >
-      {template.story && <StoryMockup template={template} />}
+      {template.story && <StoryMockup template={template} compact={compact} />}
     </div>
   );
 }

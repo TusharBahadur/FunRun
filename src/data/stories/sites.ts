@@ -119,10 +119,10 @@ export const justForYou = siteTemplate({
       eyebrow: "Our camera roll",
       title: "Some of my *favourite* moments.",
       photos: [
-        { caption: "Cutting chai, first date", date: "2022", tone: "dusk", src: photo("chai-cheers") },
+        { caption: "Cuddled up, first date", date: "2022", tone: "dusk", src: photo("road-trip") },
         { caption: "Monsoon walk", date: "Jul ’24", tone: "leaf", src: photo("misty-chai") },
         { caption: "Us, accurately", date: "Always", tone: "rose", src: board("06.jpg") },
-        { caption: "Late-night Maggi", date: "Too many nights", tone: "sun", src: photo("maggi-3am") },
+        { caption: "Lazy Sundays", date: "Too many", tone: "sun", src: photo("cat") },
       ],
     },
     {
@@ -130,7 +130,7 @@ export const justForYou = siteTemplate({
       eyebrow: "On repeat",
       title: "Songs that are basically *about you.*",
       songs: [
-        { title: "Tum Se Hi", note: "you know why", tone: "dusk", src: photo("chai-cheers") },
+        { title: "Tum Se Hi", note: "you know why", tone: "dusk", src: photo("road-trip") },
         { title: "Pehli Nazar Mein", note: "embarrassingly accurate", tone: "rose", src: board("05.jpg") },
       ],
     },
@@ -156,7 +156,7 @@ export const birthdayPage = siteTemplate({
   description: "A birthday website: their photo up top, a counter of every day they’ve been around, the things you love about them, photos, songs and a letter.",
   palette: palettes.peach,
   motif: "cake",
-  preview: { kicker: "Happy birthday", title: "You get a whole website this year. Don’t get used to it.", signoff: "A scrolling page · 6 sections" },
+  preview: { kicker: "Happy birthday", title: "You get a whole website this year. Don’t get used to it.", signoff: "A scrolling page · 7 sections" },
   recipient: "Maya",
   sender: "Sam",
   melody: "birthday",
@@ -188,14 +188,22 @@ export const birthdayPage = siteTemplate({
       ],
     },
     {
+      type: "cake",
+      eyebrow: "Before you scroll on",
+      title: "Your cake, *{to}.* Blow!",
+      hint: "Tap each flame to blow it out",
+      age: 27,
+      done: "Happy birthday. Wish granted (probably).",
+    },
+    {
       type: "gallery",
       eyebrow: "Year 27 in photos",
       title: "What a *year* you had.",
       photos: [
         { caption: "These two!!", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
         { caption: "Cousin’s wedding", date: "Nov ’24", tone: "rose", src: photo("saree-laughs") },
-        { caption: "Girls’ night", date: "Mar ’25", tone: "dusk", src: photo("party-girls") },
-        { caption: "Last year’s cake", date: "Oct ’24", tone: "rose", src: photo("pink-cake") },
+        { caption: "Birthday cake", date: "Oct ’24", tone: "dusk", src: photo("pink-cake") },
+        { caption: "Birthday nap", date: "Oct ’24", tone: "rose", src: photo("cat") },
       ],
     },
     {
@@ -203,9 +211,9 @@ export const birthdayPage = siteTemplate({
       eyebrow: "Birthday playlist",
       title: "Turn it up. *It’s your day.*",
       songs: [
-        { title: "London Thumakda", note: "for the dancing part", tone: "sun", src: photo("party-girls") },
+        { title: "London Thumakda", note: "for the dancing part", tone: "sun", src: photo("pink-cake") },
         { title: "Badtameez Dil", note: "because obviously", tone: "rose", src: board("39.jpg") },
-        { title: "Kabira", note: "for later, when it’s quiet", tone: "night", src: photo("chai-cheers") },
+        { title: "Kabira", note: "for later, when it’s quiet", tone: "night", src: photo("road-trip") },
       ],
     },
     {
@@ -259,7 +267,7 @@ export const fanPage = siteTemplate({
       photos: [
         { caption: "That wedding look", date: "Nov ’24", tone: "rose", src: photo("saree-laughs") },
         { caption: "Iconic, as usual", date: "Always", tone: "dusk", src: photo("maya-portrait") },
-        { caption: "Girls’ night", date: "Mar ’25", tone: "sun", src: photo("party-girls") },
+        { caption: "The cake", date: "Mar ’25", tone: "sun", src: photo("pink-cake") },
         { caption: "Me, looking at her", date: "Daily", tone: "rose", src: board("43.jpg") },
       ],
     },
@@ -303,7 +311,7 @@ export const hisPage = siteTemplate({
       eyebrow: "The official fan page",
       title: "{to}: *the website.*",
       subtitle: "leading man, obviously",
-      photo: photo("chai-cheers"),
+      photo: photo("road-trip"),
       tone: "sun",
     },
     {
@@ -322,8 +330,8 @@ export const hisPage = siteTemplate({
       title: "His best *moments*, as captured by his biggest fan.",
       photos: [
         { caption: "The babies", date: "Dec ’24", tone: "sun", src: photo("road-trip") },
-        { caption: "Chai face", date: "Daily", tone: "dusk", src: photo("chai-cheers") },
-        { caption: "2am maggi", date: "Mar ’25", tone: "rose", src: photo("maggi-3am") },
+        { caption: "Cake face", date: "Daily", tone: "dusk", src: photo("pink-cake") },
+        { caption: "Nap mode", date: "Sundays", tone: "rose", src: photo("cat") },
         { caption: "The usual", date: "Always", tone: "sun", src: photo("misty-chai") },
       ],
     },

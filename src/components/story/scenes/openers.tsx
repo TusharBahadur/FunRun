@@ -13,24 +13,65 @@ type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
 
 /* ───────────── Wax seal: hold to break it, the letter slides out ───────────── */
 
+// One smooth beat after another: the seal cracks, the flap swings open and
+// tucks behind, the letter rises out of the pocket and settles in front.
+const SEAL_EASE = [0.65, 0, 0.35, 1] as const;
+const ENV_H = 200; // envelope height
+const FLAP_H = 112; // flap depth (the V)
+const LETTER_H = 160;
+
 export function SealScene({ scene, done, onDone }: SceneProps<S<"seal">>) {
   const { palette, fill } = useStory();
-  const box = useRef<HTMLDivElement>(null);
+  // Already opened when we got here (going back a page)? Show it open, no replay.
+  const [cracked, setCracked] = useState(false);
   const hold = useHold(1300, () => {
+    setCracked(true);
     onDone();
   }, done);
   const p = done ? 1 : hold.progress;
+  const open = done;
+
+  // Layering changes at set moments (z-index can't tween): the flap drops
+  // behind the letter halfway through its swing, and the letter comes in
+  // front of the pocket once it's fully out. Opened earlier? Already final.
+  const [stage, setStage] = useState(0);
+  useEffect(() => {
+    if (!cracked) return;
+    const a = setTimeout(() => setStage(1), 600);
+    const b = setTimeout(() => setStage(2), 1650);
+    return () => {
+      clearTimeout(a);
+      clearTimeout(b);
+    };
+  }, [cracked]);
+  const flapBehind = open && (!cracked || stage >= 1);
+  const letterFront = open && (!cracked || stage >= 2);
 
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
-      <div ref={box} className="relative h-[280px] w-[min(86vw,340px)] [perspective:900px]">
-        {/* Letter rises out once the seal breaks */}
+      <div className="relative h-[340px] w-[min(86vw,340px)] [perspective:1100px]">
+        {/* Inside of the envelope (the back wall) */}
+        <div
+          className="absolute inset-x-0 bottom-0 overflow-hidden rounded-2xl"
+          style={{ height: ENV_H, backgroundColor: palette.pink, boxShadow: "0 34px 50px -30px rgba(27,18,21,.5)" }}
+        >
+          <div className="absolute inset-0" style={{ backgroundColor: palette.fg, opacity: 0.1 }} />
+        </div>
+
+        {/* The letter: tucked in, then up and out, then forward */}
         <motion.div
-          className="absolute inset-x-6 top-8 grid h-[200px] place-items-center rounded-xl px-5 text-center shadow-nav"
-          style={{ backgroundColor: palette.cream, color: palette.ink }}
+          className="absolute inset-x-[18px] grid place-items-center rounded-xl px-5 text-center"
+          style={{
+            bottom: 14,
+            height: LETTER_H,
+            backgroundColor: palette.cream,
+            color: palette.ink,
+            boxShadow: "0 18px 34px -18px rgba(27,18,21,.45)",
+            zIndex: letterFront ? 5 : 1,
+          }}
           initial={false}
-          animate={done ? { y: -120, zIndex: 3 } : { y: 0, zIndex: 0 }}
-          transition={{ delay: done ? 0.45 : 0, duration: 0.9, ease: EASE_OUT }}
+          animate={open ? { y: [0, -186, -150], scale: [1, 1, 1.04] } : { y: 0, scale: 1 }}
+          transition={open ? { delay: 0.75, duration: 1.5, times: [0, 0.6, 1], ease: SEAL_EASE } : { duration: 0 }}
         >
           <StudioHit field="note">
             <p className="type-display text-[1.5rem] font-semibold leading-snug" style={{ color: palette.accent }}>
@@ -38,44 +79,86 @@ export function SealScene({ scene, done, onDone }: SceneProps<S<"seal">>) {
             </p>
           </StudioHit>
         </motion.div>
-        {/* Envelope body */}
-        <div
-          className="absolute inset-x-0 bottom-0 z-[2] h-[190px] rounded-2xl"
-          style={{ backgroundColor: palette.pink, boxShadow: "0 30px 50px -30px rgba(27,18,21,.5)" }}
-        >
-          <svg viewBox="0 0 340 190" className="absolute inset-0 size-full" preserveAspectRatio="none" aria-hidden>
-            <path d="M0 190 L170 95 L340 190" fill="none" stroke={palette.fg} strokeOpacity={0.15} strokeWidth={2} />
+
+        {/* Front pocket, with the V cut out at the top */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] overflow-hidden rounded-2xl" style={{ height: ENV_H }}>
+          <svg viewBox={`0 0 340 ${ENV_H}`} className="size-full" preserveAspectRatio="none" aria-hidden>
+            <path d={`M0 0 L170 ${FLAP_H - 4} L340 0 V${ENV_H} H0 Z`} fill={palette.pink} />
+            <path d={`M0 ${ENV_H} L150 ${ENV_H * 0.52} M340 ${ENV_H} L190 ${ENV_H * 0.52}`} stroke={palette.fg} strokeOpacity={0.12} strokeWidth={1.5} fill="none" />
+            <path d={`M0 0 L170 ${FLAP_H - 4} L340 0`} stroke={palette.fg} strokeOpacity={0.1} strokeWidth={1.5} fill="none" />
           </svg>
         </div>
-        {/* Flap folds open */}
+
+        {/* The flap: swings up and over, then drops behind the letter */}
         <motion.div
-          className="absolute inset-x-0 bottom-[94px] z-[4] h-[96px] origin-top"
-          style={{ transformStyle: "preserve-3d", top: 90 }}
-          animate={done ? { rotateX: 180, zIndex: 1 } : { rotateX: 0 }}
-          transition={{ duration: 0.6, ease: EASE_OUT }}
+          className="absolute inset-x-0 origin-top"
+          style={{ top: 340 - ENV_H, height: FLAP_H, transformStyle: "preserve-3d", zIndex: flapBehind ? 0 : 4 }}
+          initial={false}
+          animate={{ rotateX: open ? 180 : 0 }}
+          transition={open ? { delay: 0.2, duration: 0.8, ease: SEAL_EASE } : { duration: 0 }}
         >
-          <svg viewBox="0 0 340 100" className="size-full" preserveAspectRatio="none" aria-hidden>
-            <path d="M0 0 H340 L170 100 Z" fill={palette.accent} opacity={0.9} />
+          {/* Outside of the flap */}
+          <svg viewBox={`0 0 340 ${FLAP_H}`} className="absolute inset-0 size-full [backface-visibility:hidden]" preserveAspectRatio="none" aria-hidden>
+            <path d={`M0 0 H340 L170 ${FLAP_H} Z`} fill={palette.accent} />
+            <path d={`M0 0 H340 L170 ${FLAP_H} Z`} fill="url(#seal-sheen)" />
+            <defs>
+              <linearGradient id="seal-sheen" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#fff" stopOpacity="0.14" />
+                <stop offset="1" stopColor="#000" stopOpacity="0.08" />
+              </linearGradient>
+            </defs>
+          </svg>
+          {/* Inside of the flap, seen once it's open */}
+          <svg
+            viewBox={`0 0 340 ${FLAP_H}`}
+            className="absolute inset-0 size-full [backface-visibility:hidden] [transform:rotateX(180deg)]"
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            <path d={`M0 0 H340 L170 ${FLAP_H} Z`} fill={palette.pink} />
+            <path d={`M0 0 H340 L170 ${FLAP_H} Z`} fill={palette.fg} fillOpacity={0.06} />
           </svg>
         </motion.div>
-        {/* The seal */}
+
+        {/* The seal: hold it, it cracks in two */}
         {!done && (
           <button
             type="button"
             {...hold.handlers}
             aria-label="Press and hold to break the seal"
-            className="absolute left-1/2 top-[160px] z-[5] grid size-[92px] -translate-x-1/2 -translate-y-1/2 touch-none select-none place-items-center rounded-full outline-none"
+            className="absolute left-1/2 z-[6] grid size-[92px] -translate-x-1/2 -translate-y-1/2 touch-none select-none place-items-center rounded-full outline-none"
+            style={{ top: 340 - ENV_H + FLAP_H - 18 }}
           >
             <HoldRing progress={p} size={92} color={palette.gold} track={`${palette.cream}66`} />
             <motion.span
               className="grid size-[70px] place-items-center rounded-full type-display text-3xl font-semibold"
-              style={{ backgroundColor: palette.accent, color: palette.cream, boxShadow: `inset 0 -6px 0 ${palette.fg}33` }}
-              animate={{ scale: 1 - p * 0.12, rotate: p * 8 }}
+              style={{ backgroundColor: palette.accent, color: palette.cream, boxShadow: `inset 0 -6px 0 ${palette.fg}33, 0 6px 14px -6px rgba(0,0,0,.4)` }}
+              animate={{ scale: 1 - p * 0.1, rotate: p * 6 }}
+              transition={{ type: "spring", stiffness: 300, damping: 24 }}
             >
               ♥
             </motion.span>
           </button>
         )}
+        {cracked &&
+          [-1, 1].map((side) => (
+            <motion.span
+              key={side}
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 z-[6] grid size-[70px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full type-display text-3xl font-semibold"
+              style={{
+                top: 340 - ENV_H + FLAP_H - 18,
+                backgroundColor: palette.accent,
+                color: palette.cream,
+                clipPath: side < 0 ? "inset(0 50% 0 0)" : "inset(0 0 0 50%)",
+              }}
+              initial={{ x: 0, y: 0, rotate: 6, opacity: 1 }}
+              animate={{ x: side * 46, y: 26, rotate: 6 + side * 28, opacity: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            >
+              ♥
+            </motion.span>
+          ))}
       </div>
     </SceneShell>
   );

@@ -11,12 +11,15 @@ import type { Template } from "@/lib/templates";
 import { bindStoryNames, storyWithNames, type GiftNames } from "@/lib/gift-names";
 import { useUser } from "@/lib/supabase/browser";
 import { useProfile } from "@/lib/supabase/profile";
+import { giftPricing } from "@/config/site";
+import { formatDay, isFuture } from "@/lib/gift-links";
+import { getSupabase } from "@/lib/supabase/browser";
 import { formatInr } from "@/lib/utils";
 import { AddSection } from "./add-section";
 import { Canvas, type DeviceMode } from "./canvas";
 import { ChangeDesign } from "./change-design";
 import { Checkout, hasPendingPublish } from "./checkout";
-import { freshDraft, loadDraft, useDraft, type Draft } from "./draft-store";
+import { freshDraft, loadDraft, removeDraft, useDraft, type Draft } from "./draft-store";
 import { ImageCropProvider } from "./image-crop";
 import { Inspector, type Selection } from "./inspector";
 import { isLook, LOOK } from "./look";
@@ -36,14 +39,21 @@ export function Studio({
   designs,
   seedNames,
   askNames = false,
+  editSlug,
 }: {
   template: StudioTemplate;
   designs: Template[];
   /** Demo To / From from the catalog recipe, so leftover names in copy can be retokenized. */
   seedNames: GiftNames;
   askNames?: boolean;
+  /** Set when a live gift is opened again to change it. */
+  editSlug?: string;
 }) {
-  const initial = useMemo(() => freshDraft(template.slug, `${template.name} for ${template.story.recipient}`, template.story), [template]);
+  const initial = useMemo(() => {
+    const d = freshDraft(template.slug, `${template.name} for ${template.story.recipient}`, template.story);
+    // Changes to a live gift are kept apart from any new draft of the same template.
+    return editSlug ? { ...d, id: `edit-${editSlug}` } : d;
+  }, [template, editSlug]);
   const { draft, edit, undo, redo, reset, canUndo, canRedo, saved } = useDraft(initial, () => hasPendingPublish(initial.id));
   // A draft from an earlier visit: offered, never loaded behind their back.
   const [resumable, setResumable] = useState<Draft | null>(null);
@@ -82,15 +92,57 @@ export function Studio({
   const [designsOpen, setDesignsOpen] = useState(false);
   const router = useRouter();
   // Signed-in senders get their saved sign-off in the "From" line of new gifts.
-  const { profile } = useProfile(useUser());
+  const user = useUser();
+  const { profile } = useProfile(user);
+  // Editing a live gift: load it from the account, then work on it like any draft.
+  const [editState, setEditState] = useState<"loading" | "ready" | "missing" | null>(editSlug ? "loading" : null);
+  useEffect(() => {
+    if (!editSlug || user === undefined) return;
+    if (user === null) {
+      const id = window.setTimeout(() => setEditState("missing"), 0);
+      return () => window.clearTimeout(id);
+    }
+    let alive = true;
+    getSupabase()
+      .from("gifts")
+      .select("slug, name, story, unlock_at, edit_until, has_password, created_at, updated_at")
+      .eq("slug", editSlug)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!alive) return;
+        if (!data?.story) return setEditState("missing");
+        const live = {
+          link: data.slug as string,
+          slug: data.slug as string,
+          unlockAt: data.unlock_at as string,
+          editUntil: (data.edit_until as string | null) ?? undefined,
+          hasPassword: !!data.has_password,
+          publishedAt: data.created_at as string,
+          paid: false as const,
+        };
+        // Unsaved changes from an earlier visit win over what's online, if they're newer.
+        const local = loadDraft(initial.id);
+        const onlineAt = new Date((data.updated_at as string | null) ?? (data.created_at as string)).getTime();
+        if (local?.live?.slug === editSlug && new Date(local.updatedAt).getTime() > onlineAt) {
+          reset({ ...local, live: { ...local.live, ...live } });
+        } else {
+          reset({ ...initial, name: data.name as string, story: data.story as Story, live, updatedAt: new Date().toISOString() });
+        }
+        setEditState("ready");
+      });
+    return () => {
+      alive = false;
+    };
+  }, [editSlug, user, initial, reset]);
+  const canSave = !!editSlug && isFuture(draft.live?.editUntil);
   const wide = useMinLg();
   const [tour, setTour] = useState(false);
   // First visit: once the names are in, show them around.
   useEffect(() => {
-    if (names !== null || resumable || wide === null || tourSeen()) return;
+    if (editSlug || names !== null || resumable || wide === null || tourSeen()) return;
     const id = window.setTimeout(() => setTour(true), 900);
     return () => window.clearTimeout(id);
-  }, [names, resumable, wide]);
+  }, [editSlug, names, resumable, wide]);
 
   // Back from Google sign-in mid-checkout: reopen it where they left off.
   useEffect(() => {
@@ -101,14 +153,14 @@ export function Studio({
 
   // Found an earlier draft of this template? Offer it (unless it's already open, or untouched).
   useEffect(() => {
-    if (hasPendingPublish(initial.id)) return;
+    if (editSlug || hasPendingPublish(initial.id)) return;
     const saved = loadDraft(initial.id);
     if (!saved || saved.live?.slug) return;
     const same = JSON.stringify(saved.story) === JSON.stringify(initial.story) && saved.name === initial.name;
     if (same) return;
     const id = window.setTimeout(() => setResumable(saved), 0);
     return () => window.clearTimeout(id);
-  }, [initial]);
+  }, [initial, editSlug]);
 
   // A fresh gift starts by asking who it's for; a saved draft already knows.
   useEffect(() => {
@@ -285,7 +337,7 @@ export function Studio({
             className="flex h-9 items-center gap-1.5 rounded-lg px-2 text-sm font-medium hover:bg-paper sm:rounded-full sm:border sm:border-line sm:px-3"
           >
             <LayoutGrid className="size-4 shrink-0" />
-            <span className="whitespace-nowrap">Change design</span>
+            <span className="hidden whitespace-nowrap sm:inline">Change design</span>
           </button>
         )}
 
@@ -333,32 +385,51 @@ export function Studio({
             setPreview(true);
             setRun((r) => r + 1);
           }}
-          aria-label="Preview"
           data-tour="preview"
-          className="grid size-9 place-items-center rounded-full border border-line hover:bg-paper sm:hidden"
-        >
-          <Eye className="size-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setPreview(true);
-            setRun((r) => r + 1);
-          }}
-          data-tour="preview"
-          className="hidden h-9 items-center gap-1.5 rounded-full border border-line px-4 text-sm hover:bg-paper sm:flex"
+          className="btn btn-paper hidden h-9 items-center gap-1.5 px-4 text-sm sm:flex"
         >
           <Eye className="size-4" /> Preview
         </button>
         <TopButton label="Show me around" onClick={() => setTour(true)}>
           <CircleHelp className="size-4" />
         </TopButton>
-        <button type="button" data-tour="publish" onClick={() => setCheckout(true)} className="flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-rose-deep pl-3 pr-1.5 text-sm font-medium text-paper hover:bg-rose sm:pl-4">
-          <span className="sm:hidden">{draft.live?.slug ? "Share" : "Publish"}</span>
-          <span className="hidden sm:inline">{draft.live?.slug ? "Share link" : "Make it live"}</span>
+        <button type="button" data-tour="publish" onClick={() => setCheckout(true)} className="btn btn-rose flex h-9 shrink-0 items-center gap-2 whitespace-nowrap pl-3 pr-1.5 text-sm sm:pl-4">
+          <span className="sm:hidden">{canSave ? "Save" : draft.live?.slug ? "Share" : "Publish"}</span>
+          <span className="hidden sm:inline">{canSave ? "Save changes" : draft.live?.slug ? "Share link" : "Make it live"}</span>
           {!draft.live?.slug && <span className="rounded-full bg-paper/20 px-2 py-0.5 text-xs">{formatInr(template.pricePaise)}</span>}
         </button>
       </header>
+
+      {editSlug && editState === "ready" && draft.live?.slug && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line bg-paper px-4 py-2.5 text-sm">
+          <p className="flex-1">
+            {canSave ? (
+              <>
+                You’re changing a live gift. Nothing changes for {draft.story.recipient} until you press <b>Save changes</b>. You can edit until{" "}
+                <b>{formatDay(draft.live.editUntil!)}</b>.
+              </>
+            ) : (
+              <>This gift is locked in: the {giftPricing.editDays} days for changes are over. It still never expires.</>
+            )}
+          </p>
+        </div>
+      )}
+
+      {editSlug && editState !== "ready" && (
+        <div className="fixed inset-0 z-[95] grid place-items-center bg-cream/90 px-6 text-center backdrop-blur-sm">
+          {editState === "missing" ? (
+            <div>
+              <p className="type-display text-3xl">We couldn’t open that gift.</p>
+              <p className="mt-2 text-ink/70">Sign in with the account that made it, then try again from your profile.</p>
+              <Link href="/profile" className="btn btn-ink mt-6 h-12 px-6">
+                Go to your profile
+              </Link>
+            </div>
+          ) : (
+            <Loader2 className="size-6 animate-spin text-muted" />
+          )}
+        </div>
+      )}
 
       {resumable && (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line bg-paper px-4 py-2.5 text-sm">
@@ -373,11 +444,11 @@ export function Studio({
               setResumable(null);
               setSel({ scene: 0, item: null });
             }}
-            className="h-8 rounded-full bg-ink px-4 text-paper"
+            className="btn btn-ink h-8 px-4"
           >
             Continue it
           </button>
-          <button type="button" onClick={() => setResumable(null)} className="h-8 rounded-full border border-line px-4 hover:bg-cream">
+          <button type="button" onClick={() => setResumable(null)} className="btn btn-paper h-8 px-4">
             Start fresh
           </button>
         </div>
@@ -392,11 +463,11 @@ export function Studio({
               reset(freshDraft(template.slug, initial.name, template.story));
               setSel({ scene: 0, item: null });
             }}
-            className="h-8 rounded-full bg-ink px-4 text-paper"
+            className="btn btn-ink h-8 px-4"
           >
             Use the new version
           </button>
-          <button type="button" onClick={() => edit({ ...draft, base: initial.base })} className="h-8 rounded-full border border-line px-4 hover:bg-cream">
+          <button type="button" onClick={() => edit({ ...draft, base: initial.base })} className="btn btn-paper h-8 px-4">
             Keep mine
           </button>
         </div>
@@ -470,6 +541,11 @@ export function Studio({
         templateSlug={template.slug}
         templateName={template.name}
         pricePaise={template.pricePaise}
+        onSaved={() => {
+          // Saved: the online gift is now the source of truth.
+          removeDraft(initial.id);
+          router.push(`/sent/${draft.live?.slug}?saved=1`);
+        }}
         onPublished={(live) => {
           // The gift is out: clear the editor for next time and go to its own page.
           reset(freshDraft(template.slug, initial.name, template.story));
@@ -486,7 +562,7 @@ export function Studio({
             <button
               type="button"
               onClick={() => setPreview(false)}
-              className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-paper px-4 py-2 text-sm font-medium"
+              className="btn btn-paper absolute right-4 top-4 flex items-center gap-1.5 px-4 py-2 text-sm"
             >
               <X className="size-4" /> Close preview
             </button>
@@ -502,98 +578,29 @@ export function Studio({
   );
 }
 
-/** The walk-through: what each part of the editor does, in the order you'd use it. */
+/** The walk-through: one short line per part of the editor. */
 function tourSteps(wide: boolean, price: string, canChangeDesign: boolean): TourStep[] {
-  const b = (t: string) => <b className="font-semibold text-ink">{t}</b>;
-  const welcome: TourStep = {
-    title: "Let’s make it yours",
-    body: (
-      <>
-        This is your gift, already filled in. Change any words, photos and stickers, and add or remove pages. It takes about 5 minutes. Want a quick look around first? It takes 30 seconds.
-      </>
-    ),
-  };
-  const names: TourStep = {
-    target: "names",
-    title: "Who it’s for",
-    body: <>Their name and how you sign off. These show up all through the gift, so you only need to type them once.</>,
-  };
+  const welcome: TourStep = { title: "Let’s make it yours", body: "A 30-second look around." };
+  const names: TourStep = { target: "names", title: "Who it’s for", body: "Their name and yours, used across the gift." };
   const design: TourStep[] = canChangeDesign
-    ? [
-        {
-          target: "design",
-          title: "Try another design",
-          body: <>Same occasion, a different set of pages and games. Your names come with you, so switching is safe.</>,
-        },
-      ]
+    ? [{ target: "design", title: "Change design", body: "Try another look. Your names come along." }]
     : [];
-  const undo: TourStep = {
-    target: "undo",
-    title: "Nothing is permanent",
-    body: wide ? (
-      <>
-        Undo anything with {b("⌘Z")} (redo with {b("⇧⌘Z")}). Your gift saves on this device as you go, so you can close the tab and come back later.
-      </>
-    ) : (
-      <>Tap undo to take back the last change. Your gift saves on this phone as you go, so you can leave and come back later.</>
-    ),
-  };
-  const preview: TourStep = {
-    target: wide ? "preview" : "m-play",
-    title: "Watch it like they will",
-    body: <>{b("Preview")} plays the whole gift full screen, start to finish, exactly as they’ll see it. Use it before you send.</>,
-  };
+  const undo: TourStep = { target: "undo", title: "Undo", body: "Take back any change. Everything saves as you go." };
+  const preview: TourStep = { target: wide ? "preview" : "m-play", title: "Preview", body: "Play it exactly as they’ll see it." };
   const publish: TourStep = {
     target: "publish",
     title: wide ? "Make it live" : "Publish",
-    body: (
-      <>
-        When it’s ready: one price ({b(price)}), no subscription. Pick the exact moment it opens and you get a {b("private link only they can open")}. It stays live for 60 days.
-      </>
-    ),
+    body: `${price}, once. Pick when it opens and get a private link.`,
   };
 
   if (wide) {
     return [
       welcome,
-      {
-        target: "pages",
-        title: "Your pages",
-        body: (
-          <>
-            Each row is one moment they tap through, in order. Click a page to edit it, {b("drag")} to reorder, use the {b("eye")} to hide one, and open the arrow to see its words, photos and stickers. {b("Assets")} keeps every photo you’ve added.
-          </>
-        ),
-      },
-      {
-        target: "add",
-        title: "Add a page",
-        body: <>Add a quiz, a photo album, love coupons, a countdown and more. New pages come in right after the one you’re on.</>,
-      },
-      {
-        target: "look",
-        title: "The look",
-        body: <>Colours, fonts and names for the whole gift. Pick a theme here and every page changes with it.</>,
-      },
-      {
-        target: "canvas",
-        title: "The live gift",
-        body: (
-          <>
-            This is the real thing, not a mock-up. {b("Click any line or photo")} on it to edit it straight away. You can play the games here too.
-          </>
-        ),
-      },
-      {
-        target: "toolbar",
-        title: "Every screen size",
-        body: <>See it on a phone, a laptop or both, zoom in and out, and replay the page’s animation after a change.</>,
-      },
-      {
-        target: "inspector",
-        title: "Edit the page",
-        body: <>Everything on the selected page: words, photos, stickers, quiz answers and coupons. Changes show on the gift as you type.</>,
-      },
+      { target: "pages", title: "Pages", body: "Click to edit, drag to reorder." },
+      { target: "add", title: "Add a page", body: "Quizzes, albums, coupons and more." },
+      { target: "look", title: "Look", body: "Colours and fonts for the whole gift." },
+      { target: "canvas", title: "Your gift", body: "Click anything on it to edit." },
+      { target: "inspector", title: "Edit here", body: "Words, photos and stickers for this page." },
       names,
       ...design,
       undo,
@@ -603,29 +610,9 @@ function tourSteps(wide: boolean, price: string, canChangeDesign: boolean): Tour
   }
   return [
     welcome,
-    {
-      target: "m-preview",
-      title: "The live gift",
-      body: (
-        <>
-          This is the real thing, not a mock-up. {b("Tap any line or photo")} on it and you’ll jump straight to editing it.
-        </>
-      ),
-    },
-    {
-      target: "m-pages",
-      title: "Your pages",
-      body: (
-        <>
-          Use the {b("arrows")} to move between pages. Tap the page name to see them all, or to {b("add a new page")} like a quiz, an album or coupons. The first one, {b("Look")}, sets the colours and fonts.
-        </>
-      ),
-    },
-    {
-      target: "m-editor",
-      title: "Edit the page",
-      body: <>Scroll down to edit the words, photos and stickers on this page. Changes show on the gift above straight away.</>,
-    },
+    { target: "m-preview", title: "Your gift", body: "Tap anything on it to edit." },
+    { target: "m-pages", title: "Pages", body: "Switch pages, or tap the name to add one." },
+    { target: "m-editor", title: "Edit here", body: "Words, photos and stickers for this page." },
     preview,
     names,
     ...design,

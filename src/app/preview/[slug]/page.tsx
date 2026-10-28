@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { BirthdayExperience } from "@/components/experiences/birthday/birthday-experience";
 import { StoryPlayer } from "@/components/story/story-player";
+import { PreviewBack } from "@/components/templates/preview-back";
 import { demoBirthdayGift } from "@/data/demo-gifts";
 import { getTemplateBySlug, getTemplates } from "@/lib/templates";
 
@@ -36,13 +36,11 @@ async function Preview({ params, searchParams }: Pick<PageProps<"/preview/[slug]
   const { palette } = template;
   const queryStr = toName || fromName ? `?${new URLSearchParams({ ...(toName ? { to: toName } : {}), ...(fromName ? { from: fromName } : {}) }).toString()}` : "";
   const back = (
-    <Link
-      href={`/templates/${template.slug}${queryStr}`}
-      className="type-label fixed left-4 top-4 z-50 flex h-10 items-center rounded-full px-4 backdrop-blur shadow-sm"
+    <PreviewBack
+      fallback={`/templates/${template.slug}${queryStr}`}
+      className="fixed left-4 top-4 z-50 flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-medium shadow-sm backdrop-blur"
       style={{ backgroundColor: `${template.experiencePalette?.cream ?? "#fff4ef"}cc`, color: template.experiencePalette?.ink ?? palette.fg }}
-    >
-      ← {template.name}
-    </Link>
+    />
   );
 
   if (template.story) {
@@ -63,13 +61,11 @@ async function Preview({ params, searchParams }: Pick<PageProps<"/preview/[slug]
 
   return (
     <main>
-      <Link
-        href={`/templates/${template.slug}${queryStr}`}
-        className="type-label fixed left-4 top-4 z-50 flex h-12 items-center rounded-full px-4 backdrop-blur shadow-sm"
+      <PreviewBack
+        fallback={`/templates/${template.slug}${queryStr}`}
+        className="fixed left-4 top-4 z-50 flex h-12 items-center gap-1.5 rounded-full px-4 text-sm font-medium shadow-sm backdrop-blur"
         style={{ backgroundColor: `${extra.cream}cc`, color: extra.ink }}
-      >
-        ← {template.name}
-      </Link>
+      />
       <BirthdayExperience
         gift={{
           ...demoBirthdayGift,
