@@ -301,11 +301,12 @@ body {
   }
 }
 
-/* Hero intro: pure-CSS reveals, so the headline plays from the very first
-   paint instead of waiting for JavaScript to load. */
-@keyframes tt-rise { from { transform: translateY(115%) rotate(5deg); } to { transform: none; } }
-@keyframes tt-rise-fade { from { transform: translateY(70%); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes tt-fade-up { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+/* Hero intro: pure-CSS, and visible from the very first frame (a gentle
+   settle into place, never hidden), so the headline counts as painted
+   straight away (LCP) instead of after an animation or JavaScript. */
+@keyframes tt-rise { from { transform: translateY(0.18em); } to { transform: none; } }
+@keyframes tt-rise-fade { from { transform: translateY(0.1em); } to { transform: none; } }
+@keyframes tt-fade-up { from { transform: translateY(10px); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) {
   .tt-css-reveal { animation: none !important; }
 }
