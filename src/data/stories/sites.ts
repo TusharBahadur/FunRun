@@ -1,5 +1,5 @@
 import { asset } from "@/lib/assets";
-import { demoPhoto as photo, palettes, siteTemplate } from "./shared";
+import { demoPhoto as photo, palettes, siteTemplate , occasionTracks } from "./shared";
 
 /*
  * Website gifts: one long scrolling page (photo hero, countdown, notes,
@@ -18,6 +18,7 @@ export const ourCorner = siteTemplate({
   palette: palettes.blueberry,
   motif: "hearts",
   preview: { kicker: "Our website", title: "Made us a tiny website. Don’t laugh.", signoff: "A scrolling page · 6 sections" },
+    track: occasionTracks.anniversary.cantHelpFalling,
   recipient: "Aditi",
   sender: "Kabir",
   melody: "waltz",
@@ -92,6 +93,7 @@ export const justForYou = siteTemplate({
   palette: palettes.strawberry,
   motif: "hearts",
   preview: { kicker: "A website, for you", title: "Couldn’t fit it in a text, so I made a website.", signoff: "A scrolling page · 5 sections" },
+    track: occasionTracks.loveLetter.alagAasmaan,
   recipient: "Meher",
   sender: "Arjun",
   melody: "lullaby",
@@ -157,6 +159,7 @@ export const birthdayPage = siteTemplate({
   palette: palettes.peach,
   motif: "cake",
   preview: { kicker: "Happy birthday", title: "You get a whole website this year. Don’t get used to it.", signoff: "A scrolling page · 7 sections" },
+    track: occasionTracks.birthday.goldenHour,
   recipient: "Maya",
   sender: "Sam",
   melody: "birthday",
@@ -238,6 +241,7 @@ export const fanPage = siteTemplate({
   palette: palettes.taro,
   motif: "stars",
   preview: { kicker: "Official fan page", title: "Every celebrity has a fan page. So now you do too.", signoff: "A scrolling page · 5 sections" },
+    track: occasionTracks.girlfriendDay.ennaSona,
   recipient: "Zoya",
   sender: "Ishaan",
   melody: "sunny",
@@ -302,6 +306,7 @@ export const hisPage = siteTemplate({
   palette: palettes.peach,
   motif: "sun",
   preview: { kicker: "Official fan page", title: "Every celebrity has a fan page. So now you do too.", signoff: "A scrolling page · 5 sections" },
+    track: occasionTracks.boyfriendDay.apnaBanaLe,
   recipient: "Kabir",
   sender: "Meher",
   melody: "sunny",

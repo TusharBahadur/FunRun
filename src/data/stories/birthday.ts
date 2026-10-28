@@ -1,4 +1,4 @@
-import { demoPhoto as photo, palettes, storyTemplate } from "./shared";
+import { demoPhoto as photo, occasionTracks, palettes, storyTemplate } from "./shared";
 
 const people = { recipient: "Maya", sender: "Sam", melody: "birthday" as const };
 
@@ -19,6 +19,7 @@ export const birthdayStories = [
     palette: palettes.honey,
     motif: "cake",
     preview: { kicker: "11:59 pm", title: "Wanted to be the first one to wish you.", signoff: "6 pages · photos of you two" },
+    track: occasionTracks.birthday.untilIFoundYou,
     ...people,
     scenes: [
       {
@@ -111,6 +112,7 @@ export const birthdayStories = [
     palette: palettes.strawberry,
     motif: "cake",
     preview: { kicker: "Happy birthday", title: "Made you something. It’s all about you.", signoff: "8 pages about them" },
+    track: occasionTracks.birthday.goldenHour,
     ...people,
     scenes: [
       {
@@ -251,6 +253,7 @@ export const birthdayStories = [
     palette: palettes.peach,
     motif: "stars",
     preview: { kicker: "Surprise!!", title: "Everyone showed up for you.", signoff: "9 pages · friends inside" },
+    track: occasionTracks.birthday.likeMeBetter,
     ...people,
     scenes: [
       {

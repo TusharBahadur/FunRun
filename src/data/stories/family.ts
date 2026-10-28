@@ -1,4 +1,4 @@
-import { demoPhoto as photo, palettes, storyTemplate } from "./shared";
+import { demoPhoto as photo, palettes, storyTemplate , occasionTracks } from "./shared";
 
 export const familyStories = [
   /* ── For Maa: flowers, overdue thank-yous, and a real day off. ── */
@@ -11,6 +11,7 @@ export const familyStories = [
     palette: palettes.strawberry,
     motif: "bloom",
     preview: { kicker: "For Maa", title: "Maa, today you’re not allowed in the kitchen.", signoff: "5 little pages" },
+    track: occasionTracks.family.aashiyan,
     recipient: "Maa",
     sender: "Riya",
     melody: "sunny",
@@ -90,6 +91,7 @@ export const familyStories = [
     palette: palettes.matcha,
     motif: "sun",
     preview: { kicker: "For Papa", title: "Papa, I made you something. Don’t make a joke about it.", signoff: "6 little pages" },
+    track: occasionTracks.family.photograph,
     recipient: "Papa",
     sender: "Aarav",
     melody: "sunny",
@@ -178,6 +180,7 @@ export const familyStories = [
   /* ── For Didi: the older sister who still shares her room, sort of. ── */
   storyTemplate({
     slug: "for-didi",
+    track: occasionTracks.family.aashiyan,
     name: "For Didi",
     occasion: "family",
     level: "little",
@@ -265,6 +268,7 @@ export const familyStories = [
     palette: palettes.matcha,
     motif: "sun",
     preview: { kicker: "For Bhai", title: "You’re the worst. I’m keeping you anyway.", signoff: "5 little pages" },
+    track: occasionTracks.friendship.teraYaarHoonMain,
     recipient: "Bhai",
     sender: "Riya",
     melody: "sunny",

@@ -1,42 +1,45 @@
 import { HAPPY_BIRTHDAY_MELODY, type Melody } from "@/components/experiences/music-box";
 import type { MelodyId } from "./types";
 
-/** Short original music-box tunes, one per mood. "R" = rest. */
+/**
+ * Soothing, relaxing, and warm ambient acoustic melodies.
+ * Tuned to lower, soothing frequencies (octaves 3 & 4) for a comforting felt-piano atmosphere.
+ */
 export const melodies: Record<MelodyId, Melody> = {
   birthday: HAPPY_BIRTHDAY_MELODY,
 
-  // Tender and slow, for love letters and apologies.
+  // Tender, deeply peaceful felt piano for love letters, apologies, and intimate notes.
   lullaby: {
-    beat: 0.5,
+    beat: 0.58,
     notes: [
-      ["E5", 1], ["C5", 1], ["G4", 1], ["C5", 1.5], ["D5", 0.5], ["E5", 2],
-      ["D5", 1], ["B4", 1], ["G4", 1], ["B4", 1.5], ["C5", 0.5], ["D5", 2],
-      ["E5", 1], ["G5", 1], ["E5", 1], ["D5", 1.5], ["C5", 0.5], ["A4", 2],
-      ["G4", 1], ["C5", 1], ["E5", 1], ["D5", 1.5], ["B4", 0.5], ["C5", 3],
+      ["E4", 1.5], ["G4", 1], ["C4", 1.5], ["E4", 1], ["D4", 2],
+      ["C4", 1.5], ["E4", 1], ["G3", 1.5], ["C4", 1], ["B3", 2],
+      ["A3", 1.5], ["C4", 1], ["E4", 1.5], ["D4", 1], ["G3", 2],
+      ["C4", 2],   ["E4", 1.5], ["D4", 1.5], ["B3", 1], ["C4", 3],
     ],
   },
 
-  // A lilting 3/4, for anniversaries and proposals.
+  // A warm, gentle romantic acoustic waltz for anniversaries, proposals, and love stories.
   waltz: {
+    beat: 0.50,
+    notes: [
+      ["C4", 1], ["E4", 1], ["G4", 1], ["A4", 2], ["G4", 1],
+      ["E4", 1], ["D4", 1], ["C4", 1], ["D4", 3],
+      ["D4", 1], ["F4", 1], ["A4", 1], ["G4", 2], ["E4", 1],
+      ["C4", 1], ["B3", 1], ["A3", 1], ["G3", 3],
+      ["C4", 1], ["E4", 1], ["G4", 1], ["C5", 2], ["B4", 1],
+      ["A4", 1], ["G4", 1], ["D4", 1], ["C4", 3],
+    ],
+  },
+
+  // Relaxing, uplifting, and sunny acoustic groove for friendship and celebration.
+  sunny: {
     beat: 0.42,
     notes: [
-      ["C5", 1], ["E5", 1], ["G5", 1], ["A5", 2], ["G5", 1],
-      ["F5", 1], ["E5", 1], ["D5", 1], ["E5", 3],
-      ["D5", 1], ["F5", 1], ["A5", 1], ["G5", 2], ["E5", 1],
-      ["D5", 1], ["C5", 1], ["B4", 1], ["C5", 3],
-      ["E5", 1], ["G5", 1], ["C5", 1], ["A4", 2], ["C5", 1],
-      ["G4", 1], ["B4", 1], ["D5", 1], ["C5", 3],
-    ],
-  },
-
-  // Bright and bouncy, for parents' days and girlfriend's day.
-  sunny: {
-    beat: 0.32,
-    notes: [
-      ["C5", 1], ["E5", 1], ["G5", 1], ["E5", 1], ["F5", 1], ["A5", 1], ["G5", 2],
-      ["E5", 1], ["C5", 1], ["D5", 1], ["E5", 1], ["D5", 2], ["R", 2],
-      ["C5", 1], ["E5", 1], ["G5", 1], ["E5", 1], ["A5", 1], ["G5", 1], ["F5", 1], ["E5", 1],
-      ["D5", 1], ["G4", 1], ["B4", 1], ["D5", 1], ["C5", 4],
+      ["C4", 1], ["E4", 1], ["G4", 1.5], ["A4", 1], ["G4", 2],
+      ["E4", 1], ["G4", 1], ["C4", 1.5], ["D4", 1], ["E4", 2],
+      ["F4", 1], ["A4", 1], ["G4", 1.5], ["E4", 1], ["D4", 2],
+      ["C4", 1.5], ["D4", 1], ["E4", 1], ["G4", 1.5], ["C4", 3],
     ],
   },
 };

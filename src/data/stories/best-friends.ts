@@ -1,4 +1,4 @@
-import { demoPhoto as photo, palettes, storyTemplate } from "./shared";
+import { demoPhoto as photo, palettes, storyTemplate , occasionTracks } from "./shared";
 
 const people = { recipient: "Dev", sender: "Arjun", melody: "lullaby" as const };
 
@@ -13,6 +13,7 @@ export const bestFriendsStories = [
     palette: palettes.honey,
     motif: "sun",
     preview: { kicker: "Best Friends Day", title: "You get me. That’s annoying and also the whole point.", signoff: "5 little pages" },
+    track: occasionTracks.friendship.teraYaarHoonMain,
     ...people,
     scenes: [
       {
@@ -86,6 +87,7 @@ export const bestFriendsStories = [
     palette: palettes.peach,
     motif: "stamp",
     preview: { kicker: "If asked, we weren’t there", title: "Partner in crime. Also partner in sitting quietly.", signoff: "7 pages · classified" },
+    track: occasionTracks.friendship.countOnMe,
     ...people,
     scenes: [
       {
@@ -184,6 +186,7 @@ export const bestFriendsStories = [
     palette: palettes.blueberry,
     motif: "stars",
     preview: { kicker: "My person", title: "Not my brother. Not my roommate. My person.", signoff: "8 pages · the whole story" },
+    track: occasionTracks.friendship.photograph,
     ...people,
     scenes: [
       {
