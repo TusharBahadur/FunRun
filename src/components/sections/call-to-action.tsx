@@ -36,7 +36,7 @@ export function CallToAction() {
           <p className="type-label text-paper/70">
             Ready when you are
           </p>
-          <h2 className="mx-auto mt-6 max-w-4xl text-[clamp(2.8rem,8vw,7.5rem)] type-display">
+          <h2 className="mx-auto mt-5 max-w-4xl text-[clamp(2.8rem,8vw,7.5rem)] type-display">
             <SplitText text="Someone’s waiting" />{" "}
             <SplitText
               text="to hear it."
@@ -44,10 +44,10 @@ export function CallToAction() {
               delay={0.2}
             />
           </h2>
-          <p className="type-copy mx-auto mt-8 max-w-md text-paper/80">
+          <p className="type-copy mx-auto mt-4 max-w-md text-paper/80 md:mt-6">
             Pick a template, pour your heart in, and send it in the next ten minutes.
           </p>
-          <div className="mt-10">
+          <div className="mt-8 md:mt-10">
             <Magnetic>
               <ButtonLink href="/templates" variant="light" size="lg">
                 Start gifting

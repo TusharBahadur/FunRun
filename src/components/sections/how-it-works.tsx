@@ -63,7 +63,7 @@ export function HowItWorks() {
       </div>
 
       {/* ── Phones: each card hangs from its own little string ── */}
-      <ol className="mx-auto mt-10 max-w-sm space-y-3 md:hidden">
+      <ol className="mx-auto mt-8 max-w-sm space-y-3 md:hidden">
         {steps.map((_, i) => (
           <li key={i} className="relative pt-9">
             <svg viewBox="0 0 300 40" className="absolute inset-x-6 top-0 h-10 w-[calc(100%-3rem)] overflow-visible" aria-hidden>

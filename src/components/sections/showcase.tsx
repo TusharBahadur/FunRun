@@ -79,13 +79,13 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
                   <span className="relative inline-flex size-2 rounded-full bg-rose" />
                 </span>
               )}
-              <b className="font-semibold text-ink">{c.strong}</b> {c.rest}
+              <b className="font-semibold text-rose-deep">{c.strong}</b> {c.rest}
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="relative mx-auto mt-16 grid max-w-7xl items-center gap-x-10 gap-y-5 lg:mt-12 lg:grid-cols-[1fr_auto_1fr] lg:gap-4">
+      <div className="relative mx-auto mt-8 grid max-w-7xl items-center gap-x-10 gap-y-5 md:mt-12 lg:grid-cols-[1fr_auto_1fr] lg:gap-4">
         <Perks items={perks.left} align="end" beat={turn} tint={current.palette} className="order-2 lg:order-1" />
 
         {/* The phones */}

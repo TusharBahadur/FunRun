@@ -75,7 +75,7 @@ export function Hero({ featured }: { featured: Template[] }) {
         mx.set((e.clientX - r.left) / r.width - 0.5);
         my.set((e.clientY - r.top) / r.height - 0.5);
       }}
-      className="relative flex min-h-[88svh] flex-col items-center justify-center overflow-hidden px-5 pb-10 pt-28 lg:pb-6 lg:pt-32"
+      className="relative flex flex-col items-center justify-center overflow-hidden px-5 pb-14 pt-28 md:min-h-[88svh] md:pb-10 lg:pb-6 lg:pt-32"
     >
       {/* Ambient glow */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -127,7 +127,7 @@ export function Hero({ featured }: { featured: Template[] }) {
             duration: 0.9,
             ease: EASE_OUT,
           }}
-          className="type-copy mt-8 max-w-xl text-balance text-muted"
+          className="type-copy mt-5 max-w-xl text-balance text-muted md:mt-8"
         >
           A little gift page, made for one person.
         </motion.p>
@@ -140,7 +140,7 @@ export function Hero({ featured }: { featured: Template[] }) {
             duration: 0.9,
             ease: EASE_OUT,
           }}
-          className="mt-10 flex flex-col items-center gap-3 sm:flex-row"
+          className="mt-8 flex flex-col items-center gap-3 sm:flex-row md:mt-10"
         >
           <Magnetic>
             <ButtonLink href="/templates" size="lg">

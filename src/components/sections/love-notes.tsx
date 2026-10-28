@@ -10,7 +10,7 @@ export function LoveNotes({ notes }: { notes: LoveNote[] }) {
 
   return (
     <section id="love-notes" className="scroll-mt-24 overflow-hidden py-14 md:py-20">
-      <div className="mx-auto mb-8 flex max-w-7xl flex-col items-center px-5 text-center md:mb-16">
+      <div className="mx-auto mb-8 flex max-w-7xl flex-col items-center px-5 text-center md:mb-12">
         <Eyebrow>Real DMs & Reactions</Eyebrow>
         <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
           <SplitText text="Straight from" />{" "}

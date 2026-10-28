@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 export function Features() {
   return (
     <section id="features" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-14 md:py-20">
-      <div className="mb-8 grid gap-4 md:mb-16 md:grid-cols-12 md:items-end md:gap-6">
+      <div className="mb-8 grid gap-4 md:mb-12 md:grid-cols-12 md:items-end md:gap-6">
         <div className="md:col-span-7">
           <Eyebrow>Details</Eyebrow>
           <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
