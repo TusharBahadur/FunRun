@@ -48,14 +48,11 @@ import { FieldFontPicker, FontPickerScope } from "./font-choices";
 import { isLook, LookSettings, setFieldFont } from "./look";
 import { childField, sceneSchemas, type FieldDef } from "./schema";
 import { TrackField } from "./track-field";
+import { boardStickerIds, stickerCategories, stickerCategory, stickerName } from "@/components/story/sticker-catalog";
 import {
-  boardStickerIds,
   drawnStickerIds,
   isUploadedSticker,
   Sticker,
-  stickerCategories,
-  stickerCategory,
-  stickerName,
   type AnyStickerId,
   type StickerPlacement,
   type StickerSpot,

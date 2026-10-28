@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useId, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import boardData from "@/data/stickers.json";
+import memeIds from "@/data/sticker-memes.json";
 import stickerHashes from "@/data/sticker-hashes.json";
 import { StudioHit, useStudioEdit } from "./scene-kit";
 
@@ -337,9 +337,11 @@ const art: Record<StickerId, () => ReactNode> = {
  *   (e.g. "cat2") and retire the old one by removing it from `drawnStickerIds`.
  */
 
-type BoardSticker = { file: string; name: string; kind: "doodle" | "meme"; category: string; retired?: boolean };
-const board = boardData as Record<string, BoardSticker>;
+// Only what's needed to draw a board sticker: its current image version, and
+// whether it's a meme (framed like a photo) or a doodle. Names and categories
+// live in ./sticker-catalog, which only the studio's picker loads.
 const boardHashes = stickerHashes as Record<string, string>;
+const memes = new Set(memeIds as string[]);
 
 export type BoardStickerId = string;
 /** A picture the sender uploaded: inline in the draft, or a link once the gift is published. */
@@ -347,7 +349,8 @@ export type UploadedSticker = `data:${string}` | `https://${string}`;
 /** Any sticker: our drawn ones, the board pack (optionally pinned "id@hash"), or an upload. */
 export type AnyStickerId = StickerId | BoardStickerId | UploadedSticker;
 
-export const boardStickerIds = Object.keys(board).filter((id) => !board[id].retired);
+/** How many board stickers there are (the full list lives in ./sticker-catalog). */
+export const boardStickerCount = Object.keys(boardHashes).length;
 export const drawnStickerIds = Object.keys(stickerNames) as StickerId[];
 
 export function isUploadedSticker(id: AnyStickerId): id is UploadedSticker {
@@ -355,18 +358,18 @@ export function isUploadedSticker(id: AnyStickerId): id is UploadedSticker {
 }
 
 /** A board sticker, live ("pin-149": today's image) or pinned ("pin-149@3fa9c1ab0d": one exact image). */
-function boardRef(id: string) {
+export function boardRef(id: string) {
   const at = id.indexOf("@");
   const key = at < 0 ? id : id.slice(0, at);
   const hash = at < 0 ? boardHashes[key] : id.slice(at + 1);
   if (!hash || !/^[0-9a-f]{10}$/.test(hash)) return null;
-  if (at < 0 && !(key in board)) return null;
-  return { key, hash, meta: board[key] as BoardSticker | undefined };
+  if (at < 0 && !(key in boardHashes)) return null;
+  return { key, hash, kind: memes.has(key) ? ("meme" as const) : ("doodle" as const) };
 }
 
 /** Pins a board sticker to the image it shows right now. Anything else is returned as is. */
 export function pinSticker(id: string) {
-  if (id.includes("@") || !(id in board)) return id;
+  if (id.includes("@") || !(id in boardHashes)) return id;
   const hash = boardHashes[id];
   return hash ? `${id}@${hash}` : id;
 }
@@ -382,13 +385,6 @@ export function stickerImage(id: AnyStickerId) {
   return ref ? `/a/s/${ref.key}.${ref.hash}.webp` : null;
 }
 
-export function stickerName(id: AnyStickerId) {
-  if (isUploadedSticker(id)) return "Your sticker";
-  const ref = boardRef(id);
-  if (ref) return ref.meta?.name ?? "Sticker";
-  return stickerNames[id as StickerId] ?? "Sticker";
-}
-
 /** One sticker. Size it with the className (e.g. `size-24`). Unknown ids render nothing. */
 export function Sticker({ id, className }: { id: AnyStickerId; className?: string }) {
   if (isUploadedSticker(id)) {
@@ -401,7 +397,7 @@ export function Sticker({ id, className }: { id: AnyStickerId; className?: strin
   }
   const ref = boardRef(id);
   if (ref) {
-    const doodle = (ref.meta?.kind ?? "doodle") === "doodle";
+    const doodle = ref.kind === "doodle";
     return (
       <div
         className={cn(
@@ -505,23 +501,4 @@ export function ReactionSticker({ id, show }: { id?: AnyStickerId; show: boolean
       )}
     </AnimatePresence>
   );
-}
-
-export type StickerCategory = "all" | "love" | "cat" | "meme" | "doodle" | "celebration" | "family" | "animated";
-
-export const stickerCategories = [
-  { id: "all", label: "All" },
-  { id: "love", label: "❤️ Love" },
-  { id: "cat", label: "🐱 Cats & Dogs" },
-  { id: "meme", label: "😂 Memes" },
-  { id: "doodle", label: "✨ Doodles" },
-  { id: "celebration", label: "🎉 Party" },
-  { id: "family", label: "👨‍👩‍👧 Family" },
-  { id: "animated", label: "✨ Animated" },
-] as const;
-
-export function stickerCategory(id: AnyStickerId): string {
-  const ref = boardRef(id);
-  if (ref) return ref.meta?.category || "doodle";
-  return "animated";
 }

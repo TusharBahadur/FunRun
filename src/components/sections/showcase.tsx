@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { Check, Clock, Lock, PenLine } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { boardStickerIds, drawnStickerIds, Sticker, type AnyStickerId } from "@/components/story/stickers";
+import { boardStickerCount, drawnStickerIds, Sticker, type AnyStickerId } from "@/components/story/stickers";
 import { StoryPlayer } from "@/components/story/story-player";
 import { occasions } from "@/config/site";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -68,7 +68,7 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
         <ul className="mt-7 flex flex-wrap justify-center gap-2 text-sm">
           {[
             { strong: String(total), rest: "templates", live: true },
-            { strong: String(boardStickerIds.length + drawnStickerIds.length), rest: "stickers" },
+            { strong: String(boardStickerCount + drawnStickerIds.length), rest: "stickers" },
             { strong: String(occasions.length), rest: "occasions" },
             { strong: "5 min", rest: "to make one" },
           ].map((c) => (

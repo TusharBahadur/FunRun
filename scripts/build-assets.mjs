@@ -9,7 +9,7 @@
  * file and leaves the old one alone. Published gifts point at exact files, so
  * they never change. Old outputs are never deleted.
  *
- * Writes src/data/sticker-hashes.json and src/data/asset-files.json.
+ * Writes src/data/sticker-hashes.json, src/data/sticker-memes.json and src/data/asset-files.json.
  * Runs before `dev` and `build`. Only needs sharp when something new must be
  * converted (sharp ships with Next.js).
  *
@@ -100,5 +100,9 @@ const write = (p, obj, sort) => {
   return fs.writeFile(rel(p), `{\n${body}\n}\n`);
 };
 await write("src/data/sticker-hashes.json", hashes, true);
+// The few bits every page needs to draw a sticker, kept apart from the full
+// catalogue (names, categories), which only the studio's picker loads.
+const memes = Object.entries(stickers).filter(([, s]) => s.kind === "meme" && !s.retired).map(([id]) => id).sort();
+await fs.writeFile(rel("src/data/sticker-memes.json"), `[\n${memes.map((id) => `  ${JSON.stringify(id)}`).join(",\n")}\n]\n`);
 await write("src/data/asset-files.json", files, true);
 console.log(`assets: ${jobs.length} images, ${built} newly built`);

@@ -43,7 +43,8 @@ import {
   updateItem,
   updateScene,
 } from "./ops";
-import { stickerName, type AnyStickerId } from "@/components/story/stickers";
+import { stickerName } from "@/components/story/sticker-catalog";
+import type { AnyStickerId } from "@/components/story/stickers";
 import { childField, sceneSchemas, sceneSubtitle, type FieldDef } from "./schema";
 
 type Edit = (next: Draft, tag?: string) => void;
