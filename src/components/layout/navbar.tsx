@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/
 import { ArrowUpRight, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import { siteConfig } from "@/config/site";
@@ -14,8 +14,25 @@ import { cn } from "@/lib/utils";
 
 const menuItems = [{ label: "Home", href: "/" }, ...siteConfig.nav];
 
+/**
+ * The navbar reads the URL (to highlight the page you're on). Pages whose URL
+ * isn't known at build time (like /sent/[slug]) can't read it while
+ * prerendering, so those get the same navbar without the highlight first,
+ * and the real one as soon as the page loads.
+ */
 export function Navbar() {
-  const pathname = usePathname();
+  return (
+    <Suspense fallback={<NavbarView pathname={null} />}>
+      <NavbarAtPath />
+    </Suspense>
+  );
+}
+
+function NavbarAtPath() {
+  return <NavbarView pathname={usePathname()} />;
+}
+
+function NavbarView({ pathname }: { pathname: string | null }) {
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
