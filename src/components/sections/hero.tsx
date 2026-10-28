@@ -24,16 +24,15 @@ export function Hero({ featured }: { featured: Template[] }) {
     target: ref,
     offset: ["start start", "end start"],
   });
-  const titleY = useTransform(scrollYProgress, [0, 1], [0, 180]);
+  const titleY = useTransform(scrollYProgress, [0, 1], [0, 40]);
   const titleOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
   const titleScale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
-  const cueOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
 
 
   return (
     <section
       ref={ref}
-      className="relative flex flex-col items-center justify-center overflow-hidden px-5 pb-14 pt-28 md:min-h-[88svh] md:pb-10 lg:pb-6 lg:pt-32"
+      className="relative flex flex-col items-center justify-center overflow-hidden px-5 pb-8 pt-28 md:pb-10 lg:pt-32"
     >
       {/* Ambient glow */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -89,31 +88,6 @@ export function Hero({ featured }: { featured: Template[] }) {
         <MobileFan templates={featured.slice(0, 3)} />
       </motion.div>
 
-      <motion.div
-        aria-hidden
-        style={{ opacity: cueOpacity }}
-        className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 [@media(min-height:960px)]:lg:block"
-      >
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: INTRO_DELAY + 1.2 }}
-          className="flex flex-col items-center gap-3"
-        >
-          <span className="type-label text-[10px] text-muted">Scroll</span>
-          <span className="relative h-10 w-px overflow-hidden bg-ink/10">
-            <motion.span
-              className="absolute inset-x-0 top-0 h-1/2 bg-rose"
-              animate={{ y: ["-100%", "200%"] }}
-              transition={{
-                duration: 1.6,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-          </span>
-        </motion.div>
-      </motion.div>
     </section>
   );
 }

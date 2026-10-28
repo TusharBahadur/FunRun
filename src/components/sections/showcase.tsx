@@ -55,22 +55,16 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
   }, [i, paused, n]);
 
   return (
-    <section className="relative overflow-hidden px-5 py-14 md:py-20">
+    <section className="relative overflow-hidden px-5 pb-14 pt-2 md:pb-20 md:pt-4">
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgb(27_18_21/0.07)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_75%)]" />
 
       <div className="relative mx-auto max-w-2xl text-center">
-        <h2 className="text-[clamp(2.4rem,5vw,4.5rem)] type-display">
-          Made of little <span className="type-accent text-rose">things.</span>
-        </h2>
-        <p className="type-copy mx-auto mt-4 max-w-md text-muted">
-          Your photos and words, tiny games, and hundreds of stickers. All in one gift they’ll keep opening.
-        </p>
-        <ul className="mt-7 flex flex-wrap justify-center gap-2 text-sm">
+        <ul className="flex flex-wrap justify-center gap-2 text-sm">
           {[
             { strong: String(total), rest: "templates", live: true },
             { strong: String(boardStickerCount + drawnStickerIds.length), rest: "stickers" },
             { strong: String(occasions.length), rest: "occasions" },
-            { strong: "5 min", rest: "to make one" },
+            { strong: "1 min", rest: "to make one" },
           ].map((c) => (
             <li key={c.rest} className="flex items-center gap-2 rounded-full border border-line bg-paper px-3.5 py-1.5 text-ink/70">
               {c.live && (
