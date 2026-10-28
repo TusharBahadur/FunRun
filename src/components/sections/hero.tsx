@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  motion,
-  useMotionValue,
-  useScroll,
-  useSpring,
-  useTransform,
-  type MotionValue,
-} from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { Magnetic } from "@/components/motion/magnetic";
 import { RotatingWords } from "@/components/motion/rotating-words";
@@ -16,7 +9,6 @@ import { TemplatePreview } from "@/components/templates/template-preview";
 import { ButtonLink } from "@/components/ui/button";
 import { EASE_OUT, INTRO_DELAY } from "@/lib/motion";
 import type { Template } from "@/lib/templates";
-import { cn } from "@/lib/utils";
 
 const phrases = [
   "I love you",
@@ -25,29 +17,6 @@ const phrases = [
   "happy birthday",
   "I’m sorry",
   "marry me?",
-];
-
-const placements = [
-  {
-    className: "left-[3%] top-[18%] w-[clamp(120px,11vw,180px)]",
-    rotate: -9,
-    depth: 40,
-  },
-  {
-    className: "left-[7%] bottom-[8%] w-[clamp(110px,9.5vw,155px)]",
-    rotate: 7,
-    depth: 70,
-  },
-  {
-    className: "right-[3%] top-[15%] w-[clamp(120px,11.5vw,185px)]",
-    rotate: 8,
-    depth: 55,
-  },
-  {
-    className: "right-[8%] bottom-[7%] w-[clamp(110px,9.5vw,155px)]",
-    rotate: -6,
-    depth: 30,
-  },
 ];
 
 export function Hero({ featured }: { featured: Template[] }) {
@@ -61,20 +30,10 @@ export function Hero({ featured }: { featured: Template[] }) {
   const titleScale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
   const cueOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
 
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const smx = useSpring(mx, { stiffness: 60, damping: 20 });
-  const smy = useSpring(my, { stiffness: 60, damping: 20 });
 
   return (
     <section
       ref={ref}
-      onPointerMove={(e) => {
-        const r = ref.current?.getBoundingClientRect();
-        if (!r) return;
-        mx.set((e.clientX - r.left) / r.width - 0.5);
-        my.set((e.clientY - r.top) / r.height - 0.5);
-      }}
       className="relative flex flex-col items-center justify-center overflow-hidden px-5 pb-14 pt-28 md:min-h-[88svh] md:pb-10 lg:pb-6 lg:pt-32"
     >
       {/* Ambient glow */}
@@ -91,17 +50,6 @@ export function Hero({ featured }: { featured: Template[] }) {
         />
       </div>
 
-      {featured.slice(0, placements.length).map((template, i) => (
-        <FloatingCard
-          key={template.slug}
-          template={template}
-          index={i}
-          mx={smx}
-          my={smy}
-          progress={scrollYProgress}
-          {...placements[i]}
-        />
-      ))}
 
       <motion.div
         style={{ y: titleY, opacity: titleOpacity, scale: titleScale }}
@@ -182,55 +130,6 @@ export function Hero({ featured }: { featured: Template[] }) {
         </motion.div>
       </motion.div>
     </section>
-  );
-}
-
-function FloatingCard({
-  template,
-  className,
-  rotate,
-  depth,
-  index,
-  mx,
-  my,
-  progress,
-}: {
-  template: Template;
-  className: string;
-  rotate: number;
-  depth: number;
-  index: number;
-  mx: MotionValue<number>;
-  my: MotionValue<number>;
-  progress: MotionValue<number>;
-}) {
-  const x = useTransform(mx, (v) => v * depth);
-  const y = useTransform(() => my.get() * depth - progress.get() * depth * 5);
-  const opacity = useTransform(progress, [0, 0.45], [1, 0]);
-
-  return (
-    <motion.div
-      aria-hidden
-      className={cn("pointer-events-none absolute hidden lg:block", className)}
-      style={{ x, y, opacity }}
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.7, rotate: rotate * 2.5, y: 80 }}
-        animate={{ opacity: 1, scale: 1, rotate, y: 0 }}
-        transition={{
-          duration: 1.3,
-          ease: EASE_OUT,
-          delay: INTRO_DELAY + 0.45 + index * 0.12,
-        }}
-      >
-        <div
-          className="animate-float rounded-[1.2rem] shadow-[0_30px_60px_-20px_rgba(27,18,21,0.35)]"
-          style={{ animationDelay: `${index * -1.5}s` }}
-        >
-          <TemplatePreview template={template} className="rounded-[1.2rem]" />
-        </div>
-      </motion.div>
-    </motion.div>
   );
 }
 

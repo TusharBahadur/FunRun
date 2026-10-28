@@ -45,45 +45,72 @@ export function LoveNotes({ notes }: { notes: LoveNote[] }) {
   );
 }
 
-/** A DM, as it is: their avatar and their bubbles, straight on the page. */
 function DmCard({ note }: { note: LoveNote }) {
+  const isShort = note.messages.length === 1 && note.messages[0].length < 30;
+
   return (
-    <figure className="my-3 flex w-[280px] shrink-0 items-end gap-2.5 select-none sm:w-[340px]">
-      <Image
-        src={note.avatar}
-        alt=""
-        width={32}
-        height={32}
-        className="mb-1 size-8 shrink-0 rounded-full object-cover ring-2 ring-white"
-      />
-      <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5 pb-2">
-        {note.messages.map((msg, idx) => {
-          const isLast = idx === note.messages.length - 1;
-          const isFirst = idx === 0;
-          return (
-            <div
-              key={idx}
-              className={cn(
-                "relative max-w-full rounded-[1.15rem] bg-white px-3.5 py-2.5 text-left text-[13px] leading-[1.45] text-ink shadow-[0_6px_16px_-10px_rgba(27,18,21,0.28)] ring-1 ring-ink/[0.05] sm:text-sm",
-                // Instagram-style grouping: the corner nearest the avatar tucks in.
-                isFirst && !isLast && "rounded-bl-[6px]",
-                !isFirst && !isLast && "rounded-l-[6px]",
-                !isFirst && isLast && "rounded-tl-[6px] rounded-bl-[4px]",
-                isFirst && isLast && "rounded-bl-[4px]",
-              )}
-            >
-              <p className="whitespace-pre-line break-words">{msg}</p>
-              {isLast && (
-                <span
-                  aria-label="Heart reaction"
-                  className="absolute -bottom-2.5 left-3 rounded-full bg-white px-1.5 py-0.5 text-[11px] leading-none shadow-sm ring-1 ring-ink/[0.06]"
+    <figure
+      style={{
+        transform: `rotate(${note.tilt}deg)`,
+      }}
+      className={cn(
+        // A thin white frame that hugs the DM; self-center so it never
+        // stretches to the tallest card in the row.
+        "group/card my-3.5 shrink-0 self-center rounded-[22px] bg-white p-1.5",
+        isShort ? "w-max max-w-[260px]" : "w-[300px] sm:w-[360px]",
+        "border border-black/[0.08] shadow-[0_12px_28px_-8px_rgba(27,18,21,0.16)]",
+        "transition-all duration-400 ease-out-expo hover:!rotate-0 hover:scale-[1.03] hover:shadow-[0_20px_45px_-6px_rgba(27,18,21,0.26)] hover:z-20 select-none",
+      )}
+    >
+      <div className="relative flex flex-col justify-center rounded-[17px] bg-[#0c0c0e] p-3.5 sm:p-4 text-left text-white shadow-inner">
+        {/* Message bubble stream with sender avatar at bottom-left */}
+        <div className="flex items-end gap-2.5">
+          {/* Sender circular avatar - Asian / Indian face */}
+          <Image
+            src={note.avatar}
+            alt="Customer avatar"
+            width={32}
+            height={32}
+            className="size-7 sm:size-8 shrink-0 rounded-full object-cover ring-1 ring-white/20 select-none mb-1"
+          />
+
+          {/* Chat bubbles */}
+          <div className="flex flex-1 flex-col items-start gap-1.5 min-w-0 pb-1">
+            {note.messages.map((msg, idx) => {
+              const isLast = idx === note.messages.length - 1;
+              const isFirst = idx === 0;
+
+              return (
+                <div
+                  key={idx}
+                  className={cn(
+                    "relative max-w-[94%] bg-[#262626] px-3.5 py-2.5 text-[12.5px] leading-[1.42] text-[#f2f2f2] sm:text-[13px]",
+                    isFirst && !isLast && "rounded-2xl rounded-bl-[6px]",
+                    !isFirst && isLast && "rounded-2xl rounded-tl-[6px] rounded-bl-[4px]",
+                    isFirst && isLast && "rounded-2xl rounded-bl-[4px]",
+                    !isFirst && !isLast && "rounded-2xl rounded-l-[6px]",
+                  )}
                 >
-                  {note.reaction || "❤️"}
-                </span>
-              )}
-            </div>
-          );
-        })}
+                  <p className="whitespace-pre-line break-words font-sans selection:bg-rose selection:text-white">
+                    {msg}
+                  </p>
+
+                  {/* Red heart reaction badge on the last bubble */}
+                  {isLast && (
+                    <div
+                      aria-label="Heart reaction"
+                      className="absolute -bottom-2.5 left-3.5 flex items-center justify-center rounded-full bg-[#262626] border border-black/60 px-1.5 py-0.5 shadow-md ring-1 ring-white/10"
+                    >
+                      <span className="text-[11px] leading-none select-none">
+                        {note.reaction || "❤️"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </figure>
   );
