@@ -181,7 +181,7 @@ export function Checkout({
                 <section>
                   <p className="mb-2 text-sm font-semibold">Your link</p>
                   <label className="flex items-center rounded-2xl border border-line bg-paper px-4 py-3 text-[15px] focus-within:border-ink/40">
-                    <span className="text-muted">tynitales.gift/for/</span>
+                    <span className="text-muted">tynitales.com/for/</span>
                     <input
                       value={link}
                       onChange={(e) => setLink(slugifyName(e.target.value))}

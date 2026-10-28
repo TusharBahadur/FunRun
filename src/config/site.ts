@@ -3,7 +3,7 @@ export const siteConfig = {
   tagline: "Gift a feeling.",
   description:
     "Beautiful digital templates you can personalize and gift to the people you love.",
-  url: "https://tynitales.gift",
+  url: "https://tynitales.com",
   nav: [
     { label: "Templates", href: "/templates" },
     { label: "How it works", href: "/#how" },

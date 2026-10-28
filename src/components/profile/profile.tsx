@@ -277,7 +277,7 @@ function GiftItem({ gift, now, state }: { gift: GiftRow; now: number; state: Tab
 
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium">{gift.name}</p>
-          <p className="mt-0.5 truncate font-mono text-xs text-muted">tynitales.gift{giftPath(gift.slug)}</p>
+          <p className="mt-0.5 truncate font-mono text-xs text-muted">tynitales.com{giftPath(gift.slug)}</p>
           <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
             {state === "scheduled" ? (
               <span className="flex items-center gap-1.5">
