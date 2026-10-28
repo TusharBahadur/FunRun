@@ -40,6 +40,7 @@ type Layout =
   | "herolayout"
   | "browser"
   | "fan"
+  | "wish"
   | "chat"
   | "scrapbook"
   | "poster"
@@ -55,7 +56,7 @@ type Layout =
 const layoutFor: Record<string, Layout> = {
   // birthday
   candle: "candle",
-  "make-a-wish": "fan",
+  "make-a-wish": "wish",
   "the-party": "chat",
   // anniversary
   "still-you": "poster",
@@ -267,6 +268,7 @@ export function StoryMockup({ template, className, compact = false }: { template
     site: SiteLayout,
     browser: BrowserLayout,
     fan: FanLayout,
+    wish: WishLayout,
     chat: ChatLayout,
     scrapbook: ScrapbookLayout,
     poster: PosterLayout,
@@ -518,6 +520,109 @@ function HeroScrapbookLayout({ g }: { g: Gift }) {
   return <ScrapbookLayout g={g} />;
 }
 
+/* ───────────── MAKE-A-WISH: a cake, a dandelion and their photo ───────────── */
+function WishLayout({ g }: { g: Gift }) {
+  const { p, scenes, story } = g;
+  const photo = giftPhotos(scenes, 1)[0];
+  const sticker = giftStickers(scenes).find((id) => /^m-/.test(id)) ?? giftStickers(scenes)[0];
+  const confetti = [
+    { l: "8%", t: "8%", c: p.accent, r: 20 },
+    { l: "88%", t: "11%", c: p.gold, r: -30 },
+    { l: "16%", t: "33%", c: p.gold, r: 45 },
+    { l: "91%", t: "34%", c: p.pink, r: 10 },
+    { l: "50%", t: "36%", c: p.accent, r: -15 },
+    { l: "4%", t: "60%", c: p.pink, r: 60 },
+  ];
+  return (
+    <Stage
+      style={{
+        backgroundColor: "#ffffff",
+        backgroundImage: `radial-gradient(${p.fg}1f 1px, transparent 1.2px)`,
+        backgroundSize: "4cqw 4cqw",
+      }}
+    >
+      {confetti.map((c, i) => (
+        <span key={i} className="absolute h-[2.2cqw] w-[1cqw] rounded-full" style={{ left: c.l, top: c.t, backgroundColor: c.c, rotate: `${c.r}deg`, opacity: 0.8 }} />
+      ))}
+
+      <p className="absolute inset-x-0 top-[6%] text-center font-mono text-[2.4cqw] uppercase tracking-[0.25em]" style={{ color: p.fg, opacity: 0.55 }}>
+        {g.kicker}
+      </p>
+      <h3 className="type-display absolute inset-x-[6%] top-[11%] text-center text-[9cqw] leading-[0.95]" style={{ color: p.fg }}>
+        Make a wish,
+        <span className="type-accent block text-[1.08em]" style={{ color: p.accent }}>
+          {story.recipient}.
+        </span>
+      </h3>
+
+      {/* their photo, taped up */}
+      {photo && (
+        <div className="absolute left-[7%] top-[41%] w-[34%] -rotate-[7deg] bg-white p-[1.6cqw] pb-[5cqw] shadow-[0_3cqw_5cqw_-3cqw_rgba(27,18,21,0.45)]">
+          <span className="absolute -top-[1.6cqw] left-1/2 h-[3.2cqw] w-[11cqw] -translate-x-1/2 rotate-3 opacity-80" style={{ backgroundColor: p.pink }} />
+          <PhotoFill src={photo.src} tone={photo.tone} alt="" className="aspect-square w-full" iconClassName="size-[6cqw]" />
+          <span className="type-hand absolute inset-x-0 bottom-[0.8cqw] text-center text-[3cqw] text-[#2a1a1f]">27 today!</span>
+        </div>
+      )}
+
+      {sticker && <Sticker id={sticker} className="absolute right-[8%] top-[40%] size-[16cqw] rotate-[8deg]" />}
+
+      {/* the cake */}
+      <svg viewBox="0 0 200 175" className="absolute bottom-[6%] right-[5%] w-[56%] drop-shadow-[0_3cqw_3cqw_rgba(27,18,21,0.18)]" aria-hidden>
+        <ellipse cx="100" cy="165" rx="92" ry="8" fill={p.fg} opacity="0.08" />
+        <ellipse cx="100" cy="158" rx="88" ry="9" fill="#fff" stroke={p.fg} strokeOpacity="0.12" />
+        {/* bottom tier */}
+        <rect x="22" y="98" width="156" height="60" rx="10" fill={p.pink} />
+        <path d="M22 108 q0 -10 10 -10 h136 q10 0 10 10 v6 q-8 10 -16 0 q-8 12 -17 0 q-9 12 -18 0 q-9 12 -18 0 q-9 12 -18 0 q-9 12 -18 0 q-9 12 -18 0 q-8 10 -16 0 z" fill="#fff" />
+        {/* top tier */}
+        <rect x="48" y="60" width="104" height="44" rx="9" fill={p.accent} />
+        <path d="M48 69 q0 -9 9 -9 h86 q9 0 9 9 v4 q-7 9 -14 0 q-7 10 -15 0 q-7 10 -15 0 q-8 10 -15 0 q-7 10 -15 0 q-7 9 -14 0 z" fill="#fff" />
+        {/* sprinkles */}
+        {[
+          [40, 130, p.accent, 20],
+          [70, 140, p.gold, -30],
+          [104, 128, p.fg, 60],
+          [138, 142, p.gold, 10],
+          [160, 126, p.accent, -50],
+          [72, 88, "#fff", 30],
+          [120, 92, p.gold, -20],
+        ].map(([x, y, c, r], i) => (
+          <rect key={i} x={x as number} y={y as number} width="7" height="2.6" rx="1.3" fill={c as string} transform={`rotate(${r} ${x} ${y})`} />
+        ))}
+        {/* candles */}
+        {[84, 116].map((x, i) => (
+          <g key={x}>
+            <rect x={x - 4} y="30" width="8" height="32" rx="2" fill="#fff" stroke={p.fg} strokeOpacity="0.15" />
+            <path d={`M${x - 4} 38 l8 -5 M${x - 4} 47 l8 -5 M${x - 4} 56 l8 -5`} stroke={p.accent} strokeWidth="2.4" />
+            <circle cx={x} cy="20" r="9" fill={p.gold} opacity="0.35" className="animate-pulse" style={{ animationDelay: `${i * -0.6}s` }} />
+            <path d={`M${x} 9 q6 8 0 15 q-6 -7 0 -15 z`} fill={p.gold} />
+            <path d={`M${x} 15 q2.4 4 0 8 q-2.4 -4 0 -8 z`} fill="#fff" opacity="0.85" />
+          </g>
+        ))}
+      </svg>
+
+      {/* a dandelion, seeds drifting off */}
+      <svg viewBox="0 0 60 90" className="absolute bottom-[5%] left-[10%] w-[19%]" aria-hidden>
+        <path d="M30 88 q-3 -30 0 -56" stroke="#7fa36b" strokeWidth="2" fill="none" />
+        <circle cx="30" cy="26" r="3" fill={p.fg} opacity="0.35" />
+        {Array.from({ length: 14 }, (_, i) => {
+          const a = (i / 14) * Math.PI * 2;
+          return <path key={i} d={`M30 26 L${30 + Math.cos(a) * 16} ${26 + Math.sin(a) * 16}`} stroke={p.fg} strokeOpacity="0.35" strokeWidth="1" />;
+        })}
+        <circle cx="30" cy="26" r="17" fill="none" stroke={p.fg} strokeOpacity="0.12" strokeDasharray="1 3" />
+      </svg>
+      {[
+        { l: "26%", t: "70%", d: "0s" },
+        { l: "32%", t: "64%", d: "-2s" },
+        { l: "22%", t: "62%", d: "-4s" },
+      ].map((sd, i) => (
+        <span key={i} className="absolute animate-float text-[3.4cqw] leading-none" style={{ left: sd.l, top: sd.t, color: p.fg, opacity: 0.4, animationDelay: sd.d }}>
+          ✻
+        </span>
+      ))}
+    </Stage>
+  );
+}
+
 /* ───────────── Shared Layouts from Design Kit ───────────── */
 
 function BrowserLayout({ g }: { g: Gift }) {
@@ -549,39 +654,62 @@ function BrowserLayout({ g }: { g: Gift }) {
   );
 }
 
+/**
+ * A little hand of paper cards: the personal page big in front, two more
+ * pages peeking out behind it. Soft white frames, no phone chrome, so the
+ * photo and the words stay readable even on a small card.
+ */
 function FanLayout({ g }: { g: Gift }) {
   const { p, scenes } = g;
-  const picks = [scenes[0], personalScene(scenes), scenes[scenes.length - 1]];
+  const front = personalScene(scenes);
+  const others = scenes.filter((s) => s !== front);
+  const back = [others[0], others[others.length - 1]].filter(Boolean);
   const stickers = giftStickers(scenes);
   return (
     <Stage
       style={{
-        // White with a soft dot grid, no colour wash.
-        backgroundColor: "#ffffff",
-        backgroundImage: `radial-gradient(${p.fg}22 1px, transparent 1.2px)`,
+        backgroundColor: p.bg,
+        backgroundImage: `radial-gradient(${p.fg}1f 1px, transparent 1.2px)`,
         backgroundSize: "4cqw 4cqw",
       }}
     >
-      <p className="absolute inset-x-0 top-[7%] text-center font-mono text-[2.6cqw] uppercase tracking-[0.2em]" style={{ color: p.fg, opacity: 0.7 }}>
+      <p className="absolute inset-x-0 top-[8%] text-center font-mono text-[2.6cqw] uppercase tracking-[0.2em]" style={{ color: p.fg, opacity: 0.65 }}>
         {g.kicker}
       </p>
-      {picks.map((s, i) => (
-        <PhoneFrame
-            dark
-          key={i}
-          className="top-[16%] w-[40%]"
-          rotate={[-12, 0, 12][i]}
-          style={{ left: ["4%", "30%", "56%"][i], top: ["20%", "14%", "20%"][i], zIndex: i === 1 ? 2 : 1 }}
-        >
-          <ScreenPeek scene={s} g={g} className="aspect-[9/16]" />
-        </PhoneFrame>
+
+      {back.map((s, i) => (
+        <PaperCard key={i} className="top-[27%] w-[46%]" style={{ [i ? "right" : "left"]: "6%", rotate: i ? "9deg" : "-10deg" }}>
+          <ScreenPeek scene={s} g={g} className="aspect-[3/4]" />
+        </PaperCard>
       ))}
+
+      <PaperCard className="left-[19%] top-[20%] z-[2] w-[62%]" style={{ rotate: "-2deg" }}>
+        <ScreenPeek scene={front} g={g} className="aspect-[3/4]" />
+      </PaperCard>
+
       {stickers.slice(0, 2).map((id, i) => (
-        <div key={id} aria-hidden className="absolute z-10 animate-float" style={[{ left: "4%", bottom: "5%", rotate: "-6deg" }, { right: "5%", bottom: "8%", rotate: "8deg", animationDelay: "-2s" }][i]}>
-          <Sticker id={id} className="size-[17cqw]" />
+        <div
+          key={id}
+          aria-hidden
+          className="absolute z-10 animate-float"
+          style={[{ left: "5%", bottom: "6%", rotate: "-8deg" }, { right: "6%", top: "15%", rotate: "10deg", animationDelay: "-2s" }][i]}
+        >
+          <Sticker id={id} className="size-[15cqw]" />
         </div>
       ))}
     </Stage>
+  );
+}
+
+/** A printed page: thin white border, rounded, a soft shadow. */
+function PaperCard({ children, className, style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
+  return (
+    <div
+      className={cn("absolute rounded-[4cqw] bg-white p-[1.3cqw] shadow-[0_5cqw_9cqw_-5cqw_rgba(27,18,21,0.38)] ring-1 ring-black/5", className)}
+      style={style}
+    >
+      <div className="overflow-hidden rounded-[3cqw]">{children}</div>
+    </div>
   );
 }
 
