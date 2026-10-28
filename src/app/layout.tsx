@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Mono, Inter_Tight, Kalam } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "@/components/providers";
 import { giftFontVariables } from "@/components/story/gift-font-faces";
 import { siteConfig } from "@/config/site";
@@ -72,6 +73,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-svh bg-cream font-sans text-ink">
         <Providers>{children}</Providers>
+        {/* Real-visitor performance data in the Vercel dashboard (Speed Insights). */}
+        <SpeedInsights />
         <div
           aria-hidden
           className="grain pointer-events-none fixed inset-0 z-[70] opacity-[0.05]"
