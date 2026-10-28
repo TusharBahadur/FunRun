@@ -13,6 +13,11 @@ type SplitTextProps = {
   stagger?: number;
   /** Reveal word by word (default) or letter by letter. */
   by?: "word" | "char";
+  /**
+   * Play right away with a CSS animation, from the first paint, without
+   * waiting for JavaScript. For text at the top of the page (the hero).
+   */
+  immediate?: boolean;
 };
 
 /** Masked "rise from below" reveal, triggered when scrolled into view. */
@@ -22,6 +27,7 @@ export function SplitText({
   delay = 0,
   stagger = 0.06,
   by = "word",
+  immediate = false,
 }: SplitTextProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "0px 0px -8% 0px" });
@@ -41,14 +47,23 @@ export function SplitText({
                   key={p}
                   className="-mb-[0.22em] -mr-[0.06em] inline-block overflow-y-clip pr-[0.06em] pb-[0.22em]"
                 >
-                  <motion.span
-                    className="inline-block origin-bottom-left will-change-transform"
-                    initial={{ y: "115%", rotate: 5 }}
-                    animate={inView ? { y: "0%", rotate: 0 } : undefined}
-                    transition={{ duration: 1, ease: EASE_OUT, delay: delay + i * stagger }}
-                  >
-                    {part}
-                  </motion.span>
+                  {immediate ? (
+                    <span
+                      className="tt-css-reveal inline-block origin-bottom-left"
+                      style={{ animation: `tt-rise 1s cubic-bezier(0.22, 1, 0.36, 1) ${delay + i * stagger}s both` }}
+                    >
+                      {part}
+                    </span>
+                  ) : (
+                    <motion.span
+                      className="inline-block origin-bottom-left will-change-transform"
+                      initial={{ y: "115%", rotate: 5 }}
+                      animate={inView ? { y: "0%", rotate: 0 } : undefined}
+                      transition={{ duration: 1, ease: EASE_OUT, delay: delay + i * stagger }}
+                    >
+                      {part}
+                    </motion.span>
+                  )}
                 </span>
               );
             })}

@@ -57,38 +57,26 @@ export function Hero({ featured }: { featured: Template[] }) {
       >
         <h1 className="text-[clamp(2.6rem,min(8vw,11svh),7.5rem)] type-display">
           <span className="block font-semibold">
-            <SplitText text="Say" delay={INTRO_DELAY + 0.05} />
+            <SplitText text="Say" delay={INTRO_DELAY + 0.05} immediate />
           </span>
           <span className="type-accent block text-[1.08em] leading-[1.02] text-rose">
             <RotatingWords words={phrases} startDelay={INTRO_DELAY + 0.2} />
           </span>
           <span className="block font-bold italic">
-            <SplitText text="beautifully." delay={INTRO_DELAY + 0.35} />
+            <SplitText text="beautifully." delay={INTRO_DELAY + 0.35} immediate />
           </span>
         </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            delay: INTRO_DELAY + 0.6,
-            duration: 0.9,
-            ease: EASE_OUT,
-          }}
-          className="type-copy mt-5 max-w-xl text-balance text-muted md:mt-8"
+        <p
+          className="tt-css-reveal type-copy mt-5 max-w-xl text-balance text-muted md:mt-8"
+          style={{ animation: `tt-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${INTRO_DELAY + 0.6}s both` }}
         >
           A little gift page, made for one person.
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            delay: INTRO_DELAY + 0.75,
-            duration: 0.9,
-            ease: EASE_OUT,
-          }}
-          className="mt-8 flex flex-col items-center gap-3 sm:flex-row md:mt-10"
+        <div
+          className="tt-css-reveal mt-8 flex flex-col items-center gap-3 sm:flex-row md:mt-10"
+          style={{ animation: `tt-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${INTRO_DELAY + 0.75}s both` }}
         >
           <Magnetic>
             <ButtonLink href="/templates" size="lg">
@@ -98,7 +86,7 @@ export function Hero({ featured }: { featured: Template[] }) {
           <ButtonLink href="#how" variant="ghost" size="lg" icon={false}>
             See how it works
           </ButtonLink>
-        </motion.div>
+        </div>
 
         {/* Phones and tablets: the floating cards become a little fanned hand of gifts under the buttons. */}
         <MobileFan templates={featured.slice(0, 3)} />

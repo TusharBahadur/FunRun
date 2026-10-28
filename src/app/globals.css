@@ -304,3 +304,11 @@ body {
   }
 }
 
+/* Hero intro: pure-CSS reveals, so the headline plays from the very first
+   paint instead of waiting for JavaScript to load. */
+@keyframes tt-rise { from { transform: translateY(115%) rotate(5deg); } to { transform: none; } }
+@keyframes tt-rise-fade { from { transform: translateY(70%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes tt-fade-up { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .tt-css-reveal { animation: none !important; }
+}
