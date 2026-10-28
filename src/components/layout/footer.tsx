@@ -43,7 +43,7 @@ export function Footer() {
           </div>
           {columns.map((col) => (
             <div key={col.title} className="md:col-span-2">
-              <p className="type-label text-cream/40">
+              <p className="type-label text-cream/65">
                 {col.title}
               </p>
               <ul className="mt-5 space-y-3">

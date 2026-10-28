@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     agentUpgrade: "security",
+    // Our CSS is small (~27 KB), so ship it inside the HTML instead of as
+    // separate files: no render-blocking request before the first paint.
+    inlineCss: true,
   },
   cacheComponents: true,
   // 127.0.0.1 plus temporary phone-testing tunnels (dev only).

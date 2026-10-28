@@ -102,14 +102,14 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
 
       {/* Which gift is playing, and where we are in the loop */}
       <div className="relative mt-9 flex flex-col items-center gap-3 lg:mt-4">
-        <div className="flex gap-1.5">
+        <div className="flex gap-3">
           {templates.map((t, j) => (
             <button
               key={t.slug}
               type="button"
               aria-label={`Show ${t.name}`}
               onClick={() => go(j)}
-              className={cn("h-1.5 rounded-full transition-all duration-500", j === i ? "w-8 bg-rose" : "w-4 bg-ink/15 hover:bg-ink/30")}
+              className={cn("relative h-1.5 rounded-full transition-all duration-500 after:absolute after:-inset-x-1 after:-inset-y-[9px] after:content-['']", j === i ? "w-8 bg-rose" : "w-4 bg-ink/15 hover:bg-ink/30")}
             />
           ))}
         </div>

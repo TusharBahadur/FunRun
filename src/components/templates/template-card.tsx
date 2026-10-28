@@ -63,7 +63,7 @@ export function TemplateCard({ template, className }: { template: Template; clas
             {formatInr(template.pricePaise)}
           </span>
         </div>
-        {line && <p className="mt-0.5 truncate text-[11px] text-ink/55 sm:text-xs">{line}</p>}
+        {line && <p className="mt-0.5 truncate text-[11px] text-ink/70 sm:text-xs">{line}</p>}
       </Link>
 
       {/* Side by side when there's room; on narrow cards Preview drops under it. */}

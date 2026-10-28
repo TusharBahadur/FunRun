@@ -32,7 +32,7 @@ export function CallToAction() {
         </div>
 
         <div className="relative">
-          <p className="type-label text-paper/70">
+          <p className="type-label text-paper/90">
             Ready when you are
           </p>
           <h2 className="mx-auto mt-5 max-w-4xl text-[clamp(2.8rem,8vw,7.5rem)] type-display">

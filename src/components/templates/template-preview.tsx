@@ -16,13 +16,19 @@ export function TemplatePreview({
   compact?: boolean;
 }) {
   return (
+    // A picture of the gift: one image to screen readers and checkers, not a
+    // pile of tiny decorative labels.
     <div
+      role="img"
+      aria-label={`${template.name} preview`}
       className={cn(
         "@container relative aspect-[3/4] w-full select-none overflow-hidden rounded-[1.75rem]",
         className,
       )}
     >
-      {template.story && <StoryMockup template={template} compact={compact} />}
+      <div aria-hidden className="contents">
+        {template.story && <StoryMockup template={template} compact={compact} />}
+      </div>
     </div>
   );
 }
