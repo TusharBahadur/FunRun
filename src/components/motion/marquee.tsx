@@ -7,14 +7,17 @@ type MarqueeProps = {
   /** Seconds for one full loop. */
   duration?: number;
   className?: string;
+  /** Fade the left and right edges into the page. On by default. */
+  fade?: boolean;
 };
 
 /** Pure-CSS infinite marquee with edge fade; pauses on hover. */
-export function Marquee({ children, reverse, duration = 40, className }: MarqueeProps) {
+export function Marquee({ children, reverse, duration = 40, className, fade = true }: MarqueeProps) {
   return (
     <div
       className={cn(
-        "group flex overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]",
+        "group flex overflow-hidden",
+        fade && "[mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]",
         className,
       )}
       style={{ "--duration": `${duration}s` } as CSSProperties}
