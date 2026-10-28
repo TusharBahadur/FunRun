@@ -450,6 +450,9 @@ export function StickerLayer({ stickers }: { stickers?: StickerPlacement[] }) {
   if (!stickers?.length) return null;
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+      {/* On wide screens the corners are measured from a centred box, not the
+          whole window, so stickers stay close to the page's content. */}
+      <div className="relative mx-auto h-full w-full md:max-w-[60rem]">
       {stickers.map((s, i) => (
         <motion.div
           key={s.at}
@@ -465,6 +468,7 @@ export function StickerLayer({ stickers }: { stickers?: StickerPlacement[] }) {
           </StudioHit>
         </motion.div>
       ))}
+      </div>
     </div>
   );
 }
