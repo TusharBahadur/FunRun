@@ -19,7 +19,7 @@ export function LetterScene({ scene, done }: SceneProps<S<"letter">>) {
   return (
     <SceneShell layout="stack" eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} done={done}>
       <Paper
-        className="relative w-[min(92vw,540px)] rotate-[-0.6deg] px-7 py-8 text-left md:px-10"
+        className="relative w-[min(92vw,540px)] rotate-[-0.6deg] break-words px-7 py-8 text-left [overflow-wrap:anywhere] md:w-[min(92vw,620px)] md:px-10"
         style={{
           // Ruled notebook paper with a margin line.
           backgroundImage: `linear-gradient(90deg, transparent 38px, ${palette.accent}33 38px 40px, transparent 40px), repeating-linear-gradient(transparent 0 33px, ${palette.ink}14 33px 34px)`,

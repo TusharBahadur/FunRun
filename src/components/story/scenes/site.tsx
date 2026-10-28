@@ -312,7 +312,7 @@ export function SiteLetter({ scene }: SceneProps<S<"letter">>) {
     <section className="mx-auto w-full max-w-3xl px-5 pb-32 pt-20 md:py-32">
       <motion.div {...rise}>
         <Glass
-          className="relative px-7 py-10 md:px-14 md:py-14"
+          className="relative break-words px-7 py-10 [overflow-wrap:anywhere] md:px-14 md:py-14"
         >
           <div className="type-label flex justify-between text-[10px] opacity-55">
             <StudioHit as="span" field="eyebrow">{fill(scene.eyebrow ?? "And finally")}</StudioHit>
