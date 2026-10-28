@@ -202,7 +202,7 @@ export const birthdayPage = siteTemplate({
       photos: [
         { caption: "These two!!", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
         { caption: "Cousin’s wedding", date: "Nov ’24", tone: "rose", src: photo("saree-laughs") },
-        { caption: "Birthday cake", date: "Oct ’24", tone: "dusk", src: photo("pink-cake") },
+        { caption: "Birthday cake", date: "Oct ’24", tone: "dusk", src: photo("cat-cake") },
         { caption: "Birthday nap", date: "Oct ’24", tone: "rose", src: photo("cat") },
       ],
     },
@@ -211,7 +211,7 @@ export const birthdayPage = siteTemplate({
       eyebrow: "Birthday playlist",
       title: "Turn it up. *It’s your day.*",
       songs: [
-        { title: "London Thumakda", note: "for the dancing part", tone: "sun", src: photo("pink-cake") },
+        { title: "London Thumakda", note: "for the dancing part", tone: "sun", src: photo("cat-cake") },
         { title: "Badtameez Dil", note: "because obviously", tone: "rose", src: board("39.jpg") },
         { title: "Kabira", note: "for later, when it’s quiet", tone: "night", src: photo("road-trip") },
       ],
@@ -267,7 +267,7 @@ export const fanPage = siteTemplate({
       photos: [
         { caption: "That wedding look", date: "Nov ’24", tone: "rose", src: photo("saree-laughs") },
         { caption: "Iconic, as usual", date: "Always", tone: "dusk", src: photo("maya-portrait") },
-        { caption: "The cake", date: "Mar ’25", tone: "sun", src: photo("pink-cake") },
+        { caption: "The cake", date: "Mar ’25", tone: "sun", src: photo("cat-cake") },
         { caption: "Me, looking at her", date: "Daily", tone: "rose", src: board("43.jpg") },
       ],
     },
@@ -330,7 +330,7 @@ export const hisPage = siteTemplate({
       title: "His best *moments*, as captured by his biggest fan.",
       photos: [
         { caption: "The babies", date: "Dec ’24", tone: "sun", src: photo("road-trip") },
-        { caption: "Cake face", date: "Daily", tone: "dusk", src: photo("pink-cake") },
+        { caption: "Cake face", date: "Daily", tone: "dusk", src: photo("cat-cake") },
         { caption: "Nap mode", date: "Sundays", tone: "rose", src: photo("cat") },
         { caption: "The usual", date: "Always", tone: "sun", src: photo("misty-chai") },
       ],

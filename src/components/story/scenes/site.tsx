@@ -7,7 +7,7 @@ import { Accented } from "@/components/experiences/birthday/accented";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
 import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import { playHtmlAudio, playTrackAudio, trackHref, trackSrc, getTrackPlayable, type Stopper } from "../gift-music";
+import { playTrackAudio, trackHref, getTrackPlayable, type Stopper } from "../gift-music";
 import { SceneShell, StudioHit, TurnButton, useStudioEdit, useStory, type SceneProps } from "../scene-kit";
 import type { Scene, Track } from "../types";
 

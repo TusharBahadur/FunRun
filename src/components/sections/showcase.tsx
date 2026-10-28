@@ -85,7 +85,7 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
         </ul>
       </div>
 
-      <div className="relative mx-auto mt-8 grid max-w-7xl items-center gap-x-10 gap-y-5 md:mt-12 lg:grid-cols-[1fr_auto_1fr] lg:gap-4">
+      <div className="relative mx-auto mt-8 grid max-w-7xl items-center gap-x-10 gap-y-5 md:mt-12 lg:max-w-[64rem] lg:grid-cols-[1fr_auto_1fr] lg:gap-x-12">
         <Perks items={perks.left} align="end" beat={turn} tint={current.palette} className="order-2 lg:order-1" />
 
         {/* The phones */}
@@ -259,7 +259,7 @@ function Perks({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: EASE_OUT, delay: 0.1 * k }}
-            className="relative w-full lg:max-w-[15rem]"
+            className="relative w-full lg:w-[14.5rem] lg:max-w-none"
           >
             <motion.div
               animate={

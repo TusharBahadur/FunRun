@@ -149,7 +149,7 @@ export const girlfriendDayStories = [
         hint: "Tap each photo",
         photos: [
           { caption: "That wedding look", date: "Nov ’24", tone: "rose", src: photo("saree-laughs") },
-          { caption: "Birthday cake", date: "Mar ’25", tone: "dusk", src: photo("pink-cake") },
+          { caption: "Birthday cake", date: "Mar ’25", tone: "dusk", src: photo("cat-cake") },
           { caption: "Cuddle break", date: "Every day", tone: "sun", src: photo("road-trip") },
         ],
         done: "Framing every single one.",

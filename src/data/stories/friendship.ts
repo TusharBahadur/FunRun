@@ -89,7 +89,7 @@ export const friendshipStories = [
           "You’re the person I send the unhinged voice note to. That’s a sacred job. Don’t apply for a transfer.",
         ],
         signoff: "Your HR of nothing useful, {from}",
-        photo: photo("pink-cake"),
+        photo: photo("cat-cake"),
         stickers: [{ id: "b-hug-hearts", at: "bl" }],
       },
     ],
@@ -182,7 +182,7 @@ export const friendshipStories = [
         title: "QA from *this year.*",
         hint: "Tap each photo",
         photos: [
-          { caption: "Release cake", date: "That night", tone: "dusk", src: photo("pink-cake") },
+          { caption: "Release cake", date: "That night", tone: "dusk", src: photo("cat-cake") },
           { caption: "Pair programming", date: "Weekly", tone: "sun", src: photo("road-trip") },
           { caption: "Post-deploy nap", date: "Mar ’25", tone: "rose", src: photo("cat") },
         ],
@@ -198,7 +198,7 @@ export const friendshipStories = [
           "Happy Friendship Day. Don’t uninstall me. The rollback is ugly.",
         ],
         signoff: "Your least stable dependency, {from}",
-        photo: photo("pink-cake"),
+        photo: photo("cat-cake"),
         stickers: [{ id: "b-smooch", at: "bl" }],
       },
       {

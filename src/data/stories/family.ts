@@ -249,7 +249,7 @@ export const familyStories = [
           "I know I still steal your stuff. I’ll keep doing that. Love you anyway.",
         ],
         signoff: "Your problem, {from}",
-        photo: photo("pink-cake"),
+        photo: photo("cat-cake"),
         stickers: [{ id: "b-best-sis", at: "bl" }],
       },
     ],

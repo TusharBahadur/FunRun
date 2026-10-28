@@ -8,7 +8,6 @@ replace them with their own photos.
 | road-trip.jpg | https://unsplash.com/photos/2l0CWTpcChI |
 | misty-chai.jpg | https://unsplash.com/photos/1695809725756-4cc167d0d15e |
 | saree-laughs.jpg | https://unsplash.com/photos/1787295779676-181b3d5b55dd |
-| pink-cake.jpg | https://unsplash.com/photos/1694043325785-d841a964257f |
 | cat.jpg | TyniTales Pinterest board (same as stickers/board/05.jpg) |
 | chai-hands.jpg | Alias of cat.jpg so older saved drafts still load |
 | night-sky.jpg | https://unsplash.com/photos/1759738080643-44944609bc84 |

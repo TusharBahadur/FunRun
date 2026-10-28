@@ -495,3 +495,4 @@ Total stickers in pack: 489 (457 fetched from the Pinterest board + initial seed
 | pin-455.jpg | A gray and white cat with yellow | love | meme | [Pin pin-455](https://www.pinterest.com/pin/e1_AfqPShyh7X1NQTJoK3BPPM-oPxEZcR86nB_bj0Qjpv131blM-ggt/) | Uploaded by user |
 | pin-456.jpg | A cat with pink bows on it's hea | cat | meme | [Pin pin-456](https://www.pinterest.com/pin/e1_AfqPShwfCic6-RLNsrDKv8_WNSVZXgiGNdYt2dzgcJs08RnIS8GV/) | Uploaded by user |
 | pin-457.png | A cat is holding a bunch of pink | cat | doodle | [Pin pin-457](https://www.pinterest.com/pin/e1_AfqPShyc_hFzUTy9AMeGck0onLBf7P2nycJT4hmK39ZwORjc7ng_/) | Uploaded by user |
+| birthday-cat-cake.jpg | Birthday cat with cake | celebration | meme | [Pin 764345368050173751](https://www.pinterest.com/pin/764345368050173751/) | Uploaded by user |

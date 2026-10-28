@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Clock, Sparkles, Plus, Calendar, Bell, Volume2, Check, Lock, Unlock } from "lucide-react";
-import { Confetti } from "@/components/experiences/confetti";
+import { Clock, Sparkles, Bell, Unlock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ActivationTimerProps {

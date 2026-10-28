@@ -200,7 +200,7 @@ export function VoiceScene({ scene, done }: SceneProps<S<"voice">>) {
 /* ───────────── Finale ───────────── */
 
 export function FinaleScene({ scene, done }: SceneProps<S<"finale">>) {
-  const { palette, fill, playSong, restart, slug, to, from } = useStory();
+  const { fill, playSong, restart, slug, to, from } = useStory();
   const [thanked, setThanked] = useState(false);
 
   return (

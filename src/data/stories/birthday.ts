@@ -65,7 +65,7 @@ export const birthdayStories = [
         hint: "Tap each photo",
         photos: [
           { caption: "These two!!", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
-          { caption: "The cake", date: "Every year", tone: "dusk", src: photo("pink-cake") },
+          { caption: "The cake", date: "Every year", tone: "dusk", src: photo("cat-cake") },
           { caption: "Nap club", date: "Too many naps", tone: "night", src: photo("cat") },
         ],
         done: "We need more of these this year.",
@@ -80,7 +80,7 @@ export const birthdayStories = [
         age: 27,
         done: "What did you wish for? Jk, don’t tell me.",
         stickers: [
-          { id: "b-cake", at: "bl" },
+          { id: "m-birthday-cat", at: "bl" },
           { id: "popper", at: "tr", size: "s" },
         ],
         reaction: "m-dance-cat",
@@ -186,7 +186,7 @@ export const birthdayStories = [
         age: 27,
         done: "Smoke and everything. Now the real wish.",
         stickers: [
-          { id: "b-cake", at: "bl" },
+          { id: "m-birthday-cat", at: "bl" },
           { id: "popper", at: "tr", size: "s" },
         ],
         reaction: "m-dance-cat",
@@ -210,7 +210,7 @@ export const birthdayStories = [
         hint: "Tap each photo",
         photos: [
           { caption: "These two!!", date: "Jan ’25", tone: "sun", src: photo("road-trip") },
-          { caption: "The cake", date: "Every year", tone: "dusk", src: photo("pink-cake") },
+          { caption: "The cake", date: "Every year", tone: "dusk", src: photo("cat-cake") },
           { caption: "Cousin’s wedding", date: "Nov ’24", tone: "rose", src: photo("saree-laughs") },
           { caption: "Nap club", date: "Too many naps", tone: "night", src: photo("cat") },
         ],
@@ -373,7 +373,7 @@ export const birthdayStories = [
         age: 27,
         done: "The whole room cheered.",
         stickers: [
-          { id: "b-cake", at: "bl" },
+          { id: "m-birthday-cat", at: "bl" },
           { id: "balloons", at: "tr", size: "s" },
         ],
         reaction: "pin-168",

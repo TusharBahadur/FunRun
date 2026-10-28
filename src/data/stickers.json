@@ -887,5 +887,6 @@
   "b-p444": {"file":"444.jpg","name":"Board 444","kind":"doodle","category":"doodle"},
   "b-p445": {"file":"445.jpg","name":"Board 445","kind":"doodle","category":"doodle"},
   "b-p446": {"file":"446.jpg","name":"Board 446","kind":"doodle","category":"doodle"},
-  "b-p447": {"file":"447.jpg","name":"Board 447","kind":"doodle","category":"doodle"}
+  "b-p447": {"file":"447.jpg","name":"Board 447","kind":"doodle","category":"doodle"},
+  "m-birthday-cat": {"file":"birthday-cat-cake.jpg","name":"Birthday cat with cake","kind":"meme","category":"celebration"}
 }
