@@ -242,9 +242,10 @@ const fan = [
 
 function MobileFan({ templates }: { templates: Template[] }) {
   return (
-    // Phones get it at its own size; tablets get the same fan, scaled up.
-    <div aria-hidden className="pointer-events-none relative mt-12 h-[210px] w-full max-w-[360px] md:mt-14 md:h-[300px] lg:hidden">
-      <div className="absolute inset-0 origin-top md:scale-[1.42]">
+    // Tablets only: hidden on phones (kept the hero short), replaced by the
+    // floating cards on desktop.
+    <div aria-hidden className="pointer-events-none relative mt-14 hidden h-[300px] w-full max-w-[360px] md:block lg:hidden">
+      <div className="absolute inset-0 origin-top scale-[1.42]">
       {templates.map((t, i) => (
         <motion.div
           key={t.slug}
