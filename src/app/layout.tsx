@@ -30,6 +30,10 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   style: ["normal", "italic"],
   axes: ["SOFT", "WONK", "opsz"],
+  // Not preloaded: with its axes the two files are ~264 KB, which on a slow
+  // phone held back the first paint (LCP). Text shows in a size-matched
+  // fallback serif for a moment, then swaps in.
+  preload: false,
 });
 
 // Utility: small uppercase labels only.
