@@ -590,18 +590,12 @@ function StickerGrid({
 
   const filteredBoardStickers = useMemo(() => {
     if (activeCategory === "all") return boardStickerIds;
-    if (activeCategory === "animated") return [];
-    if (activeCategory === "cat") {
-      return boardStickerIds.filter((id) => {
-        const cat = stickerCategory(id);
-        return cat === "cat" || cat === "dog";
-      });
-    }
+    if (activeCategory === "drawn") return [];
     return boardStickerIds.filter((id) => stickerCategory(id) === activeCategory);
   }, [activeCategory]);
 
   const filteredAnimatedStickers = useMemo(() => {
-    if (activeCategory === "all" || activeCategory === "animated") return drawnStickerIds;
+    if (activeCategory === "all" || activeCategory === "drawn") return drawnStickerIds;
     return [];
   }, [activeCategory]);
 

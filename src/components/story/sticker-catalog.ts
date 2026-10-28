@@ -18,21 +18,24 @@ export function stickerName(id: AnyStickerId) {
   return stickerNames[id as StickerId] ?? "Sticker";
 }
 
-export type StickerCategory = "all" | "love" | "cat" | "meme" | "doodle" | "celebration" | "family" | "animated";
+export type StickerCategory = "all" | "love" | "cat" | "animal" | "meme" | "celebration" | "friends" | "words" | "cute" | "drawn";
 
+/** The tabs in the studio's sticker picker, in the order they're shown. */
 export const stickerCategories = [
   { id: "all", label: "All" },
   { id: "love", label: "❤️ Love" },
-  { id: "cat", label: "🐱 Cats & Dogs" },
+  { id: "cat", label: "🐱 Cats" },
+  { id: "animal", label: "🐶 Animals" },
   { id: "meme", label: "😂 Memes" },
-  { id: "doodle", label: "✨ Doodles" },
   { id: "celebration", label: "🎉 Party" },
-  { id: "family", label: "👨‍👩‍👧 Family" },
-  { id: "animated", label: "✨ Animated" },
+  { id: "friends", label: "👯 Friends & family" },
+  { id: "words", label: "💬 Words" },
+  { id: "cute", label: "🌸 Cute" },
+  { id: "drawn", label: "✏️ Drawn" },
 ] as const;
 
 export function stickerCategory(id: AnyStickerId): string {
   const ref = boardRef(id);
-  if (ref) return board[ref.key]?.category || "doodle";
-  return "animated";
+  if (ref) return board[ref.key]?.category || "cute";
+  return "drawn";
 }
