@@ -20,7 +20,7 @@ export function PhotoFill({
     return (
       // Sender uploads are local data URLs, so next/image adds nothing here.
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={src} alt={alt} draggable={false} className={cn("object-cover", className)} />
+      <img src={src} alt={alt} loading="lazy" decoding="async" draggable={false} className={cn("object-cover", className)} />
     );
   }
   const t = TONES[tone];

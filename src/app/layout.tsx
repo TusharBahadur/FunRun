@@ -13,9 +13,12 @@ import "./globals.css";
  */
 
 // Voice: headlines, body and interface.
+// Fonts: only the latin files are preloaded (they cover nearly every page).
+// latin-ext (the ₹ sign) and devanagari still load on their own, the moment a
+// page actually uses one of those characters.
 const interTight = Inter_Tight({
   variable: "--font-inter-tight",
-  subsets: ["latin", "latin-ext"], // latin-ext carries the ₹ sign
+  subsets: ["latin"],
   style: ["normal", "italic"],
 });
 
@@ -23,7 +26,7 @@ const interTight = Inter_Tight({
 // covers every serif look (classic, soft, playful) through its SOFT/WONK/opsz axes.
 const fraunces = Fraunces({
   variable: "--font-fraunces",
-  subsets: ["latin", "latin-ext"], // latin-ext carries the ₹ sign
+  subsets: ["latin"],
   style: ["normal", "italic"],
   axes: ["SOFT", "WONK", "opsz"],
 });
@@ -31,16 +34,18 @@ const fraunces = Fraunces({
 // Utility: small uppercase labels only.
 const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
-  subsets: ["latin", "latin-ext"], // latin-ext carries the ₹ sign
+  subsets: ["latin"],
   weight: ["400", "500"],
+  preload: false, // tiny labels only; swaps in a moment later
 });
 
 // Hand: handwritten captions, notes and signatures inside gifts — the human touch.
-// Also writes Hindi. Preloaded so gift previews never fall back to a thin system script.
+// Also writes Hindi.
 const kalam = Kalam({
   variable: "--font-kalam",
   subsets: ["latin", "latin-ext", "devanagari"],
   weight: ["400", "700"],
+  preload: false, // only used inside gifts; not worth delaying every page for
 });
 
 export const metadata: Metadata = {
