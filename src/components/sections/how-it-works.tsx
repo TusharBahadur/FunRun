@@ -27,8 +27,8 @@ const DIP_Y = 18 + SAG;
  * One left-to-right sweep drives everything: the string draws at a steady
  * pace, and each nail, bulb and card turns up the moment the string reaches it.
  */
-const DRAW_START = 0.15;
-const DRAW_TIME = 0.9;
+const DRAW_START = 0.2;
+const DRAW_TIME = 1.9;
 /** When the string reaches x (0–1000). */
 const reach = (x: number) => DRAW_START + (DRAW_TIME * x) / 1000;
 
@@ -64,7 +64,7 @@ export function HowItWorks() {
         <ol className="relative grid grid-cols-4" style={{ marginTop: `${-((150 - DIP_Y - 6) / 1000) * 100}%` }}>
           {steps.map((_, i) => (
             <li key={i} className="flex justify-center px-3">
-              <Card step={i} delay={reach((PINS[i] + PINS[i + 1]) / 2) + 0.1} />
+              <Card step={i} delay={reach((PINS[i] + PINS[i + 1]) / 2) + 0.15} />
             </li>
           ))}
         </ol>
@@ -84,7 +84,7 @@ export function HowItWorks() {
                 initial={{ pathLength: 0 }}
                 whileInView={{ pathLength: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.1, duration: 0.55, ease: "linear" }}
+                transition={{ delay: 0.15, duration: 1.1, ease: "linear" }}
               />
               {[
                 [45, 18],
@@ -92,11 +92,11 @@ export function HowItWorks() {
                 [205, 28],
                 [255, 18],
               ].map(([x, y], k) => (
-                <Bulb key={k} x={x} y={y} r={4.2} color={i + k} tilt={k % 2 ? 10 : -10} delay={0.12 + (0.55 * x) / 300} />
+                <Bulb key={k} x={x} y={y} r={4.2} color={i + k} tilt={k % 2 ? 10 : -10} delay={0.18 + (1.1 * x) / 300} />
               ))}
             </svg>
             <div className="flex justify-center">
-              <Card step={i} wide delay={0.4} />
+              <Card step={i} wide delay={0.8} />
             </div>
           </li>
         ))}
@@ -140,7 +140,7 @@ function Garland() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-10% 0px" }}
-          transition={{ delay: reach(x), duration: 0.15 }}
+          transition={{ delay: reach(x), duration: 0.3 }}
         />
       ))}
       {LIGHTS.map(([x, y], i) => (
@@ -244,7 +244,7 @@ function Card({ step, wide = false, delay }: { step: number; wide?: boolean; del
       initial={{ opacity: 0, y: -24, rotate: tilt * 3 }}
       whileInView={{ opacity: 1, y: 0, rotate: tilt }}
       viewport={{ once: true, margin: "-10% 0px" }}
-      transition={{ type: "spring", stiffness: 170, damping: 12, delay }}
+      transition={{ type: "spring", stiffness: 90, damping: 13, delay }}
     >
       <motion.div
         className="origin-top"
