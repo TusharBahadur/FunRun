@@ -28,6 +28,8 @@ async function StudioLoader({ params, searchParams }: Pick<PageProps<"/studio/[s
   const sp = await searchParams;
   const toName = typeof sp?.to === "string" ? sp.to : undefined;
   const fromName = typeof sp?.from === "string" ? sp.from : undefined;
+  // ?edit=<gift link> reopens a live gift to change it (allowed for 7 days).
+  const editSlug = typeof sp?.edit === "string" && /^[a-z0-9-]{3,48}$/.test(sp.edit) ? sp.edit : undefined;
   const template = await getTemplateBySlug(slug);
   if (!template?.story) notFound();
 
@@ -45,7 +47,8 @@ async function StudioLoader({ params, searchParams }: Pick<PageProps<"/studio/[s
       template={{ slug: template.slug, name: template.name, pricePaise: template.pricePaise, story }}
       designs={designs}
       seedNames={seedNames}
-      askNames={!toName && !fromName}
+      askNames={!toName && !fromName && !editSlug}
+      editSlug={editSlug}
     />
   );
 }

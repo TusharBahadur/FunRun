@@ -370,14 +370,14 @@ function Dialog({ job, onDone }: { job: Job; onDone: (url: string | null) => voi
             />
           </label>
           <div className="flex gap-2">
-            <button type="button" onClick={() => onDone(null)} className="h-11 flex-1 rounded-full border border-line text-sm font-medium hover:bg-paper">
+            <button type="button" onClick={() => onDone(null)} className="btn btn-paper h-11 flex-1 text-sm">
               Cancel
             </button>
             <button
               type="button"
               onClick={confirm}
               disabled={!layout || !!error}
-              className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-rose-deep text-sm font-medium text-paper hover:bg-rose disabled:opacity-40"
+              className="btn btn-rose flex h-11 flex-1 items-center justify-center gap-1.5 text-sm"
             >
               <Check className="size-4" /> Use photo
             </button>

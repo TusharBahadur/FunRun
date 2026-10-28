@@ -303,7 +303,7 @@ export function Locked({
       <button
         type="button"
         onClick={onUnlock}
-        className="type-label rounded-full bg-ink px-4 py-2.5 text-paper transition-colors hover:bg-ink-soft"
+        className="btn btn-ink type-label px-4 py-2.5"
       >
         Unlock with {tierName} · {price}
       </button>

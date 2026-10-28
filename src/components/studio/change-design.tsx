@@ -1,11 +1,11 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
 import { Check, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { occasions } from "@/config/site";
 import type { Template } from "@/lib/templates";
+import { Sheet } from "@/components/ui/sheet";
 import { cn, formatInr } from "@/lib/utils";
 import { TemplatePreview } from "@/components/templates/template-preview";
 
@@ -42,25 +42,7 @@ export function ChangeDesign({
   const q = names.toString();
 
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          className="fixed inset-0 z-[80] grid place-items-center bg-ink/30 p-4 backdrop-blur-[2px]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-        >
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="designs-title"
-            className="flex h-[min(86vh,720px)] w-[min(96vw,920px)] flex-col overflow-hidden rounded-[1.6rem] bg-cream shadow-float"
-            initial={{ y: 20, scale: 0.98 }}
-            animate={{ y: 0, scale: 1 }}
-            exit={{ y: 20, scale: 0.98 }}
-            onClick={(e) => e.stopPropagation()}
-          >
+    <Sheet open={open} onClose={onClose} labelledBy="designs-title" scroll={false} width="w-[min(96vw,920px)]" className="h-[88svh] sm:h-[min(86vh,720px)]">
             <div className="flex items-start justify-between border-b border-line px-6 py-4">
               <div>
                 <p id="designs-title" className="font-semibold">Change design</p>
@@ -108,9 +90,6 @@ export function ChangeDesign({
                 })}
               </div>
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    </Sheet>
   );
 }

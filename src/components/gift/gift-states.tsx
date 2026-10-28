@@ -16,7 +16,7 @@ export function LockedGift({ opensAt, recipient, palette }: { opensAt: string; r
   );
 }
 
-/** After the link's time is up. The gift's content has been deleted. */
+/** Only for a few very old gifts from when links used to close. New gifts never expire. */
 export function WrappedUp({ recipient, sender, palette }: { recipient: string; sender: string; palette: Palette }) {
   return (
     <main className="grid min-h-svh place-items-center px-6 text-center" style={{ backgroundColor: palette.bg ?? "#fbf8f3", color: palette.fg ?? "#1b1215" }}>

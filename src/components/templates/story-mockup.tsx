@@ -48,32 +48,48 @@ type Layout =
 
 // Every template has its own dedicated composition. Sites skip this map
 // and use SiteLayout via format === "site".
+/**
+ * Which picture each template gets. Spread across the base styles so no
+ * style shows up too often, and matched to what each gift opens with.
+ */
 const layoutFor: Record<string, Layout> = {
+  // birthday
   candle: "candle",
-  "make-a-wish": "cakescrapbook",
-  "the-party": "partychat",
+  "make-a-wish": "fan",
+  "the-party": "chat",
+  // anniversary
+  "still-you": "poster",
   "paper-hearts": "scrapbook",
-  "sealed-with-love": "waxenvelope",
-  "midnight-notes": "midnightchat",
-  "forever-yours": "foreverscrapbook",
-  "little-sorry": "apologychat",
-  "white-flag": "trucelayout",
-  "make-it-right": "couponlayout",
-  "main-character": "magazinelayout",
-  "top-fan": "fandecklayout",
-  "girlfriend-of-the-year": "trophybrowser",
-  "leading-man": "magazinelayout",
-  "soft-launch": "filmstrip",
-  "boyfriend-of-the-year": "trophybrowser",
-  "the-band": "magazinelayout",
-  "patch-notes": "recipesitelayout",
-  "you-get-me": "recipesitelayout",
-  "partner-in-crime": "dadjokeslayout",
-  "my-person": "ringboxlayout",
-  "for-maa": "recipelayout",
-  "for-papa": "papalayout",
-  "for-didi": "cakescrapbook",
-  "for-bhai": "filmstrip",
+  "our-map": "browser",
+  "written-in-the-stars": "poster",
+  // love letter
+  "sealed-with-love": "envelope",
+  "midnight-notes": "chat",
+  "forever-yours": "scrapbook",
+  // apology
+  "little-sorry": "chat",
+  "white-flag": "envelope",
+  "make-it-right": "fan",
+  // best friends
+  "you-get-me": "browser",
+  "partner-in-crime": "fan",
+  "my-person": "envelope",
+  // boyfriend
+  "leading-man": "poster",
+  "soft-launch": "scrapbook",
+  "boyfriend-of-the-year": "browser",
+  // girlfriend
+  "main-character": "poster",
+  "top-fan": "fan",
+  "girlfriend-of-the-year": "browser",
+  // friendship
+  "the-band": "chat",
+  "patch-notes": "browser",
+  // family
+  "for-maa": "envelope",
+  "for-papa": "poster",
+  "for-didi": "scrapbook",
+  "for-bhai": "fan",
 };
 const fallbackLayouts: Layout[] = ["browser", "fan", "poster", "scrapbook", "envelope", "chat"];
 
@@ -206,11 +222,22 @@ function unstar(line: string) {
 
 /* ───────────── The Static Mockup Card ───────────── */
 
-export function StoryMockup({ template, className }: { template: Template; className?: string }) {
+/** The picture style a template's card uses (used to keep look-alikes apart in lists). */
+export function mockupKind(template: Template): Layout {
+  return (
+    (template.story?.format === "site" ? "site" : layoutFor[template.slug]) ??
+    fallbackLayouts[[...template.slug].reduce((n, c) => n + c.charCodeAt(0), 0) % fallbackLayouts.length]
+  );
+}
+
+/**
+ * `compact`: the mockup fills whatever frame it's given (a card shorter than
+ * 3:4, say). The background runs edge to edge; the design itself stays 3:4,
+ * centred and scaled to the frame's height, so nothing gets cropped.
+ */
+export function StoryMockup({ template, className, compact = false }: { template: Template; className?: string; compact?: boolean }) {
   const g = readGift(template);
-  const layout =
-    (g.story.format === "site" ? "site" : layoutFor[template.slug]) ??
-    fallbackLayouts[[...template.slug].reduce((n, c) => n + c.charCodeAt(0), 0) % fallbackLayouts.length];
+  const layout = mockupKind(template);
 
   const View = {
     candle: CandleLayout,
@@ -247,7 +274,14 @@ export function StoryMockup({ template, className }: { template: Template; class
   }[layout] ?? PosterLayout;
 
   return (
-    <div data-gift-font="classic" className={cn("@container relative aspect-[3/4] w-full select-none overflow-hidden rounded-[1.75rem]", className)}>
+    <div
+      data-gift-font="classic"
+      className={cn(
+        "@container relative aspect-[3/4] w-full select-none overflow-hidden rounded-[1.75rem]",
+        compact && "tt-compact absolute inset-0 aspect-auto h-full rounded-none",
+        className,
+      )}
+    >
       <View g={g} />
     </div>
   );
@@ -271,7 +305,11 @@ function Hearts({ color, spots }: { color: string; spots: { left: string; top: s
 function Stage({ children, style }: { children: ReactNode; style: CSSProperties }) {
   return (
     <div className="absolute inset-0" style={style}>
-      {children}
+      {/* In a compact frame this inner box stays 3:4 and centred, so the
+          layout keeps its proportions while the background fills the frame. */}
+      <div className="@container absolute inset-0 [.tt-compact_&]:left-1/2 [.tt-compact_&]:right-auto [.tt-compact_&]:aspect-[3/4] [.tt-compact_&]:w-auto [.tt-compact_&]:-translate-x-1/2">
+        {children}
+      </div>
     </div>
   );
 }
@@ -518,9 +556,10 @@ function FanLayout({ g }: { g: Gift }) {
   return (
     <Stage
       style={{
-        backgroundColor: p.bg,
-        backgroundImage: `radial-gradient(${p.fg}22 1px, transparent 1.2px), radial-gradient(70% 50% at 50% 100%, ${p.accent}55, transparent 70%)`,
-        backgroundSize: "4cqw 4cqw, 100% 100%",
+        // White with a soft dot grid, no colour wash.
+        backgroundColor: "#ffffff",
+        backgroundImage: `radial-gradient(${p.fg}22 1px, transparent 1.2px)`,
+        backgroundSize: "4cqw 4cqw",
       }}
     >
       <p className="absolute inset-x-0 top-[7%] text-center font-mono text-[2.6cqw] uppercase tracking-[0.2em]" style={{ color: p.fg, opacity: 0.7 }}>
@@ -528,6 +567,7 @@ function FanLayout({ g }: { g: Gift }) {
       </p>
       {picks.map((s, i) => (
         <PhoneFrame
+            dark
           key={i}
           className="top-[16%] w-[40%]"
           rotate={[-12, 0, 12][i]}
@@ -559,7 +599,7 @@ function ChatLayout({ g }: { g: Gift }) {
 
   return (
     <Stage style={{ background: `linear-gradient(160deg, ${p.pink}, ${p.accent}66)` }}>
-      <div className="absolute inset-x-[7%] bottom-0 top-[5%] overflow-hidden rounded-t-[6cqw] border-x-[1.2cqw] border-t-[1.2cqw] border-[#1b1215] bg-[#efe7dd] shadow-[0_6cqw_12cqw_-6cqw_rgba(27,18,21,0.6)]">
+      <div className="absolute inset-x-[7%] bottom-0 top-[5%] overflow-hidden rounded-t-[6cqw] border-x-[1.2cqw] border-t-[1.2cqw] border-[#fdfbf8] ring-[0.3cqw] ring-black/10 bg-[#efe7dd] shadow-[0_6cqw_12cqw_-6cqw_rgba(27,18,21,0.32)]">
         <div className="flex items-center gap-[2cqw] bg-white/85 px-[3.5cqw] py-[2.6cqw]">
           <span className="grid size-[8cqw] place-items-center rounded-full text-[3.6cqw] font-semibold" style={{ backgroundColor: p.accent, color: p.cream }}>
             {group ? story.recipient[0] : story.sender[0]}
@@ -796,10 +836,16 @@ function SiteLayout({ g }: { g: Gift }) {
 
 /* ───────────── Shared Frame & Screen Peek ───────────── */
 
-export function PhoneFrame({ children, className, rotate = 0, style }: { children: ReactNode; className?: string; rotate?: number; style?: CSSProperties }) {
+export function PhoneFrame({ children, className, rotate = 0, style, dark = false }: { children: ReactNode; className?: string; rotate?: number; style?: CSSProperties; dark?: boolean }) {
   return (
     <div
-      className={cn("absolute overflow-hidden rounded-[5cqw] border-[1.2cqw] border-[#1b1215] bg-[#1b1215] shadow-[0_6cqw_10cqw_-5cqw_rgba(27,18,21,0.55)]", className)}
+      className={cn(
+        "absolute overflow-hidden rounded-[5cqw]",
+        dark
+          ? "border-[0.6cqw] border-[#1b1215] bg-[#1b1215] shadow-[0_5cqw_9cqw_-5cqw_rgba(27,18,21,0.28)]"
+          : "border-[1.2cqw] border-[#fdfbf8] ring-[0.3cqw] ring-black/10 bg-[#fdfbf8] shadow-[0_6cqw_10cqw_-5cqw_rgba(27,18,21,0.32)]",
+        className,
+      )}
       style={{ rotate: `${rotate}deg`, ...style }}
     >
       <div className="overflow-hidden rounded-[3.6cqw]">{children}</div>
@@ -893,7 +939,7 @@ function StoryFlowVideo({ template }: { template: Template }) {
       </div>
 
       {/* Centered Phone Screen with real slides */}
-      <div className="absolute inset-x-[18%] bottom-[4%] top-[10%] overflow-hidden rounded-[5.5cqw] border-[1.2cqw] border-[#1b1215] bg-[#1b1215] shadow-[0_8cqw_16cqw_-6cqw_rgba(0,0,0,0.6)]">
+      <div className="absolute inset-x-[18%] bottom-[4%] top-[10%] overflow-hidden rounded-[5.5cqw] border-[1.2cqw] border-[#fdfbf8] ring-[0.3cqw] ring-black/10 bg-[#fdfbf8] shadow-[0_8cqw_16cqw_-6cqw_rgba(0,0,0,0.32)]">
         {/* iOS Island */}
         <div className="absolute left-1/2 top-[1.2cqw] z-30 h-[1.8cqw] w-[14cqw] -translate-x-1/2 rounded-full bg-black" />
 
@@ -992,7 +1038,7 @@ function SiteFlowVideo({ template }: { template: Template }) {
       </div>
 
       {/* Mini Browser window */}
-      <div className="absolute inset-x-[10%] bottom-[4%] top-[12%] overflow-hidden rounded-[3.5cqw] border-[1.2cqw] border-[#1b1215] bg-white shadow-[0_8cqw_16cqw_-6cqw_rgba(0,0,0,0.5)]">
+      <div className="absolute inset-x-[10%] bottom-[4%] top-[12%] overflow-hidden rounded-[3.5cqw] border-[1.2cqw] border-[#fdfbf8] ring-[0.3cqw] ring-black/10 bg-[#fdfbf8] shadow-[0_8cqw_16cqw_-6cqw_rgba(0,0,0,0.32)]">
         <div className="flex h-[6cqw] items-center gap-[1.2cqw] border-b border-black/10 bg-[#f4ece3] px-[3cqw]">
           <span className="size-[1.6cqw] rounded-full bg-rose-400" />
           <span className="size-[1.6cqw] rounded-full bg-amber-400" />

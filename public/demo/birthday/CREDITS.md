@@ -6,12 +6,9 @@ replace them with their own photos.
 | --- | --- |
 | maya-portrait.jpg | https://pin.it/1wLMWYsGE |
 | road-trip.jpg | https://unsplash.com/photos/2l0CWTpcChI |
-| chai-cheers.jpg | https://unsplash.com/photos/1680413002471-965cca788f5b |
 | misty-chai.jpg | https://unsplash.com/photos/1695809725756-4cc167d0d15e |
 | saree-laughs.jpg | https://unsplash.com/photos/1787295779676-181b3d5b55dd |
-| maggi-3am.jpg | https://unsplash.com/photos/1638591050340-bb9c1df12af0 |
 | pink-cake.jpg | https://unsplash.com/photos/1694043325785-d841a964257f |
 | cat.jpg | TyniTales Pinterest board (same as stickers/board/05.jpg) |
 | chai-hands.jpg | Alias of cat.jpg so older saved drafts still load |
 | night-sky.jpg | https://unsplash.com/photos/1759738080643-44944609bc84 |
-| party-girls.jpg | https://unsplash.com/photos/1720094920161-45e272bb1c79 |

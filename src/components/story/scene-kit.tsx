@@ -215,7 +215,9 @@ export function StudioHit({
   };
 
   const on = !!studio && studio.pick.field === field && (item === undefined ? studio.pick.item == null : studio.pick.item === item);
-  if (!studio && !face && !transformStyle) return children;
+  // Nothing to edit or restyle: skip the wrapper, but keep any spacing or
+  // layout classes it was given (a gap above the options, say).
+  if (!studio && !face && !transformStyle) return className ? <Tag className={className}>{children}</Tag> : children;
 
   const onPointerDown = isUnlocked && studio ? (e: React.PointerEvent) => {
     if (e.button !== 0) return;

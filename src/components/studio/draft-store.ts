@@ -15,10 +15,22 @@ export type Draft = {
   /** Uploaded images, reusable across scenes. */
   assets: { id: string; name: string; src: string }[];
   /**
-   * Set once "Make it live" is done. `slug` is the real online link
-   * (/for/<slug>); older drafts made before gifts went online don't have one.
+   * Set once "Make it live" is done, or when a live gift is opened again to
+   * change it. `slug` is the real online link (/for/<slug>); older drafts made
+   * before gifts went online don't have one.
    */
-  live?: { link: string; slug?: string; unlockAt?: string; expiresAt?: string; publishedAt: string; paid: false };
+  live?: {
+    link: string;
+    slug?: string;
+    unlockAt?: string;
+    /** Old gifts only: links used to close after 60 days. */
+    expiresAt?: string;
+    /** Changes can be saved until then (7 days after going live). */
+    editUntil?: string;
+    hasPassword?: boolean;
+    publishedAt: string;
+    paid: false;
+  };
   updatedAt: string;
 };
 
@@ -64,6 +76,14 @@ export function saveDraft(d: Draft) {
     return true;
   } catch {
     return false;
+  }
+}
+
+export function removeDraft(id: string) {
+  try {
+    localStorage.removeItem(key(id));
+  } catch {
+    /* nothing to clean up */
   }
 }
 

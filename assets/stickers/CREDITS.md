@@ -59,7 +59,6 @@ Total stickers in pack: 489 (457 fetched from the Pinterest board + initial seed
 | pin-018.jpg | A cat with the caption that read | cat | meme | [Pin pin-018](https://www.pinterest.com/pin/e1_AfqPShxSiMuKzocOmtiSSzfLovFh4CTnhLuNIJ2uQKpwI4hmVerR0A/) | instagram.com |
 | pin-019.jpg | Funny twitter meme sticker | meme | meme | [Pin pin-019](https://www.pinterest.com/pin/e1_AfqPShxKyo0ciCsJiQz2w5TR1uI8hkN7m-RrcNKtK3yk3C3oAm6veQ/) | redbubble.com |
 | pin-020.jpg | Silly Cat Rose Cutout Cat Cute S | love | meme | [Pin pin-020](https://www.pinterest.com/pin/e1_AfqPShwOmmDy_eST8FaEeKYPLO42YeYqSq39fVPZHRtTgxqg7kFwkQ/) | redbubble.com |
-| pin-021.jpg | Sticker face ^ sticker emoji Fun | love | meme | [Pin pin-021](https://www.pinterest.com/pin/e1_AfqPShwxJEdThiZGOmMLrHh7sI7U_5JUbXH5VceBBs7WWEnpu-tJiw/) | behance.net |
 | pin-022.jpg | Sticker 22 | doodle | meme | [Pin pin-022](https://www.pinterest.com/pin/e1_AfqPShyyI02Ls3ZT0HlRVlj5u-P9yhQRNacYC2Axdd1WRQURG4VL2A/) | Uploaded by user |
 | pin-023.jpg | You are mine…. | cat | meme | [Pin pin-023](https://www.pinterest.com/pin/e1_AfqPShy7VH3W4LvBq-hq3Yj93RNCVs0y5Ar_o-FyOlPbAguF2VuKDA/) | Uploaded by user |
 | pin-024.jpg | A girl covers her face with her | love | meme | [Pin pin-024](https://www.pinterest.com/pin/e1_AfqPShxJh9fE_dws6zFD_BvhBEJZpXVxjJ1Hln-TwBJm7sdfPO24AA/) | Uploaded by user |

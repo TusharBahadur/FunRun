@@ -27,7 +27,7 @@ export function MobilePreview({
     const fit = () => {
       // Leave room under the phone for the page switcher and the first field.
       const byW = el.clientWidth / W;
-      const byH = (window.innerHeight * 0.72) / H;
+      const byH = (window.innerHeight * 0.56) / H;
       const next = Math.min(byW, byH, 1);
       if (next > 0) setScale(next);
     };
@@ -72,7 +72,7 @@ export function MobilePreview({
           type="button"
           onClick={onPreview}
           data-tour="m-play"
-          className="flex h-7 items-center gap-1.5 rounded-full bg-ink px-3 text-xs font-medium text-paper hover:bg-ink/85"
+          className="btn btn-ink flex h-7 items-center gap-1.5 px-3 text-xs"
         >
           <Play className="size-3 fill-current" /> Preview
         </button>

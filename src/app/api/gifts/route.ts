@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import { giftPricing } from "@/config/site";
-import { expiryFor, GIFT_SCHEMA_VERSION, giftSlug } from "@/lib/gift-links";
+import { editableUntil, GIFT_SCHEMA_VERSION, giftSlug } from "@/lib/gift-links";
+import { isError, readPassword, readStory, readUnlockAt, str } from "@/lib/gift-input";
+import { hashPassword } from "@/lib/gift-secrets";
 import { getAdmin, userFromRequest } from "@/lib/supabase/admin";
 import { getTemplateBySlug } from "@/lib/templates";
 
 /** Gifts a sender can publish per day: generous for real use, stops runaway scripts. */
 const DAILY_LIMIT = 20;
-/** Text-only gift size once photos are uploaded. Real gifts are well under 100 KB. */
-const MAX_STORY_BYTES = 512 * 1024;
-/** How far ahead a gift can be scheduled to unlock. */
-const MAX_SCHEDULE_DAYS = 366;
 
 type Body = {
   templateSlug?: unknown;
@@ -18,13 +16,16 @@ type Body = {
   unlockAt?: unknown;
   mediaFolder?: unknown;
   schemaVersion?: unknown;
+  password?: unknown;
   story?: unknown;
 };
 
 const fail = (status: number, error: string) => NextResponse.json({ error }, { status });
-const str = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
-/** Publishes a gift: saves it and returns its share link. Gifts can't be edited afterwards. */
+/**
+ * Publishes a gift: saves it and returns its share link. The link never
+ * expires; the sender can still change the gift for a few days (see PATCH /api/gifts/[slug]).
+ */
 export async function POST(request: Request) {
   const user = await userFromRequest(request);
   if (!user) return fail(401, "Please sign in again.");
@@ -39,30 +40,21 @@ export async function POST(request: Request) {
   const template = await getTemplateBySlug(str(body.templateSlug, 80));
   if (!template) return fail(400, "That template doesn't exist.");
 
-  const story = body.story as { recipient?: unknown; sender?: unknown; palette?: unknown; scenes?: unknown } | null;
-  if (!story || typeof story !== "object" || !Array.isArray(story.scenes) || story.scenes.length === 0) {
-    return fail(400, "The gift has no pages.");
-  }
-  const storyJson = JSON.stringify(story);
-  if (storyJson.length > MAX_STORY_BYTES) return fail(413, "This gift is too large. Try removing a few pages.");
-  // Photos and songs must be uploaded first; the gift only stores their links.
-  if (storyJson.includes('"data:')) return fail(400, "Some photos didn't finish uploading. Please try again.");
-
-  const recipient = str(story.recipient, 80) || "you";
-  const sender = str(story.sender, 80) || "me";
+  const read = readStory(body.story);
+  if ("error" in read) return fail(read.status, read.error);
+  const { story, recipient, sender } = read;
   const name = str(body.name, 120) || `${template.name} for ${recipient}`;
 
   const mediaFolder = str(body.mediaFolder, 120);
   if (mediaFolder && !new RegExp(`^${user.id}/[0-9a-f-]{36}$`).test(mediaFolder)) return fail(400, "Bad upload folder.");
 
   const now = new Date();
-  let unlockAt = now;
-  const asked = typeof body.unlockAt === "string" ? new Date(body.unlockAt) : null;
-  if (asked && !Number.isNaN(asked.getTime()) && asked > now) {
-    if (asked.getTime() - now.getTime() > MAX_SCHEDULE_DAYS * 86_400_000) return fail(400, "Pick an unlock time within the next year.");
-    unlockAt = asked;
-  }
-  const expiresAt = expiryFor(unlockAt);
+  const asked = readUnlockAt(body.unlockAt, now);
+  if (isError(asked)) return fail(asked.status, asked.error);
+  const unlockAt = asked ?? now;
+
+  const password = readPassword(body.password);
+  if (isError(password)) return fail(password.status, password.error);
 
   const db = getAdmin();
 
@@ -71,6 +63,8 @@ export async function POST(request: Request) {
   if ((count ?? 0) >= DAILY_LIMIT) return fail(429, "You've made a lot of gifts today. Try again tomorrow.");
 
   const linkName = str(body.link, 40) || recipient;
+  const editUntil = editableUntil(now);
+  const passwordHash = password ? await hashPassword(password) : null;
 
   // The random code makes clashes vanishingly rare; retry just in case.
   for (let attempt = 0; attempt < 4; attempt++) {
@@ -89,10 +83,14 @@ export async function POST(request: Request) {
       price_paise: giftPricing.pricePaise,
       paid: false,
       unlock_at: unlockAt.toISOString(),
-      expires_at: expiresAt.toISOString(),
+      edit_until: editUntil.toISOString(),
+      password_hash: passwordHash,
     });
     if (!error) {
-      return NextResponse.json({ slug, unlockAt: unlockAt.toISOString(), expiresAt: expiresAt.toISOString() }, { status: 201 });
+      return NextResponse.json(
+        { slug, unlockAt: unlockAt.toISOString(), editUntil: editUntil.toISOString(), hasPassword: !!passwordHash },
+        { status: 201 },
+      );
     }
     if (error.code !== "23505") {
       console.error("[gifts] insert failed", error);

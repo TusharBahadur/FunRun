@@ -5,7 +5,6 @@ import { Features } from "@/components/sections/features";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
 import { LoveNotes } from "@/components/sections/love-notes";
-import { MarqueeBand } from "@/components/sections/marquee-band";
 import { Showcase } from "@/components/sections/showcase";
 import { occasions } from "@/config/site";
 import { loveNotes } from "@/data/love-notes";
@@ -20,20 +19,20 @@ export default async function HomePage() {
       .map((slug) => templates.find((t) => t.slug === slug))
       .filter((t): t is Template => Boolean(t));
 
-  // One of each kind: the mid-size design for the first six occasions.
+  // One of each kind: the mid-size design for the first eight occasions
+  // (two rows of four on desktop; phones and tablets show six).
   const featured = occasions
     .map((o) => templates.find((t) => t.occasion === o.id && t.level === "classic") ?? templates.find((t) => t.occasion === o.id))
     .filter((t): t is Template => Boolean(t))
-    .slice(0, 6);
+    .slice(0, 8);
 
   return (
     <>
       <main>
         <Hero featured={pick(["sealed-with-love", "make-a-wish", "our-corner", "midnight-notes"])} />
-        <FeaturedTemplates templates={featured} total={templates.length} />
-        <MarqueeBand />
-        <HowItWorks previews={pick(["candle", "make-a-wish", "sealed-with-love"])} />
         <Showcase templates={pick(["little-sorry", "our-map", "white-flag", "paper-hearts", "make-it-right"])} total={templates.length} />
+        <FeaturedTemplates templates={featured} total={templates.length} />
+        <HowItWorks />
         <Features />
         <LoveNotes notes={loveNotes} />
         <CallToAction />

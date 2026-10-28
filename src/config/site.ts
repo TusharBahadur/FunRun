@@ -7,7 +7,6 @@ export const siteConfig = {
   nav: [
     { label: "Templates", href: "/templates" },
     { label: "How it works", href: "/#how" },
-    { label: "Details", href: "/#features" },
     { label: "Love notes", href: "/#love-notes" },
     { label: "Profile", href: "/profile" },
   ],
@@ -16,8 +15,8 @@ export const siteConfig = {
 /** One price and one link lifetime for every gift. */
 export const giftPricing = {
   pricePaise: 9900,
-  /** Days a shared gift link keeps working, counted from when it unlocks. */
-  linkValidDays: 60,
+  /** Days after going live that the sender can still change the gift. Links never expire. */
+  editDays: 7,
 } as const;
 
 export const occasions = [

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Check, Copy, ExternalLink, Eye, Gift, Hourglass, Loader2, LogOut, Trash2, X } from "lucide-react";
+import { Check, Copy, ExternalLink, Eye, Gift, Hourglass, KeyRound, Loader2, LogOut, PenLine, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ButtonLink } from "@/components/ui/button";
@@ -22,7 +22,8 @@ type GiftRow = {
   palette: { bg?: string; fg?: string; accent?: string } | null;
   status: "live" | "expired";
   unlock_at: string;
-  expires_at: string;
+  edit_until: string | null;
+  has_password: boolean;
   created_at: string;
   open_count: number;
   first_opened_at: string | null;
@@ -31,10 +32,9 @@ type GiftRow = {
 
 type Tab = "live" | "scheduled" | "closed";
 
-const DAY = 86_400_000;
-
 function giftState(g: GiftRow, now: number): Tab {
-  if (g.status === "expired" || new Date(g.expires_at).getTime() <= now) return "closed";
+  // Gifts never expire now; only a few from before can be wrapped up.
+  if (g.status === "expired") return "closed";
   if (new Date(g.unlock_at).getTime() > now) return "scheduled";
   return "live";
 }
@@ -72,7 +72,7 @@ export function ProfilePage() {
     let alive = true;
     getSupabase()
       .from("gifts")
-      .select("slug, name, recipient, template_slug, palette, status, unlock_at, expires_at, created_at, open_count, first_opened_at, last_opened_at")
+      .select("slug, name, recipient, template_slug, palette, status, unlock_at, edit_until, has_password, created_at, open_count, first_opened_at, last_opened_at")
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
         if (!alive) return;
@@ -95,7 +95,7 @@ export function ProfilePage() {
   const list = gifts ?? [];
   const counts = { live: 0, scheduled: 0, closed: 0 } as Record<Tab, number>;
   for (const g of list) counts[giftState(g, now)]++;
-  const closingSoon = list.filter((g) => giftState(g, now) === "live" && new Date(g.expires_at).getTime() - now < 7 * DAY).length;
+  const editable = list.filter((g) => giftState(g, now) !== "closed" && !!g.edit_until && new Date(g.edit_until).getTime() > now).length;
 
   return (
     <div className="space-y-8">
@@ -123,10 +123,10 @@ export function ProfilePage() {
         </div>
       </motion.header>
 
-      {closingSoon > 0 && (
+      {editable > 0 && (
         <p className="flex items-center gap-2 rounded-2xl border border-rose/25 bg-rose/5 px-5 py-3.5 text-sm">
-          <Hourglass className="size-4 shrink-0 text-rose-deep" />
-          {closingSoon === 1 ? "One of your gifts closes" : `${closingSoon} of your gifts close`} within a week. Links work for {giftPricing.linkValidDays} days after they open.
+          <PenLine className="size-4 shrink-0 text-rose-deep" />
+          You can still change {editable === 1 ? "one of your gifts" : `${editable} of your gifts`}. Each gift locks in {giftPricing.editDays} days after it goes live, and never expires.
         </p>
       )}
 
@@ -179,7 +179,7 @@ function Name({ value }: { value: string }) {
 const tabs: { id: Tab; label: string }[] = [
   { id: "live", label: "Live" },
   { id: "scheduled", label: "Scheduled" },
-  { id: "closed", label: "Closed" },
+  { id: "closed", label: "Wrapped up" },
 ];
 
 function GiftsSection({ gifts, counts, now, error }: { gifts: GiftRow[] | null; counts: Record<Tab, number>; now: number; error: string | null }) {
@@ -198,7 +198,7 @@ function GiftsSection({ gifts, counts, now, error }: { gifts: GiftRow[] | null; 
           </h2>
         </div>
         <div role="tablist" className="flex gap-1 rounded-full border border-line bg-cream p-1">
-          {tabs.map((t) => (
+          {tabs.filter((t) => t.id !== "closed" || counts.closed > 0).map((t) => (
             <button
               key={t.id}
               role="tab"
@@ -230,7 +230,7 @@ function GiftsSection({ gifts, counts, now, error }: { gifts: GiftRow[] | null; 
           <Gift className="size-8 text-rose" />
           <p className="type-display mt-4 text-3xl">Nothing sent yet.</p>
           <p className="mt-2 max-w-sm text-muted">Pick a template, fill it with your photos and words, and your links will live here.</p>
-          <Link href="/templates" className="mt-6 rounded-full bg-ink px-6 py-3 text-paper hover:bg-ink-soft">
+          <Link href="/templates" className="btn btn-ink mt-6 px-6 py-3">
             Browse templates
           </Link>
         </div>
@@ -254,10 +254,11 @@ function GiftItem({ gift, now, state }: { gift: GiftRow; now: number; state: Tab
   const [copied, setCopied] = useState(false);
   const accent = gift.palette?.accent ?? "#e23b54";
   const bg = gift.palette?.bg ?? "#f5efe6";
-  const opensAt = new Date(gift.unlock_at).getTime();
-  const closesAt = new Date(gift.expires_at).getTime();
-  const daysLeft = Math.max(0, Math.ceil((closesAt - now) / DAY));
-  const used = state === "live" ? Math.min(1, Math.max(0, (now - opensAt) / (closesAt - opensAt))) : state === "closed" ? 1 : 0;
+  const editUntil = gift.edit_until ? new Date(gift.edit_until).getTime() : 0;
+  const editable = state !== "closed" && editUntil > now;
+  const editStart = new Date(gift.created_at).getTime();
+  // How much of the 7 days for changes has passed.
+  const used = editable ? Math.min(1, Math.max(0, (now - editStart) / (editUntil - editStart))) : 0;
   const url = typeof window === "undefined" ? giftPath(gift.slug) : `${window.location.origin}${giftPath(gift.slug)}`;
 
   return (
@@ -291,14 +292,24 @@ function GiftItem({ gift, now, state }: { gift: GiftRow; now: number; state: Tab
                   : "Not opened yet"}
               </span>
             )}
-            <span className={cn("text-muted", state === "live" && daysLeft <= 7 && "font-medium text-rose-deep")}>
-              {state === "closed" ? `Closed ${formatDay(gift.expires_at)}` : state === "live" ? `${daysLeft} ${daysLeft === 1 ? "day" : "days"} left` : `Works until ${formatDay(gift.expires_at)}`}
+            <span className={cn("text-muted", editable && "font-medium text-rose-deep")}>
+              {state === "closed" ? "Wrapped up" : editable ? `Editable until ${formatDay(gift.edit_until!)}` : "Locked in · never expires"}
             </span>
+            {gift.has_password && (
+              <span className="flex items-center gap-1 text-muted">
+                <KeyRound className="size-3.5" /> Password
+              </span>
+            )}
           </p>
         </div>
 
         {state !== "closed" && (
-          <div className="flex shrink-0 gap-2 text-sm">
+          <div className="flex shrink-0 flex-wrap gap-2 text-sm">
+            {editable && (
+              <Link href={`/studio/${gift.template_slug}?edit=${gift.slug}`} className="btn btn-paper flex h-10 items-center gap-1.5 px-4">
+                <PenLine className="size-4" /> Edit
+              </Link>
+            )}
             <button
               type="button"
               onClick={async () => {
@@ -310,7 +321,7 @@ function GiftItem({ gift, now, state }: { gift: GiftRow; now: number; state: Tab
                   setCopied(false);
                 }
               }}
-              className="flex h-10 items-center gap-1.5 rounded-full border border-line bg-paper px-4 hover:bg-white"
+              className="btn btn-paper flex h-10 items-center gap-1.5 px-4"
             >
               {copied ? <Check className="size-4" /> : <Copy className="size-4" />} {copied ? "Copied" : "Copy"}
             </button>
@@ -322,16 +333,18 @@ function GiftItem({ gift, now, state }: { gift: GiftRow; now: number; state: Tab
             >
               WhatsApp
             </a>
-            <a href={giftPath(gift.slug)} target="_blank" rel="noreferrer" aria-label="Open gift" className="grid size-10 place-items-center rounded-full bg-ink text-paper hover:bg-ink-soft">
+            <a href={giftPath(gift.slug)} target="_blank" rel="noreferrer" aria-label="Open gift" className="btn btn-ink grid size-10 place-items-center">
               <ExternalLink className="size-4" />
             </a>
           </div>
         )}
       </div>
-      {/* How much of the link's time has passed */}
-      <div className="h-1 bg-line/60">
-        <div className="h-full rounded-r-full transition-[width] duration-700" style={{ width: `${used * 100}%`, backgroundColor: accent }} />
-      </div>
+      {/* How much of the 7 days for changes has passed */}
+      {editable && (
+        <div className="h-1 bg-line/60">
+          <div className="h-full rounded-r-full transition-[width] duration-700" style={{ width: `${used * 100}%`, backgroundColor: accent }} />
+        </div>
+      )}
     </motion.li>
   );
 }
@@ -369,7 +382,7 @@ function SignOffCard({ value, fallback, onSave }: { value: string; fallback: str
             aria-label="Your sign-off"
           />
         </label>
-        <button type="submit" disabled={state === "saving" || draft === null} className="flex h-[52px] items-center gap-2 rounded-2xl bg-ink px-5 text-sm font-medium text-paper disabled:opacity-40">
+        <button type="submit" disabled={state === "saving" || draft === null} className="btn btn-ink flex h-[52px] items-center gap-2 px-5 text-sm">
           {state === "saving" ? <Loader2 className="size-4 animate-spin" /> : state === "saved" ? <Check className="size-4" /> : null}
           {state === "saved" ? "Saved" : "Save"}
         </button>
@@ -387,7 +400,7 @@ function AccountCard() {
       <h3 className="type-display mt-2 text-3xl">Signed in with Google</h3>
       <p className="mt-2 text-sm text-muted">Drafts you’re still editing stay on this device. Gifts you’ve made live are saved to your account.</p>
       <div className="mt-auto flex flex-wrap gap-2 pt-5">
-        <button type="button" onClick={() => signOut()} className="flex h-11 items-center gap-2 rounded-full border border-line px-5 text-sm hover:bg-cream">
+        <button type="button" onClick={() => signOut()} className="btn btn-paper flex h-11 items-center gap-2 px-5 text-sm">
           <LogOut className="size-4" /> Sign out
         </button>
         <button type="button" onClick={() => setConfirming(true)} className="flex h-11 items-center gap-2 rounded-full px-5 text-sm text-rose-deep hover:bg-rose/5">
@@ -446,7 +459,7 @@ function DeleteDialog({ open, onClose }: { open: boolean; onClose: () => void })
                   setBusy(false);
                 }
               }}
-              className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-rose-deep font-medium text-paper disabled:opacity-40"
+              className="btn btn-rose mt-5 flex h-12 w-full items-center justify-center gap-2"
             >
               {busy && <Loader2 className="size-4 animate-spin" />} Delete everything
             </button>

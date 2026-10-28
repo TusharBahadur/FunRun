@@ -35,7 +35,7 @@ export function LocalGift({ id }: { id: string }) {
             This gift lives on <span className="type-accent text-rose">another device.</span>
           </h1>
           <p className="mt-4 text-muted">Test links only open in the browser where the gift was made. Real links work everywhere once payments are live.</p>
-          <Link href="/templates" className="mt-6 inline-block rounded-full bg-ink px-6 py-3 text-paper">
+          <Link href="/templates" className="btn btn-ink mt-6 inline-block px-6 py-3">
             Browse templates
           </Link>
         </div>

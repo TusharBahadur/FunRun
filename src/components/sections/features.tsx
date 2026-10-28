@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 export function Features() {
   return (
     <section id="features" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-14 md:py-20">
-      <div className="mb-12 md:mb-16 grid gap-6 md:grid-cols-12 md:items-end">
+      <div className="mb-8 grid gap-4 md:mb-16 md:grid-cols-12 md:items-end md:gap-6">
         <div className="md:col-span-7">
           <Eyebrow>Details</Eyebrow>
           <h2 className="mt-5 text-[clamp(2.4rem,5vw,4.5rem)] type-display">
@@ -28,44 +28,33 @@ export function Features() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
+      {/* Phones: the headline feature full width, then the rest as a 2×2 grid of small cards. Wider: a bento grid. */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-6 md:gap-4">
         <BentoCard
           index={0}
-          className="md:col-span-4"
+          wide
+          className="col-span-2 md:col-span-4"
           title="Opens at the perfect moment"
           body="Schedule your gift to unlock at midnight on their birthday — or the second your flight lands."
+          short="Set it to unlock at midnight on their birthday."
         >
           <Countdown />
         </BentoCard>
-        <BentoCard
-          index={1}
-          className="md:col-span-2"
-          title="Your song, on cue"
-          body="Add the track that starts playing as they open it."
-        >
+        <BentoCard index={1} className="md:col-span-2" title="Your song, on cue" body="Add the track that starts playing as they open it." short="Plays as they open it.">
           <Equalizer />
         </BentoCard>
-        <BentoCard
-          index={2}
-          className="md:col-span-2"
-          title="Photos & voice notes"
-          body="Hover to spill the memories."
-        >
+        <BentoCard index={2} className="md:col-span-2" title="Photos & voice notes" body="Your memories, spilling out of the envelope." short="Your memories, all in.">
           <Polaroids />
         </BentoCard>
-        <BentoCard
-          index={3}
-          className="md:col-span-2"
-          title="Private by design"
-          body="Only the person with the link can open it."
-        >
+        <BentoCard index={3} className="md:col-span-2" title="Private by design" body="Only the person with the link can open it. Add a password if you like." short="Private link, optional password.">
           <LockPulse />
         </BentoCard>
         <BentoCard
           index={4}
           className="md:col-span-2"
-          title="Yours for 60 days"
-          body="The link stays open for 60 days after it unlocks, so they can replay it again and again."
+          title="Yours forever"
+          body="Pay once and the link never expires. They can open it again and again, for years."
+          short="Pay once. Never expires."
         >
           <InfinityDraw />
         </BentoCard>
@@ -79,28 +68,43 @@ function BentoCard({
   className,
   title,
   body,
+  short,
+  wide = false,
   children,
 }: {
   index: number;
   className?: string;
   title: string;
   body: string;
+  /** A shorter line for the small cards on phones. */
+  short: string;
+  /** Full width on phones too. */
+  wide?: boolean;
   children: ReactNode;
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-10% 0px" }}
-      transition={{ duration: 0.9, ease: EASE_OUT, delay: index * 0.08 }}
+      transition={{ duration: 0.8, ease: EASE_OUT, delay: (index % 3) * 0.08 }}
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-[2rem] border border-line bg-paper p-7 transition-shadow duration-500 hover:shadow-[0_30px_60px_-30px_rgba(27,18,21,0.3)] md:p-8",
+        "group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-line bg-paper p-4 transition-shadow duration-500 hover:shadow-[0_30px_60px_-30px_rgba(27,18,21,0.3)] md:rounded-[2rem] md:p-8",
         className,
       )}
     >
-      <div className="relative mb-8 flex h-44 items-center justify-center">{children}</div>
-      <h3 className="mt-auto type-heading text-xl">{title}</h3>
-      <p className="type-copy mt-2 text-[13px] text-muted">{body}</p>
+      <div
+        className={cn(
+          "relative flex items-center justify-center overflow-hidden md:mb-8 md:h-44 md:overflow-visible",
+          wide ? "mb-4 h-auto" : "mb-3 h-24",
+        )}
+      >
+        {/* The little animations, shrunk to fit the small phone cards. */}
+        <div className={cn("flex w-full items-center justify-center md:scale-100", !wide && "scale-[0.6]")}>{children}</div>
+      </div>
+      <h3 className="mt-auto type-heading text-[15px] leading-tight md:text-xl">{title}</h3>
+      <p className="type-copy mt-1 text-[13px] leading-snug text-muted md:hidden">{short}</p>
+      <p className="type-copy mt-2 hidden text-[15px] text-muted md:block">{body}</p>
     </motion.div>
   );
 }
@@ -135,14 +139,15 @@ function Countdown() {
 
   return (
     <div className="w-full">
-      <p className="type-label mb-4 flex items-center gap-2 text-muted">
+      <p className="type-label mb-3 flex items-center gap-2 text-[11px] text-muted md:mb-4 md:text-xs">
         <span className="size-1.5 animate-pulse rounded-full bg-rose" />
-        Unlocks on Valentine’s Day, 9:00 AM
+        <span className="md:hidden">Unlocks Feb 14, 9:00 AM</span>
+        <span className="hidden md:inline">Unlocks on Valentine’s Day, 9:00 AM</span>
       </p>
-      <div className="mx-auto grid w-[11rem] grid-cols-2 gap-1.5">
+      <div className="mx-auto grid w-full max-w-[16rem] grid-cols-4 gap-1.5 md:max-w-[30rem] md:gap-3">
         {units.map((u) => (
-          <div key={u.label} className="flex aspect-square flex-col items-center justify-center rounded-xl bg-cream px-1">
-            <div className="relative h-7 w-full overflow-hidden font-mono text-xl font-medium leading-none tabular-nums tracking-tight">
+          <div key={u.label} className="flex aspect-square flex-col items-center justify-center rounded-xl bg-cream px-1 md:rounded-2xl">
+            <div className="relative h-7 w-full overflow-hidden font-mono text-xl font-medium leading-none tabular-nums tracking-tight md:h-12 md:text-[2.6rem]">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.span
                   key={u.value ?? "x"}
@@ -156,7 +161,7 @@ function Countdown() {
                 </motion.span>
               </AnimatePresence>
             </div>
-            <p className="mt-2 type-label text-[11px] text-muted">{u.label}</p>
+            <p className="mt-2 type-label text-[11px] text-muted md:mt-3">{u.label}</p>
           </div>
         ))}
       </div>
@@ -220,7 +225,7 @@ function LockPulse() {
           transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.8, ease: "easeOut" }}
         />
       ))}
-      <span className="relative grid size-20 place-items-center rounded-full bg-ink text-paper">
+      <span className="relative grid size-20 place-items-center rounded-full bg-[linear-gradient(180deg,#e2546c,#c3304a)] text-paper shadow-[inset_0_2px_2px_rgba(255,255,255,0.35),0_12px_24px_-10px_rgba(191,40,64,0.55)]">
         <Lock className="size-7" strokeWidth={1.6} />
       </span>
     </div>

@@ -478,7 +478,7 @@ export function StickerSlotEditor({
 
 function UploadButton({ onUpload }: { onUpload: (id: AnyStickerId) => void }) {
   return (
-    <label className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-ink px-3 text-sm font-medium text-paper">
+    <label className="btn btn-ink flex h-9 items-center gap-1.5 px-3 text-sm">
       <Upload className="size-3.5" /> Upload your own
       <FileCropInput
         maxSide={STICKER_SIDE}

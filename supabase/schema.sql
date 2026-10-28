@@ -158,3 +158,43 @@ select id,
        coalesce(raw_user_meta_data ->> 'avatar_url', raw_user_meta_data ->> 'picture')
   from auth.users
 on conflict (id) do nothing;
+
+-- ──────────────── Added: forever links, 7-day edits, passwords ────────────────
+-- Gifts never expire now. expires_at stays for old rows but is no longer set.
+alter table public.gifts alter column expires_at drop not null;
+update public.gifts set expires_at = null where status = 'live';
+drop index if exists gifts_expiring_idx;
+
+-- The sender can change a live gift until this moment (7 days after it went live).
+alter table public.gifts add column if not exists edit_until timestamptz;
+update public.gifts set edit_until = created_at + interval '7 days' where edit_until is null;
+alter table public.gifts add column if not exists updated_at timestamptz;
+
+-- Optional password. Only a salted hash is kept, and only the server can read it.
+alter table public.gifts add column if not exists password_hash text;
+alter table public.gifts add column if not exists has_password boolean
+  generated always as (password_hash is not null) stored;
+
+-- Senders read their own gifts from the browser, but never the password hash.
+revoke select on public.gifts from authenticated;
+grant select (
+  id, owner_id, slug, template_slug, name, recipient, sender, story, palette, media_folder,
+  status, price_paise, paid, unlock_at, expires_at, created_at, schema_version,
+  open_count, first_opened_at, last_opened_at, edit_until, updated_at, has_password
+) on public.gifts to authenticated;
+
+create or replace function public.record_gift_open(p_slug text)
+returns void
+language sql
+security definer
+set search_path = ''
+as $$
+  update public.gifts
+     set open_count = open_count + 1,
+         first_opened_at = coalesce(first_opened_at, now()),
+         last_opened_at = now()
+   where slug = p_slug
+     and status = 'live'
+     and unlock_at <= now();
+$$;
+revoke execute on function public.record_gift_open(text) from public, anon, authenticated;

@@ -34,9 +34,18 @@ export function giftSlug(name: string) {
   return `${slugifyName(name) || "for-you"}-${randomCode()}`;
 }
 
-/** Links work for a fixed number of days, counted from when the gift unlocks. */
-export function expiryFor(unlockAt: Date) {
-  return new Date(unlockAt.getTime() + giftPricing.linkValidDays * 24 * 60 * 60 * 1000);
+/** Until when a gift published at `from` can still be changed. */
+export function editableUntil(from: Date = new Date()) {
+  return new Date(from.getTime() + giftPricing.editDays * 24 * 60 * 60 * 1000);
+}
+
+/** Gift passwords: long enough to mean something, short enough to read out. */
+export const PASSWORD_MIN = 4;
+export const PASSWORD_MAX = 64;
+
+/** True while a moment (like the end of the edit window) is still ahead. */
+export function isFuture(iso: string | null | undefined) {
+  return !!iso && new Date(iso).getTime() > Date.now();
 }
 
 /** "23 Dec 2026" in Indian English. */

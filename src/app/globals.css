@@ -6,7 +6,8 @@
   --color-paper: #fbf8f3;
   --color-ink: #1b1215;
   --color-ink-soft: #2c2024;
-  --color-muted: #76696c;
+  /* Darker and warmer than before, so secondary text reads easily on cream. */
+  --color-muted: #5c4f54;
   --color-line: #e3d8ca;
   --color-rose: #e23b54;
   --color-rose-deep: #bf2840;
@@ -86,12 +87,13 @@
 }
 
 /* Running copy: uppercase mono. */
+/* Supporting paragraphs: plain, readable sans in normal case. */
 @utility type-copy {
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  line-height: 1.35;
-  letter-spacing: 0;
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  text-transform: none;
 }
 
 /* Handwritten captions, notes and signatures (gifts only). */
@@ -210,3 +212,95 @@ body {
 .grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+
+/* ───────────── Buttons ─────────────
+ * Simple, solid pills. The main action is a flat rose pill with white text;
+ * secondary ones are a quiet light pill. A small lift on hover, a soft
+ * squeeze when pressed. Sizing (h-*, px-*, w-full) comes from utilities.
+ */
+@layer components {
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition:
+      transform 300ms cubic-bezier(0.3, 0.7, 0.4, 1),
+      box-shadow 300ms ease,
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  @media (hover: hover) {
+    .btn:hover:not(:disabled):not([aria-disabled="true"]) {
+      transform: translateY(-1px);
+    }
+  }
+  .btn:active:not(:disabled):not([aria-disabled="true"]) {
+    transform: scale(0.97);
+    transition-duration: 80ms;
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--color-rose);
+    outline-offset: 3px;
+  }
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  /* The main action: solid rose. (".btn-ink" kept as a name so nothing else changes.) */
+  .btn-ink,
+  .btn-rose {
+    background-color: #b83d52;
+    color: #fff;
+    box-shadow: 0 10px 22px -12px rgb(184 61 82 / 0.55);
+  }
+  .btn-ink:hover:not(:disabled),
+  .btn-rose:hover:not(:disabled) {
+    background-color: #a83348;
+    box-shadow: 0 14px 26px -12px rgb(184 61 82 / 0.6);
+  }
+
+  /* Secondary: a quiet light pill. */
+  .btn-paper {
+    background-color: #fff;
+    color: var(--color-ink);
+    border-color: rgb(27 18 21 / 0.1);
+    box-shadow: 0 6px 16px -12px rgb(27 18 21 / 0.35);
+  }
+  .btn-paper:hover:not(:disabled) { background-color: #fdfaf7; border-color: rgb(27 18 21 / 0.18); }
+
+  /* Any colour, solid: set --btn-bg on the element (a gift's own accent, say). */
+  .btn-tint {
+    background-color: var(--btn-bg);
+    color: #fff;
+    box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--btn-bg) 70%, transparent);
+  }
+  .btn-tint:hover:not(:disabled) { filter: brightness(0.95); }
+
+  /* Quiet: no body, just a soft wash on hover. */
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-ink);
+  }
+  .btn-ghost:hover:not(:disabled) { background-color: rgb(27 18 21 / 0.05); }
+  .btn.btn-ghost:hover:not(:disabled) { transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn,
+    .btn:hover,
+    .btn:active { transform: none !important; }
+  }
+}
+
