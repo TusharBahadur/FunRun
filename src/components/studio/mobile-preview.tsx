@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { Play } from "lucide-react";
 
 const W = 390;
@@ -18,36 +18,34 @@ export function MobilePreview({
   hidden: boolean;
   onPreview: () => void;
 }) {
-  const box = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.7);
+  const phone = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0);
 
-  useEffect(() => {
-    const el = box.current;
+  // The phone's size comes from CSS (below), so the page never shifts while it
+  // loads; this only scales the 390px-wide gift inside to fill it.
+  useLayoutEffect(() => {
+    const el = phone.current;
     if (!el) return;
     const fit = () => {
-      // Leave room under the phone for the page switcher and the first field.
-      const byW = el.clientWidth / W;
-      const byH = (window.innerHeight * 0.56) / H;
-      const next = Math.min(byW, byH, 1);
+      const next = el.clientWidth / W;
       if (next > 0) setScale(next);
     };
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
-    window.addEventListener("resize", fit);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", fit);
-    };
+    return () => ro.disconnect();
   }, []);
 
   return (
     <div className="bg-[#efe8dc] px-3 pb-2 pt-3">
-      <div ref={box} className="mx-auto w-full">
+      <div className="mx-auto w-full">
         <div
+          ref={phone}
           data-tour="m-preview"
-          className="relative mx-auto overflow-hidden rounded-[1.35rem] bg-paper shadow-[0_18px_40px_-24px_rgba(27,18,21,.55)] ring-2 ring-ink/80"
-          style={{ width: W * scale, height: H * scale, opacity: hidden ? 0.55 : 1 }}
+          // Fits in 56% of the screen height (room for the page switcher and the
+          // first field below), never wider than the screen, never above 100%.
+          className="relative mx-auto aspect-[390/844] h-[min(56svh,844px,calc((100vw-24px)*2.164))] overflow-hidden rounded-[1.35rem] bg-paper shadow-[0_18px_40px_-24px_rgba(27,18,21,.55)] ring-2 ring-ink/80"
+          style={{ opacity: hidden ? 0.55 : 1 }}
         >
           <iframe
             ref={(el) => {
@@ -59,7 +57,7 @@ export function MobilePreview({
             title={`Live preview, ${sceneLabel}. Tap anything to edit it.`}
             scrolling="no"
             className="absolute left-0 top-0 origin-top-left border-0"
-            style={{ width: W, height: H, transform: `scale(${scale})` }}
+            style={{ width: W, height: H, transform: `scale(${scale})`, visibility: scale ? undefined : "hidden" }}
           />
           {hidden && (
             <p className="pointer-events-none absolute inset-x-0 top-3 text-center text-sm font-medium text-ink">Hidden</p>
