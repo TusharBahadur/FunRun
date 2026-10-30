@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useId, type ReactNode } from "react";
+import { useId, type ReactNode, type SyntheticEvent } from "react";
 import { cn } from "@/lib/utils";
 import memeIds from "@/data/sticker-memes.json";
 import stickerHashes from "@/data/sticker-hashes.json";
@@ -385,8 +385,22 @@ export function stickerImage(id: AnyStickerId) {
   return ref ? `/a/s/${ref.key}.${ref.hash}.webp` : null;
 }
 
-/** One sticker. Size it with the className (e.g. `size-24`). Unknown ids render nothing. */
-export function Sticker({ id, className }: { id: AnyStickerId; className?: string }) {
+/** If a sticker image fails (a dropped connection, a flaky network), try it once more. */
+function retryOnce(e: SyntheticEvent<HTMLImageElement>) {
+  const img = e.currentTarget;
+  if (img.dataset.retried) return;
+  img.dataset.retried = "1";
+  const src = img.src;
+  setTimeout(() => (img.src = `${src}${src.includes("?") ? "&" : "?"}r=1`), 800);
+}
+
+/**
+ * One sticker. Size it with the className (e.g. `size-24`). Unknown ids render nothing.
+ * `eager` is for stickers on a gift page: they only exist while their page is open, so
+ * there is nothing to save by waiting, and some browsers never start a lazy image that
+ * pops in from scale 0. Long lists (the studio picker, template cards) stay lazy.
+ */
+export function Sticker({ id, className, eager }: { id: AnyStickerId; className?: string; eager?: boolean }) {
   if (isUploadedSticker(id)) {
     return (
       <div className={cn("size-24 overflow-hidden rounded-[22%] bg-white p-[6%] shadow-[0_8px_16px_-8px_rgba(42,26,31,0.45)]", className)}>
@@ -411,8 +425,9 @@ export function Sticker({ id, className }: { id: AnyStickerId; className?: strin
         <img
           src={`/a/s/${ref.key}.${ref.hash}.webp`}
           alt=""
-          loading="lazy"
+          loading={eager ? "eager" : "lazy"}
           decoding="async"
+          onError={retryOnce}
           draggable={false}
           className={cn("size-full", doodle ? "object-contain" : "rounded-[3px] object-cover")}
         />
@@ -463,7 +478,7 @@ export function StickerLayer({ stickers }: { stickers?: StickerPlacement[] }) {
         >
           <StudioHit field={`sticker-${i}`}>
             <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 3 + i * 0.4, repeat: Infinity, ease: "easeInOut" }}>
-              <Sticker id={s.id} className={sizes[s.size ?? "m"]} />
+              <Sticker id={s.id} className={sizes[s.size ?? "m"]} eager />
             </motion.div>
           </StudioHit>
         </motion.div>
@@ -500,7 +515,7 @@ export function ReactionSticker({ id, show }: { id?: AnyStickerId; show: boolean
           // Pops in big, holds a beat, then tucks into the corner so it never covers the page.
           transition={{ duration: 3.2, times: [0, 0.12, 0.18, 0.8, 1], ease: "easeOut", delay: 0.35 }}
         >
-          <Sticker id={id} className="size-28 md:size-40" />
+          <Sticker id={id} className="size-28 md:size-40" eager />
         </motion.div>
       )}
     </AnimatePresence>

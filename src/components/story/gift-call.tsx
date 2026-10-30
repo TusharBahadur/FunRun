@@ -53,7 +53,7 @@ function ScreenFill({ id, fit }: { id: AnyStickerId; fit: "cover" | "contain" })
           : "absolute left-1/2 top-[38%] size-[70%] -translate-x-1/2 -translate-y-1/2"
       }
     >
-      <Sticker id={id} className="size-full" />
+      <Sticker id={id} className="size-full" eager />
     </span>
   );
 }
@@ -271,7 +271,7 @@ function PhoneSticker({ placement, index, delay }: { placement: StickerPlacement
       }}
     >
       <StudioHit field={`sticker-${index}`}>
-        <Sticker id={placement.id} className="size-full" />
+        <Sticker id={placement.id} className="size-full" eager />
       </StudioHit>
     </motion.div>
   );
