@@ -408,7 +408,7 @@ export function Studio({
         <button type="button" data-tour="publish" onClick={() => setCheckout(true)} className="btn btn-rose flex h-9 shrink-0 items-center gap-2 whitespace-nowrap pl-3 pr-1.5 text-sm sm:pl-4">
           <span className="sm:hidden">{canSave ? "Save" : draft.live?.slug ? "Share" : "Publish"}</span>
           <span className="hidden sm:inline">{canSave ? "Save changes" : draft.live?.slug ? "Share link" : "Make it live"}</span>
-          {!draft.live?.slug && <span className="rounded-full bg-paper/20 px-2 py-0.5 text-xs">{formatInr(template.pricePaise)}</span>}
+          {!draft.live?.slug && <span className="rounded-full bg-ink/25 px-2 py-0.5 text-xs">{formatInr(template.pricePaise)}</span>}
         </button>
       </header>
 

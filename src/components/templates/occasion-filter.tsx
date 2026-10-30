@@ -42,7 +42,7 @@ export function OccasionFilter({ active }: { active?: OccasionId }) {
                 className={cn(
                   "relative flex h-9 items-center rounded-full border px-4 text-sm transition-colors duration-300",
                   isActive
-                    ? "border-transparent font-medium text-rose-deep"
+                    ? "border-transparent font-medium text-wine"
                     : "border-ink/10 bg-white/60 text-ink/65 hover:border-ink/20 hover:text-ink",
                 )}
               >

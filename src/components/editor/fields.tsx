@@ -128,7 +128,7 @@ export function Fold({
       >
         <span className="min-w-0 flex-1">
           <span className="type-heading block text-[1.05rem] font-semibold text-ink">{title}</span>
-          {!open && preview ? <span className="mt-1 block truncate text-[15px] text-ink/55">{preview}</span> : null}
+          {!open && preview ? <span className="mt-1 block truncate text-[15px] text-ink/65">{preview}</span> : null}
         </span>
         <ChevronDown className={cn("size-5 shrink-0 text-ink/40 transition-transform", open && "rotate-180")} />
       </button>

@@ -26,6 +26,8 @@ export async function TemplatesListing({ occasion }: { occasion?: OccasionId }) 
       <div className="mb-8 mt-6 md:mb-12 md:mt-8">
         <OccasionFilter active={occasion} />
       </div>
+      {/* Keeps the heading order h1 → h2 → h3 (each card has an h3) for screen readers. */}
+      <h2 className="sr-only">{label ?? "All"} templates</h2>
       <TemplateGrid templates={templates} />
     </main>
   );
