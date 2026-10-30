@@ -40,7 +40,11 @@ export function TemplateCard({ template, className }: { template: Template; clas
       <Link
         href={href}
         data-cursor="view"
-        className="relative block overflow-hidden rounded-[1rem] sm:rounded-[1.1rem]"
+        // The mockup is the heavy part of a card. `content-visibility: auto` lets
+        // the browser skip drawing it until it's scrolled near, which keeps a page
+        // of 30+ cards from blocking the first paint on slow phones. The aspect
+        // ratio keeps its size exact while it's skipped, so nothing shifts.
+        className="relative block aspect-[25/27] overflow-hidden rounded-[1rem] [content-visibility:auto] sm:rounded-[1.1rem]"
         aria-label={`${template.name}: see details`}
       >
         <TemplatePreview
