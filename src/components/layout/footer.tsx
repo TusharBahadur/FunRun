@@ -7,8 +7,10 @@ import { EnquiryForm } from "./enquiry-form";
 const links = [
   { label: "Templates", href: "/templates" },
   { label: "How it works", href: "/#how" },
-  { label: "Love notes", href: "/#love-notes" },
-  { label: "My gifts", href: "/my-gifts" },
+  { label: "About", href: "/about" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
 ];
 
 const { email, whatsapp, whatsappLabel } = siteConfig.contact;
