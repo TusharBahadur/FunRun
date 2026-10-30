@@ -10,6 +10,12 @@ export const siteConfig = {
     { label: "Love notes", href: "/#love-notes" },
     { label: "Profile", href: "/profile" },
   ],
+  contact: {
+    email: "tusharbahadur001@gmail.com",
+    /** WhatsApp number, digits only with country code (wa.me format). */
+    whatsapp: "918789974703",
+    whatsappLabel: "+91 87899 74703",
+  },
 } as const;
 
 /** One price and one link lifetime for every gift. */
