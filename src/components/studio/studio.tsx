@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { ArrowLeft, Check, ChevronDown, CircleHelp, Eye, LayoutGrid, Loader2, Redo2, RotateCcw, Undo2, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { canGoBackInApp } from "@/lib/nav-history";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { StudioFrameMessage } from "@/app/studio/frame/page";
 import type { SceneType, Story } from "@/components/story/types";
@@ -304,7 +305,18 @@ export function Studio({
       <div className="fixed inset-0 flex flex-col overflow-clip bg-cream text-ink">
       {/* Top bar */}
       <header className="flex h-14 shrink-0 items-center gap-1 border-b border-line px-2 sm:gap-2 sm:px-3">
-        <Link href={`/templates/${template.slug}`} aria-label="Back to the template" className="grid size-9 place-items-center rounded-lg hover:bg-paper">
+        <Link
+          href={`/templates/${template.slug}`}
+          aria-label="Back"
+          // Back to wherever they came from (the listing, the home page…); the template's page only if the studio was opened directly.
+          onClick={(e) => {
+            if (canGoBackInApp()) {
+              e.preventDefault();
+              router.back();
+            }
+          }}
+          className="grid size-9 place-items-center rounded-lg hover:bg-paper"
+        >
           <ArrowLeft className="size-4" />
         </Link>
         <span data-tour="undo" className="flex">
