@@ -5,6 +5,7 @@ import { useId, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import memeIds from "@/data/sticker-memes.json";
 import stickerHashes from "@/data/sticker-hashes.json";
+import stickerStills from "@/data/sticker-stills.json";
 import { StudioHit, useStudioEdit } from "./scene-kit";
 
 /**
@@ -342,6 +343,8 @@ const art: Record<StickerId, () => ReactNode> = {
 // live in ./sticker-catalog, which only the studio's picker loads.
 const boardHashes = stickerHashes as Record<string, string>;
 const memes = new Set(memeIds as string[]);
+/** Animated stickers ("<id>.<hash>") that also have a small first-frame still. */
+const stills = new Set(stickerStills as string[]);
 
 export type BoardStickerId = string;
 /** A picture the sender uploaded: inline in the draft, or a link once the gift is published. */
@@ -385,8 +388,12 @@ export function stickerImage(id: AnyStickerId) {
   return ref ? `/a/s/${ref.key}.${ref.hash}.webp` : null;
 }
 
-/** One sticker. Size it with the className (e.g. `size-24`). Unknown ids render nothing. */
-export function Sticker({ id, className }: { id: AnyStickerId; className?: string }) {
+/**
+ * One sticker. Size it with the className (e.g. `size-24`). Unknown ids render nothing.
+ * `still` shows the first frame of an animated sticker (a few KB instead of up to
+ * 300 KB): for thumbnails and pickers, never inside a gift.
+ */
+export function Sticker({ id, className, still }: { id: AnyStickerId; className?: string; still?: boolean }) {
   if (isUploadedSticker(id)) {
     return (
       <div className={cn("size-24 overflow-hidden rounded-[22%] bg-white p-[6%] shadow-[0_8px_16px_-8px_rgba(42,26,31,0.45)]", className)}>
@@ -409,7 +416,7 @@ export function Sticker({ id, className }: { id: AnyStickerId; className?: strin
         {/* Small fixed assets; next/image would add a request per size for no gain. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={`/a/s/${ref.key}.${ref.hash}.webp`}
+          src={`/a/s/${ref.key}.${ref.hash}${still && stills.has(`${ref.key}.${ref.hash}`) ? ".still" : ""}.webp`}
           alt=""
           loading="lazy"
           decoding="async"

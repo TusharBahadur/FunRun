@@ -346,7 +346,7 @@ function CandleLayout({ g }: { g: Gift }) {
 
       {stickers.slice(0, 2).map((id, i) => (
         <div key={id} aria-hidden className="absolute z-10 animate-float" style={[{ left: "8%", bottom: "8%", rotate: "-8deg" }, { right: "4%", top: "10%", rotate: "10deg", animationDelay: "-2.5s" }][i]}>
-          <Sticker id={id} className="size-[15cqw]" />
+          <Sticker still id={id} className="size-[15cqw]" />
         </div>
       ))}
     </Stage>
@@ -393,7 +393,7 @@ function FilmstripLayout({ g }: { g: Gift }) {
 
       {stickers.slice(0, 2).map((id, i) => (
         <div key={id} aria-hidden className="absolute z-10 animate-float" style={[{ left: "6%", bottom: "8%", rotate: "6deg" }, { right: "6%", top: "8%", rotate: "-10deg", animationDelay: "-2s" }][i]}>
-          <Sticker id={id} className="size-[16cqw]" />
+          <Sticker still id={id} className="size-[16cqw]" />
         </div>
       ))}
     </Stage>
@@ -443,7 +443,7 @@ function ProposalPosterLayout({ g }: { g: Gift }) {
 
       {stickers.slice(0, 2).map((id, i) => (
         <div key={id} aria-hidden className="absolute z-10 animate-float" style={[{ left: "6%", top: "18%", rotate: "-8deg" }, { right: "6%", bottom: "12%", rotate: "8deg", animationDelay: "-2s" }][i]}>
-          <Sticker id={id} className="size-[18cqw]" />
+          <Sticker still id={id} className="size-[18cqw]" />
         </div>
       ))}
     </Stage>
@@ -615,7 +615,7 @@ function BrowserLayout({ g }: { g: Gift }) {
           {["#ff6b6b", "#ffc74d", "#5ad17a"].map((c) => (
             <span key={c} className="size-[1.6cqw] rounded-full" style={{ backgroundColor: c }} />
           ))}
-          <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.6cqw] font-mono text-[2cqw] text-black/50">tynitales.com/for-{story.recipient.toLowerCase()}</span>
+          <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.6cqw] font-mono text-[2cqw] text-black/65">tynitales.com/for-{story.recipient.toLowerCase()}</span>
         </div>
         <ScreenPeek scene={first} g={g} className="aspect-[4/3.3]" big />
       </div>
@@ -624,7 +624,7 @@ function BrowserLayout({ g }: { g: Gift }) {
       </PhoneFrame>
       {stickers.slice(0, 2).map((id, i) => (
         <div key={id} aria-hidden className="absolute animate-float" style={[{ left: "3%", bottom: "8%", rotate: "-8deg" }, { right: "3%", top: "3%", rotate: "9deg", animationDelay: "-3s" }][i]}>
-          <Sticker id={id} className="size-[15cqw]" />
+          <Sticker still id={id} className="size-[15cqw]" />
         </div>
       ))}
     </Stage>
@@ -717,7 +717,7 @@ function ChatLayout({ g }: { g: Gift }) {
           {!group && <Bubble>{g.opening}</Bubble>}
           {meme && (
             <div className="w-[36%] self-start" style={{ rotate: "-3deg" }}>
-              <Sticker id={meme} className="size-full" />
+              <Sticker still id={meme} className="size-full" />
             </div>
           )}
           <div className="w-[78%] self-end overflow-hidden rounded-[3cqw] bg-[#dcf3d5] p-[1.2cqw] shadow-sm">
@@ -798,7 +798,7 @@ function ScrapbookLayout({ g }: { g: Gift }) {
       ))}
       {stickers.slice(0, 2).map((id, i) => (
         <div key={id} aria-hidden className="absolute z-[4] animate-float" style={[{ left: "5%", bottom: "4%", rotate: "-6deg" }, { right: "6%", top: "4%", rotate: "8deg", animationDelay: "-2s" }][i]}>
-          <Sticker id={id} className="size-[16cqw]" />
+          <Sticker still id={id} className="size-[16cqw]" />
         </div>
       ))}
     </Stage>
@@ -825,10 +825,10 @@ function PosterLayout({ g }: { g: Gift }) {
         </div>
       </div>
       <div aria-hidden className="absolute -right-[4%] top-[48%] animate-float" style={{ rotate: "10deg" }}>
-        <Sticker id={meme ?? drawn} className="size-[34cqw]" />
+        <Sticker still id={meme ?? drawn} className="size-[34cqw]" />
       </div>
       <div aria-hidden className="absolute left-[44%] top-[56%] animate-float" style={{ rotate: "-12deg", animationDelay: "-2s" }}>
-        <Sticker id={drawn} className="size-[18cqw]" />
+        <Sticker still id={drawn} className="size-[18cqw]" />
       </div>
     </Stage>
   );
@@ -858,7 +858,7 @@ function EnvelopeLayout({ g }: { g: Gift }) {
       </div>
       {stickers.slice(0, 2).map((id, i) => (
         <div key={id} aria-hidden className="absolute animate-float" style={[{ right: "3%", top: "4%", rotate: "10deg" }, { left: "3%", bottom: "3%", rotate: "-8deg", animationDelay: "-2s" }][i]}>
-          <Sticker id={id} className="size-[16cqw]" />
+          <Sticker still id={id} className="size-[16cqw]" />
         </div>
       ))}
     </Stage>
@@ -879,7 +879,7 @@ function SiteLayout({ g }: { g: Gift }) {
           {["#ff6b6b", "#ffc74d", "#5ad17a"].map((c) => (
             <span key={c} className="size-[1.5cqw] rounded-full" style={{ backgroundColor: c }} />
           ))}
-          <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.5cqw] font-mono text-[1.9cqw] text-black/50">tynitales.com/for-{story.recipient.toLowerCase()}</span>
+          <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.5cqw] font-mono text-[1.9cqw] text-black/65">tynitales.com/for-{story.recipient.toLowerCase()}</span>
         </div>
         <div className="relative aspect-[4/3.2] overflow-hidden">
           <PhotoFill src={hero?.photo} tone={hero?.tone ?? "rose"} alt="" className="size-full" iconClassName="size-[8cqw]" />
@@ -895,7 +895,7 @@ function SiteLayout({ g }: { g: Gift }) {
               {["Days", "Hours", "Min", "Sec"].map((u, i) => (
                 <div key={u} className="flex aspect-square flex-col items-center justify-center rounded-[2cqw] border" style={{ borderColor: `${p.ink}18`, backgroundColor: `${p.cream}` }}>
                   <span className={cn(serif, "block text-[5.2cqw] leading-none")}>{["124", "08", "42", "17"][i]}</span>
-                  <span className="mt-[0.6cqw] block font-mono text-[1.3cqw] uppercase opacity-55">{u}</span>
+                  <span className="mt-[0.6cqw] block font-mono text-[1.3cqw] uppercase opacity-80">{u}</span>
                 </div>
               ))}
             </div>
@@ -910,7 +910,7 @@ function SiteLayout({ g }: { g: Gift }) {
 
       <PhoneFrame className="bottom-[4%] right-[5%] w-[36%]" rotate={5}>
         <div className="relative aspect-[9/16] overflow-hidden px-[2.6cqw] pt-[5cqw]" style={{ backgroundColor: p.bg, color: p.fg }}>
-          <p className="font-mono text-[1.4cqw] uppercase opacity-60">Our archive</p>
+          <p className="font-mono text-[1.4cqw] uppercase opacity-80">Our archive</p>
           <p className={cn(serif, "mt-[1cqw] text-[3.4cqw] leading-tight")}>Too many good ones.</p>
           {photos.map((ph, i) => (
             <div
@@ -984,7 +984,7 @@ export function ScreenPeek({ scene, g, className, big = false }: { scene: Scene;
           )}
         </div>
       ) : (
-        <Sticker id={sceneArt[scene.type]} className={cn("mt-[3cqw]", big ? "size-[18cqw]" : "size-[16cqw]")} />
+        <Sticker still id={sceneArt[scene.type]} className={cn("mt-[3cqw]", big ? "size-[18cqw]" : "size-[16cqw]")} />
       )}
 
       {scene.hint && big && (
@@ -1135,7 +1135,7 @@ function SiteFlowVideo({ template }: { template: Template }) {
           <span className="size-[1.6cqw] rounded-full bg-rose-400" />
           <span className="size-[1.6cqw] rounded-full bg-amber-400" />
           <span className="size-[1.6cqw] rounded-full bg-emerald-400" />
-          <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.5cqw] font-mono text-[1.8cqw] text-black/50 truncate max-w-[65%]">
+          <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.5cqw] font-mono text-[1.8cqw] text-black/65 truncate max-w-[65%]">
             tynitales.com/for-{story.recipient.toLowerCase()}
           </span>
         </div>

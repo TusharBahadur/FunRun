@@ -673,7 +673,7 @@ function StickerGrid({
                     on ? "border-ink bg-paper" : "border-line hover:border-ink/30",
                   )}
                 >
-                  <Sticker id={id} className="size-full shadow-none" />
+                  <Sticker still id={id} className="size-full shadow-none" />
                   {on && (
                     <span
                       aria-hidden
