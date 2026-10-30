@@ -370,7 +370,7 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={callerSrc} alt="" className="size-full object-cover" />
             ) : (
-              <Sticker id={caller} className="size-full shadow-none" eager />
+              <Sticker id={caller} className="size-full shadow-none" />
             )}
           </span>
         </div>
