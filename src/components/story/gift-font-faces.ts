@@ -21,8 +21,9 @@ import {
 
 /*
  * Extra faces for gifts only. None are preloaded — the browser downloads a
- * family once some text on screen uses it. Import this file from layout.tsx,
- * not from client components.
+ * family once some text on screen uses it. Only the gift and studio route
+ * layouts import this (see src/app/for/layout.tsx), so the rest of the site
+ * doesn't carry these @font-face rules. Never import it from client components.
  *
  * Thin italic serifs and script faces are not loaded: they do not belong
  * on gift previews.

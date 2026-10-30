@@ -13,7 +13,7 @@ const MONO = "ui-monospace, monospace";
 
 /**
  * Fonts a sender can pick for the whole gift or for a single line.
- * Faces are loaded in gift-font-faces.ts (preload: false) and attached in layout.
+ * Faces are loaded in gift-font-faces.ts (preload: false) and attached by the gift and studio route layouts.
  * Thin italic serifs and script faces are kept off this list — they do not
  * belong on gift previews.
  */

@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Mono, Inter_Tight, Kalam } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "@/components/providers";
-import { giftFontVariables } from "@/components/story/gift-font-faces";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -73,7 +72,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${interTight.variable} ${fraunces.variable} ${plexMono.variable} ${kalam.variable} ${giftFontVariables} antialiased`}
+      className={`${interTight.variable} ${fraunces.variable} ${plexMono.variable} ${kalam.variable} antialiased`}
     >
       <body className="min-h-svh bg-cream font-sans text-ink">
         <Providers>{children}</Providers>
