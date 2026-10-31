@@ -29,19 +29,7 @@ export default async function HomePage() {
   return (
     <>
       <main>
-        <Hero
-          featured={pick([
-            "sealed-with-love",
-            "make-a-wish",
-            "midnight-notes",
-            "paper-hearts",
-            "little-sorry",
-            "written-in-the-stars",
-            "our-corner",
-            "forever-yours",
-            "still-you",
-          ])}
-        />
+        <Hero featured={pick(["sealed-with-love", "make-a-wish", "our-corner", "midnight-notes"])} />
         <Showcase templates={pick(["little-sorry", "our-map", "white-flag", "paper-hearts", "make-it-right"])} total={templates.length} />
         <FeaturedTemplates templates={featured} total={templates.length} />
         <HowItWorks />
