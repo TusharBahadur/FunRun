@@ -1,4 +1,4 @@
-import { demoPhoto as photo, palettes, storyTemplate } from "./shared";
+import { demoPhoto as photo, palettes, storyTemplate , occasionTracks } from "./shared";
 
 const people = { recipient: "Aditi", sender: "Kabir", melody: "waltz" as const };
 
@@ -20,6 +20,7 @@ export const anniversaryStories = [
     palette: palettes.taro,
     motif: "hearts",
     preview: { kicker: "Year three", title: "Three years and I still get excited when you text.", signoff: "5 little pages" },
+    track: occasionTracks.anniversary.tumSeHi,
     ...people,
     scenes: [
       {
@@ -111,6 +112,7 @@ export const anniversaryStories = [
     motif: "hearts",
     paper: true,
     preview: { kicker: "Happy anniversary", title: "Made you a little paper story. About us.", signoff: "8 pages · photos, songs, a few games" },
+    track: occasionTracks.anniversary.perfect,
     ...people,
     scenes: [
       {
@@ -238,6 +240,7 @@ export const anniversaryStories = [
     palette: palettes.blueberry,
     motif: "stamp",
     preview: { kicker: "Happy anniversary", title: "Made you a map of everywhere we’ve been.", signoff: "7 pages · a little map" },
+    track: occasionTracks.anniversary.cantHelpFalling,
     ...people,
     scenes: [
       {
@@ -317,6 +320,7 @@ export const anniversaryStories = [
   /* ── Written in the Stars: the odds of finding each other, and everyone who saw it coming. ── */
   storyTemplate({
     slug: "written-in-the-stars",
+    track: occasionTracks.anniversary.tumSeHi,
     name: "Written in the Stars",
     occasion: "anniversary",
     level: "grand",

@@ -1,4 +1,4 @@
-import { demoPhoto as photo, palettes, storyTemplate } from "./shared";
+import { demoPhoto as photo, palettes, storyTemplate , occasionTracks } from "./shared";
 
 const people = { recipient: "Riya", sender: "Ananya", melody: "sunny" as const };
 
@@ -19,6 +19,7 @@ export const friendshipStories = [
     palette: palettes.peach,
     motif: "bloom",
     preview: { kicker: "Wrist out", title: "I made you a band. Don’t take it off. I’m watching.", signoff: "6 little pages" },
+    track: occasionTracks.friendship.countOnMe,
     ...people,
     scenes: [
       {
@@ -105,6 +106,7 @@ export const friendshipStories = [
     palette: palettes.matcha,
     motif: "stamp",
     preview: { kicker: "v8.4 is ready", title: "Don’t force quit. I wrote you release notes.", signoff: "8 pages · please read" },
+    track: occasionTracks.friendship.photograph,
     ...people,
     scenes: [
       {

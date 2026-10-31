@@ -1,4 +1,4 @@
-import { demoPhoto as photo, palettes, storyTemplate } from "./shared";
+import { demoPhoto as photo, palettes, storyTemplate , occasionTracks } from "./shared";
 
 const people = { recipient: "Ananya", sender: "Rohan", melody: "lullaby" as const };
 
@@ -13,6 +13,7 @@ export const apologyStories = [
     palette: palettes.strawberry,
     motif: "hearts",
     preview: { kicker: "I messed up", title: "Pick up. I brought momos.", signoff: "5 little pages" },
+    track: occasionTracks.apology.chooLo,
     ...people,
     scenes: [
       {
@@ -90,6 +91,7 @@ export const apologyStories = [
     palette: palettes.taro,
     motif: "stamp",
     preview: { kicker: "Truce?", title: "I surrender. You win. You always win.", signoff: "7 pages · can’t say no" },
+    track: occasionTracks.apology.baarishein,
     ...people,
     scenes: [
       {
@@ -194,6 +196,7 @@ export const apologyStories = [
     palette: palettes.honey,
     motif: "bloom",
     preview: { kicker: "I’m really sorry", title: "I know I messed up. Let me fix it, properly.", signoff: "9 pages · voice note" },
+    track: occasionTracks.apology.somewhereOnlyWeKnow,
     ...people,
     scenes: [
       {

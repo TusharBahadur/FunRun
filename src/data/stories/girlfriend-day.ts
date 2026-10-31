@@ -1,4 +1,4 @@
-import { demoPhoto as photo, palettes, storyTemplate } from "./shared";
+import { demoPhoto as photo, palettes, storyTemplate , occasionTracks } from "./shared";
 
 const people = { recipient: "Zoya", sender: "Ishaan", melody: "sunny" as const };
 
@@ -13,6 +13,7 @@ export const girlfriendDayStories = [
     palette: palettes.peach,
     motif: "sun",
     preview: { kicker: "Girlfriend’s Day", title: "It’s your day. I’m just the guy holding the bags.", signoff: "5 little pages" },
+    track: occasionTracks.girlfriendDay.ennaSona,
     ...people,
     scenes: [
       {
@@ -85,6 +86,7 @@ export const girlfriendDayStories = [
     palette: palettes.strawberry,
     motif: "hearts",
     preview: { kicker: "From your #1 fan", title: "I’m obsessed with you. Thought you should know.", signoff: "7 pages · fan mail inside" },
+    track: occasionTracks.girlfriendDay.lover,
     ...people,
     scenes: [
       {
@@ -180,6 +182,7 @@ export const girlfriendDayStories = [
     palette: palettes.taro,
     motif: "stars",
     preview: { kicker: "Awards night", title: "You won. Everyone voted. It wasn’t close.", signoff: "8 pages · friends inside" },
+    track: occasionTracks.girlfriendDay.dandelions,
     ...people,
     scenes: [
       {

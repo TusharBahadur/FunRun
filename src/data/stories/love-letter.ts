@@ -1,4 +1,4 @@
-import { demoPhoto as photo, palettes, storyTemplate } from "./shared";
+import { demoPhoto as photo, palettes, storyTemplate , occasionTracks } from "./shared";
 
 const people = { recipient: "Meher", sender: "Arjun", melody: "lullaby" as const };
 
@@ -13,6 +13,7 @@ export const loveLetterStories = [
     palette: palettes.strawberry,
     motif: "hearts",
     preview: { kicker: "For when you miss me", title: "Open this when you miss me. So, now probably.", signoff: "5 little pages" },
+    track: occasionTracks.loveLetter.kasoor,
     ...people,
     scenes: [
       {
@@ -88,6 +89,7 @@ export const loveLetterStories = [
     palette: palettes.taro,
     motif: "stars",
     preview: { kicker: "2:07 am", title: "Couldn’t sleep, so I wrote you some stuff.", signoff: "8 pages · night sky" },
+    track: occasionTracks.loveLetter.dandelions,
     ...people,
     scenes: [
       {
@@ -203,6 +205,7 @@ export const loveLetterStories = [
     palette: palettes.peach,
     motif: "hearts",
     preview: { kicker: "A love letter", title: "Wrote down our whole story. It’s a good one.", signoff: "8 pages · voice note" },
+    track: occasionTracks.loveLetter.pehlaNasha,
     ...people,
     scenes: [
       {
