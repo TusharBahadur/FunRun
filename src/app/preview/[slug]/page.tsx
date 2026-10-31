@@ -11,7 +11,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/preview/[slug]">): Promise<Metadata> {
   const template = await getTemplateBySlug((await params).slug);
-  return { title: template ? `Preview · ${template.name}` : "Preview", robots: { index: false }, alternates: { canonical: `/templates/${(await params).slug}` } };
+  // Not indexed (it duplicates the template page). No canonical: Google advises
+  // against combining noindex with a canonical pointing elsewhere.
+  return { title: template ? `Preview · ${template.name}` : "Preview", robots: { index: false } };
 }
 
 export default async function PreviewPage({ params }: PageProps<"/preview/[slug]">) {

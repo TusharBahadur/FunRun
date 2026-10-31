@@ -10,7 +10,11 @@ import { occasions, siteConfig } from "@/config/site";
 import { loveNotes } from "@/data/love-notes";
 import { getTemplates, type Template } from "@/lib/templates";
 
-export const metadata: Metadata = { alternates: { canonical: "/" } };
+export const metadata: Metadata = {
+  // Brand first, then what it is in the words people search with.
+  title: { absolute: `${siteConfig.name} — Personalised Digital Gifts & Surprise Pages` },
+  alternates: { canonical: "/" },
+};
 
 // Tells search engines who runs the site (brand name, logo, contact) and what
 // the site is called, for the brand panel and sitelinks in results.

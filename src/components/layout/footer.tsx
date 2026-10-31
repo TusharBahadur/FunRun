@@ -1,7 +1,7 @@
 import { Heart, Mail } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
-import { siteConfig } from "@/config/site";
+import { occasions, siteConfig } from "@/config/site";
 import { EnquiryForm } from "./enquiry-form";
 
 const links = [
@@ -57,7 +57,21 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-t border-line pt-6 md:flex-row md:items-center md:justify-between">
+        {/* Every occasion page, linked from every page. */}
+        <nav aria-label="Gifts by occasion" className="mt-10 border-t border-line pt-6">
+          <p className="type-label mb-3 text-muted">Gifts for</p>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            {occasions.map((o) => (
+              <li key={o.id}>
+                <Link href={`/templates/for/${o.id}`} className="text-muted transition-colors hover:text-ink">
+                  {o.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="mt-6 flex flex-col gap-4 border-t border-line pt-6 md:flex-row md:items-center md:justify-between">
           <nav aria-label="Footer">
             <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
               {links.map((l) => (

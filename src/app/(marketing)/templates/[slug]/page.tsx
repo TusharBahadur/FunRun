@@ -6,10 +6,11 @@ import { SplitText } from "@/components/motion/split-text";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { sceneLabels } from "@/components/story/labels";
 import { ButtonLinkWithNames, NamesBanner } from "@/components/templates/with-names";
+import { TemplateCard } from "@/components/templates/template-card";
 import { TemplatePreview } from "@/components/templates/template-preview";
 import { birthdayTiers } from "@/components/experiences/birthday/tiers";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { occasions, siteConfig } from "@/config/site";
+import { occasions, occasionSeo, siteConfig } from "@/config/site";
 import { getTemplateBySlug, getTemplates } from "@/lib/templates";
 import { formatInr } from "@/lib/utils";
 
@@ -21,8 +22,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/templates/[slug]">): Promise<Metadata> {
   const template = await getTemplateBySlug((await params).slug);
   if (!template) return {};
-  const occasion = occasions.find((o) => o.id === template.occasion);
-  const title = `${template.name}: ${occasion?.label ?? "Gift"} template`;
+  const title = `${template.name}: ${occasionSeo[template.occasion].gift}`;
   return {
     title,
     description: template.description,
@@ -50,9 +50,17 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
   const tier = template.tier ? birthdayTiers[template.tier] : null;
   const steps = template.story ? template.story.scenes.map((s) => sceneLabels[s.type]) : (tier?.highlights ?? []);
 
-  // Product data so search results can show the name, price and image.
-  const jsonLd = {
-    "@context": "https://schema.org",
+  // More of the same occasion first, then others, for the "More like this" row.
+  const all = await getTemplates();
+  const related = [
+    ...all.filter((t) => t.occasion === template.occasion && t.slug !== template.slug),
+    ...all.filter((t) => t.occasion !== template.occasion),
+  ].slice(0, 4);
+  const occasionHref = `/templates/for/${template.occasion}`;
+
+  // Product data so search results can show the name, price and image, and the
+  // breadcrumb trail (Templates › Occasion › Template).
+  const product = {
     "@type": "Product",
     name: template.name,
     description: template.description,
@@ -68,13 +76,39 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
       url: `${siteConfig.url}/templates/${template.slug}`,
     },
   };
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      product,
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Templates", item: `${siteConfig.url}/templates` },
+          { "@type": "ListItem", position: 2, name: occasion?.label ?? "Gifts", item: `${siteConfig.url}${occasionHref}` },
+          { "@type": "ListItem", position: 3, name: template.name, item: `${siteConfig.url}/templates/${template.slug}` },
+        ],
+      },
+    ],
+  };
 
   return (
     <main className="mx-auto max-w-7xl px-5 pb-36 pt-24 md:pb-32 md:pt-40">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-      <Link href="/templates" className="type-label text-muted hover:text-ink">
-        ← All templates
-      </Link>
+      <nav aria-label="Breadcrumb">
+        <ol className="type-label flex items-center gap-2 text-muted">
+          <li>
+            <Link href="/templates" className="hover:text-ink">
+              ← Templates
+            </Link>
+          </li>
+          <li aria-hidden>/</li>
+          <li>
+            <Link href={occasionHref} className="hover:text-ink">
+              {occasion?.label}
+            </Link>
+          </li>
+        </ol>
+      </nav>
 
       <NamesBanner accent={template.palette.accent} />
 
@@ -133,6 +167,24 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
         </div>
       </div>
 
+      {/* More like this: same occasion first. Keeps people browsing, and links the catalogue together. */}
+      {related.length > 0 && (
+        <section className="mt-24 md:mt-32">
+          <div className="mb-6 flex items-end justify-between gap-4 md:mb-8">
+            <h2 className="type-display text-[clamp(1.6rem,3vw,2.4rem)]">More like this</h2>
+            <Link href={occasionHref} className="type-label shrink-0 text-muted hover:text-ink">
+              All {occasion?.label} →
+            </Link>
+          </div>
+          <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+            {related.map((t) => (
+              <li key={t.slug}>
+                <TemplateCard template={t} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Phones: the actions stay in reach at the bottom of the screen. */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-cream/90 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-3 backdrop-blur-md md:hidden">

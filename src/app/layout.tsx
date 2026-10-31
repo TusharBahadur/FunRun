@@ -62,6 +62,12 @@ export const metadata: Metadata = {
   applicationName: siteConfig.name,
   openGraph: { type: "website", siteName: siteConfig.name, locale: "en_IN" },
   twitter: { card: "summary_large_image" },
+  // Set these in Vercel to verify the site in Google Search Console and Bing
+  // Webmaster Tools (the "HTML tag" method: paste only the content="…" value).
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : undefined,
+  },
 };
 
 export const viewport: Viewport = {

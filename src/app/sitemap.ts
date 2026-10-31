@@ -14,6 +14,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/privacy`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${base}/terms`, changeFrequency: "yearly", priority: 0.2 },
     ...occasions.map((o) => ({ url: `${base}/templates/for/${o.id}`, changeFrequency: "weekly" as const, priority: 0.8 })),
-    ...templates.map((t) => ({ url: `${base}/templates/${t.slug}`, changeFrequency: "monthly" as const, priority: 0.7 })),
+    // Each template's preview picture, so it can show in Google Images.
+    ...templates.map((t) => ({
+      url: `${base}/templates/${t.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+      images: [`${base}/templates/${t.slug}/opengraph-image`],
+    })),
   ];
 }
