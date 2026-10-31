@@ -48,7 +48,16 @@ export type OccasionId = (typeof occasions)[number]["id"];
  */
 export const occasionSeo: Record<
   OccasionId,
-  { title: string; gift: string; heading: string; description: string; intro: string; faqs: { q: string; a: string }[] }
+  {
+    title: string;
+    gift: string;
+    heading: string;
+    description: string;
+    intro: string;
+    faqs: { q: string; a: string }[];
+    /** A guide that helps with this occasion, linked under the intro. */
+    guide?: { slug: string; label: string };
+  }
 > = {
   birthday: {
     title: "Digital Birthday Gifts & Surprise Websites",
@@ -77,12 +86,13 @@ export const occasionSeo: Record<
     ],
   },
   love: {
-    title: "Digital Love Letters, Personalised Online",
+    title: "Love Letter Templates: Send a Digital Love Letter",
     gift: "Digital Love Letter",
     heading: "Say it properly, for once.",
     description: "Write a digital love letter they open like a sealed envelope, with photos, little games and your words. Personal, private, no app needed.",
     intro:
       "A digital love letter they open like a real one: break the seal, read it page by page, with your photos tucked in between. You write every word yourself, so it sounds like you, and it stays private: only someone with the link (and the password, if you add one) can open it.",
+    guide: { slug: "how-to-write-a-love-letter", label: "Stuck on the words? How to write a love letter, with examples" },
     faqs: [
       { q: "How do I send a love letter online?", a: "Choose a love letter template, write your letter, add photos if you like, then make it live. You get a private link to send on WhatsApp, Instagram or anywhere else." },
       { q: "Can anyone else read it?", a: "Only people with the link, and you can lock it with a password too. Gift pages are hidden from Google and never listed anywhere." },

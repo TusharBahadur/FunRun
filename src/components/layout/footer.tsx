@@ -7,6 +7,7 @@ import { EnquiryForm } from "./enquiry-form";
 const links = [
   { label: "Templates", href: "/templates" },
   { label: "How it works", href: "/#how" },
+  { label: "Guides", href: "/guides" },
   { label: "About", href: "/about" },
   { label: "FAQ", href: "/faq" },
   { label: "Privacy", href: "/privacy" },

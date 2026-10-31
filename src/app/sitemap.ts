@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { occasions, siteConfig } from "@/config/site";
+import { guides } from "@/data/guides";
 import { getTemplates } from "@/lib/templates";
 
 /** Every public page search engines should know about. Gift links are private and left out. */
@@ -10,6 +11,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: base, changeFrequency: "weekly", priority: 1 },
     { url: `${base}/templates`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/faq`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${base}/guides`, changeFrequency: "weekly", priority: 0.6 },
+    ...guides.map((g) => ({ url: `${base}/guides/${g.slug}`, lastModified: g.updated, changeFrequency: "monthly" as const, priority: 0.7 })),
     { url: `${base}/about`, changeFrequency: "yearly", priority: 0.4 },
     { url: `${base}/privacy`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${base}/terms`, changeFrequency: "yearly", priority: 0.2 },

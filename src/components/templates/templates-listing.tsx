@@ -1,6 +1,7 @@
 import { OccasionFilter } from "@/components/templates/occasion-filter";
 import { TemplateGrid } from "@/components/templates/template-grid";
 import { ChevronDown } from "lucide-react";
+import Link from "next/link";
 import { occasions, occasionSeo, siteConfig, type OccasionId } from "@/config/site";
 import { getTemplates } from "@/lib/templates";
 
@@ -72,6 +73,13 @@ export async function TemplatesListing({ occasion }: { occasion?: OccasionId }) 
         <section className="mx-auto mt-24 max-w-2xl md:mt-32">
           <h2 className="type-display text-[clamp(1.8rem,3.6vw,2.6rem)]">{seo.heading}</h2>
           <p className="type-copy mt-4 text-pretty text-muted">{seo.intro}</p>
+          {seo.guide && (
+            <p className="mt-4">
+              <Link href={`/guides/${seo.guide.slug}`} className="text-rose-deep underline decoration-rose/30 underline-offset-4 hover:decoration-rose-deep">
+                {seo.guide.label} →
+              </Link>
+            </p>
+          )}
           <div className="mt-8 divide-y divide-line rounded-3xl border border-line bg-paper">
             {seo.faqs.map((f) => (
               <details key={f.q} className="group px-5 md:px-6">
