@@ -24,6 +24,24 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const VERSION = "tynitales-assets-v1\0";
+
+/**
+ * Per-frame durations (ms) of an animated WebP, read from its ANMF chunks.
+ * sharp re-timed animated WebP sources to a flat 80ms a frame (the dancing cat
+ * played 4x slower than the original), so we pass the real timings through.
+ * Returns null for anything that isn't an animated WebP.
+ */
+function webpFrameDelays(buf) {
+  if (buf.length < 16 || buf.toString("ascii", 0, 4) !== "RIFF" || buf.toString("ascii", 8, 12) !== "WEBP") return null;
+  const delays = [];
+  for (let i = 12; i + 8 <= buf.length; ) {
+    const id = buf.toString("ascii", i, i + 4);
+    const size = buf.readUInt32LE(i + 4);
+    if (id === "ANMF") delays.push(buf.readUIntLE(i + 8 + 12, 3));
+    i += 8 + size + (size & 1);
+  }
+  return delays.length > 1 ? delays : null;
+}
 const check = process.argv.includes("--check");
 
 const rel = (...p) => path.join(ROOT, ...p);
@@ -64,7 +82,15 @@ for (const job of jobs) {
   });
   // Photos also hash their size settings, so changing them gives new file names
   // (and browsers fetch the new files). Sticker names are unaffected.
-  const hash = createHash("sha256").update(VERSION).update(buf).update(job.sticker ? "" : `:${job.max}:${job.quality}`).digest("hex").slice(0, 10);
+  const delays = webpFrameDelays(buf);
+  // Re-timed animated WebPs get new names, so browsers fetch the fixed files.
+  const hash = createHash("sha256")
+    .update(VERSION)
+    .update(buf)
+    .update(job.sticker ? "" : `:${job.max}:${job.quality}`)
+    .update(delays ? ":webp-timing" : "")
+    .digest("hex")
+    .slice(0, 10);
   const out = `${job.outDir}/${job.name}.${hash}.webp`;
   const src = "/" + out.replace(/^public\//, "");
   let entry = previous[job.key]?.src === src ? previous[job.key] : null;
@@ -79,7 +105,7 @@ for (const job of jobs) {
     if (!existsSync(rel(out))) {
       await s(buf, { animated: true })
         .resize({ width: job.max, height: job.max, fit: "inside", withoutEnlargement: true })
-        .webp({ quality: job.quality, effort: 6 })
+        .webp({ quality: job.quality, effort: 6, ...(delays ? { delay: delays, loop: 0 } : {}) })
         .toFile(rel(out));
       built++;
     }
