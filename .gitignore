@@ -44,5 +44,3 @@ next-env.d.ts
 # Unlighthouse reports
 .unlighthouse/
 
-# Raw showcase screen recordings (scripts/record-showcase.mjs); the encoded videos live in public/showcase
-recordings/

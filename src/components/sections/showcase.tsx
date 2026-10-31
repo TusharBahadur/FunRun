@@ -5,10 +5,7 @@ import { Check, Clock, Lock, PenLine } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { boardStickerCount, drawnStickerIds, Sticker, type AnyStickerId } from "@/components/story/stickers";
-import { ImageLoadingContext } from "@/components/story/image-loading";
-import { StoryPlayer } from "@/components/story/story-player";
 import { occasions } from "@/config/site";
-import showcase from "@/data/showcase.json";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { EASE_OUT } from "@/lib/motion";
 import type { Template } from "@/lib/templates";
@@ -19,8 +16,6 @@ const SLIDE_MS = 2400;
 /** How long one turn of the stack takes. */
 const TURN_S = 0.75;
 /** The gift is laid out at a real phone size, then scaled down to fit the frame. */
-const PHONE_W = 390;
-const PHONE_H = 844;
 
 const perks = {
   left: [
@@ -34,31 +29,22 @@ const perks = {
 };
 
 /**
- * Real gifts, playing in a fanned stack of phones. They're a picture, not a
- * control: nothing inside them can be tapped. Every few seconds the next gift
- * slides to the front.
+ * Real gifts in a fanned stack of phones: a picture of each gift's first page.
+ * Every few seconds the next one slides to the front.
  */
 export function Showcase({ templates, total }: { templates: Template[]; total: number }) {
   const [i, setI] = useState(0);
   // Counts every turn without wrapping, so the notes keep taking turns in order
   // even though there are more gifts than notes.
   const [turn, setTurn] = useState(0);
-  // The next gift to come round is built ahead, once the stack is still, so a
-  // turn never has to build a whole gift mid-animation (that was the stutter).
-  const [settled, setSettled] = useState(false);
-  const settleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const go = (next: number) => {
     setI(next);
     setTurn((t) => t + 1);
-    setSettled(false);
-    clearTimeout(settleTimer.current);
-    settleTimer.current = setTimeout(() => setSettled(true), TURN_S * 1000 + 150);
   };
   const n = templates.length;
   const current = templates[i];
 
-  // Only turn while the stack is on screen: off screen it was still rebuilding
-  // gifts every few seconds, slowing down scrolling and the menu.
+  // Only turn while the stack is on screen.
   const section = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -66,14 +52,8 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
     if (!el) return;
     const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { rootMargin: "100px" });
     io.observe(el);
-    // After the page has loaded, build the next gift in the background.
-    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500));
-    const handle = idle(() => setSettled(true));
     return () => {
       io.disconnect();
-      if (window.cancelIdleCallback) window.cancelIdleCallback(handle);
-      else window.clearTimeout(handle);
-      clearTimeout(settleTimer.current);
     };
   }, []);
 
@@ -117,7 +97,7 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
           <FloatingSticker id="b-frog-kiss" className="-right-7 top-16 size-16 sm:-right-12 sm:top-24 sm:size-20" delay={0.6} />
           <FloatingSticker id="m-flower-kitten" className="-left-7 bottom-16 size-16 sm:-left-14 sm:bottom-24 sm:size-20" delay={1.2} />
           <FloatingSticker id="b-love-duck" className="-right-6 -bottom-2 size-14 sm:-right-8 sm:bottom-6 sm:size-16" delay={1.8} />
-          <Revolver templates={templates} index={i} settled={settled} visible={visible} />
+          <Revolver templates={templates} index={i} />
         </div>
 
         <Perks items={perks.right} align="start" beat={turn} tint={current.palette} className="order-3" />
@@ -147,59 +127,27 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
   );
 }
 
-/** Gifts with a recorded video (scripts/record-showcase.mjs → public/showcase). */
-const videos = new Set<string>(showcase.videos);
-
 /**
- * A recording of the gift's first page. Phones decode video in hardware, so
- * this costs about as much as a picture, where a live gift ran a whole app
- * (that is what made the stack lag on phones). Plays only while on screen.
+ * A picture of the gift's first page (public/showcase/<slug>.webp, 750×1624,
+ * a screenshot of /preview/<slug> at phone size). The phones can't be tapped
+ * and only show that first page, so a picture looks the same as the live gift
+ * at a fraction of the cost: running three whole gifts here made phones lag.
  */
-function PhoneVideo({ slug, play, priority }: { slug: string; play: boolean; priority: boolean }) {
-  const ref = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const v = ref.current;
-    if (!v) return;
-    if (play) v.play().catch(() => {});
-    else v.pause();
-  }, [play]);
+function PhonePicture({ slug, front }: { slug: string; front: boolean }) {
   return (
-    <video
-      ref={ref}
-      src={`/showcase/${slug}.mp4`}
-      poster={`/showcase/${slug}.webp`}
-      muted
-      loop
-      playsInline
-      preload={priority ? "auto" : "metadata"}
-      className="size-full rounded-[1.65rem] object-cover sm:rounded-[2.2rem]"
+    // Plain <img>: one fixed-size file per gift, already sized for phones.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`/showcase/${slug}.webp`}
+      alt=""
+      width={750}
+      height={1624}
+      loading={front ? "eager" : "lazy"}
+      fetchPriority={front ? "high" : "auto"}
+      decoding="async"
+      draggable={false}
+      className="size-full rounded-[1.65rem] object-cover object-top sm:rounded-[2.2rem]"
     />
-  );
-}
-
-/** The real gift, laid out at phone size and scaled into the frame. */
-function LivePhone({ template }: { template: Template }) {
-  const box = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(264 / PHONE_W);
-
-  useEffect(() => {
-    const el = box.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([e]) => setScale(e.contentRect.width / PHONE_W));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  return (
-    <div ref={box} className="relative size-full overflow-hidden rounded-[1.65rem] sm:rounded-[2.2rem]" style={{ backgroundColor: template.palette.bg }}>
-      {/* transform makes this the box that the gift's "fixed" buttons stick to */}
-      <div
-        className="absolute left-0 top-0 origin-top-left overflow-hidden"
-        style={{ width: PHONE_W, height: PHONE_H, transform: `scale(${scale})` }}
-      >
-        {template.story && <StoryPlayer story={template.story} slug={template.slug} embedded />}
-      </div>
-    </div>
   );
 }
 
@@ -210,7 +158,7 @@ type Slot = "center" | "left" | "right" | "back";
  * to the front, the front one to the left, the left one round the back, and
  * the one at the back comes out on the right.
  */
-function Revolver({ templates, index, settled, visible }: { templates: Template[]; index: number; settled: boolean; visible: boolean }) {
+function Revolver({ templates, index }: { templates: Template[]; index: number }) {
   const n = templates.length;
   const narrow = useMediaQuery("(max-width: 639px)", true);
   const reach = narrow ? 64 : 150;
@@ -229,9 +177,8 @@ function Revolver({ templates, index, settled, visible }: { templates: Template[
         const off = (j - index + n) % n;
         const slot: Slot = off === 0 ? "center" : off === 1 ? "right" : off === n - 1 ? "left" : "back";
         const front = slot === "center";
-        // The three you can see play their gift, plus the next one to come round
-        // (built while hidden, once the stack is still).
-        const live = slot !== "back" || (off === 2 && settled);
+        // The three you can see, plus the next one to come round (so it's loaded in time).
+        const shown = slot !== "back" || off === 2;
         return (
           <motion.div
             key={t.slug}
@@ -249,19 +196,7 @@ function Revolver({ templates, index, settled, visible }: { templates: Template[
                   : "shadow-[0_24px_44px_-26px_rgba(27,18,21,0.3)]",
               )}
             >
-              {/* The three you can see play their first page; the next one to come round is built while hidden. */}
-              {live && (
-                <div className="size-full">
-                  {/* The front phone is the biggest picture on the home page: load it first. */}
-                  {videos.has(t.slug) ? (
-                    <PhoneVideo slug={t.slug} play={visible && slot !== "back"} priority={front} />
-                  ) : (
-                    <ImageLoadingContext.Provider value={front ? "priority" : "lazy"}>
-                      <LivePhone template={t} />
-                    </ImageLoadingContext.Provider>
-                  )}
-                </div>
-              )}
+              {shown && <PhonePicture slug={t.slug} front={front} />}
             </div>
           </motion.div>
         );
