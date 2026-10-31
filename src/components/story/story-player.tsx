@@ -202,7 +202,10 @@ function PagesPlayer({
       >
         <Confetti ref={confetti} colors={[palette.accent, palette.gold, palette.pink, palette.cream, palette.fg]} />
 
-        <AnimatePresence mode="wait">
+        {/* Embedded (the home-page showcase): show the first page straight from the
+            server HTML instead of fading it in after JavaScript loads. It was the
+            page's largest image, held invisible until then (slow LCP). */}
+        <AnimatePresence mode="wait" initial={!embedded}>
           <motion.main
             key={`${run}-${safeIndex}`}
             initial={{ opacity: 0, y: 30 }}
