@@ -31,12 +31,12 @@ src/
     globals.css         design tokens & keyframes
   components/
     motion/             reusable animation primitives (SplitText, RotatingWords,
-                        VelocityMarquee, Marquee, ScrollRevealText, Magnetic,
+                        Marquee, ScrollRevealText, Magnetic,
                         TiltCard, Typewriter, Cursor, Preloader)
     sections/           landing page sections
     layout/             Navbar, Dock, Footer
     templates/          TemplatePreview, TemplateCard, TemplateGrid, OccasionFilter
-    ui/                 Button, RollText, Eyebrow, Logo
+    ui/                 Button, Eyebrow, Logo
   config/site.ts        nav, occasions, site metadata
   data/                 seed data (templates, love notes) — shaped like future DB rows
   lib/                  data access layer, motion tokens, utils

@@ -19,6 +19,12 @@ export default async function PreviewPage({ params }: PageProps<"/preview/[slug]
   const template = await getTemplateBySlug(slug);
   if (!template?.experience) notFound();
 
+  // Neighbours in the gallery's order, wrapping round, for the ‹ › buttons.
+  const all = (await getTemplates()).filter((t) => t.experience);
+  const at = all.findIndex((t) => t.slug === slug);
+  const prev = all[(at - 1 + all.length) % all.length];
+  const next = all[(at + 1) % all.length];
+
   const { palette } = template;
   const extra = template.experiencePalette ?? { cream: "#fff4ef", pink: "#ffb3c1", gold: "#f6b73c", ink: palette.fg };
   const cream = template.story ? (template.experiencePalette?.cream ?? "#fff4ef") : extra.cream;
@@ -32,6 +38,8 @@ export default async function PreviewPage({ params }: PageProps<"/preview/[slug]
         story={template.story ?? undefined}
         experience={template.story ? undefined : { palette: { ...palette, ...extra }, tier: template.tier ?? "wish" }}
         backStyle={{ backgroundColor: `${cream}cc`, color: ink }}
+        prev={{ slug: prev.slug, name: prev.name }}
+        next={{ slug: next.slug, name: next.name }}
       />
     </Suspense>
   );
