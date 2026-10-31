@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
-import { siteConfig } from "@/config/site";
 
 /**
  * Footer enquiry: emails the message to us through Resend (https://resend.com).
  * Needs RESEND_API_KEY in Vercel. Without it this answers 503 and the form
  * falls back to opening the visitor's email app with their message filled in.
  *
- * ENQUIRY_TO (default: the contact email) and ENQUIRY_FROM (default: Resend's
- * test sender, which can only mail the Resend account's own address) are optional.
+ * ENQUIRY_TO and ENQUIRY_FROM are optional. Until tynitales.com is verified in
+ * Resend, the only allowed sender is Resend's test address, and it can only mail
+ * the Resend account's own email, so that is the default inbox. Once the domain
+ * is verified, set ENQUIRY_TO=support.tynitales@gmail.com and
+ * ENQUIRY_FROM="TyniTales <hello@tynitales.com>".
  */
+const RESEND_ACCOUNT_EMAIL = "tusharbahadur001@gmail.com";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: Request) {
@@ -35,7 +38,7 @@ export async function POST(request: Request) {
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from: process.env.ENQUIRY_FROM || "TyniTales <onboarding@resend.dev>",
-      to: [process.env.ENQUIRY_TO || siteConfig.contact.email],
+      to: [process.env.ENQUIRY_TO || RESEND_ACCOUNT_EMAIL],
       reply_to: email,
       subject: `TyniTales enquiry from ${email}`,
       text: `${message}\n\n— ${email}`,

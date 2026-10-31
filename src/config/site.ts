@@ -11,7 +11,7 @@ export const siteConfig = {
     { label: "Profile", href: "/profile" },
   ],
   contact: {
-    email: "tusharbahadur001@gmail.com",
+    email: "support.tynitales@gmail.com",
     /** WhatsApp number, digits only with country code (wa.me format). */
     whatsapp: "918789974703",
     whatsappLabel: "+91 87899 74703",
