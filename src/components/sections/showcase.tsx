@@ -12,10 +12,10 @@ import { EASE_OUT } from "@/lib/motion";
 import type { Template } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
-/** How long each gift plays before the stack turns to the next (unless someone's playing with it). */
-const SLIDE_MS = 4000;
+/** How long each gift shows before the stack turns to the next. */
+const SLIDE_MS = 2400;
 /** How long one turn of the stack takes. */
-const TURN_S = 1;
+const TURN_S = 0.75;
 /** The gift is laid out at a real phone size, then scaled down to fit the frame. */
 const PHONE_W = 390;
 const PHONE_H = 844;
@@ -32,12 +32,12 @@ const perks = {
 };
 
 /**
- * Real gifts, playing in a fanned stack of phones. The front one is live:
- * tap around inside it. Every few seconds the next gift slides to the front.
+ * Real gifts, playing in a fanned stack of phones. They're a picture, not a
+ * control: nothing inside them can be tapped. Every few seconds the next gift
+ * slides to the front.
  */
 export function Showcase({ templates, total }: { templates: Template[]; total: number }) {
   const [i, setI] = useState(0);
-  const [paused, setPaused] = useState(false);
   // Counts every turn without wrapping, so the notes keep taking turns in order
   // even though there are more gifts than notes.
   const [turn, setTurn] = useState(0);
@@ -49,10 +49,9 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
   const current = templates[i];
 
   useEffect(() => {
-    if (paused) return;
     const id = setTimeout(() => go((i + 1) % n), SLIDE_MS);
     return () => clearTimeout(id);
-  }, [i, paused, n]);
+  }, [i, n]);
 
   return (
     <section className="relative overflow-hidden px-5 pb-14 pt-2 md:pb-20 md:pt-4">
@@ -88,7 +87,7 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
           <FloatingSticker id="b-frog-kiss" className="-right-7 top-16 size-16 sm:-right-12 sm:top-24 sm:size-20" delay={0.6} />
           <FloatingSticker id="m-flower-kitten" className="-left-7 bottom-16 size-16 sm:-left-14 sm:bottom-24 sm:size-20" delay={1.2} />
           <FloatingSticker id="b-love-duck" className="-right-6 -bottom-2 size-14 sm:-right-8 sm:bottom-6 sm:size-16" delay={1.8} />
-          <Revolver templates={templates} index={i} onPick={go} onPause={setPaused} />
+          <Revolver templates={templates} index={i} />
         </div>
 
         <Perks items={perks.right} align="start" beat={turn} tint={current.palette} className="order-3" />
@@ -135,9 +134,8 @@ function LivePhone({ template }: { template: Template }) {
     <div ref={box} className="relative size-full overflow-hidden rounded-[1.65rem] sm:rounded-[2.2rem]" style={{ backgroundColor: template.palette.bg }}>
       {/* transform makes this the box that the gift's "fixed" buttons stick to */}
       <div
-        className="absolute left-0 top-0 origin-top-left overflow-y-auto overflow-x-hidden [scrollbar-width:none]"
+        className="absolute left-0 top-0 origin-top-left overflow-hidden"
         style={{ width: PHONE_W, height: PHONE_H, transform: `scale(${scale})` }}
-        data-lenis-prevent
       >
         {template.story && <StoryPlayer story={template.story} slug={template.slug} embedded />}
       </div>
@@ -152,17 +150,7 @@ type Slot = "center" | "left" | "right" | "back";
  * to the front, the front one to the left, the left one round the back, and
  * the one at the back comes out on the right.
  */
-function Revolver({
-  templates,
-  index,
-  onPick,
-  onPause,
-}: {
-  templates: Template[];
-  index: number;
-  onPick: (i: number) => void;
-  onPause: (p: boolean) => void;
-}) {
+function Revolver({ templates, index }: { templates: Template[]; index: number }) {
   const n = templates.length;
   const narrow = useMediaQuery("(max-width: 639px)");
   const reach = narrow ? 64 : 150;
@@ -176,7 +164,7 @@ function Revolver({
 
 
   return (
-    <div className="absolute inset-0">
+    <div aria-hidden inert className="pointer-events-none absolute inset-0 select-none">
       {templates.map((t, j) => {
         const off = (j - index + n) % n;
         const slot: Slot = off === 0 ? "center" : off === 1 ? "right" : off === n - 1 ? "left" : "back";
@@ -189,9 +177,6 @@ function Revolver({
             animate={slots[slot]}
             // Stacking order changes instantly, so the incoming phone glides over the outgoing one.
             transition={{ duration: TURN_S, ease: [0.22, 1, 0.36, 1], zIndex: { duration: 0 } }}
-            onPointerDown={front ? () => onPause(true) : undefined}
-            onMouseEnter={front ? () => onPause(true) : undefined}
-            onMouseLeave={front ? () => onPause(false) : undefined}
           >
             <div
               className={cn(
@@ -203,17 +188,9 @@ function Revolver({
             >
               {/* The three phones you can see all play their real first page; the hidden one rests. */}
               {slot !== "back" && (
-                <div className={cn("size-full", !front && "pointer-events-none")} inert={!front}>
+                <div className="size-full">
                   <LivePhone template={t} />
                 </div>
-              )}
-              {!front && slot !== "back" && (
-                <button
-                  type="button"
-                  onClick={() => onPick(j)}
-                  aria-label={`Show ${t.name}`}
-                  className="absolute inset-0 rounded-[1.65rem] sm:rounded-[2.2rem]"
-                />
               )}
             </div>
           </motion.div>
