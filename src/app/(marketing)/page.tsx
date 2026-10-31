@@ -8,6 +8,7 @@ import { LoveNotes } from "@/components/sections/love-notes";
 import { Showcase } from "@/components/sections/showcase";
 import { occasions, siteConfig } from "@/config/site";
 import { loveNotes } from "@/data/love-notes";
+import showcase from "@/data/showcase.json";
 import { getTemplates, type Template } from "@/lib/templates";
 
 export const metadata: Metadata = {
@@ -69,18 +70,7 @@ export default async function HomePage() {
         {/* Sections below the hero are skipped by the browser until they're near the screen (see .cv-auto). */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
         <Hero featured={pick(["sealed-with-love", "make-a-wish", "our-corner", "midnight-notes"])} />
-        <div className="cv-auto"><Showcase templates={pick([
-            "little-sorry",
-            "our-map",
-            "make-a-wish",
-            "white-flag",
-            "sealed-with-love",
-            "paper-hearts",
-            "written-in-the-stars",
-            "partner-in-crime",
-            "make-it-right",
-            "for-maa",
-          ])} total={templates.length} /></div>
+        <div className="cv-auto"><Showcase templates={pick(showcase.slugs)} total={templates.length} /></div>
         <div className="cv-auto"><FeaturedTemplates templates={featured} total={templates.length} /></div>
         <div className="cv-auto"><HowItWorks /></div>
         <div className="cv-auto"><Features /></div>

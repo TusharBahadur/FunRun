@@ -13,7 +13,7 @@ type RotatingWordsProps = {
   className?: string;
 };
 
-/** Cycles through phrases, each rising in as one piece. */
+/** Cycles through phrases, cross-fading each one in place. */
 export function RotatingWords({
   words,
   interval = 2600,
@@ -54,28 +54,21 @@ export function RotatingWords({
             key={word}
             aria-hidden
             className="inline-flex"
-            exit={{
-              y: "-35%",
-              opacity: 0,
-              transition: { duration: 0.35, ease: EASE_IN },
-            }}
+            exit={{ opacity: 0, transition: { duration: 0.3, ease: EASE_IN } }}
           >
-            {/* The whole phrase moves as one: letter-by-letter looked like the
-                text was still being built, and cost far more on phones. */}
+            {/* The phrase cross-fades in place. Sliding it up made it overlap the
+                line below for a moment, so the headline looked like it was shifting. */}
             {started ? (
               <motion.span
                 className="inline-block whitespace-pre"
-                initial={{ y: "45%", opacity: 0 }}
-                animate={{ y: "0%", opacity: 1 }}
-                transition={{ duration: 0.6, ease: EASE_OUT }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.45, ease: EASE_OUT }}
               >
                 {word}
               </motion.span>
             ) : (
-              <span
-                className="tt-css-reveal inline-block whitespace-pre"
-                style={{ animation: `tt-rise-fade 0.75s cubic-bezier(0.22, 1, 0.36, 1) ${startDelay}s both` }}
-              >
+              <span className="inline-block whitespace-pre">
                 {word}
               </span>
             )}

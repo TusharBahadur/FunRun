@@ -8,6 +8,7 @@ import { boardStickerCount, drawnStickerIds, Sticker, type AnyStickerId } from "
 import { ImageLoadingContext } from "@/components/story/image-loading";
 import { StoryPlayer } from "@/components/story/story-player";
 import { occasions } from "@/config/site";
+import showcase from "@/data/showcase.json";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { EASE_OUT } from "@/lib/motion";
 import type { Template } from "@/lib/templates";
@@ -116,7 +117,7 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
           <FloatingSticker id="b-frog-kiss" className="-right-7 top-16 size-16 sm:-right-12 sm:top-24 sm:size-20" delay={0.6} />
           <FloatingSticker id="m-flower-kitten" className="-left-7 bottom-16 size-16 sm:-left-14 sm:bottom-24 sm:size-20" delay={1.2} />
           <FloatingSticker id="b-love-duck" className="-right-6 -bottom-2 size-14 sm:-right-8 sm:bottom-6 sm:size-16" delay={1.8} />
-          <Revolver templates={templates} index={i} settled={settled} />
+          <Revolver templates={templates} index={i} settled={settled} visible={visible} />
         </div>
 
         <Perks items={perks.right} align="start" beat={turn} tint={current.palette} className="order-3" />
@@ -143,6 +144,36 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
         </p>
       </div>
     </section>
+  );
+}
+
+/** Gifts with a recorded video (scripts/record-showcase.mjs → public/showcase). */
+const videos = new Set<string>(showcase.videos);
+
+/**
+ * A recording of the gift's first page. Phones decode video in hardware, so
+ * this costs about as much as a picture, where a live gift ran a whole app
+ * (that is what made the stack lag on phones). Plays only while on screen.
+ */
+function PhoneVideo({ slug, play, priority }: { slug: string; play: boolean; priority: boolean }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    if (play) v.play().catch(() => {});
+    else v.pause();
+  }, [play]);
+  return (
+    <video
+      ref={ref}
+      src={`/showcase/${slug}.mp4`}
+      poster={`/showcase/${slug}.webp`}
+      muted
+      loop
+      playsInline
+      preload={priority ? "auto" : "metadata"}
+      className="size-full rounded-[1.65rem] object-cover sm:rounded-[2.2rem]"
+    />
   );
 }
 
@@ -179,9 +210,8 @@ type Slot = "center" | "left" | "right" | "back";
  * to the front, the front one to the left, the left one round the back, and
  * the one at the back comes out on the right.
  */
-function Revolver({ templates, index, settled }: { templates: Template[]; index: number; settled: boolean }) {
+function Revolver({ templates, index, settled, visible }: { templates: Template[]; index: number; settled: boolean; visible: boolean }) {
   const n = templates.length;
-  // Server HTML assumes a phone (most visitors): one live gift, not three.
   const narrow = useMediaQuery("(max-width: 639px)", true);
   const reach = narrow ? 64 : 150;
   // Flat transforms only (no 3D): far smoother with a whole gift inside the phone.
@@ -199,11 +229,9 @@ function Revolver({ templates, index, settled }: { templates: Template[]; index:
         const off = (j - index + n) % n;
         const slot: Slot = off === 0 ? "center" : off === 1 ? "right" : off === n - 1 ? "left" : "back";
         const front = slot === "center";
-        // Which phones play a real gift. Desktop: the three you can see, plus the
-        // next one to come round (built while hidden, once the stack is still).
-        // Phones: the side phones only peek out, so just the front one, plus the
-        // one on the right (it's next), built once the stack is still.
-        const live = narrow ? front || (off === 1 && settled) : slot !== "back" || (off === 2 && settled);
+        // The three you can see play their gift, plus the next one to come round
+        // (built while hidden, once the stack is still).
+        const live = slot !== "back" || (off === 2 && settled);
         return (
           <motion.div
             key={t.slug}
@@ -222,14 +250,16 @@ function Revolver({ templates, index, settled }: { templates: Template[]; index:
               )}
             >
               {/* The three you can see play their first page; the next one to come round is built while hidden. */}
-              {/* The rest show just the gift's colour. */}
-              {!live && <div className="size-full rounded-[1.65rem] sm:rounded-[2.2rem]" style={{ backgroundColor: t.palette.bg }} />}
               {live && (
                 <div className="size-full">
                   {/* The front phone is the biggest picture on the home page: load it first. */}
-                  <ImageLoadingContext.Provider value={front ? "priority" : "lazy"}>
-                    <LivePhone template={t} />
-                  </ImageLoadingContext.Provider>
+                  {videos.has(t.slug) ? (
+                    <PhoneVideo slug={t.slug} play={visible && slot !== "back"} priority={front} />
+                  ) : (
+                    <ImageLoadingContext.Provider value={front ? "priority" : "lazy"}>
+                      <LivePhone template={t} />
+                    </ImageLoadingContext.Provider>
+                  )}
                 </div>
               )}
             </div>

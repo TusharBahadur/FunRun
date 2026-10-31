@@ -42,7 +42,7 @@ export function Hero({ featured }: { featured: Template[] }) {
           <span className="block font-semibold">
             <SplitText text="Say" delay={INTRO_DELAY + 0.05} immediate />
           </span>
-          <span className="type-accent block text-[1.08em] leading-[1.02] text-rose">
+          <span className="type-accent block py-[0.04em] text-[1.08em] leading-[1.12] text-rose">
             <RotatingWords words={phrases} startDelay={INTRO_DELAY + 0.2} />
           </span>
           <span className="block font-bold italic">

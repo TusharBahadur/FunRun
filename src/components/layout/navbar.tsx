@@ -59,7 +59,13 @@ function NavbarView({ pathname }: { pathname: string | null }) {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    // The menu covers the screen: keep the page behind it from scrolling.
+    const { overflow } = document.documentElement.style;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = overflow;
+    };
   }, [open]);
 
   // On the home page, use bare hashes so smooth-scroll handles them.
@@ -166,27 +172,19 @@ function NavbarView({ pathname }: { pathname: string | null }) {
         </div>
       </motion.header>
 
-      {/* The menu (phones and tablets): a plain card under the header, on the
-          site's own paper. No slide or staggered letters: it opens instantly,
-          which is what makes it feel fast on a phone. */}
+      {/* The menu (phones and tablets): full screen on the site's own paper,
+          under the header (which stays on top with the close button). No slide
+          or staggered letters: it opens instantly, which keeps it fast on phones. */}
       {open && (
-        <>
-          <button
-            type="button"
-            aria-label="Close menu"
-            tabIndex={-1}
-            onClick={() => setOpen(false)}
-            className="fixed inset-0 z-40 cursor-default bg-ink/20"
-          />
-          <div
-            id="site-menu"
-            role="dialog"
-            aria-label="Site menu"
-            data-lenis-prevent
-            className="fixed inset-x-3 top-[4.5rem] z-40 rounded-[1.75rem] border border-line bg-paper p-3 shadow-[0_24px_60px_-24px_rgba(27,18,21,0.45)] sm:inset-x-5 md:left-auto md:w-96"
-          >
-            <nav>
-              <ul className="flex flex-col">
+        <div
+          id="site-menu"
+          role="dialog"
+          aria-label="Site menu"
+          data-lenis-prevent
+          className="fixed inset-0 z-40 flex flex-col overflow-y-auto bg-paper px-5 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] pt-24 sm:px-8"
+        >
+            <nav className="flex-1">
+              <ul className="flex flex-col divide-y divide-line border-y border-line">
                 {/* Profile / Sign in is the button at the bottom. */}
                 {menuItems.filter((item) => item.href !== "/profile").map((item) => {
                   const active = item.href === pathname;
@@ -197,32 +195,31 @@ function NavbarView({ pathname }: { pathname: string | null }) {
                         onClick={() => setOpen(false)}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "flex items-center justify-between rounded-2xl px-4 py-3.5 text-lg font-medium transition-colors",
-                          active ? "bg-blush/60 text-rose-deep" : "text-ink hover:bg-cream",
+                          "type-display flex items-center justify-between py-5 text-[2rem] transition-colors",
+                          active ? "text-rose-deep" : "text-ink hover:text-rose-deep",
                         )}
                       >
                         {item.label}
-                        <ArrowUpRight className={cn("size-4", active ? "text-rose-deep" : "text-ink/30")} />
+                        <ArrowUpRight className={cn("size-5", active ? "text-rose-deep" : "text-ink/30")} />
                       </Link>
                     </li>
                   );
                 })}
               </ul>
             </nav>
-            <div className="mt-2 flex items-center gap-2 border-t border-line px-1 pt-3">
-              <Link href="/templates" onClick={() => setOpen(false)} className="btn btn-rose h-11 flex-1 text-sm">
+            <div className="mt-8 flex items-center gap-2">
+              <Link href="/templates" onClick={() => setOpen(false)} className="btn btn-rose h-12 flex-1 text-base">
                 Start gifting
               </Link>
               <Link
                 href={me ? "/profile" : "/sign-in"}
                 onClick={() => setOpen(false)}
-                className="btn btn-paper h-11 gap-1.5 px-4 text-sm"
+                className="btn btn-paper h-12 gap-1.5 px-5 text-base"
               >
                 <UserRound className="size-4" /> {me ? "Profile" : "Sign in"}
               </Link>
             </div>
-          </div>
-        </>
+        </div>
       )}
     </>
   );
