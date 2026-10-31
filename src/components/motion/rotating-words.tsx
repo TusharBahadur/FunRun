@@ -53,14 +53,17 @@ export function RotatingWords({
           <motion.span
             key={word}
             aria-hidden
-            className="inline-flex"
+            className="-mx-[0.15em] inline-flex px-[0.15em]"
             exit={{ opacity: 0, transition: { duration: 0.3, ease: EASE_IN } }}
           >
             {/* The phrase cross-fades in place. Sliding it up made it overlap the
                 line below for a moment, so the headline looked like it was shifting. */}
             {started ? (
+              // Padding (cancelled by the negative margin) gives the italic overhang
+              // room: while fading, the phrase is its own layer cut to its box, so
+              // the tip of a slanted "?" was clipped until the fade finished.
               <motion.span
-                className="inline-block whitespace-pre"
+                className="-mx-[0.15em] inline-block whitespace-pre px-[0.15em]"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.45, ease: EASE_OUT }}
@@ -68,7 +71,7 @@ export function RotatingWords({
                 {word}
               </motion.span>
             ) : (
-              <span className="inline-block whitespace-pre">
+              <span className="-mx-[0.15em] inline-block whitespace-pre px-[0.15em]">
                 {word}
               </span>
             )}
