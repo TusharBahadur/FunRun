@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronLeft, Volume2, VolumeX } from "lucide-react";
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Confetti, type ConfettiHandle } from "@/components/experiences/confetti";
 import { EASE_OUT } from "@/lib/motion";
 import { accentMoodVars } from "@/components/experiences/birthday/accent-moods";
@@ -30,6 +30,11 @@ type PlayerProps = {
   studio?: StudioEdit;
   /** Shown inside another page (the home-page showcase): don't scroll the page or take over the arrow keys. */
   embedded?: boolean;
+  /**
+   * Template preview: draws its own controls (back, ‹ page ›, make it yours).
+   * `go` jumps straight to a page, without playing the one before.
+   */
+  renderNav?: (nav: { index: number; count: number; go: (index: number) => void }) => ReactNode;
 };
 
 /** Plays a gift: page by page (the games), or as one scrolling website. */
@@ -61,6 +66,7 @@ function PagesPlayer({
   onIndexChange,
   studio,
   embedded = false,
+  renderNav,
 }: PlayerProps) {
   const scenes = useMemo(
     () => story.scenes.filter((s) => !s.hidden && s.type !== "finale"),
@@ -105,6 +111,18 @@ function PagesPlayer({
       if (!embedded) window.scrollTo({ top: 0 });
     },
     [done, index, scenes.length, unlocked, onIndexChange, embedded],
+  );
+
+  // Preview browsing: any page, straight away (the music keeps playing).
+  const jump = useCallback(
+    (to: number) => {
+      if (to < 0 || to >= scenes.length) return;
+      window.speechSynthesis?.cancel();
+      setIndex(to);
+      onIndexChange?.(to);
+      window.scrollTo({ top: 0 });
+    },
+    [scenes.length, onIndexChange],
   );
 
   useEffect(() => {
@@ -201,6 +219,7 @@ function PagesPlayer({
         }}
       >
         <Confetti ref={confetti} colors={[palette.accent, palette.gold, palette.pink, palette.cream, palette.fg]} />
+        {renderNav?.({ index: safeIndex, count: scenes.length, go: jump })}
 
         {/* Embedded (the home-page showcase): show the first page straight from the
             server HTML instead of fading it in after JavaScript loads. It was the
