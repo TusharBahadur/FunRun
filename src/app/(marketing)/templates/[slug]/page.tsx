@@ -187,7 +187,7 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
       )}
 
       {/* Phones: the actions stay in reach at the bottom of the screen. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-cream/90 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-3 backdrop-blur-md md:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-cream/95 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-3 md:hidden">
         <div className="mx-auto flex max-w-md items-center gap-2.5">
           {template.experience && (
             <ButtonLinkWithNames href={`/preview/${template.slug}`} variant="light" icon={false} className="h-12 px-5">

@@ -469,9 +469,10 @@ export function StickerLayer({ stickers }: { stickers?: StickerPlacement[] }) {
           transition={{ type: "spring", bounce: 0.55, delay: 0.5 + i * 0.15 }}
         >
           <StudioHit field={`sticker-${i}`}>
-            <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 3 + i * 0.4, repeat: Infinity, ease: "easeInOut" }}>
+            {/* CSS loop (GPU), not a JavaScript one: this layer is on almost every gift page. */}
+            <div className="tt-loop" style={{ animation: `tt-float-y ${3 + i * 0.4}s ease-in-out infinite` }}>
               <Sticker id={s.id} className={sizes[s.size ?? "m"]} />
-            </motion.div>
+            </div>
           </StudioHit>
         </motion.div>
       ))}

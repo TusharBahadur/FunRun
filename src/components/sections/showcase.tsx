@@ -181,7 +181,8 @@ type Slot = "center" | "left" | "right" | "back";
  */
 function Revolver({ templates, index, settled }: { templates: Template[]; index: number; settled: boolean }) {
   const n = templates.length;
-  const narrow = useMediaQuery("(max-width: 639px)");
+  // Server HTML assumes a phone (most visitors): one live gift, not three.
+  const narrow = useMediaQuery("(max-width: 639px)", true);
   const reach = narrow ? 64 : 150;
   // Flat transforms only (no 3D): far smoother with a whole gift inside the phone.
   const slots: Record<Slot, { x: number; y: number; rotate: number; scale: number; opacity: number; zIndex: number }> = {
@@ -198,6 +199,11 @@ function Revolver({ templates, index, settled }: { templates: Template[]; index:
         const off = (j - index + n) % n;
         const slot: Slot = off === 0 ? "center" : off === 1 ? "right" : off === n - 1 ? "left" : "back";
         const front = slot === "center";
+        // Which phones play a real gift. Desktop: the three you can see, plus the
+        // next one to come round (built while hidden, once the stack is still).
+        // Phones: the side phones only peek out, so just the front one, plus the
+        // one on the right (it's next), built once the stack is still.
+        const live = narrow ? front || (off === 1 && settled) : slot !== "back" || (off === 2 && settled);
         return (
           <motion.div
             key={t.slug}
@@ -216,7 +222,9 @@ function Revolver({ templates, index, settled }: { templates: Template[]; index:
               )}
             >
               {/* The three you can see play their first page; the next one to come round is built while hidden. */}
-              {(slot !== "back" || (off === 2 && settled)) && (
+              {/* The rest show just the gift's colour. */}
+              {!live && <div className="size-full rounded-[1.65rem] sm:rounded-[2.2rem]" style={{ backgroundColor: t.palette.bg }} />}
+              {live && (
                 <div className="size-full">
                   {/* The front phone is the biggest picture on the home page: load it first. */}
                   <ImageLoadingContext.Provider value={front ? "priority" : "lazy"}>
@@ -326,9 +334,9 @@ function FloatingSticker({ id, className, delay }: { id: AnyStickerId; className
       viewport={{ once: true }}
       transition={{ type: "spring", bounce: 0.5, delay: 0.3 + delay * 0.3 }}
     >
-      <motion.div className="size-full" animate={{ y: [0, -8, 0], rotate: [-4, 4, -4] }} transition={{ duration: 4, delay, repeat: Infinity, ease: "easeInOut" }}>
+      <div className="tt-loop size-full" style={{ animation: `tt-bob 4s ease-in-out ${delay}s infinite` }}>
         <Sticker id={id} className="size-full" />
-      </motion.div>
+      </div>
     </motion.div>
   );
 }

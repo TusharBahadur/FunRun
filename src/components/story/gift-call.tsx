@@ -266,16 +266,18 @@ function PhoneSticker({ placement, index, delay }: { placement: StickerPlacement
     <motion.div
       className={cn("absolute z-10", PHONE_SPOTS[placement.at])}
       initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1, y: [0, -6, 0] }}
+      animate={{ scale: 1, opacity: 1 }}
       transition={{
         scale: { type: "spring", bounce: 0.55, delay },
         opacity: { duration: 0.3, delay },
-        y: { duration: 2.4, repeat: Infinity, ease: "easeInOut", delay },
       }}
     >
-      <StudioHit field={`sticker-${index}`}>
-        <Sticker id={placement.id} className="size-full" />
-      </StudioHit>
+      {/* The bob is a CSS loop (GPU) rather than a JavaScript one. */}
+      <div className="tt-loop size-full" style={{ animation: `tt-float-y 2.4s ease-in-out ${delay}s infinite` }}>
+        <StudioHit field={`sticker-${index}`}>
+          <Sticker id={placement.id} className="size-full" />
+        </StudioHit>
+      </div>
     </motion.div>
   );
 }

@@ -1015,7 +1015,7 @@ function StoryFlowVideo({ template }: { template: Template }) {
       <div className="absolute inset-0 bg-radial from-black/10 via-transparent to-black/35 pointer-events-none" />
 
       {/* Floating recording pill */}
-      <div className="absolute left-[4cqw] top-[4cqw] z-30 flex items-center gap-[1.2cqw] rounded-full bg-black/60 px-[2.8cqw] py-[0.9cqw] text-white backdrop-blur-md">
+      <div className="absolute left-[4cqw] top-[4cqw] z-30 flex items-center gap-[1.2cqw] rounded-full bg-black/60 px-[2.8cqw] py-[0.9cqw] text-white">
         <span className="size-[1.6cqw] rounded-full bg-rose-500 animate-pulse" />
         <span className="font-mono text-[2.2cqw] font-semibold tracking-wider">FLOW PREVIEW</span>
       </div>
@@ -1028,7 +1028,7 @@ function StoryFlowVideo({ template }: { template: Template }) {
         {/* 4 Segmented Story Progress Bars */}
         <div className="absolute inset-x-[3cqw] top-[3.8cqw] z-30 grid grid-cols-4 gap-[1cqw]">
           {[0, 1, 2, 3].map((step) => (
-            <div key={step} className="h-[0.7cqw] overflow-hidden rounded-full bg-black/30 backdrop-blur-xs">
+            <div key={step} className="h-[0.7cqw] overflow-hidden rounded-full bg-black/30">
               <div
                 className="h-full rounded-full"
                 style={{
@@ -1114,7 +1114,7 @@ function SiteFlowVideo({ template }: { template: Template }) {
   return (
     <div className="relative h-full w-full overflow-hidden select-none" style={{ backgroundColor: p.bg, color: p.fg }}>
       {/* Recording badge */}
-      <div className="absolute left-[4cqw] top-[4cqw] z-30 flex items-center gap-[1.2cqw] rounded-full bg-black/60 px-[2.8cqw] py-[0.9cqw] text-white backdrop-blur-md">
+      <div className="absolute left-[4cqw] top-[4cqw] z-30 flex items-center gap-[1.2cqw] rounded-full bg-black/60 px-[2.8cqw] py-[0.9cqw] text-white">
         <span className="size-[1.6cqw] rounded-full bg-rose-500 animate-pulse" />
         <span className="font-mono text-[2.2cqw] font-semibold tracking-wider">WEBSITE FLOW</span>
       </div>
@@ -1176,13 +1176,13 @@ function ClassicCardFlowVideo({ template }: { template: Template }) {
   return (
     <div className="relative h-full w-full overflow-hidden select-none" style={{ backgroundColor: palette.bg, color: palette.fg }}>
       {/* Recording pill */}
-      <div className="absolute left-[4cqw] top-[4cqw] z-30 flex items-center gap-[1.2cqw] rounded-full bg-black/60 px-[2.8cqw] py-[0.9cqw] text-white backdrop-blur-md">
+      <div className="absolute left-[4cqw] top-[4cqw] z-30 flex items-center gap-[1.2cqw] rounded-full bg-black/60 px-[2.8cqw] py-[0.9cqw] text-white">
         <span className="size-[1.6cqw] rounded-full bg-rose-500 animate-pulse" />
         <span className="font-mono text-[2.2cqw] font-semibold tracking-wider">GIFT UNBOXING</span>
       </div>
 
       {/* Envelope & letter sliding out */}
-      <div className="absolute inset-x-[12%] bottom-[8%] top-[14%] overflow-hidden rounded-3xl bg-white/40 p-[4cqw] shadow-lg backdrop-blur-md flex flex-col justify-between text-center">
+      <div className="absolute inset-x-[12%] bottom-[8%] top-[14%] overflow-hidden rounded-3xl bg-white/40 p-[4cqw] shadow-lg flex flex-col justify-between text-center">
         <div className="my-auto">
           <span className="font-mono text-[2.2cqw] uppercase tracking-wider opacity-70 block">{preview.kicker}</span>
           <p className="type-display mt-[1.5cqw] text-[6.5cqw] font-semibold leading-tight">{preview.title}</p>

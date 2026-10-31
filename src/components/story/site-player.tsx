@@ -131,7 +131,7 @@ export function SitePlayer({
               else play({ openLink: true });
             }}
             aria-label={playing ? "Stop the music" : "Play the music"}
-            className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-3 z-40 grid size-10 place-items-center rounded-full backdrop-blur lg:bottom-5 lg:right-4"
+            className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-3 z-40 grid size-10 place-items-center rounded-full md:backdrop-blur lg:bottom-5 lg:right-4"
             style={{ backgroundColor: `${palette.cream}cc`, color: palette.ink }}
           >
             {playing ? <Volume2 className="size-4" /> : <VolumeX className="size-4 opacity-60" />}

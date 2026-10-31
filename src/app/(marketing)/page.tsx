@@ -66,9 +66,10 @@ export default async function HomePage() {
   return (
     <>
       <main>
+        {/* Sections below the hero are skipped by the browser until they're near the screen (see .cv-auto). */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
         <Hero featured={pick(["sealed-with-love", "make-a-wish", "our-corner", "midnight-notes"])} />
-        <Showcase templates={pick([
+        <div className="cv-auto"><Showcase templates={pick([
             "little-sorry",
             "our-map",
             "make-a-wish",
@@ -79,12 +80,12 @@ export default async function HomePage() {
             "partner-in-crime",
             "make-it-right",
             "for-maa",
-          ])} total={templates.length} />
-        <FeaturedTemplates templates={featured} total={templates.length} />
-        <HowItWorks />
-        <Features />
-        <LoveNotes notes={loveNotes} />
-        <CallToAction />
+          ])} total={templates.length} /></div>
+        <div className="cv-auto"><FeaturedTemplates templates={featured} total={templates.length} /></div>
+        <div className="cv-auto"><HowItWorks /></div>
+        <div className="cv-auto"><Features /></div>
+        <div className="cv-auto"><LoveNotes notes={loveNotes} /></div>
+        <div className="cv-auto"><CallToAction /></div>
       </main>
     </>
   );

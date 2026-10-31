@@ -1,7 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { motion } from "motion/react";
 import { RotatingWords } from "@/components/motion/rotating-words";
 import { SplitText } from "@/components/motion/split-text";
 import { TemplatePreview } from "@/components/templates/template-preview";
@@ -19,40 +18,26 @@ const phrases = [
 ];
 
 export function Hero({ featured }: { featured: Template[] }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-  const titleY = useTransform(scrollYProgress, [0, 1], [0, 40]);
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
-  const titleScale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
-
 
   return (
     <section
-      ref={ref}
       className="relative flex flex-col items-center justify-center overflow-hidden px-5 pb-8 pt-28 md:pb-10 lg:pt-32"
     >
       {/* Ambient glow */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <motion.div
-          className="absolute left-1/2 top-[45%] size-[70vw] max-h-[900px] max-w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,var(--color-blush),transparent)] will-change-transform"
-          animate={{ scale: [1, 1.15, 1], opacity: [0.55, 0.85, 0.55] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        {/* CSS loops (GPU), not JavaScript: they used to run on the main thread every frame. */}
+        <div
+          className="tt-loop absolute left-1/2 top-[45%] size-[70vw] max-h-[900px] max-w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,var(--color-blush),transparent)]"
+          style={{ animation: "tt-glow 10s ease-in-out infinite" }}
         />
-        <motion.div
-          className="absolute right-[10%] top-[10%] size-[30vw] max-w-[420px] rounded-full bg-[radial-gradient(closest-side,#f8dc8c,transparent)] opacity-30 will-change-transform"
-          animate={{ x: [0, -40, 0], y: [0, 30, 0] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        <div
+          className="tt-loop absolute right-[10%] top-[10%] size-[30vw] max-w-[420px] rounded-full bg-[radial-gradient(closest-side,#f8dc8c,transparent)] opacity-30"
+          style={{ animation: "tt-drift 14s ease-in-out infinite" }}
         />
       </div>
 
 
-      <motion.div
-        style={{ y: titleY, opacity: titleOpacity, scale: titleScale }}
-        className="relative z-10 flex flex-col items-center text-center"
-      >
+      <div className="relative z-10 flex flex-col items-center text-center">
         <h1 className="text-[clamp(2.6rem,min(8vw,11svh),7.5rem)] type-display">
           <span className="block font-semibold">
             <SplitText text="Say" delay={INTRO_DELAY + 0.05} immediate />
@@ -86,7 +71,7 @@ export function Hero({ featured }: { featured: Template[] }) {
 
         {/* Phones and tablets: the floating cards become a little fanned hand of gifts under the buttons. */}
         <MobileFan templates={featured.slice(0, 3)} />
-      </motion.div>
+      </div>
 
     </section>
   );

@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { Lock } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { SplitText } from "@/components/motion/split-text";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { EASE_OUT } from "@/lib/motion";
@@ -176,11 +176,10 @@ function Equalizer() {
     <div className="flex w-full flex-col items-center gap-5">
       <div className="flex h-24 items-end gap-1">
         {bars.map((h, i) => (
-          <motion.span
+          <span
             key={i}
-            className="h-full w-1.5 origin-bottom rounded-full bg-rose"
-            animate={{ scaleY: [h * 0.3, h, h * 0.5, h * 0.9, h * 0.3] }}
-            transition={{ duration: 1.2 + (i % 5) * 0.15, repeat: Infinity, ease: "easeInOut", delay: i * 0.05 }}
+            className="tt-loop h-full w-1.5 origin-bottom rounded-full bg-rose"
+            style={{ "--lo": h * 0.3, "--hi": h, animation: `tt-eq ${1.2 + (i % 5) * 0.15}s ease-in-out ${i * 0.05}s infinite` } as CSSProperties}
           />
         ))}
       </div>
@@ -218,11 +217,10 @@ function LockPulse() {
   return (
     <div className="relative grid place-items-center">
       {[0, 1, 2].map((i) => (
-        <motion.span
+        <span
           key={i}
-          className="absolute size-20 rounded-full border border-rose"
-          animate={{ scale: [1, 2.2], opacity: [0.5, 0] }}
-          transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.8, ease: "easeOut" }}
+          className="tt-loop absolute size-20 rounded-full border border-rose opacity-0"
+          style={{ animation: `tt-ripple 2.4s ease-out ${i * 0.8}s infinite` }}
         />
       ))}
       <span className="relative grid size-20 place-items-center rounded-full bg-[linear-gradient(180deg,#e2546c,#c3304a)] text-paper shadow-[inset_0_2px_2px_rgba(255,255,255,0.35),0_12px_24px_-10px_rgba(191,40,64,0.55)]">

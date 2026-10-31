@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
+import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import { ArrowUpRight, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -9,7 +9,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import { siteConfig } from "@/config/site";
 import { peekSignedInUser, type PeekedUser } from "@/lib/session-peek";
-import { EASE_IN_OUT, EASE_OUT, INTRO_DELAY } from "@/lib/motion";
+import { EASE_OUT, INTRO_DELAY } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 const menuItems = [{ label: "Home", href: "/" }, ...siteConfig.nav];
@@ -87,7 +87,7 @@ function NavbarView({ pathname }: { pathname: string | null }) {
           >
             <Logo
               onClick={() => setOpen(false)}
-              className={cn("transition-colors duration-500", open && "text-cream md:text-ink")}
+              className="transition-colors duration-500"
             />
 
             {/* Wide screens: every page is one click away, no menu needed. */}
@@ -155,9 +155,7 @@ function NavbarView({ pathname }: { pathname: string | null }) {
                 aria-controls="site-menu"
                 className={cn(
                   "type-label flex h-10 items-center gap-3 rounded-full border pl-4 pr-3.5 transition-colors duration-500 md:backdrop-blur-xl lg:hidden",
-                  open
-                    ? "border-cream/15 bg-cream/10 text-cream"
-                    : "border-ink/10 bg-paper/90 text-ink hover:bg-paper md:bg-paper/70",
+                  open ? "border-ink/15 bg-paper text-ink" : "border-ink/10 bg-paper/90 text-ink hover:bg-paper md:bg-paper/70",
                 )}
               >
                 Menu
@@ -168,101 +166,64 @@ function NavbarView({ pathname }: { pathname: string | null }) {
         </div>
       </motion.header>
 
-      <AnimatePresence>
-        {open && (
-          <>
-            {/* The page stays visible behind (softly blurred on larger screens; phones skip the blur, it made opening the menu stutter). */}
-            <motion.button
-              key="scrim"
-              type="button"
-              aria-label="Close menu"
-              tabIndex={-1}
-              onClick={() => setOpen(false)}
-              className="fixed inset-0 z-40 cursor-default bg-ink/25 md:bg-ink/15 md:backdrop-blur-[3px]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-            />
-
-            <motion.aside
-              key="panel"
-              id="site-menu"
-              aria-label="Site menu"
-              data-lenis-prevent
-              className="fixed inset-2 z-40 flex flex-col overflow-hidden rounded-[1.75rem] border border-cream/10 bg-ink/[0.94] px-7 pb-8 pt-28 text-cream shadow-[0_0_80px_-20px_rgba(27,18,21,0.6)] will-change-transform md:inset-y-0 md:bg-ink/75 md:backdrop-blur-2xl md:left-auto md:right-0 md:w-[min(36vw,560px)] md:min-w-[420px] md:rounded-none md:border-y-0 md:border-r-0 md:px-12"
-              initial={{ x: "105%" }}
-              animate={{ x: "0%" }}
-              exit={{ x: "105%" }}
-              transition={{ duration: 0.75, ease: EASE_IN_OUT }}
-            >
-              {/* Soft colour wash so the glass reads as tinted, not flat. */}
-              <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 size-[30rem] rounded-full bg-[radial-gradient(closest-side,rgb(226_59_84/0.35),transparent)]" />
-              <div aria-hidden className="pointer-events-none absolute -bottom-32 -left-20 size-[28rem] rounded-full bg-[radial-gradient(closest-side,rgb(90_26_43/0.6),transparent)]" />
-
-              {/* A size container: menu words scale to the panel, so the longest one always fits. */}
-              <nav className="@container relative flex flex-1 flex-col justify-center">
-                <ul className="flex flex-col items-end gap-3 text-right sm:gap-2">
-                  {menuItems.map((item, i) => {
-                    const active = item.href === pathname;
-                    return (
-                      <li key={item.href} className="overflow-hidden">
-                        <motion.div
-                          initial={{ y: "105%" }}
-                          animate={{ y: "0%" }}
-                          exit={{ y: "105%", transition: { duration: 0.3, ease: EASE_IN_OUT } }}
-                          transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.25 + i * 0.06 }}
-                        >
-                          <Link
-                            href={resolve(item.href)}
-                            onClick={() => setOpen(false)}
-                            className="group flex items-baseline justify-end gap-4 py-1"
-                          >
-                            <span className="type-label text-[10px] text-cream/35 transition-colors group-hover:text-rose">
-                              {String(i + 1).padStart(2, "0")}
-                            </span>
-                            <span
-                              className={cn(
-                                "whitespace-nowrap font-serif text-[min(4.75rem,12cqi)] uppercase leading-[0.92] tracking-[-0.01em] transition-colors duration-300 group-hover:text-blush",
-                                active ? "text-blush" : "text-cream",
-                              )}
-                            >
-                              {item.label}
-                            </span>
-                          </Link>
-                        </motion.div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </nav>
-
-              <motion.div
-                className="relative flex flex-col items-end gap-2.5 border-t border-cream/10 pt-6"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ delay: 0.6, duration: 0.6 }}
+      {/* The menu (phones and tablets): a plain card under the header, on the
+          site's own paper. No slide or staggered letters: it opens instantly,
+          which is what makes it feel fast on a phone. */}
+      {open && (
+        <>
+          <button
+            type="button"
+            aria-label="Close menu"
+            tabIndex={-1}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-40 cursor-default bg-ink/20"
+          />
+          <div
+            id="site-menu"
+            role="dialog"
+            aria-label="Site menu"
+            data-lenis-prevent
+            className="fixed inset-x-3 top-[4.5rem] z-40 rounded-[1.75rem] border border-line bg-paper p-3 shadow-[0_24px_60px_-24px_rgba(27,18,21,0.45)] sm:inset-x-5 md:left-auto md:w-96"
+          >
+            <nav>
+              <ul className="flex flex-col">
+                {/* Profile / Sign in is the button at the bottom. */}
+                {menuItems.filter((item) => item.href !== "/profile").map((item) => {
+                  const active = item.href === pathname;
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={resolve(item.href)}
+                        onClick={() => setOpen(false)}
+                        aria-current={active ? "page" : undefined}
+                        className={cn(
+                          "flex items-center justify-between rounded-2xl px-4 py-3.5 text-lg font-medium transition-colors",
+                          active ? "bg-blush/60 text-rose-deep" : "text-ink hover:bg-cream",
+                        )}
+                      >
+                        {item.label}
+                        <ArrowUpRight className={cn("size-4", active ? "text-rose-deep" : "text-ink/30")} />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+            <div className="mt-2 flex items-center gap-2 border-t border-line px-1 pt-3">
+              <Link href="/templates" onClick={() => setOpen(false)} className="btn btn-rose h-11 flex-1 text-sm">
+                Start gifting
+              </Link>
+              <Link
+                href={me ? "/profile" : "/sign-in"}
+                onClick={() => setOpen(false)}
+                className="btn btn-paper h-11 gap-1.5 px-4 text-sm"
               >
-                <Link
-                  href="/templates"
-                  onClick={() => setOpen(false)}
-                  className="type-label flex items-center gap-2 text-cream/80 hover:text-cream"
-                >
-                  <ArrowUpRight className="size-3.5" /> Start gifting
-                </Link>
-                <Link
-                  href={me ? "/profile" : "/sign-in"}
-                  onClick={() => setOpen(false)}
-                  className="type-label flex items-center gap-2 text-cream/80 hover:text-cream"
-                >
-                  <UserRound className="size-3.5" /> {me ? "Your profile" : "Sign in"}
-                </Link>
-              </motion.div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+                <UserRound className="size-4" /> {me ? "Profile" : "Sign in"}
+              </Link>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }

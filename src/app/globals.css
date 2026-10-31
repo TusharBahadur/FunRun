@@ -312,3 +312,61 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .tt-css-reveal { animation: none !important; }
 }
+
+/* ───────────── Decorative loops ─────────────
+ * Pure CSS, animating only transform and opacity, so phones run them on the
+ * GPU without blocking scrolling. (They used to be JavaScript animations that
+ * ran every frame on the main thread, on screen or not.) Add `tt-loop` and set
+ * the animation inline: `animation: tt-bob 4s ease-in-out infinite`.
+ */
+@keyframes tt-bob {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-8px) rotate(4deg); }
+}
+@keyframes tt-float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes tt-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(1.6deg); }
+  75% { transform: rotate(-1.6deg); }
+}
+@keyframes tt-eq {
+  0%, 100% { transform: scaleY(var(--lo)); }
+  50% { transform: scaleY(var(--hi)); }
+}
+@keyframes tt-ripple {
+  from { transform: scale(1); opacity: 0.5; }
+  to { transform: scale(2.2); opacity: 0; }
+}
+@keyframes tt-flicker {
+  0%, 100% { opacity: 0.35; }
+  30% { opacity: 0.7; }
+  60% { opacity: 0.45; }
+  80% { opacity: 0.65; }
+}
+@keyframes tt-heart-rise {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateY(-760px) rotate(var(--turn, 25deg)); opacity: 0; }
+}
+@keyframes tt-glow {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.15); opacity: 0.85; }
+}
+@keyframes tt-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-40px, 30px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tt-loop { animation: none !important; }
+}
+
+/* Long pages: the browser skips laying out, painting and animating a section
+   until it's near the screen (big savings on phones). The size is a guess
+   used only until the section has been seen once. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}

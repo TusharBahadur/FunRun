@@ -53,7 +53,7 @@ export function TemplateCard({ template, className }: { template: Template; clas
           className="aspect-[25/27] rounded-none transition-transform duration-700 ease-out group-hover/card:scale-[1.03]"
         />
         {template.isNew && (
-          <span className="pointer-events-none absolute left-2 top-2 rounded-full bg-white/90 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-rose-deep shadow-sm backdrop-blur sm:px-2 sm:text-[10px]">
+          <span className="pointer-events-none absolute left-2 top-2 rounded-full bg-white/90 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-rose-deep shadow-sm sm:px-2 sm:text-[10px]">
             New
           </span>
         )}

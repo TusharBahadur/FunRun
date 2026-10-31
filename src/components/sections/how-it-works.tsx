@@ -164,27 +164,33 @@ function BulbDefs() {
           <stop offset="100%" stopColor={c} stopOpacity={0.9} />
         </radialGradient>
       ))}
+      {/* The soft glow around each bulb: a gradient, not a live blur filter. */}
+      {BULBS.map((c, i) => (
+        <radialGradient key={`glow-${c}`} id={`tt-glow-${i}`}>
+          <stop offset="0%" stopColor={c} stopOpacity={0.9} />
+          <stop offset="45%" stopColor={c} stopOpacity={0.45} />
+          <stop offset="100%" stopColor={c} stopOpacity={0} />
+        </radialGradient>
+      ))}
     </defs>
   );
 }
 
 /** One fairy light: a short wire, a little cap, and a glass bulb with a warm glow that flickers on its own rhythm. */
 function Bulb({ x, y, r, color, tilt, delay }: { x: number; y: number; r: number; color: number; tilt: number; delay: number }) {
-  const c = BULBS[color % BULBS.length];
   const top = y + 1;
   const bulbY = top + r * 2.1;
   const flicker = 2 + ((x * 7) % 13) / 10;
   return (
     <motion.g initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay }}>
       <g transform={`rotate(${tilt} ${x} ${top})`}>
-        <motion.circle
+        <circle
           cx={x}
           cy={bulbY}
-          r={r * 3}
-          fill={c}
-          style={{ filter: "blur(5px)" }}
-          animate={{ opacity: [0.25, 0.6, 0.35, 0.55, 0.25] }}
-          transition={{ duration: flicker, repeat: Infinity, ease: "easeInOut", delay: delay % flicker }}
+          r={r * 3.4}
+          fill={`url(#tt-glow-${color % BULBS.length})`}
+          className="tt-loop"
+          style={{ animation: `tt-flicker ${flicker}s ease-in-out ${delay % flicker}s infinite` }}
         />
         <line x1={x} y1={top - 1} x2={x} y2={top + r * 0.5} stroke="#c9a090" strokeWidth={1.1} />
         <rect x={x - r * 0.5} y={top + r * 0.45} width={r} height={r * 0.8} rx={r * 0.2} fill="#d9bfa8" stroke="#c49a86" strokeWidth={0.6} />
@@ -246,11 +252,9 @@ function Card({ step, wide = false, delay }: { step: number; wide?: boolean; del
       viewport={{ once: true, margin: "-10% 0px" }}
       transition={{ type: "spring", stiffness: 90, damping: 13, delay }}
     >
-      <motion.div
-        className="origin-top"
-        animate={{ rotate: [0, 1.6, 0, -1.6, 0] }}
-        transition={{ duration: 5 + step * 0.6, repeat: Infinity, ease: "easeInOut", delay: step * 0.4 }}
-        whileHover={{ rotate: 0, y: -4 }}
+      <div
+        className="tt-loop origin-top"
+        style={{ animation: `tt-sway ${5 + step * 0.6}s ease-in-out ${step * 0.4}s infinite` }}
       >
         <Hanger kind={s.hang} />
         <div
@@ -282,7 +286,7 @@ function Card({ step, wide = false, delay }: { step: number; wide?: boolean; del
           <h3 className={cn("type-heading relative text-xl leading-tight", wide ? "mt-2" : "mt-4")}>{s.title}</h3>
           <p className="relative mt-1.5 text-[15px] leading-relaxed text-ink/70">{s.body}</p>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }

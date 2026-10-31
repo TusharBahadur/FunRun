@@ -13,7 +13,7 @@ type RotatingWordsProps = {
   className?: string;
 };
 
-/** Cycles through phrases with a per-letter rise-in. */
+/** Cycles through phrases, each rising in as one piece. */
 export function RotatingWords({
   words,
   interval = 2600,
@@ -60,26 +60,24 @@ export function RotatingWords({
               transition: { duration: 0.35, ease: EASE_IN },
             }}
           >
-            {Array.from(word).map((char, i) =>
-              started ? (
-                <motion.span
-                  key={i}
-                  className="inline-block"
-                  initial={{ y: "70%", opacity: 0 }}
-                  animate={{ y: "0%", opacity: 1 }}
-                  transition={{ duration: 0.75, ease: EASE_OUT, delay: i * 0.035 }}
-                >
-                  {char === " " ? " " : char}
-                </motion.span>
-              ) : (
-                <span
-                  key={i}
-                  className="tt-css-reveal inline-block"
-                  style={{ animation: `tt-rise-fade 0.75s cubic-bezier(0.22, 1, 0.36, 1) ${startDelay + i * 0.035}s both` }}
-                >
-                  {char === " " ? " " : char}
-                </span>
-              ),
+            {/* The whole phrase moves as one: letter-by-letter looked like the
+                text was still being built, and cost far more on phones. */}
+            {started ? (
+              <motion.span
+                className="inline-block whitespace-pre"
+                initial={{ y: "45%", opacity: 0 }}
+                animate={{ y: "0%", opacity: 1 }}
+                transition={{ duration: 0.6, ease: EASE_OUT }}
+              >
+                {word}
+              </motion.span>
+            ) : (
+              <span
+                className="tt-css-reveal inline-block whitespace-pre"
+                style={{ animation: `tt-rise-fade 0.75s cubic-bezier(0.22, 1, 0.36, 1) ${startDelay}s both` }}
+              >
+                {word}
+              </span>
             )}
           </motion.span>
         )}

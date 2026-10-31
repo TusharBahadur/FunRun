@@ -37,7 +37,7 @@ export function PreviewWithNames({
   const fromName = sp.get("from") || undefined;
   const query = new URLSearchParams({ ...(toName ? { to: toName } : {}), ...(fromName ? { from: fromName } : {}) }).toString();
   const withNames = (path: string) => `${path}${query ? `?${query}` : ""}`;
-  const pill = "flex h-10 items-center rounded-full shadow-sm backdrop-blur";
+  const pill = "flex h-10 items-center rounded-full shadow-sm md:backdrop-blur";
 
   // Back · ‹ page › on the left, "Make it yours" on the right. Kept small: the gift is the point.
   const controls = (pages?: { index: number; count: number; go: (index: number) => void }, ctaRight = "right-4") => (

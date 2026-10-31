@@ -251,7 +251,7 @@ function PagesPlayer({
             type="button"
             onClick={() => go(safeIndex - 1)}
             aria-label="Previous page"
-            className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] left-4 z-40 grid size-10 place-items-center rounded-full backdrop-blur"
+            className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] left-4 z-40 grid size-10 place-items-center rounded-full md:backdrop-blur"
             style={{ backgroundColor: `${palette.cream}cc`, color: palette.ink }}
           >
             <ChevronLeft className="size-5" />
@@ -268,7 +268,7 @@ function PagesPlayer({
             } else playSong();
           }}
           aria-label={playing ? "Stop the music" : "Play the music"}
-          className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] right-4 z-40 grid size-10 place-items-center rounded-full backdrop-blur"
+          className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] right-4 z-40 grid size-10 place-items-center rounded-full md:backdrop-blur"
           style={{ backgroundColor: `${palette.cream}cc`, color: palette.ink }}
         >
           {playing ? <Volume2 className="size-4" /> : <VolumeX className="size-4 opacity-60" />}
