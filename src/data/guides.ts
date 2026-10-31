@@ -160,6 +160,223 @@ export const guides: Guide[] = [
       },
     ],
   },
+  {
+    slug: "what-to-write-in-a-birthday-message",
+    title: "What to write in a birthday message",
+    accent: "that isn’t just HBD.",
+    seoTitle: "What to Write in a Birthday Message (Examples for Every Person)",
+    description:
+      "Birthday wishes that sound like you, not a forward: a simple formula, and ready-to-adapt messages for your partner, best friend, Maa, Papa and siblings.",
+    intro:
+      "“Happy birthday! Have a great year 🎉” is fine. It’s also what everyone else sent. Here’s a simple way to write a birthday message that actually lands, with examples for the people you’re most likely writing to.",
+    published: "2026-11-01",
+    updated: "2026-11-01",
+    occasion: "birthday",
+    cta: {
+      text: "Want it to feel like a surprise, not a text? Turn your message into a little birthday page with candles to blow out and your photos, timed to open at midnight.",
+      label: "See birthday templates",
+    },
+    body: [
+      { type: "h2", text: "The three-line formula", id: "formula" },
+      {
+        type: "p",
+        text: "Almost every good birthday message does three small things. You don’t need more than a line for each.",
+      },
+      {
+        type: "list",
+        items: [
+          "Something only you would say. A memory, an inside joke, a nickname, a thing they did this year that you noticed.",
+          "What they mean to you, plainly. Not “you’re the best”, but why: “you’re the first person I call when something goes wrong”.",
+          "A wish that fits them. Not “all the happiness in the world”, but “I hope this is the year you finally take that trip to Spiti”.",
+        ],
+      },
+      {
+        type: "note",
+        text: "Quick test before you send: could this message be sent to anyone else in your contacts? If yes, add one detail that makes it only theirs.",
+      },
+
+      { type: "h2", text: "For your partner", id: "partner" },
+      {
+        type: "letter",
+        label: "Girlfriend or boyfriend",
+        lines: [
+          "Happy birthday to the person who still laughs at my worst jokes and pretends my cooking is good.",
+          "This year you took on a new job, a new city and me on my most dramatic days, and you made all of it look easy. I’m so proud of you.",
+          "I hope this year is gentle with you, and that you finally get that window seat you keep talking about. I’ll be in the one next to it.",
+        ],
+        sign: "Love you, today and every day after",
+      },
+
+      { type: "h2", text: "For your best friend", id: "best-friend" },
+      {
+        type: "letter",
+        label: "Best friend",
+        lines: [
+          "Happy birthday to the only person who knows the full story of what happened in Goa and has still never told anyone.",
+          "Ten years, three cities and a thousand voice notes later, you’re still the person I want to tell everything to first.",
+          "Have the loudest, happiest year. And reply to my texts like a normal human, just this once.",
+        ],
+        sign: "Yours till the group chat dies",
+      },
+
+      { type: "h2", text: "For Maa", id: "maa" },
+      {
+        type: "letter",
+        label: "For Maa",
+        lines: [
+          "Happy birthday, Maa. I don’t say it enough, so I’m writing it down: thank you.",
+          "For waking up before everyone, for the tiffin that was always ready, for pretending you weren’t worried every time I came home late.",
+          "This year, I hope you do something just for yourself. And let someone else make the chai for once.",
+        ],
+        sign: "Your favourite child (don’t tell the others)",
+      },
+
+      { type: "h2", text: "For Papa", id: "papa" },
+      {
+        type: "letter",
+        label: "For Papa",
+        lines: [
+          "Happy birthday, Papa. You taught me how to ride a cycle, how to save money and how to argue properly. All three have been very useful.",
+          "I see more of you in myself every year, and I’m glad about that.",
+          "Wishing you good health, long walks and a year with fewer things to fix around the house.",
+        ],
+        sign: "With love and respect",
+      },
+
+      { type: "h2", text: "For a brother or sister", id: "siblings" },
+      {
+        type: "letter",
+        label: "Bhai or Didi",
+        lines: [
+          "Happy birthday to my first best friend and my first enemy, often on the same day.",
+          "You’ve covered for me more times than I can count, and you’re still the only one I trust with the remote.",
+          "Have an amazing year. Your gift is that I won’t tell Maa about the thing.",
+        ],
+        sign: "Your favourite sibling, obviously",
+      },
+
+      { type: "h2", text: "When they’re far away", id: "far-away" },
+      {
+        type: "p",
+        text: "Distance makes timing matter more. Send it so it arrives at midnight their time, or the moment they wake up, and mention the distance once, warmly, without making it sad: “I hate that I’m not there to embarrass you with a cake, so here’s the next best thing.”",
+      },
+
+      { type: "h2", text: "Things to avoid", id: "avoid" },
+      {
+        type: "list",
+        items: [
+          "Forwarded quotes and long poems from the internet. They read as “I didn’t have time”.",
+          "Jokes about age that might sting this particular person. You know which ones.",
+          "Making it about you: “I can’t believe I forgot last year” belongs in a separate apology.",
+          "Sending it at 11:58 pm the next day. Late is fine; pretending it isn’t late isn’t.",
+        ],
+      },
+      {
+        type: "p",
+        text: "Short and specific beats long and generic every time. Three honest lines are a gift in themselves.",
+      },
+    ],
+  },
+  {
+    slug: "how-to-say-sorry",
+    title: "How to say sorry",
+    accent: "and mean it.",
+    seoTitle: "How to Say Sorry Properly (With Example Apology Messages)",
+    description:
+      "How to apologise to your girlfriend, boyfriend or best friend in a way that actually repairs things: what to say, what not to say, and real example messages.",
+    intro:
+      "A good apology isn’t about finding the perfect words. It’s about making the other person feel heard. Here’s what that looks like, step by step, with example messages you can adapt for your own situation.",
+    published: "2026-11-01",
+    updated: "2026-11-01",
+    occasion: "apology",
+    cta: {
+      text: "When a text feels too small, say it with something you made: an apology page in your own words, with a few honest promises and a gentle way for them to answer.",
+      label: "See apology templates",
+    },
+    body: [
+      { type: "h2", text: "What a real apology has", id: "parts" },
+      {
+        type: "list",
+        items: [
+          "Name what you did. Not “I’m sorry for everything”, but “I’m sorry I cancelled on Saturday at the last minute”.",
+          "Name how it affected them. “You’d planned the whole evening and I made it feel like it didn’t matter.”",
+          "Own it, without a “but”. Anything after “but” cancels what came before it.",
+          "Say what will change. One small, specific thing you will actually do.",
+          "Give them space to answer. An apology isn’t a request for instant forgiveness.",
+        ],
+      },
+      {
+        type: "note",
+        text: "Avoid “I’m sorry you feel that way” and “I’m sorry if I upset you”. Both quietly put the problem on them.",
+      },
+
+      { type: "h2", text: "Example: to your girlfriend", id: "girlfriend" },
+      {
+        type: "letter",
+        label: "To her",
+        lines: [
+          "I’m sorry about last night. You were telling me about your day and I was on my phone the whole time.",
+          "You noticed, and you were right to be hurt. It made you feel like what you said didn’t matter to me, and it does.",
+          "From now on, when we’re talking, my phone goes face down. And I want to hear the rest of the story about your manager, properly this time.",
+        ],
+        sign: "I’m sorry. I love you.",
+      },
+
+      { type: "h2", text: "Example: to your boyfriend", id: "boyfriend" },
+      {
+        type: "letter",
+        label: "To him",
+        lines: [
+          "I’m sorry for what I said in the car. I was stressed about work and I took it out on you, and that wasn’t fair.",
+          "You were only trying to help, and I made you feel like the problem.",
+          "Next time I’m having a bad day, I’ll tell you that, instead of picking a fight about the route.",
+        ],
+        sign: "Still your favourite passenger, hopefully",
+      },
+
+      { type: "h2", text: "Example: to your best friend", id: "best-friend" },
+      {
+        type: "letter",
+        label: "To a friend",
+        lines: [
+          "I owe you an apology. I missed your birthday dinner and then went quiet instead of explaining. That’s worse than just missing it.",
+          "You’ve shown up for me every single time, and I didn’t show up for you.",
+          "Let me take you out this weekend, my treat, your choice of place. And I’ll be on time. Early, even.",
+        ],
+        sign: "Your very sorry friend",
+      },
+
+      { type: "h2", text: "Example: a short one, when it’s small", id: "short" },
+      {
+        type: "letter",
+        label: "Short and sweet",
+        lines: ["I was snappy with you earlier and you didn’t deserve it. Sorry. Chai’s on me tomorrow."],
+        sign: "Me",
+      },
+
+      { type: "h2", text: "What to avoid", id: "avoid" },
+      {
+        type: "list",
+        items: [
+          "Explaining before apologising. Context can come later, if they ask for it.",
+          "Over-apologising until they have to comfort you. Keep the focus on them.",
+          "Grand promises you can’t keep. “It’ll never happen again” is easy to say and hard to believe.",
+          "Gifts instead of words. A gift can go with an apology; it can’t replace one.",
+          "Asking “are we okay now?” straight away. Give them the time they need.",
+        ],
+      },
+
+      { type: "h2", text: "Text, call or in person?", id: "how" },
+      {
+        type: "p",
+        text: "For something big, in person is best, and a message is a good way to open the door: “I want to apologise properly. Can we talk tonight?” For smaller things, or when they need space first, a thoughtful written apology lets them read it in their own time and reply when they’re ready.",
+      },
+      {
+        type: "p",
+        text: "However you send it, the words matter less than what you do afterwards. The apology is the start of making it right, not the end.",
+      },
+    ],
+  },
 ];
 
 export function getGuide(slug: string) {

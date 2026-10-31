@@ -61,6 +61,7 @@ export const occasionSeo: Record<
 > = {
   birthday: {
     title: "Digital Birthday Gifts & Surprise Websites",
+    guide: { slug: "what-to-write-in-a-birthday-message", label: "Not sure what to write? Birthday message ideas, with examples" },
     gift: "Digital Birthday Gift",
     heading: "Birthday surprises they’ll replay all year.",
     description: "Personalised digital birthday gifts: blow out candles, unlock wishes from friends and read a letter from you. Ready in minutes, opens on any phone.",
@@ -153,6 +154,7 @@ export const occasionSeo: Record<
   },
   apology: {
     title: "Apology Gifts: Say Sorry With a Personal Page",
+    guide: { slug: "how-to-say-sorry", label: "How to say sorry properly, with example messages" },
     gift: "Apology Gift",
     heading: "Sorry, said with more than a text.",
     description: "A heartfelt digital apology with your words, a few small promises and a gentle way to make it right. Private and personal.",
