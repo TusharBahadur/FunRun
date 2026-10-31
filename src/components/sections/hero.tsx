@@ -2,7 +2,6 @@
 
 import { motion } from "motion/react";
 import { RotatingWords } from "@/components/motion/rotating-words";
-import { SplitText } from "@/components/motion/split-text";
 import { TemplatePreview } from "@/components/templates/template-preview";
 import { ButtonLink } from "@/components/ui/button";
 import { EASE_OUT, INTRO_DELAY } from "@/lib/motion";
@@ -40,13 +39,16 @@ export function Hero({ featured }: { featured: Template[] }) {
       <div className="relative z-10 flex flex-col items-center text-center">
         <h1 className="text-[clamp(2.6rem,min(8vw,11svh),7.5rem)] type-display">
           <span className="block font-semibold">
-            <SplitText text="Say" delay={INTRO_DELAY + 0.05} immediate />
+            {/* Plain text, no entrance: the masked rise-in cut off the bottom of
+                the letters and revealed it a moment later, which looked like the
+                headline filling in in pieces on phones. */}
+            Say
           </span>
           <span className="type-accent block py-[0.04em] text-[1.08em] leading-[1.12] text-rose">
             <RotatingWords words={phrases} startDelay={INTRO_DELAY + 0.2} />
           </span>
           <span className="block font-bold italic">
-            <SplitText text="beautifully." delay={INTRO_DELAY + 0.35} immediate />
+            beautifully.
           </span>
         </h1>
 
