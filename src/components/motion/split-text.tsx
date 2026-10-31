@@ -1,76 +1,23 @@
-"use client";
-
-import { motion, useInView } from "motion/react";
-import { Fragment, useRef } from "react";
-import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 type SplitTextProps = {
   text: string;
   className?: string;
-  /** Seconds before the first piece starts moving. */
+  /** Kept so existing headings compile; headings no longer animate in. */
   delay?: number;
   stagger?: number;
-  /** Reveal word by word (default) or letter by letter. */
   by?: "word" | "char";
-  /**
-   * Play right away with a CSS animation, from the first paint, without
-   * waiting for JavaScript. For text at the top of the page (the hero).
-   */
   immediate?: boolean;
 };
 
-/** Masked "rise from below" reveal, triggered when scrolled into view. */
-export function SplitText({
-  text,
-  className,
-  delay = 0,
-  stagger = 0.06,
-  by = "word",
-  immediate = false,
-}: SplitTextProps) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "0px 0px -8% 0px" });
-  const words = text.split(" ");
-  let index = 0;
-
-  return (
-    <span ref={ref} className={cn("inline", className)}>
-      <span className="sr-only">{text}</span>
-      {words.map((word, w) => (
-        <Fragment key={w}>
-          <span aria-hidden className="inline-block whitespace-nowrap">
-            {(by === "char" ? Array.from(word) : [word]).map((part, p) => {
-              const i = index++;
-              return (
-                <span
-                  key={p}
-                  className="-mb-[0.22em] -mr-[0.06em] inline-block overflow-y-clip pr-[0.06em] pb-[0.22em]"
-                >
-                  {immediate ? (
-                    <span
-                      className="tt-css-reveal inline-block origin-bottom-left"
-                      style={{ animation: `tt-rise 1s cubic-bezier(0.22, 1, 0.36, 1) ${delay + i * stagger}s both` }}
-                    >
-                      {part}
-                    </span>
-                  ) : (
-                    <motion.span
-                      className="inline-block origin-bottom-left will-change-transform"
-                      initial={{ y: "115%", rotate: 5 }}
-                      animate={inView ? { y: "0%", rotate: 0 } : undefined}
-                      transition={{ duration: 1, ease: EASE_OUT, delay: delay + i * stagger }}
-                    >
-                      {part}
-                    </motion.span>
-                  )}
-                </span>
-              );
-            })}
-          </span>
-          {w < words.length - 1 && " "}
-        </Fragment>
-      ))}
-    </span>
-  );
+/**
+ * A heading fragment, shown as plain text.
+ *
+ * It used to rise in word by word from behind a clip mask. On phones the
+ * bottoms of the letters appeared a beat after the tops (it looked like the
+ * text was filling in), headings started hidden until JavaScript loaded, and
+ * every word was its own animation. Plain text is instant and costs nothing.
+ */
+export function SplitText({ text, className }: SplitTextProps) {
+  return <span className={cn("inline", className)}>{text}</span>;
 }

@@ -38,16 +38,18 @@ export function Hero({ featured }: { featured: Template[] }) {
 
       <div className="relative z-10 flex flex-col items-center text-center">
         <h1 className="text-[clamp(2.6rem,min(8vw,11svh),7.5rem)] type-display">
-          <span className="block font-semibold">
-            {/* Plain text, no entrance: the masked rise-in cut off the bottom of
-                the letters and revealed it a moment later, which looked like the
-                headline filling in in pieces on phones. */}
+          {/* Each line fades in and settles, one after another (CSS, see tt-hero-in).
+              No clip mask: that showed the bottoms of letters a beat late on phones. */}
+          <span className="tt-css-reveal block font-semibold" style={{ animation: "tt-hero-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both" }}>
             Say
           </span>
-          <span className="type-accent block py-[0.04em] text-[1.08em] leading-[1.12] text-rose">
+          <span
+            className="tt-css-reveal type-accent block py-[0.04em] text-[1.08em] leading-[1.12] text-rose"
+            style={{ animation: "tt-hero-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both" }}
+          >
             <RotatingWords words={phrases} startDelay={INTRO_DELAY + 0.2} />
           </span>
-          <span className="block font-bold italic">
+          <span className="tt-css-reveal block font-bold italic" style={{ animation: "tt-hero-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both" }}>
             beautifully.
           </span>
         </h1>

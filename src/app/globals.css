@@ -370,3 +370,11 @@ body {
   content-visibility: auto;
   contain-intrinsic-size: auto 900px;
 }
+
+/* Hero headline: each line fades in and settles up a few pixels, one after
+   another. Opacity + transform only (GPU), no clip mask, so letters never
+   appear in pieces. Off with reduced motion (via .tt-css-reveal). */
+@keyframes tt-hero-in {
+  from { opacity: 0; transform: translateY(0.12em); }
+  to { opacity: 1; transform: none; }
+}
