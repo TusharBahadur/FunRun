@@ -1,3 +1,6 @@
+"use client";
+
+import { useImageLoading } from "@/components/story/image-loading";
 import { cn } from "@/lib/utils";
 import { TONES } from "./tones";
 import type { PhotoTone } from "./types";
@@ -16,11 +19,12 @@ export function PhotoFill({
   iconClassName?: string;
   className?: string;
 }) {
+  const { loading, fetchPriority } = useImageLoading();
   if (src) {
     return (
       // Sender uploads are local data URLs, so next/image adds nothing here.
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={src} alt={alt} loading="lazy" decoding="async" draggable={false} className={cn("bg-[#ece4dc] object-cover", className)} />
+      <img src={src} alt={alt} loading={loading} fetchPriority={fetchPriority} decoding="async" draggable={false} className={cn("bg-[#ece4dc] object-cover", className)} />
     );
   }
   const t = TONES[tone];

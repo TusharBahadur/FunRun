@@ -3,7 +3,7 @@
  * Builds fingerprinted WebP images from the sources in assets/.
  *
  *   assets/stickers/<file>  → public/a/s/<sticker id>.<hash>.webp   (max 512px)
- *   assets/photos/<file>    → public/a/p/<name>.<hash>.webp         (max 1600px)
+ *   assets/photos/<file>    → public/a/p/<name>.<hash>.webp         (max 960px)
  *
  * <hash> comes from the source file's bytes, so replacing a source makes a new
  * file and leaves the old one alone. Published gifts point at exact files, so
@@ -45,7 +45,8 @@ for (const [id, s] of Object.entries(stickers)) {
 }
 for (const file of (await fs.readdir(rel("assets/photos"))).sort()) {
   if (!/\.(jpe?g|png|webp|gif)$/i.test(file)) continue;
-  jobs.push({ key: `photos/${file}`, source: `assets/photos/${file}`, outDir: "public/a/p", name: path.parse(file).name, max: 1600, quality: 80 });
+  // 960px still looks sharp full-width on a 3x phone; wider was wasted bytes.
+  jobs.push({ key: `photos/${file}`, source: `assets/photos/${file}`, outDir: "public/a/p", name: path.parse(file).name, max: 960, quality: 76 });
 }
 
 let sharp = null;
@@ -61,7 +62,9 @@ for (const job of jobs) {
   const buf = await fs.readFile(rel(job.source)).catch(() => {
     throw new Error(`Missing source ${job.source}`);
   });
-  const hash = createHash("sha256").update(VERSION).update(buf).digest("hex").slice(0, 10);
+  // Photos also hash their size settings, so changing them gives new file names
+  // (and browsers fetch the new files). Sticker names are unaffected.
+  const hash = createHash("sha256").update(VERSION).update(buf).update(job.sticker ? "" : `:${job.max}:${job.quality}`).digest("hex").slice(0, 10);
   const out = `${job.outDir}/${job.name}.${hash}.webp`;
   const src = "/" + out.replace(/^public\//, "");
   let entry = previous[job.key]?.src === src ? previous[job.key] : null;

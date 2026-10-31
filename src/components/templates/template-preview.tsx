@@ -1,5 +1,6 @@
 "use client";
 
+import { ImageLoadingContext } from "@/components/story/image-loading";
 import type { Template } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 import { StoryMockup } from "./story-mockup";
@@ -9,11 +10,14 @@ export function TemplatePreview({
   template,
   className,
   compact = false,
+  priority = false,
 }: {
   template: Template;
   className?: string;
   /** Fill a frame that isn't 3:4 without cropping (see StoryMockup). */
   compact?: boolean;
+  /** The main picture of the page: its photos load first instead of lazily. */
+  priority?: boolean;
 }) {
   return (
     // A picture of the gift: one image to screen readers and checkers, not a
@@ -27,7 +31,11 @@ export function TemplatePreview({
       )}
     >
       <div aria-hidden className="contents">
-        {template.story && <StoryMockup template={template} compact={compact} />}
+        {template.story && (
+          <ImageLoadingContext.Provider value={priority ? "priority" : "lazy"}>
+            <StoryMockup template={template} compact={compact} />
+          </ImageLoadingContext.Provider>
+        )}
       </div>
     </div>
   );

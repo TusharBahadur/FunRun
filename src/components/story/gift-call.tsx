@@ -4,6 +4,7 @@ import { ChevronRight, Phone } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { useImageLoading } from "./image-loading";
 import { capturePointer, StudioHit, useStory } from "./scene-kit";
 import { Sticker, stickerImage, type AnyStickerId, type StickerPlacement, type StickerSpot } from "./stickers";
 import type { StoryPalette } from "./types";
@@ -30,12 +31,14 @@ function shell(palette: StoryPalette) {
 
 function ScreenFill({ id, fit }: { id: AnyStickerId; fit: "cover" | "contain" }) {
   const src = stickerImage(id);
+  const { fetchPriority } = useImageLoading();
   if (src) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={src}
         alt=""
+        fetchPriority={fetchPriority}
         draggable={false}
         className={
           fit === "cover"

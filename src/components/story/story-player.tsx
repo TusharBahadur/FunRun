@@ -2,12 +2,13 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronLeft, Volume2, VolumeX } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Confetti, type ConfettiHandle } from "@/components/experiences/confetti";
 import { EASE_OUT } from "@/lib/motion";
 import { accentMoodVars } from "@/components/experiences/birthday/accent-moods";
 import { giftFontRoot } from "./gift-fonts";
 import { useGiftMusic } from "./gift-music";
+import { ImageLoadingContext } from "./image-loading";
 import { autoTurn, turnLabel } from "./labels";
 import { SceneFontsContext, ScenePositionsContext, StoryContext, StudioEditContext, StudioSurface, TurnContext, type StoryApi, type StudioEdit } from "./scene-kit";
 import { SCENES } from "./scene-registry";
@@ -33,7 +34,14 @@ type PlayerProps = {
 
 /** Plays a gift: page by page (the games), or as one scrolling website. */
 export function StoryPlayer(props: PlayerProps) {
-  const inner = props.story.format === "site" ? <SitePlayer {...props} /> : <PagesPlayer {...props} />;
+  const site = props.story.format === "site";
+  // A page-by-page gift only shows its current page, so its photos are on
+  // screen: load them straight away. A website gift scrolls, so stay lazy.
+  // An outer "priority" (preview page, home showcase) wins.
+  const outer = useContext(ImageLoadingContext);
+  const loading = outer === "priority" ? "priority" : site ? "lazy" : "eager";
+  const player = site ? <SitePlayer {...props} /> : <PagesPlayer {...props} />;
+  const inner = <ImageLoadingContext.Provider value={loading}>{player}</ImageLoadingContext.Provider>;
   if (!props.studio) return inner;
   return (
     <StudioEditContext.Provider value={props.studio}>

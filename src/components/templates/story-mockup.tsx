@@ -818,11 +818,6 @@ function PosterLayout({ g }: { g: Gift }) {
           {g.kicker}
         </span>
         <p className="type-display mt-[6cqw] text-[11.5cqw] leading-[0.95]">{unstar(g.opening)}</p>
-        <div className="mt-auto flex items-center">
-          <span className="ml-auto rounded-full px-[3.4cqw] py-[1.6cqw] text-[2.8cqw] font-medium" style={{ backgroundColor: p.accent, color: p.cream }}>
-            Open it →
-          </span>
-        </div>
       </div>
       <div aria-hidden className="absolute -right-[4%] top-[48%] animate-float" style={{ rotate: "10deg" }}>
         <Sticker still id={meme ?? drawn} className="size-[34cqw]" />
@@ -901,7 +896,7 @@ function SiteLayout({ g }: { g: Gift }) {
             </div>
           ) : noticed ? (
             <div className="rounded-[2cqw] px-[3cqw] py-[2.4cqw]" style={{ backgroundColor: p.cream, color: p.ink }}>
-              <span className="type-display text-[3cqw] font-semibold opacity-30">01</span>
+              <span className="type-display text-[3cqw] font-semibold opacity-70">01</span>
               <p className={cn(serif, "text-[3.4cqw]")}>{g.fill(noticed.items[0]?.title ?? "")}</p>
             </div>
           ) : null}
@@ -987,11 +982,6 @@ export function ScreenPeek({ scene, g, className, big = false }: { scene: Scene;
         <Sticker still id={sceneArt[scene.type]} className={cn("mt-[3cqw]", big ? "size-[18cqw]" : "size-[16cqw]")} />
       )}
 
-      {scene.hint && big && (
-        <span className="mt-[2.4cqw] rounded-full px-[3cqw] py-[1cqw] text-[1.9cqw] font-medium" style={{ backgroundColor: palette.accent, color: palette.cream }}>
-          {g.fill(scene.hint)}
-        </span>
-      )}
     </div>
   );
 }

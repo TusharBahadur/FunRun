@@ -280,7 +280,9 @@ body {
 
   /* Any colour, solid: set --btn-bg on the element (a gift's own accent, say). */
   .btn-tint {
-    background-color: var(--btn-bg);
+    /* A shade deeper than the gift colour, so white text stays readable on the
+       lighter palettes (coral, pink, sage). */
+    background-color: color-mix(in oklab, var(--btn-bg), black 22%);
     color: #fff;
     box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--btn-bg) 70%, transparent);
   }

@@ -81,7 +81,7 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
       <div className="mt-6 grid items-start gap-8 md:mt-10 md:grid-cols-12 md:gap-16">
         <div className="mx-auto w-[78%] max-w-sm md:col-span-5 md:mx-0 md:w-full md:max-w-none">
           <TiltCard className="rounded-[1.75rem] shadow-[0_40px_80px_-40px_rgba(27,18,21,0.5)]">
-            <TemplatePreview template={template} />
+            <TemplatePreview template={template} priority />
           </TiltCard>
         </div>
 

@@ -16,7 +16,8 @@ export async function TemplatesListing({ occasion }: { occasion?: OccasionId }) 
     <main className="mx-auto max-w-7xl px-5 pb-32 pt-32 md:pt-40">
       <div className="flex items-end justify-between gap-4">
         <h1 className="text-[clamp(2.4rem,5vw,4.5rem)] type-display">
-          {label ?? "All"} <span className="type-accent text-rose">templates.</span>
+          {/* Two lines on phones: one line only just fits, so the web font swapping in could re-wrap it and shift the page. */}
+          {label ?? "All"} <span className="type-accent block text-rose sm:inline">templates.</span>
         </h1>
         <p className="mb-2 shrink-0 text-sm text-muted md:mb-4">
           {templates.length} {templates.length === 1 ? "design" : "designs"}

@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import type { ComponentProps, CSSProperties } from "react";
 import { BirthdayExperience } from "@/components/experiences/birthday/birthday-experience";
+import { ImageLoadingContext } from "@/components/story/image-loading";
 import type { Story } from "@/components/story/types";
 import { StoryPlayer } from "@/components/story/story-player";
 import { PreviewBack } from "@/components/templates/preview-back";
@@ -42,7 +43,10 @@ export function PreviewWithNames({
     return (
       <>
         {back}
-        <StoryPlayer story={{ ...story, recipient: toName || story.recipient, sender: fromName || story.sender }} slug={slug} />
+        {/* The gift is the page: its first photos load before anything else. */}
+        <ImageLoadingContext.Provider value={story.format === "site" ? "lazy" : "priority"}>
+          <StoryPlayer story={{ ...story, recipient: toName || story.recipient, sender: fromName || story.sender }} slug={slug} />
+        </ImageLoadingContext.Provider>
       </>
     );
   }

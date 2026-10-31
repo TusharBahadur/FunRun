@@ -5,6 +5,7 @@ import { Check, Clock, Lock, PenLine } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { boardStickerCount, drawnStickerIds, Sticker, type AnyStickerId } from "@/components/story/stickers";
+import { ImageLoadingContext } from "@/components/story/image-loading";
 import { StoryPlayer } from "@/components/story/story-player";
 import { occasions } from "@/config/site";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -189,7 +190,10 @@ function Revolver({ templates, index }: { templates: Template[]; index: number }
               {/* The three phones you can see all play their real first page; the hidden one rests. */}
               {slot !== "back" && (
                 <div className="size-full">
-                  <LivePhone template={t} />
+                  {/* The front phone is the biggest picture on the home page: load it first. */}
+                  <ImageLoadingContext.Provider value={front ? "priority" : "lazy"}>
+                    <LivePhone template={t} />
+                  </ImageLoadingContext.Provider>
                 </div>
               )}
             </div>

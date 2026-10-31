@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "TyniTales",
   tagline: "Gift a feeling.",
   description:
-    "Beautiful digital templates you can personalize and gift to the people you love.",
+    "Make a personalised digital gift in a minute: a little page with your photos, words, games and music for birthdays, anniversaries, apologies and more.",
   url: "https://tynitales.com",
   nav: [
     { label: "Templates", href: "/templates" },
