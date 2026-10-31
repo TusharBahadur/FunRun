@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useMotionValue, useTransform, type PanInfo } f
 import { useRef, useState, type ReactNode } from "react";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
 import { Paper, SceneShell, StoryButton, StudioHit, StudioPager, Tape, usePickedItem, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
+import { cn } from "@/lib/utils";
 import type { Scene } from "../types";
 
 type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
@@ -440,13 +441,19 @@ export function PolaroidsScene({ scene, done, onDone }: SceneProps<S<"polaroids"
 
   return (
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} doneText={scene.done} done={done}>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3">
+      {/* Always two by two; an odd last photo sits centred on its own row. */}
+      <div className="mx-auto grid w-fit grid-cols-2 gap-x-4 gap-y-7 sm:gap-x-7 sm:gap-y-9">
         {scene.photos.map((ph, i) => (
-          <StudioHit key={i} field="photos" item={i}>
+          <StudioHit
+            key={i}
+            field="photos"
+            item={i}
+            className={cn(i === scene.photos.length - 1 && scene.photos.length % 2 === 1 && "col-span-2 justify-self-center")}
+          >
           <motion.button
             type="button"
             onClick={() => develop(i)}
-            className="relative w-[min(40vw,180px)] bg-white p-2 pb-12 text-left shadow-[0_18px_30px_-18px_rgba(27,18,21,.5)]"
+            className="relative w-[min(42vw,240px)] bg-white p-2 pb-12 text-left sm:p-2.5 sm:pb-14 shadow-[0_18px_30px_-18px_rgba(27,18,21,.5)]"
             initial={{ opacity: 0, y: 20, rotate: TILTS[i % TILTS.length] * 2 }}
             animate={
               shaking === i
@@ -461,7 +468,7 @@ export function PolaroidsScene({ scene, done, onDone }: SceneProps<S<"polaroids"
               color={[palette.pink, palette.gold, palette.accent][i % 3]}
             />
             <div className="relative aspect-square overflow-hidden">
-              <PhotoFill src={ph.src} tone={ph.tone} alt={fill(ph.caption)} iconClassName="size-10" className="size-full" />
+              <PhotoFill src={ph.src} tone={ph.tone} alt={fill(ph.caption)} iconClassName="size-10 sm:size-12" className="size-full" />
               <motion.div
                 className="absolute inset-0"
                 style={{ background: "linear-gradient(160deg,#3b3a3f,#1d1c20)" }}
@@ -479,8 +486,8 @@ export function PolaroidsScene({ scene, done, onDone }: SceneProps<S<"polaroids"
               className="absolute bottom-1.5 left-3 right-3 transition-opacity duration-700"
               style={{ opacity: developed[i] ? 1 : 0, color: palette.ink }}
             >
-              <span className="type-hand block truncate text-[17px] leading-tight">{fill(ph.caption)}</span>
-              {ph.date && <span className="type-hand block text-xs opacity-55">{ph.date}</span>}
+              <span className="type-hand block truncate text-[17px] leading-tight sm:text-[20px]">{fill(ph.caption)}</span>
+              {ph.date && <span className="type-hand block text-xs opacity-55 sm:text-sm">{ph.date}</span>}
             </span>
           </motion.button>
           </StudioHit>
