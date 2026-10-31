@@ -10,7 +10,8 @@
  * they never change. Old outputs are never deleted.
  *
  * Writes src/data/sticker-hashes.json, src/data/sticker-memes.json, src/data/sticker-stills.json
- * and src/data/asset-files.json. Animated stickers also get <id>.<hash>.still.webp (first frame).
+ * and src/data/asset-files.json. Animated stickers also get <id>.<hash>.still.webp (first frame);
+ * everything else gets <name>.<hash>.thumb.webp (192px stickers, 400px photos) for cards.
  * Runs before `dev` and `build`. Only needs sharp when something new must be
  * converted (sharp ships with Next.js).
  *
@@ -116,13 +117,26 @@ for (const job of jobs) {
   // Animated stickers also get a small still (first frame) for thumbnails and
   // the studio picker, where a 300 KB animation at 50px is wasted.
   // An animated WebP has an ANIM chunk near the start of the file.
-  if (job.sticker && existsSync(rel(out)) && (await fs.readFile(rel(out))).subarray(0, 64).includes("ANIM")) {
+  const animated = job.sticker && existsSync(rel(out)) && (await fs.readFile(rel(out))).subarray(0, 64).includes("ANIM");
+  if (animated) {
     const still = `${job.outDir}/${job.name}.${hash}.still.webp`;
     if (!existsSync(rel(still)) && !check) {
       const s = await loadSharp();
       await s(rel(out), { pages: 1 }).resize({ width: 256, height: 256, fit: "inside", withoutEnlargement: true }).webp({ quality: 80, effort: 6 }).toFile(rel(still));
     }
     stills.push(`${job.sticker}.${hash}`);
+  } else if (existsSync(rel(out))) {
+    // Everything else gets a small copy for template cards and thumbnails,
+    // where the full file (512px stickers, 960px photos) is shown far smaller.
+    const thumb = `${job.outDir}/${job.name}.${hash}.thumb.webp`;
+    if (!existsSync(rel(thumb))) {
+      if (check) stale.push(`${job.source} (thumbnail)`);
+      else {
+        const s = await loadSharp();
+        const size = job.sticker ? 192 : 400;
+        await s(rel(out)).resize({ width: size, height: size, fit: "inside", withoutEnlargement: true }).webp({ quality: 76, effort: 6 }).toFile(rel(thumb));
+      }
+    }
   }
   files[job.key] = entry;
 }

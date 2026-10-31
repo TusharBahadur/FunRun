@@ -1,11 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useId, type ReactNode } from "react";
+import { useContext, useId, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import memeIds from "@/data/sticker-memes.json";
 import stickerHashes from "@/data/sticker-hashes.json";
 import stickerStills from "@/data/sticker-stills.json";
+import { ImageLoadingContext } from "./image-loading";
 import { StudioHit, useStudioEdit } from "./scene-kit";
 
 /**
@@ -382,10 +383,14 @@ export function isBoardSticker(id: string) {
 }
 
 /** Bitmap for a board sticker or upload; drawn stickers have none. */
-export function stickerImage(id: AnyStickerId) {
+export function stickerImage(id: AnyStickerId, small = false) {
   if (isUploadedSticker(id)) return id;
   const ref = boardRef(id);
-  return ref ? `/a/s/${ref.key}.${ref.hash}.webp` : null;
+  if (!ref) return null;
+  const base = `/a/s/${ref.key}.${ref.hash}`;
+  // Small: the first frame of an animated sticker, or the 192px copy of a still one (cards).
+  if (small) return `${base}${stills.has(`${ref.key}.${ref.hash}`) ? ".still" : ".thumb"}.webp`;
+  return `${base}.webp`;
 }
 
 /**
@@ -394,6 +399,10 @@ export function stickerImage(id: AnyStickerId) {
  * 300 KB): for thumbnails and pickers, never inside a gift.
  */
 export function Sticker({ id, className, still }: { id: AnyStickerId; className?: string; still?: boolean }) {
+  // Small displays (cards, pickers) get the small copy; the big preview on a
+  // template's page ("priority") keeps the full file so it stays sharp.
+  const loadingMode = useContext(ImageLoadingContext);
+  const small = still && loadingMode !== "priority";
   if (isUploadedSticker(id)) {
     return (
       <div className={cn("size-24 overflow-hidden rounded-[22%] bg-white p-[6%] shadow-[0_8px_16px_-8px_rgba(42,26,31,0.45)]", className)}>
@@ -416,7 +425,7 @@ export function Sticker({ id, className, still }: { id: AnyStickerId; className?
         {/* Small fixed assets; next/image would add a request per size for no gain. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={`/a/s/${ref.key}.${ref.hash}${still && stills.has(`${ref.key}.${ref.hash}`) ? ".still" : ""}.webp`}
+          src={`/a/s/${ref.key}.${ref.hash}${still && stills.has(`${ref.key}.${ref.hash}`) ? ".still" : small ? ".thumb" : ""}.webp`}
           alt=""
           loading="lazy"
           decoding="async"

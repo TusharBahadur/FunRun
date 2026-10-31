@@ -32,7 +32,7 @@ export function TemplatePreview({
     >
       <div aria-hidden className="contents">
         {template.story && (
-          <ImageLoadingContext.Provider value={priority ? "priority" : "lazy"}>
+          <ImageLoadingContext.Provider value={priority ? "priority" : "thumb"}>
             <StoryMockup template={template} compact={compact} />
           </ImageLoadingContext.Provider>
         )}

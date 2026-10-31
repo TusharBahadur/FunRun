@@ -30,8 +30,9 @@ function shell(palette: StoryPalette) {
 }
 
 function ScreenFill({ id, fit }: { id: AnyStickerId; fit: "cover" | "contain" }) {
-  const src = stickerImage(id);
-  const { fetchPriority } = useImageLoading();
+  const { fetchPriority, thumb } = useImageLoading();
+  // In a template card, the small copy (a 300 KB animation is wasted there).
+  const src = stickerImage(id, thumb);
   if (src) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
