@@ -16,6 +16,9 @@ export function Providers({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Phones and tablets scroll natively (Lenis doesn't smooth touch anyway);
+    // skipping it there saves a never-ending animation loop on every page.
+    if (window.matchMedia("(pointer: coarse)").matches) return;
     const lenis = new Lenis({ lerp: 0.1, anchors: { offset: -24 } });
     let frame = requestAnimationFrame(function loop(time) {
       lenis.raf(time);

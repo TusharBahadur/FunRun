@@ -42,20 +42,48 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
   // Counts every turn without wrapping, so the notes keep taking turns in order
   // even though there are more gifts than notes.
   const [turn, setTurn] = useState(0);
+  // The next gift to come round is built ahead, once the stack is still, so a
+  // turn never has to build a whole gift mid-animation (that was the stutter).
+  const [settled, setSettled] = useState(false);
+  const settleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const go = (next: number) => {
     setI(next);
     setTurn((t) => t + 1);
+    setSettled(false);
+    clearTimeout(settleTimer.current);
+    settleTimer.current = setTimeout(() => setSettled(true), TURN_S * 1000 + 150);
   };
   const n = templates.length;
   const current = templates[i];
 
+  // Only turn while the stack is on screen: off screen it was still rebuilding
+  // gifts every few seconds, slowing down scrolling and the menu.
+  const section = useRef<HTMLElement>(null);
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
+    const el = section.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { rootMargin: "100px" });
+    io.observe(el);
+    // After the page has loaded, build the next gift in the background.
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500));
+    const handle = idle(() => setSettled(true));
+    return () => {
+      io.disconnect();
+      if (window.cancelIdleCallback) window.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
+      clearTimeout(settleTimer.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!visible) return;
     const id = setTimeout(() => go((i + 1) % n), SLIDE_MS);
     return () => clearTimeout(id);
-  }, [i, n]);
+  }, [i, n, visible]);
 
   return (
-    <section className="relative overflow-hidden px-5 pb-14 pt-2 md:pb-20 md:pt-4">
+    <section ref={section} className="relative overflow-hidden px-5 pb-14 pt-2 md:pb-20 md:pt-4">
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgb(27_18_21/0.07)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_75%)]" />
 
       <div className="relative mx-auto max-w-2xl text-center">
@@ -88,7 +116,7 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
           <FloatingSticker id="b-frog-kiss" className="-right-7 top-16 size-16 sm:-right-12 sm:top-24 sm:size-20" delay={0.6} />
           <FloatingSticker id="m-flower-kitten" className="-left-7 bottom-16 size-16 sm:-left-14 sm:bottom-24 sm:size-20" delay={1.2} />
           <FloatingSticker id="b-love-duck" className="-right-6 -bottom-2 size-14 sm:-right-8 sm:bottom-6 sm:size-16" delay={1.8} />
-          <Revolver templates={templates} index={i} />
+          <Revolver templates={templates} index={i} settled={settled} />
         </div>
 
         <Perks items={perks.right} align="start" beat={turn} tint={current.palette} className="order-3" />
@@ -151,7 +179,7 @@ type Slot = "center" | "left" | "right" | "back";
  * to the front, the front one to the left, the left one round the back, and
  * the one at the back comes out on the right.
  */
-function Revolver({ templates, index }: { templates: Template[]; index: number }) {
+function Revolver({ templates, index, settled }: { templates: Template[]; index: number; settled: boolean }) {
   const n = templates.length;
   const narrow = useMediaQuery("(max-width: 639px)");
   const reach = narrow ? 64 : 150;
@@ -187,8 +215,8 @@ function Revolver({ templates, index }: { templates: Template[]; index: number }
                   : "shadow-[0_24px_44px_-26px_rgba(27,18,21,0.3)]",
               )}
             >
-              {/* The three phones you can see all play their real first page; the hidden one rests. */}
-              {slot !== "back" && (
+              {/* The three you can see play their first page; the next one to come round is built while hidden. */}
+              {(slot !== "back" || (off === 2 && settled)) && (
                 <div className="size-full">
                   {/* The front phone is the biggest picture on the home page: load it first. */}
                   <ImageLoadingContext.Provider value={front ? "priority" : "lazy"}>

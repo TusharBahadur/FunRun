@@ -44,8 +44,8 @@
   /* Three families. Hindi falls back to the device's Devanagari font. */
   --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
-  --font-italic: var(--font-fraunces), ui-serif, Georgia, serif;
-  --font-wordmark: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-italic: var(--font-fraunces-accent), var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-wordmark: var(--font-fraunces-accent), var(--font-fraunces), ui-serif, Georgia, serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
   --font-hand: var(--font-kalam), ui-rounded, system-ui, sans-serif;
 }

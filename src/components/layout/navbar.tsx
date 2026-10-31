@@ -80,7 +80,8 @@ function NavbarView({ pathname }: { pathname: string | null }) {
             className={cn(
               "flex items-center justify-between rounded-full border transition-all duration-500 ease-out-expo",
               scrolled && !open
-                ? "border-ink/6 bg-paper/70 py-1.5 pl-5 pr-1.5 shadow-[0_8px_30px_-12px_rgba(27,18,21,0.25)] backdrop-blur-xl"
+                ? // Live blur only on larger screens: on phones it re-blurs the moving page every frame while scrolling.
+                  "border-ink/6 bg-paper/95 py-1.5 pl-5 pr-1.5 shadow-[0_8px_30px_-12px_rgba(27,18,21,0.25)] md:bg-paper/70 md:backdrop-blur-xl"
                 : "border-transparent py-2.5 pl-2 pr-0",
             )}
           >
@@ -153,10 +154,10 @@ function NavbarView({ pathname }: { pathname: string | null }) {
                 aria-expanded={open}
                 aria-controls="site-menu"
                 className={cn(
-                  "type-label flex h-10 items-center gap-3 rounded-full border pl-4 pr-3.5 backdrop-blur-xl transition-colors duration-500 lg:hidden",
+                  "type-label flex h-10 items-center gap-3 rounded-full border pl-4 pr-3.5 transition-colors duration-500 md:backdrop-blur-xl lg:hidden",
                   open
                     ? "border-cream/15 bg-cream/10 text-cream"
-                    : "border-ink/10 bg-paper/70 text-ink hover:bg-paper",
+                    : "border-ink/10 bg-paper/90 text-ink hover:bg-paper md:bg-paper/70",
                 )}
               >
                 Menu
@@ -170,14 +171,14 @@ function NavbarView({ pathname }: { pathname: string | null }) {
       <AnimatePresence>
         {open && (
           <>
-            {/* The page stays visible behind, softly blurred. */}
+            {/* The page stays visible behind (softly blurred on larger screens; phones skip the blur, it made opening the menu stutter). */}
             <motion.button
               key="scrim"
               type="button"
               aria-label="Close menu"
               tabIndex={-1}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 z-40 cursor-default bg-ink/15 backdrop-blur-[3px]"
+              className="fixed inset-0 z-40 cursor-default bg-ink/25 md:bg-ink/15 md:backdrop-blur-[3px]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -189,7 +190,7 @@ function NavbarView({ pathname }: { pathname: string | null }) {
               id="site-menu"
               aria-label="Site menu"
               data-lenis-prevent
-              className="fixed inset-2 z-40 flex flex-col overflow-hidden rounded-[1.75rem] border border-cream/10 bg-ink/75 px-7 pb-8 pt-28 text-cream shadow-[0_0_80px_-20px_rgba(27,18,21,0.6)] backdrop-blur-2xl md:inset-y-0 md:left-auto md:right-0 md:w-[min(36vw,560px)] md:min-w-[420px] md:rounded-none md:border-y-0 md:border-r-0 md:px-12"
+              className="fixed inset-2 z-40 flex flex-col overflow-hidden rounded-[1.75rem] border border-cream/10 bg-ink/[0.94] px-7 pb-8 pt-28 text-cream shadow-[0_0_80px_-20px_rgba(27,18,21,0.6)] will-change-transform md:inset-y-0 md:bg-ink/75 md:backdrop-blur-2xl md:left-auto md:right-0 md:w-[min(36vw,560px)] md:min-w-[420px] md:rounded-none md:border-y-0 md:border-r-0 md:px-12"
               initial={{ x: "105%" }}
               animate={{ x: "0%" }}
               exit={{ x: "105%" }}

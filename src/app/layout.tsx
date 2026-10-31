@@ -35,6 +35,18 @@ const fraunces = Fraunces({
   preload: false,
 });
 
+// Accent words and the wordmark on every page: the same Fraunces italic, but
+// only its weight and optical-size axes (no SOFT/WONK, which only the gifts'
+// serif looks use). A fraction of the size, so it can be preloaded and the
+// hero's rotating words show in the right font from the start, not swap in.
+const frauncesAccent = Fraunces({
+  variable: "--font-fraunces-accent",
+  subsets: ["latin"],
+  style: ["italic"],
+  axes: ["opsz"],
+  preload: true,
+});
+
 // Utility: small uppercase labels only.
 const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
@@ -78,7 +90,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${interTight.variable} ${fraunces.variable} ${plexMono.variable} ${kalam.variable} antialiased`}
+      className={`${interTight.variable} ${fraunces.variable} ${frauncesAccent.variable} ${plexMono.variable} ${kalam.variable} antialiased`}
     >
       <body className="min-h-svh bg-cream font-sans text-ink">
         <Providers>{children}</Providers>
@@ -86,7 +98,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SpeedInsights />
         <div
           aria-hidden
-          className="grain pointer-events-none fixed inset-0 z-[70] opacity-[0.05]"
+          // A full-screen layer over everything costs phones every frame; the 5% grain is barely visible there anyway.
+          className="grain pointer-events-none fixed inset-0 z-[70] hidden opacity-[0.05] md:block"
         />
       </body>
     </html>
