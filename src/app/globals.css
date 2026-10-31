@@ -23,7 +23,7 @@
 
   --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 
-  --animate-marquee: marquee var(--duration, 40s) linear infinite;
+  --animate-marquee: marquee calc(var(--duration, 40s) * var(--marquee-pace, 1)) linear infinite;
   --animate-blink: blink 1s steps(2, start) infinite;
   --animate-float: float 6s ease-in-out infinite;
 
@@ -378,3 +378,10 @@ body {
   from { opacity: 0; transform: translateY(0.12em); }
   to { opacity: 1; transform: none; }
 }
+
+/* Marquees (the reviews strip) move slower on phones: calmer to read, and
+   less to draw each second. Paused while off screen (see Marquee). */
+@media (max-width: 639px) {
+  :root { --marquee-pace: 1.4; }
+}
+.marquee-paused { animation-play-state: paused !important; }
