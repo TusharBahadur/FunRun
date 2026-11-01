@@ -47,15 +47,12 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
   // Only turn while the stack is on screen.
   const section = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
-  const [seen, setSeen] = useState(false);
   useEffect(() => {
     const el = section.current;
     if (!el) return;
     const io = new IntersectionObserver(
       ([e]) => {
         setVisible(e.isIntersecting);
-        // After a lap, so the first pictures aren't held up by the rest.
-        if (e.isIntersecting) window.setTimeout(() => setSeen(true), SLIDE_MS * 2);
       },
       { rootMargin: "100px" },
     );
@@ -105,7 +102,7 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
           <FloatingSticker id="b-frog-kiss" className="-right-7 top-16 size-16 sm:-right-12 sm:top-24 sm:size-20" delay={0.6} />
           <FloatingSticker id="m-flower-kitten" className="-left-7 bottom-16 size-16 sm:-left-14 sm:bottom-24 sm:size-20" delay={1.2} />
           <FloatingSticker id="b-love-duck" className="-right-6 -bottom-2 size-14 sm:-right-8 sm:bottom-6 sm:size-16" delay={1.8} />
-          <Revolver templates={templates} index={i} warm={seen} />
+          <Revolver templates={templates} index={i} />
         </div>
 
         <Perks items={perks.right} align="start" beat={turn} tint={current.palette} className="order-3" />
@@ -150,8 +147,10 @@ function PhonePicture({ slug, front }: { slug: string; front: boolean }) {
       alt=""
       width={750}
       height={1624}
-      loading={front ? "eager" : "lazy"}
-      fetchPriority={front ? "high" : "auto"}
+      // All ten together are ~200 KB: load them all up front (the front one first)
+      // rather than lazily, which left the phones blank for a lap or two.
+      loading="eager"
+      fetchPriority={front ? "high" : "low"}
       decoding="async"
       draggable={false}
       className="size-full rounded-[1.65rem] object-cover object-top sm:rounded-[2.2rem]"
@@ -166,7 +165,7 @@ type Slot = "center" | "left" | "right" | "back";
  * to the front, the front one to the left, the left one round the back, and
  * the one at the back comes out on the right.
  */
-function Revolver({ templates, index, warm }: { templates: Template[]; index: number; warm: boolean }) {
+function Revolver({ templates, index }: { templates: Template[]; index: number }) {
   const n = templates.length;
   const narrow = useMediaQuery("(max-width: 639px)", true);
   const reach = narrow ? 64 : 150;
@@ -186,9 +185,8 @@ function Revolver({ templates, index, warm }: { templates: Template[]; index: nu
         const slot: Slot = off === 0 ? "center" : off === 1 ? "right" : off === n - 1 ? "left" : "back";
         const front = slot === "center";
         // The three you can see, plus the next one to come round (so it's loaded in time).
-        // Once the stack has been seen, every picture stays in: dropping one as it
-        // went round the back made the browser fetch it again on every lap.
-        const shown = warm || slot !== "back" || off === 2;
+        // Every picture stays in from the start: mounting them as they came round
+        // meant a blank phone until each one loaded.
         return (
           <motion.div
             key={t.slug}
@@ -200,13 +198,15 @@ function Revolver({ templates, index, warm }: { templates: Template[]; index: nu
           >
             <div
               className={cn(
-                "relative size-full overflow-hidden rounded-[2rem] border-[5px] border-[#fdfbf8] bg-[#fdfbf8] ring-1 ring-ink/10 transition-shadow duration-700 sm:rounded-[2.6rem] sm:border-[6px]",
+                "relative size-full overflow-hidden rounded-[2rem] border-[5px] border-[#fdfbf8] ring-1 ring-ink/10 transition-shadow duration-700 sm:rounded-[2.6rem] sm:border-[6px]",
                 front
                   ? "shadow-[0_34px_60px_-26px_rgba(27,18,21,0.38),0_6px_16px_-6px_rgba(27,18,21,0.14)]"
                   : "shadow-[0_24px_44px_-26px_rgba(27,18,21,0.3)]",
               )}
+              // While a picture loads, the phone shows the gift's own colour, not blank white.
+              style={{ backgroundColor: t.palette.bg }}
             >
-              {shown && <PhonePicture slug={t.slug} front={front} />}
+              <PhonePicture slug={t.slug} front={front} />
             </div>
           </motion.div>
         );
