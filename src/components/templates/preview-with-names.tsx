@@ -45,7 +45,8 @@ export function PreviewWithNames({
       <nav aria-label="Preview" className="fixed left-4 top-4 z-50 flex gap-2">
         <PreviewBack fallback={withNames(`/templates/${slug}`)} className={`${pill} gap-1.5 px-4 text-sm font-medium`} style={backStyle} />
         {pages && pages.count > 1 && (
-          <div className={`${pill} px-0.5 text-sm`} style={backStyle}>
+          // Phones turn pages with the arrow at the bottom of the gift, so this is desktop only.
+          <div className={`${pill} max-md:hidden px-0.5 text-sm`} style={backStyle}>
             <button
               type="button"
               onClick={() => pages.go(pages.index - 1)}
