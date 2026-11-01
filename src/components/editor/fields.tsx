@@ -89,8 +89,8 @@ export function Field({
         <span
           className={cn(
             "flex items-baseline justify-between gap-3",
-            roomy ? "type-heading text-base font-semibold" : "text-[13px] font-medium",
-            highlight ? "text-rose-deep" : roomy ? "text-ink" : "text-ink/55",
+            roomy ? "type-heading text-base font-semibold" : "text-[14px] font-semibold",
+            highlight ? "text-rose-deep" : roomy ? "text-ink" : "text-ink/85",
           )}
         >
           <span>{label}</span>

@@ -1357,8 +1357,8 @@ function Group({
 }) {
   return (
     <section className="space-y-7">
-      <div className="-mb-2 flex items-center justify-between">
-        <h3 className="type-label text-[10px] text-ink/40">{title}</h3>
+      <div className="flex items-center justify-between border-b border-ink/10 pb-2">
+        <h3 className="type-label text-[10px] text-ink/45">{title}</h3>
         {action}
       </div>
       {children}
