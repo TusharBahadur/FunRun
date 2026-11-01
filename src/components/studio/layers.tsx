@@ -67,6 +67,7 @@ export function LeftPanel({
 function Layers({ draft, sel, setSel, edit }: { draft: Draft; sel: Selection; setSel: (s: Selection) => void; edit: Edit }) {
   const scenes = draft.story.scenes;
   const [open, setOpen] = useState<Set<number>>(new Set());
+  const [dragging, setDragging] = useState(false);
 
 
   return (
@@ -122,7 +123,16 @@ function Layers({ draft, sel, setSel, edit }: { draft: Draft; sel: Selection; se
           };
 
           return (
-            <Reorder.Item key={sceneKey(scene)} value={scene} className="group list-none">
+            <Reorder.Item
+              key={sceneKey(scene)}
+              value={scene}
+              // Rows only glide while you're dragging one; opening or closing a
+              // page's layers just shows them, no sliding.
+              transition={dragging ? undefined : { layout: { duration: 0 } }}
+              onDragStart={() => setDragging(true)}
+              onDragEnd={() => setDragging(false)}
+              className="group list-none"
+            >
               <div
                 className={cn(
                   "flex items-center gap-1 rounded-lg px-1 py-1 text-sm",
@@ -137,7 +147,7 @@ function Layers({ draft, sel, setSel, edit }: { draft: Draft; sel: Selection; se
                   onClick={() => setOpen((o) => (o.has(i) ? new Set([...o].filter((x) => x !== i)) : new Set([...o, i])))}
                   className={cn("grid size-5 place-items-center text-muted", !hasKids && "invisible")}
                 >
-                  <ChevronRight className={cn("size-3.5 transition-transform", expanded && "rotate-90")} />
+                  <ChevronRight className={cn("size-3.5", expanded && "rotate-90")} />
                 </button>
                 <button type="button" onClick={() => setSel({ scene: i, item: null, field: null })} className="flex min-w-0 flex-1 items-center gap-2 text-left">
                   <Icon className="size-4 shrink-0 text-ink/70" />
