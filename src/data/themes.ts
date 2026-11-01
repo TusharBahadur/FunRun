@@ -74,12 +74,12 @@ export const palettes = {
 export type ThemeId = keyof typeof palettes;
 
 export const themeNames: Record<ThemeId, string> = {
-  strawberry: "Strawberry milk",
-  matcha: "Matcha latte",
-  honey: "Honey toast",
-  blueberry: "Blueberry yogurt",
-  peach: "Peach soda",
-  taro: "Taro milk",
+  strawberry: "Strawberry",
+  matcha: "Matcha",
+  honey: "Honey",
+  blueberry: "Blueberry",
+  peach: "Peach",
+  taro: "Taro",
   notebook: "Notebook",
 };
 
