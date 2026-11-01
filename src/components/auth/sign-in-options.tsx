@@ -121,7 +121,6 @@ export function SignInOptions({
               {busy ? <Loader2 className="size-4 animate-spin" /> : <Mail className="size-4" />} Email me a sign-in code
             </button>
           </form>
-          {app && <p className="mt-3 text-center text-xs text-muted">Google sign-in doesn’t work inside {app}, so we’ll email you a code instead.</p>}
         </>
       ) : (
         <form onSubmit={verify} className="space-y-2">
