@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ContinueChip } from "@/components/drafts/continue-chip";
 import { TemplatesListing } from "@/components/templates/templates-listing";
 
 export const metadata: Metadata = {
@@ -9,5 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default function TemplatesPage() {
-  return <TemplatesListing />;
+  return (
+    <>
+      <TemplatesListing />
+      <ContinueChip />
+    </>
+  );
 }

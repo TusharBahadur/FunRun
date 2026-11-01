@@ -198,3 +198,29 @@ as $$
      and unlock_at <= now();
 $$;
 revoke execute on function public.record_gift_open(text) from public, anon, authenticated;
+
+-- ─────────────────────────── Drafts ───────────────────────────
+-- Gifts in progress, for signed-in senders (everyone also keeps a copy on
+-- their device). `data` is the whole draft; its photos are links into
+-- gift-media/<user id>/drafts/. Removed when the gift goes live, or after 60
+-- days untouched (see /api/cron/expire).
+create table if not exists public.drafts (
+  id            text primary key,
+  user_id       uuid not null references auth.users (id) on delete cascade,
+  template_slug text not null,
+  name          text not null,
+  recipient     text,
+  data          jsonb not null,
+  updated_at    timestamptz not null default now()
+);
+
+create index if not exists drafts_user_updated on public.drafts (user_id, updated_at desc);
+
+alter table public.drafts enable row level security;
+
+drop policy if exists "People manage their own drafts" on public.drafts;
+create policy "People manage their own drafts"
+  on public.drafts for all
+  to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);

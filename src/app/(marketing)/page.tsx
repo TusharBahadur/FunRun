@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CallToAction } from "@/components/sections/call-to-action";
 import { FeaturedTemplates } from "@/components/sections/featured-templates";
 import { Features } from "@/components/sections/features";
+import { ContinueChip } from "@/components/drafts/continue-chip";
 import { PauseOffscreen } from "@/components/motion/pause-offscreen";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
@@ -78,6 +79,7 @@ export default async function HomePage() {
         <PauseOffscreen className="cv-auto"><LoveNotes notes={loveNotes} /></PauseOffscreen>
         <PauseOffscreen className="cv-auto"><CallToAction /></PauseOffscreen>
       </main>
+      <ContinueChip />
     </>
   );
 }

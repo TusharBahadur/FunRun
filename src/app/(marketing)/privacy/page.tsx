@@ -60,8 +60,9 @@ export default function PrivacyPage() {
 
       <PolicySection title="What stays on your device">
         <p>
-          While you make a gift, it stays in the open page on your device, photos included. Nothing reaches our servers
-          until you make it live, and closing the page before then discards it.
+          While you make a gift, it’s saved as a draft in your browser’s storage on your device, photos included. If
+          you’re signed in, the draft is also saved to your account so you can open it on another device; only you can
+          see it. Drafts are deleted when the gift goes live, when you delete them, or after 60 days untouched.
         </p>
       </PolicySection>
 

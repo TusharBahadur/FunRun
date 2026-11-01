@@ -8,6 +8,7 @@ import { Suspense, useEffect, useState } from "react";
 import { ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import { siteConfig } from "@/config/site";
+import { deviceDrafts } from "@/lib/drafts-device";
 import { peekSignedInUser, type PeekedUser } from "@/lib/session-peek";
 import { EASE_OUT, INTRO_DELAY } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,17 @@ function NavbarView({ pathname }: { pathname: string | null }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [me, setMe] = useState<PeekedUser | null>(null);
+  // "Drafts" shows up once this device has a gift in progress.
+  const [hasDrafts, setHasDrafts] = useState(false);
+  useEffect(() => {
+    if (typeof indexedDB === "undefined") return;
+    let alive = true;
+    deviceDrafts().then((list) => alive && setHasDrafts(list.length > 0));
+    return () => {
+      alive = false;
+    };
+  }, [pathname]);
+  const items = hasDrafts ? [...menuItems.filter((i) => i.href !== "/profile"), { label: "Drafts", href: "/drafts" }] : menuItems.filter((i) => i.href !== "/profile");
 
   // Signed in? Read from saved session so marketing pages don't load the auth library.
   useEffect(() => {
@@ -98,8 +110,7 @@ function NavbarView({ pathname }: { pathname: string | null }) {
 
             {/* Wide screens: every page is one click away, no menu needed. */}
             <ul className="hidden items-center gap-1 lg:flex">
-              {menuItems
-                .filter((item) => item.href !== "/profile")
+              {items
                 .map((item) => {
                   const active = item.href === pathname;
                   return (
@@ -186,7 +197,7 @@ function NavbarView({ pathname }: { pathname: string | null }) {
             <nav className="flex-1">
               <ul className="flex flex-col divide-y divide-line border-y border-line">
                 {/* Profile / Sign in is the button at the bottom. */}
-                {menuItems.filter((item) => item.href !== "/profile").map((item) => {
+                {items.map((item) => {
                   const active = item.href === pathname;
                   return (
                     <li key={item.href}>

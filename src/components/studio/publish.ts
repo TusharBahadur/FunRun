@@ -5,7 +5,7 @@ import type { Story } from "@/components/story/types";
 import { GIFT_SCHEMA_VERSION } from "@/lib/gift-links";
 import { accessToken, getSupabase } from "@/lib/supabase/browser";
 
-const MEDIA_BUCKET = "gift-media";
+export const MEDIA_BUCKET = "gift-media";
 
 /** Browsers name a few types loosely; the storage bucket only accepts the standard names. */
 const NORMALIZE: Record<string, string> = {
@@ -15,7 +15,7 @@ const NORMALIZE: Record<string, string> = {
   "audio/x-flac": "audio/flac",
 };
 
-const EXTENSION: Record<string, string> = {
+export const EXTENSION: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
@@ -141,7 +141,7 @@ export async function updateGift({
   return send(`/api/gifts/${slug}`, "PATCH", ready.token, { name, unlockAt, password, story: ready.story }, "Couldn't save your changes. Please try again.");
 }
 
-function collectDataUrls(value: unknown, out: Set<string>) {
+export function collectDataUrls(value: unknown, out: Set<string>) {
   if (typeof value === "string") {
     if (value.startsWith("data:")) out.add(value);
   } else if (Array.isArray(value)) {
@@ -151,7 +151,7 @@ function collectDataUrls(value: unknown, out: Set<string>) {
   }
 }
 
-function mapStrings<T>(value: T, fn: (s: string) => string): T {
+export function mapStrings<T>(value: T, fn: (s: string) => string): T {
   if (typeof value === "string") return fn(value) as T;
   if (Array.isArray(value)) return value.map((v) => mapStrings(v, fn)) as T;
   if (value && typeof value === "object") {
@@ -160,7 +160,7 @@ function mapStrings<T>(value: T, fn: (s: string) => string): T {
   return value;
 }
 
-function dataUrlToBlob(dataUrl: string) {
+export function dataUrlToBlob(dataUrl: string) {
   const comma = dataUrl.indexOf(",");
   const meta = dataUrl.slice(5, comma); // after "data:"
   const raw = meta.split(";")[0].toLowerCase();

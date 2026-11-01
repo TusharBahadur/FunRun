@@ -12,6 +12,7 @@ import { EASE_OUT } from "@/lib/motion";
 import { getSupabase, signOut, useUser } from "@/lib/supabase/browser";
 import { deleteAccount, useProfile } from "@/lib/supabase/profile";
 import { cn } from "@/lib/utils";
+import { DraftsList } from "@/components/drafts/drafts-list";
 import { SignInCard } from "./sign-in-card";
 
 type GiftRow = {
@@ -129,6 +130,9 @@ export function ProfilePage() {
           You can still change {editable === 1 ? "one of your gifts" : `${editable} of your gifts`}. Each gift locks in {giftPricing.editDays} days after it goes live, and never expires.
         </p>
       )}
+
+      {/* ── Not sent yet ── */}
+      <DraftsList hideWhenEmpty />
 
       {/* ── Your gifts ── */}
       <GiftsSection gifts={gifts} counts={counts} now={now} error={error} />

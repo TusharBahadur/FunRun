@@ -3,7 +3,7 @@
 import { useCallback, useReducer } from "react";
 import type { Story } from "@/components/story/types";
 
-/** A gift being made in the studio. Lives in memory until it goes live. */
+/** A gift being made in the studio. Saved as a draft (lib/drafts) until it goes live. */
 export type Draft = {
   v: 1;
   id: string;
@@ -94,7 +94,12 @@ export function freshDraft(slug: string, name: string, story: Story): Draft {
 
 /* ───────────── Undo / redo ───────────── */
 
-type History = { past: Draft[]; present: Draft; future: Draft[]; lastPush: number; lastTag?: string };
+/**
+ * `edits` counts every change since the gift was loaded; `real` leaves out the
+ * automatic ones and names alone, which aren't worth keeping a draft for.
+ */
+type History = { past: Draft[]; present: Draft; future: Draft[]; lastPush: number; lastTag?: string; edits: number; real: number };
+const QUIET_TAGS = new Set(["bind-names", "names", "names-to", "names-from"]);
 type Action =
   | { type: "edit"; next: Draft; tag?: string }
   | { type: "undo" }
@@ -115,22 +120,24 @@ function reducer(h: History, a: Action): History {
         future: [],
         lastPush: now,
         lastTag: a.tag,
+        edits: h.edits + 1,
+        real: h.real + (a.tag && QUIET_TAGS.has(a.tag) ? 0 : 1),
       };
     }
     case "undo":
       if (!h.past.length) return h;
-      return { past: h.past.slice(0, -1), present: h.past[h.past.length - 1], future: [h.present, ...h.future], lastPush: 0 };
+      return { ...h, past: h.past.slice(0, -1), present: { ...h.past[h.past.length - 1], updatedAt: new Date().toISOString() }, future: [h.present, ...h.future], lastPush: 0, lastTag: undefined, edits: h.edits + 1, real: h.real + 1 };
     case "redo":
       if (!h.future.length) return h;
-      return { past: [...h.past, h.present], present: h.future[0], future: h.future.slice(1), lastPush: 0 };
+      return { ...h, past: [...h.past, h.present], present: { ...h.future[0], updatedAt: new Date().toISOString() }, future: h.future.slice(1), lastPush: 0, lastTag: undefined, edits: h.edits + 1, real: h.real + 1 };
     case "replace":
-      return { past: [], present: a.draft, future: [], lastPush: 0 };
+      return { past: [], present: a.draft, future: [], lastPush: 0, edits: 0, real: 0 };
   }
 }
 
-/** The studio's working copy: edit, undo and redo, in memory. */
+/** The studio's working copy: edit, undo and redo. Saving is the studio's job (see lib/drafts). */
 export function useDraft(initial: Draft) {
-  const [h, dispatch] = useReducer(reducer, { past: [], present: initial, future: [], lastPush: 0 });
+  const [h, dispatch] = useReducer(reducer, { past: [], present: initial, future: [], lastPush: 0, edits: 0, real: 0 });
 
   const edit = useCallback((next: Draft, tag?: string) => {
     dispatch({ type: "edit", next, tag });
@@ -144,6 +151,9 @@ export function useDraft(initial: Draft) {
     reset: useCallback((d: Draft) => dispatch({ type: "replace", draft: d }), []),
     canUndo: h.past.length > 0,
     canRedo: h.future.length > 0,
+    /** Changes since the gift was loaded: all of them, and the ones worth a draft. */
+    edits: h.edits,
+    realEdits: h.real,
   };
 }
 /** Shrinks an image so drafts stay small enough to keep on this device. */

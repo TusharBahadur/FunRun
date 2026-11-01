@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Sheet } from "@/components/ui/sheet";
+import type { DraftSummary } from "@/lib/drafts";
 
 /** Asks who the gift is for and who it's from. Blank answers keep the current names. */
 export function NamesDialog({
@@ -11,11 +12,16 @@ export function NamesDialog({
   from,
   accent,
   submitLabel,
+  resume,
+  onResume,
   onSave,
   onClose,
 }: {
   open: boolean;
   submitLabel: string;
+  /** A draft of this template they could carry on with instead. */
+  resume?: DraftSummary | null;
+  onResume?: (d: DraftSummary) => void;
   to: string;
   from: string;
   accent: string;
@@ -24,7 +30,7 @@ export function NamesDialog({
 }) {
   return (
     <Sheet open={open} onClose={onClose} labelledBy="names-title" z={100} width="w-full max-w-md">
-      <Dialog to={to} from={from} accent={accent} submitLabel={submitLabel} onSave={onSave} onClose={onClose} />
+      <Dialog to={to} from={from} accent={accent} submitLabel={submitLabel} resume={resume} onResume={onResume} onSave={onSave} onClose={onClose} />
     </Sheet>
   );
 }
@@ -34,17 +40,22 @@ function Dialog({
   from: initialFrom,
   accent,
   submitLabel,
+  resume,
+  onResume,
   onSave,
   onClose,
 }: Omit<Parameters<typeof NamesDialog>[0], "open">) {
+  const [fresh, setFresh] = useState(false);
   const [to, setTo] = useState(initialTo);
   const [from, setFrom] = useState(initialFrom);
   const toRef = useRef<HTMLInputElement>(null);
 
+  const asking = !!resume && !fresh;
   useEffect(() => {
+    if (asking) return;
     const id = setTimeout(() => toRef.current?.focus(), 350);
     return () => clearTimeout(id);
-  }, []);
+  }, [asking]);
 
   function submit(e: FormEvent) {
     e.preventDefault();
@@ -65,6 +76,25 @@ function Dialog({
         >
           <X className="size-4" />
         </button>
+        {asking && resume ? (
+          <div className="px-6 pb-6 pt-1 sm:pt-5">
+            <h2 id="names-title" className="type-heading pr-8 text-2xl">
+              Continue your gift for {resume.recipient}?
+            </h2>
+            <p className="mt-1 text-sm text-muted">You started one from this template {editedAgo(resume.updatedAt)}.</p>
+            <button
+              type="button"
+              onClick={() => onResume?.(resume)}
+              className="btn btn-tint mt-6 h-12 w-full text-base"
+              style={{ "--btn-bg": accent } as React.CSSProperties}
+            >
+              Continue
+            </button>
+            <button type="button" onClick={() => setFresh(true)} className="btn btn-paper mt-2 h-12 w-full text-base">
+              Start a new one
+            </button>
+          </div>
+        ) : (
         <form onSubmit={submit} className="px-6 pb-6 pt-1 sm:pt-5">
           <h2 id="names-title" className="type-heading pr-8 text-2xl">
             Who’s this gift for?
@@ -88,6 +118,16 @@ function Dialog({
             {submitLabel}
           </button>
         </form>
+        )}
     </div>
   );
+}
+
+const ago = new Intl.RelativeTimeFormat("en-IN", { numeric: "auto" });
+function editedAgo(iso: string) {
+  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60_000);
+  if (mins < 60) return ago.format(-Math.max(1, mins), "minute");
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return ago.format(-hours, "hour");
+  return ago.format(-Math.round(hours / 24), "day");
 }

@@ -7,7 +7,7 @@ import { Studio } from "./studio";
 type Props = ComponentProps<typeof Studio>;
 
 /**
- * The studio, with ?to=, ?from= and ?edit= read in the browser. That lets the
+ * The studio, with ?to=, ?from=, ?edit= and ?draft= read in the browser. That lets the
  * page be built ahead of time, so opening the studio never waits on a server render.
  */
 export function StudioFromUrl({ template, designs, seedNames }: Pick<Props, "template" | "designs" | "seedNames">) {
@@ -17,6 +17,9 @@ export function StudioFromUrl({ template, designs, seedNames }: Pick<Props, "tem
   // ?edit=<gift link> reopens a live gift to change it (allowed for 7 days).
   const edit = sp.get("edit");
   const editSlug = edit && /^[a-z0-9-]{3,48}$/.test(edit) ? edit : undefined;
+  // ?draft=<id>: a gift in progress, kept on this device and (signed in) in their account.
+  const draft = sp.get("draft");
+  const draftId = draft && /^[0-9a-f-]{36}$/.test(draft) ? draft : undefined;
   // Stable unless the names change: the studio rebuilds its starting draft when this does.
   const named = useMemo(
     () => ({ ...template, story: { ...template.story, recipient: toName || template.story.recipient, sender: fromName || template.story.sender } }),
@@ -27,8 +30,9 @@ export function StudioFromUrl({ template, designs, seedNames }: Pick<Props, "tem
       template={named}
       designs={designs}
       seedNames={seedNames}
-      askNames={!toName && !fromName && !editSlug}
+      askNames={!toName && !fromName && !editSlug && !draftId}
       editSlug={editSlug}
+      draftId={draftId}
     />
   );
 }

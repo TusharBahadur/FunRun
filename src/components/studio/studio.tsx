@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ChevronDown, CircleHelp, Eye, LayoutGrid, Loader2, Redo2, RotateCcw, Undo2, UserRound, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, Cloud, CircleHelp, Eye, LayoutGrid, Loader2, Redo2, RotateCcw, Undo2, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { canGoBackInApp } from "@/lib/nav-history";
@@ -13,13 +13,15 @@ import { useUser } from "@/lib/supabase/browser";
 import { useProfile } from "@/lib/supabase/profile";
 import { giftPricing } from "@/config/site";
 import { formatDay, isFuture } from "@/lib/gift-links";
-import { getSupabase } from "@/lib/supabase/browser";
+import { getSupabase, signInWithGoogle } from "@/lib/supabase/browser";
 import { cn, formatInr } from "@/lib/utils";
 import { AddSection } from "./add-section";
 import { Canvas, type DeviceMode } from "./canvas";
 import { ChangeDesign } from "./change-design";
 import { Checkout, hasPendingPublish } from "./checkout";
 import { freshDraft, useDraft, type Draft } from "./draft-store";
+import { copyDeviceDraftsToAccount, deleteDraft, getDraft, listDrafts, newDraftId, saveOnDevice, saveToAccount, type DraftSummary } from "@/lib/drafts";
+import { SaveStatus, type SaveState } from "./save-status";
 import { ImageCropProvider } from "./image-crop";
 import { Inspector, type Selection } from "./inspector";
 import { isLook, LOOK } from "./look";
@@ -40,6 +42,7 @@ export function Studio({
   seedNames,
   askNames = false,
   editSlug,
+  draftId,
 }: {
   template: StudioTemplate;
   designs: Template[];
@@ -48,13 +51,15 @@ export function Studio({
   askNames?: boolean;
   /** Set when a live gift is opened again to change it. */
   editSlug?: string;
+  /** Set when a saved draft is opened (?draft=…). */
+  draftId?: string;
 }) {
   const initial = useMemo(() => {
     const d = freshDraft(template.slug, `${template.name} for ${template.story.recipient}`, template.story);
     // Changes to a live gift are kept apart from any new draft of the same template.
     return editSlug ? { ...d, id: `edit-${editSlug}` } : d;
   }, [template, editSlug]);
-  const { draft, edit, undo, redo, reset, canUndo, canRedo } = useDraft(initial);
+  const { draft, edit, undo, redo, reset, canUndo, canRedo, edits, realEdits } = useDraft(initial);
 
   const save = useCallback(
     (next: Draft, tag?: string) => {
@@ -91,11 +96,98 @@ export function Studio({
   // The `run` the preview frame last put on screen.
   const [previewShown, setPreviewShown] = useState(-1);
   const [names, setNames] = useState<"first" | "edit" | null>(null);
+  // The first-time names question has been put to them (the tour waits for it).
+  const [askedNames, setAskedNames] = useState(false);
   const [designsOpen, setDesignsOpen] = useState(false);
   const router = useRouter();
   // Signed-in senders get their saved sign-off in the "From" line of new gifts.
   const user = useUser();
   const { profile } = useProfile(user);
+  /* ───────────── Drafts ───────────── */
+  // The draft this gift is saved as: none until the first real change.
+  const savedId = useRef<string | null>(null);
+  const [saveState, setSaveState] = useState<SaveState>(null);
+  const [draftLoading, setDraftLoading] = useState(!!draftId);
+
+  // Opening a draft (?draft=…): the device's copy, or the account's if it's newer.
+  useEffect(() => {
+    if (!draftId || draftId === savedId.current || user === undefined) return;
+    let alive = true;
+    getDraft(draftId, !!user).then((found) => {
+      if (!alive) return;
+      if (found) {
+        savedId.current = draftId;
+        // The editor keeps its own id (checkout remembers choices by it); the draft's is in savedId.
+        reset({ ...found, id: initial.id });
+        setSaveState(user ? "account" : "device");
+      } else {
+        // Gone (sent, deleted, or made on another device): start fresh.
+        window.history.replaceState(window.history.state, "", window.location.pathname);
+        setNames("first");
+      }
+      setDraftLoading(false);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [draftId, user, reset, initial.id]);
+
+  // Save a second after each change. The first real change creates the draft.
+  // `retry` re-runs it after a failed save.
+  const [retry, setRetry] = useState(0);
+  const cloudQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const saveSeq = useRef(0);
+  useEffect(() => {
+    if (editSlug || draftLoading || user === undefined) return;
+    if (realEdits === 0 && !(savedId.current && edits > 0)) return;
+    setSaveState("saving");
+    const seq = ++saveSeq.current;
+    const t = window.setTimeout(async () => {
+      if (!savedId.current) {
+        savedId.current = newDraftId();
+        const url = new URL(window.location.href);
+        url.searchParams.set("draft", savedId.current);
+        window.history.replaceState(window.history.state, "", url.pathname + url.search);
+      }
+      const copy = { ...draft, id: savedId.current };
+      const onDevice = await saveOnDevice(copy);
+      if (!user) {
+        if (seq === saveSeq.current) setSaveState(onDevice ? "device" : "failed");
+        return;
+      }
+      // One account save at a time, so an older one never lands after a newer one.
+      cloudQueue.current = cloudQueue.current.then(() =>
+        saveToAccount(copy, user.id).then(
+          () => seq === saveSeq.current && setSaveState("account"),
+          () => seq === saveSeq.current && setSaveState(onDevice ? "device" : "failed"),
+        ),
+      );
+    }, 1000);
+    return () => window.clearTimeout(t);
+  }, [draft, edits, realEdits, editSlug, draftLoading, user, retry]);
+
+  // Just signed in: this device's drafts go into their account too.
+  const copied = useRef(false);
+  useEffect(() => {
+    if (!user || copied.current) return;
+    copied.current = true;
+    void copyDeviceDraftsToAccount(user.id);
+  }, [user]);
+
+  // Not signed in: once, a while after they start, offer to keep it safe in an account.
+  const [nudge, setNudge] = useState(false);
+  useEffect(() => {
+    if (user !== null || saveState !== "device" || nudgeSeen()) return;
+    const t = window.setTimeout(() => {
+      setNudge(true);
+      markNudgeSeen();
+    }, 120_000);
+    return () => window.clearTimeout(t);
+  }, [user, saveState]);
+
+  // A new gift from a template they already have a draft of: offer to carry on with it.
+  const [resume, setResume] = useState<DraftSummary | null>(null);
+
   // Editing a live gift: load it from the account, then work on it like any draft.
   const [editState, setEditState] = useState<"loading" | "ready" | "missing" | null>(editSlug ? "loading" : null);
   useEffect(() => {
@@ -134,10 +226,10 @@ export function Studio({
   const [tour, setTour] = useState(false);
   // First visit: once the names are in, show them around.
   useEffect(() => {
-    if (editSlug || names !== null || wide === null || tourSeen()) return;
+    if (editSlug || names !== null || wide === null || (askNames && !askedNames) || tourSeen()) return;
     const id = window.setTimeout(() => setTour(true), 900);
     return () => window.clearTimeout(id);
-  }, [editSlug, names, wide]);
+  }, [editSlug, names, wide, askNames, askedNames]);
 
   // Back from Google sign-in mid-checkout: reopen it where they left off.
   useEffect(() => {
@@ -148,11 +240,23 @@ export function Studio({
 
   // Every new gift starts by asking who it's for (unless the link already said,
   // or they're back from sign-in with a gift in progress).
+  const signedIn = user === undefined ? undefined : !!user;
   useEffect(() => {
-    if (!askNames || hasPendingPublish(initial.id)) return;
-    const id = window.setTimeout(() => setNames("first"), 250);
-    return () => window.clearTimeout(id);
-  }, [askNames, initial.id]);
+    if (!askNames || signedIn === undefined || hasPendingPublish(initial.id)) return;
+    let alive = true;
+    listDrafts(signedIn).then((list) => {
+      if (!alive) return;
+      setResume(list.find((d) => d.templateSlug === template.slug) ?? null);
+      window.setTimeout(() => {
+        if (!alive) return;
+        setNames((n) => n ?? "first");
+        setAskedNames(true);
+      }, 250);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [askNames, signedIn, initial.id, template.slug]);
 
   function saveNames(to: string, from: string) {
     const { story } = draft;
@@ -328,6 +432,7 @@ export function Studio({
             <Undo2 className="size-4" />
           </TopButton>
         </span>
+        <SaveStatus state={saveState} onRetry={() => setRetry((n) => n + 1)} onSignIn={() => void signInWithGoogle()} />
         <span className="hidden items-center sm:flex">
           <TopButton label="Redo (⇧⌘Z)" onClick={redo} disabled={!canRedo}>
             <Redo2 className="size-4" />
@@ -402,6 +507,30 @@ export function Studio({
           {!draft.live?.slug && <span className="rounded-full bg-ink/25 px-2 py-0.5 text-xs">{formatInr(template.pricePaise)}</span>}
         </button>
       </header>
+
+      {nudge && !user && (
+        <div className="flex items-center gap-3 border-b border-line bg-paper px-4 py-2 text-sm">
+          <Cloud className="size-4 shrink-0 text-muted" />
+          <p className="flex-1">Sign in to keep this gift safe on any device.</p>
+          <button type="button" onClick={() => void signInWithGoogle()} className="btn btn-ink h-8 px-4">
+            Sign in
+          </button>
+          <button
+            type="button"
+            aria-label="Not now"
+            onClick={() => setNudge(false)}
+            className="grid size-8 place-items-center rounded-full text-muted hover:bg-cream"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      )}
+
+      {draftLoading && (
+        <div className="fixed inset-0 z-[95] grid place-items-center bg-cream/90">
+          <Loader2 className="size-6 animate-spin text-muted" />
+        </div>
+      )}
 
       {editSlug && editState === "ready" && draft.live?.slug && (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line bg-paper px-4 py-2.5 text-sm">
@@ -510,6 +639,14 @@ export function Studio({
         from={names === "edit" ? draft.story.sender : (profile?.sign_off ?? "")}
         accent={draft.story.palette.accent}
         submitLabel={names === "edit" ? "Save" : "Start editing"}
+        resume={names === "first" ? resume : null}
+        onResume={(d) => {
+          setNames(null);
+          setDraftLoading(true);
+          const url = new URL(window.location.href);
+          url.searchParams.set("draft", d.id);
+          window.history.replaceState(window.history.state, "", url.pathname + url.search);
+        }}
         onSave={saveNames}
         onClose={() => setNames(null)}
       />
@@ -525,7 +662,9 @@ export function Studio({
           router.push(`/sent/${draft.live?.slug}?saved=1`);
         }}
         onPublished={(live) => {
-          // The gift is out: clear the editor for next time and go to its own page.
+          // The gift is out: it's no longer a draft. Clear the editor for next time and go to its own page.
+          if (savedId.current) void deleteDraft(savedId.current, !!user);
+          savedId.current = null;
           reset(freshDraft(template.slug, initial.name, template.story));
           router.push(`/sent/${live.slug}`);
         }}
@@ -631,4 +770,20 @@ function TopButton({ label, onClick, disabled, children }: { label: string; onCl
       {children}
     </button>
   );
+}
+
+const NUDGE_KEY = "tynitales:signin-nudge";
+function nudgeSeen() {
+  try {
+    return localStorage.getItem(NUDGE_KEY) === "1";
+  } catch {
+    return true;
+  }
+}
+function markNudgeSeen() {
+  try {
+    localStorage.setItem(NUDGE_KEY, "1");
+  } catch {
+    /* fine: it just might show again */
+  }
 }
