@@ -4,6 +4,7 @@ import "lenis/dist/lenis.css";
 import Lenis from "lenis";
 import { MotionConfig } from "motion/react";
 import { useEffect, type ReactNode } from "react";
+import { usePauseWhenHidden } from "@/components/motion/pause-offscreen";
 import { trackNavigations } from "@/lib/nav-history";
 
 /**
@@ -13,6 +14,7 @@ import { trackNavigations } from "@/lib/nav-history";
 export function Providers({ children }: { children: ReactNode }) {
   // Lets "Back" buttons know whether there's somewhere in the site to go back to.
   useEffect(() => trackNavigations(), []);
+  usePauseWhenHidden();
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;

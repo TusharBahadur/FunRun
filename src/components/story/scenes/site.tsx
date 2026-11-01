@@ -316,7 +316,7 @@ export function SiteLetter({ scene }: SceneProps<S<"letter">>) {
         >
           <div className="type-label flex justify-between text-[10px] opacity-55">
             <StudioHit as="span" field="eyebrow">{fill(scene.eyebrow ?? "And finally")}</StudioHit>
-            <span>For {to} · from {from}</span>
+            <StudioHit as="span" field="meta">{scene.meta !== undefined ? fill(scene.meta) : `For ${to} · from ${from}`}</StudioHit>
           </div>
           <StudioHit field="title" className="mt-6">
             <h2 className="type-display text-[clamp(2.6rem,9vw,4.4rem)] font-semibold" style={{ color: `${palette.accent}66` }}>

@@ -64,9 +64,13 @@ export function SpotlightScene({ scene, done, onDone }: SceneProps<S<"spotlight"
               />
             )}
           </div>
-          <span className="type-hand absolute inset-x-0 bottom-2.5 flex items-center justify-center gap-1.5 text-2xl" style={{ color: palette.ink }}>
-            {fill("{to}")}
-            <Heart className="size-4 fill-current" style={{ color: palette.accent }} />
+          <span className="type-hand absolute inset-x-0 bottom-2.5 flex items-center justify-center text-2xl" style={{ color: palette.ink }}>
+            <StudioHit field="caption" as="span" className="px-1">
+              <span className="flex items-center gap-1.5">
+                {fill(scene.caption ?? "{to}")}
+                <Heart className="size-4 fill-current" style={{ color: palette.accent }} />
+              </span>
+            </StudioHit>
           </span>
         </motion.button>
         </StudioHit>

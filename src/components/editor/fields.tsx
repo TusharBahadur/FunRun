@@ -68,11 +68,14 @@ export function Field({
   roomy,
   highlight,
   hideLabel,
+  action,
 }: {
   label: string;
   hint?: ReactNode;
   children: ReactNode;
   counter?: string;
+  /** A small link on the label row (e.g. "Remove"). */
+  action?: ReactNode;
   /** Phone editor: sentence-case labels you can actually read. */
   roomy?: boolean;
   /** Studio: this field is the one tapped in the preview. */
@@ -81,22 +84,25 @@ export function Field({
   hideLabel?: boolean;
 }) {
   return (
-    <label className="block">
+    <div className="block">
       {!hideLabel && (
         <span
           className={cn(
-            "flex items-baseline justify-between",
-            roomy ? "type-heading text-base font-semibold" : "type-label",
-            highlight ? "text-rose-deep" : roomy ? "text-ink" : "text-muted",
+            "flex items-baseline justify-between gap-3",
+            roomy ? "type-heading text-base font-semibold" : "text-[13px] font-medium",
+            highlight ? "text-rose-deep" : roomy ? "text-ink" : "text-ink/55",
           )}
         >
-          {label}
-          {counter && <span className={roomy ? "text-sm font-normal text-muted" : "text-[10px]"}>{counter}</span>}
+          <span>{label}</span>
+          <span className="flex items-baseline gap-3 font-normal">
+            {counter && <span className="text-[11px] tabular-nums text-ink/40">{counter}</span>}
+            {action}
+          </span>
         </span>
       )}
-      <span className={cn(hideLabel ? "block" : "mt-2 block")}>{children}</span>
-      {hint && <span className={roomy ? "mt-2 block text-sm leading-snug text-muted" : "mt-1.5 block text-xs text-muted"}>{hint}</span>}
-    </label>
+      <label className={cn(hideLabel ? "block" : "mt-1 block")}>{children}</label>
+      {hint && <span className={roomy ? "mt-2 block text-sm leading-snug text-muted" : "mt-1.5 block text-xs leading-snug text-ink/45"}>{hint}</span>}
+    </div>
   );
 }
 
@@ -141,8 +147,9 @@ export function Fold({
   );
 }
 
-const inputClass =
-  "w-full rounded-2xl border border-line bg-paper px-4 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-ink/40";
+/** Underline only: the words they type are the loudest thing in the form. */
+export const inputClass =
+  "w-full rounded-none border-0 border-b border-ink/15 bg-transparent px-0 pb-2 pt-1.5 text-[17px] leading-snug text-ink outline-none transition-colors placeholder:text-ink/30 hover:border-ink/30 focus:border-rose-deep";
 
 export function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={cn(inputClass, props.className)} />;
@@ -216,7 +223,7 @@ export function NumberInput({
 }
 
 export function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea {...props} className={cn(inputClass, "min-h-28 resize-y leading-relaxed", props.className)} />;
+  return <textarea {...props} className={cn(inputClass, "min-h-[3.25rem] resize-none leading-relaxed [field-sizing:content]", props.className)} />;
 }
 
 export function ColorInput({

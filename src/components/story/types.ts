@@ -74,10 +74,10 @@ export type Scene =
   | ({ type: "seal" } & Heading & { note: string })
   | ({ type: "scratch" } & Heading & { reveal: string; sub?: string })
   | ({ type: "lights" } & Heading & { candles: number; reveal: string })
-  | ({ type: "knock" } & Heading & { knocks: number; reveal: string; /** Sticker or gif filling the phone before they pick up. */ caller?: AnyStickerId; /** Sticker or gif after the call connects. */ party?: AnyStickerId })
+  | ({ type: "knock" } & Heading & { knocks: number; reveal: string; /** Name on the ringing phone; defaults to {from}. */ callerName?: string; /** Sticker or gif filling the phone before they pick up. */ caller?: AnyStickerId; /** Sticker or gif after the call connects. */ party?: AnyStickerId })
   | ({ type: "unwrap" } & Heading & { taps: number; inside: string; insideSub?: string })
   // About them
-  | ({ type: "spotlight" } & Heading & { photo?: string; tone?: PhotoTone; tags: string[]; /** Joins the notes at the end; defaults to the "yay!" stamp, null for none. */ stamp?: AnyStickerId | null })
+  | ({ type: "spotlight" } & Heading & { photo?: string; tone?: PhotoTone; tags: string[]; /** Under the photo; defaults to {to}. */ caption?: string; /** Joins the notes at the end; defaults to the "yay!" stamp, null for none. */ stamp?: AnyStickerId | null })
   | ({ type: "compliments" } & Heading & { bubbles: string[] })
   // Website sections (work as pages too)
   | ({ type: "hero" } & Heading & { subtitle?: string; photo?: string; tone?: PhotoTone })
@@ -90,10 +90,10 @@ export type Scene =
   | ({ type: "cake" } & Heading & { age: number })
   | ({ type: "meter" } & Heading & { label: string; levels: string[] })
   // Cards, paper and keepsakes
-  | ({ type: "receipt" } & Heading & { store: string; items: { name: string; qty: string }[]; total: string })
+  | ({ type: "receipt" } & Heading & { store: string; items: { name: string; qty: string }[]; total: string; footer?: string })
   | ({ type: "deck" } & Heading & { cards: string[] })
-  | ({ type: "album" } & Heading & { photos: Photo[] })
-  | ({ type: "coupon" } & Heading & { offer: string; terms: string })
+  | ({ type: "album" } & Heading & { photos: Photo[]; /** Shown once every photo is thrown. */ end?: string })
+  | ({ type: "coupon" } & Heading & { offer: string; terms: string; fine?: string })
   | ({ type: "jar" } & Heading & { notes: string[] })
   | ({ type: "polaroids" } & Heading & { photos: Photo[] })
   // Games
@@ -109,7 +109,7 @@ export type Scene =
   | ({ type: "letter" } & Heading & { greeting?: string; meta?: string; paragraphs: string[]; signoff: string; /** A photo pinned to the corner of the letter. */ photo?: string })
   | ({ type: "numbers" } & Heading & { stats: { value: number; suffix?: string; label: string }[] })
   | ({ type: "wishes" } & Heading & { wishes: { name: string; message: string }[] })
-  | ({ type: "voice" } & Heading & { transcript: string; seconds: number })
+  | ({ type: "voice" } & Heading & { transcript: string; seconds: number; /** Above the player; defaults to "A voice note from {from}". */ label?: string })
   | ({ type: "finale" } & Heading & { keepsake?: boolean; thankYou?: boolean; /** A little collage above the buttons. */ photos?: Photo[] });
 
 export type SceneType = Scene["type"];

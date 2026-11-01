@@ -34,6 +34,9 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/a/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }] },
+      // Showcase pictures keep their names when retaken, so cache for a day and
+      // refresh quietly in the background, instead of re-checking on every view.
+      { source: "/showcase/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }] },
     ];
   },
   turbopack: {

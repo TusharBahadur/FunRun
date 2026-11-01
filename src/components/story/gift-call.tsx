@@ -94,10 +94,12 @@ export function GiftCall({
   caller = DEFAULT_CALLER,
   party = DEFAULT_PARTY,
   stickers,
+  callerName,
 }: {
   open: boolean;
   onAnswer: () => void;
   reveal: ReactNode;
+  callerName?: string;
   caller?: AnyStickerId;
   party?: AnyStickerId;
   stickers?: StickerPlacement[];
@@ -140,7 +142,9 @@ export function GiftCall({
                 <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/50" />
                 <div className="absolute inset-x-0 top-5 z-[1] px-3 text-center text-white">
                   <p className="type-label text-[10px] tracking-[0.14em] opacity-80">Incoming call</p>
-                  <p className="type-display mt-1.5 text-[1.35rem] font-semibold leading-none">{from}</p>
+                  <StudioHit field="callerName" className="mx-auto mt-1.5 w-fit">
+                    <p className="type-display text-[1.35rem] font-semibold leading-none">{callerName ?? from}</p>
+                  </StudioHit>
                   <p className="type-label mt-1.5 text-[9px] opacity-60">Mobile</p>
                 </div>
               </div>

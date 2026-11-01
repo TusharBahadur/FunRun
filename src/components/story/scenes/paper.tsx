@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useMotionValue, useTransform, type PanInfo } from "motion/react";
 import { useRef, useState, type ReactNode } from "react";
 import { PhotoFill } from "@/components/experiences/birthday/photo-fill";
-import { Paper, SceneShell, StoryButton, StudioHit, StudioPager, Tape, usePickedItem, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
+import { Paper, SceneShell, StoryButton, StudioAlso, StudioHit, StudioPager, Tape, usePickedItem, useStory, useStudioEdit, type SceneProps } from "../scene-kit";
 import { cn } from "@/lib/utils";
 import type { Scene } from "../types";
 
@@ -68,7 +68,11 @@ export function ReceiptScene({ scene, done, onDone }: SceneProps<S<"receipt">>) 
                   <span>{fill(scene.total)}</span>
                 </p>
               </StudioHit>
-              <p className="mt-3 text-center opacity-50">No refunds. No returns. Keep forever.</p>
+              {scene.footer !== "" && (
+                <StudioHit field="footer">
+                  <p className="mt-3 text-center opacity-50">{fill(scene.footer ?? "No refunds. No returns. Keep forever.")}</p>
+                </StudioHit>
+              )}
               <p className="mt-2 text-center tracking-[0.3em] opacity-70">||| || ||| | || |||</p>
             </motion.div>
           )}
@@ -217,9 +221,11 @@ export function AlbumScene({ scene, done, onDone }: SceneProps<S<"album">>) {
       <div className="relative h-[min(58vh,420px)] w-[min(82vw,300px)]">
         {left === 0 && (
           <div className="grid h-full place-items-center px-6 text-center">
-            <p className="type-display text-3xl" style={{ color: palette.accent }}>
-              That’s us.
-            </p>
+            <StudioHit field="end">
+              <p className="type-display text-3xl" style={{ color: palette.accent }}>
+                {fill(scene.end ?? "That’s us.")}
+              </p>
+            </StudioHit>
           </div>
         )}
         <AnimatePresence>
@@ -255,6 +261,11 @@ export function AlbumScene({ scene, done, onDone }: SceneProps<S<"album">>) {
         </p>
       )}
       <StudioPager count={scene.photos.length} field="photos" current={gone} />
+      <StudioAlso label="After the last photo" field="end">
+        <p className="type-display text-2xl" style={{ color: palette.accent }}>
+          {fill(scene.end ?? "That’s us.")}
+        </p>
+      </StudioAlso>
     </SceneShell>
   );
 }
@@ -276,7 +287,11 @@ export function CouponScene({ scene, done, onDone }: SceneProps<S<"coupon">>) {
           className="relative rounded-t-2xl px-6 pb-6 pt-5 text-center"
           style={{ backgroundColor: palette.cream, color: palette.ink }}
         >
-          <p className="type-label text-[10px] opacity-60">Admit one · valid forever</p>
+          {scene.fine !== "" && (
+            <StudioHit field="fine" className="mx-auto w-fit">
+              <p className="type-label text-[10px] opacity-60">{fill(scene.fine ?? "Admit one · valid forever")}</p>
+            </StudioHit>
+          )}
           <StudioHit field="offer" className="mx-auto w-fit">
             <p className="type-hand mt-2 text-[1.9rem] leading-tight" style={{ color: palette.accent }}>
               {fill(scene.offer)}

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EASE_IN, EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,19 @@ export function RotatingWords({
 }: RotatingWordsProps) {
   const [index, setIndex] = useState(0);
   const [started, setStarted] = useState(false);
+  const box = useRef<HTMLSpanElement>(null);
+  const seen = useRef(true);
+
+  // No point swapping phrases nobody can see (scrolled past, or another tab).
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => {
+      seen.current = e.isIntersecting;
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     let id: ReturnType<typeof setInterval> | undefined;
@@ -30,7 +43,10 @@ export function RotatingWords({
     const start = setTimeout(() => {
       setStarted(true);
       setIndex(1 % words.length);
-      id = setInterval(() => setIndex((i) => (i + 1) % words.length), interval);
+      id = setInterval(() => {
+        if (document.hidden || !seen.current) return;
+        setIndex((i) => (i + 1) % words.length);
+      }, interval);
     }, startDelay * 1000 + interval);
     return () => {
       clearTimeout(start);
@@ -42,6 +58,7 @@ export function RotatingWords({
 
   return (
     <span
+      ref={box}
       className={cn(
         "relative -mb-[0.14em] inline-flex justify-center overflow-y-clip pb-[0.14em]",
         className,

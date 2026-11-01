@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { Lock } from "lucide-react";
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { SplitText } from "@/components/motion/split-text";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { EASE_OUT } from "@/lib/motion";
@@ -118,9 +118,14 @@ function nextValentines(from: number) {
 
 function Countdown() {
   const [now, setNow] = useState<number | null>(null);
+  const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const tick = () => setNow(Date.now());
+    // Ticks only while you can see it: scrolled past or in another tab, it waits.
+    const tick = () => {
+      if (document.hidden || box.current?.closest("[data-offscreen]")) return;
+      setNow(Date.now());
+    };
     const first = setTimeout(tick, 0);
     const id = setInterval(tick, 1000);
     return () => {
@@ -138,7 +143,7 @@ function Countdown() {
   ];
 
   return (
-    <div className="w-full">
+    <div ref={box} className="w-full">
       <p className="type-label mb-3 flex items-center gap-2 text-[11px] text-muted md:mb-4 md:text-xs">
         <span className="size-1.5 animate-pulse rounded-full bg-rose" />
         <span className="md:hidden">Unlocks Feb 14, 9:00 AM</span>

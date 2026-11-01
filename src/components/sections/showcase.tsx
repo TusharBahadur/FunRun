@@ -47,10 +47,18 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
   // Only turn while the stack is on screen.
   const section = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
+  const [seen, setSeen] = useState(false);
   useEffect(() => {
     const el = section.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { rootMargin: "100px" });
+    const io = new IntersectionObserver(
+      ([e]) => {
+        setVisible(e.isIntersecting);
+        // After a lap, so the first pictures aren't held up by the rest.
+        if (e.isIntersecting) window.setTimeout(() => setSeen(true), SLIDE_MS * 2);
+      },
+      { rootMargin: "100px" },
+    );
     io.observe(el);
     return () => {
       io.disconnect();
@@ -97,7 +105,7 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
           <FloatingSticker id="b-frog-kiss" className="-right-7 top-16 size-16 sm:-right-12 sm:top-24 sm:size-20" delay={0.6} />
           <FloatingSticker id="m-flower-kitten" className="-left-7 bottom-16 size-16 sm:-left-14 sm:bottom-24 sm:size-20" delay={1.2} />
           <FloatingSticker id="b-love-duck" className="-right-6 -bottom-2 size-14 sm:-right-8 sm:bottom-6 sm:size-16" delay={1.8} />
-          <Revolver templates={templates} index={i} />
+          <Revolver templates={templates} index={i} warm={seen} />
         </div>
 
         <Perks items={perks.right} align="start" beat={turn} tint={current.palette} className="order-3" />
@@ -158,7 +166,7 @@ type Slot = "center" | "left" | "right" | "back";
  * to the front, the front one to the left, the left one round the back, and
  * the one at the back comes out on the right.
  */
-function Revolver({ templates, index }: { templates: Template[]; index: number }) {
+function Revolver({ templates, index, warm }: { templates: Template[]; index: number; warm: boolean }) {
   const n = templates.length;
   const narrow = useMediaQuery("(max-width: 639px)", true);
   const reach = narrow ? 64 : 150;
@@ -178,7 +186,9 @@ function Revolver({ templates, index }: { templates: Template[]; index: number }
         const slot: Slot = off === 0 ? "center" : off === 1 ? "right" : off === n - 1 ? "left" : "back";
         const front = slot === "center";
         // The three you can see, plus the next one to come round (so it's loaded in time).
-        const shown = slot !== "back" || off === 2;
+        // Once the stack has been seen, every picture stays in: dropping one as it
+        // went round the back made the browser fetch it again on every lap.
+        const shown = warm || slot !== "back" || off === 2;
         return (
           <motion.div
             key={t.slug}

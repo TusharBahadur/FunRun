@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CallToAction } from "@/components/sections/call-to-action";
 import { FeaturedTemplates } from "@/components/sections/featured-templates";
 import { Features } from "@/components/sections/features";
+import { PauseOffscreen } from "@/components/motion/pause-offscreen";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
 import { LoveNotes } from "@/components/sections/love-notes";
@@ -67,15 +68,15 @@ export default async function HomePage() {
   return (
     <>
       <main>
-        {/* Sections below the hero are skipped by the browser until they're near the screen (see .cv-auto). */}
+        {/* Sections below the hero are skipped by the browser until they're near the screen (see .cv-auto), and their loops pause while off screen. */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-        <Hero featured={pick(["sealed-with-love", "make-a-wish", "our-corner", "midnight-notes"])} />
-        <div className="cv-auto"><Showcase templates={pick(showcase.slugs)} total={templates.length} /></div>
-        <div className="cv-auto"><FeaturedTemplates templates={featured} total={templates.length} /></div>
-        <div className="cv-auto"><HowItWorks /></div>
-        <div className="cv-auto"><Features /></div>
-        <div className="cv-auto"><LoveNotes notes={loveNotes} /></div>
-        <div className="cv-auto"><CallToAction /></div>
+        <PauseOffscreen><Hero featured={pick(["sealed-with-love", "make-a-wish", "our-corner", "midnight-notes"])} /></PauseOffscreen>
+        <PauseOffscreen className="cv-auto"><Showcase templates={pick(showcase.slugs)} total={templates.length} /></PauseOffscreen>
+        <PauseOffscreen className="cv-auto"><FeaturedTemplates templates={featured} total={templates.length} /></PauseOffscreen>
+        <PauseOffscreen className="cv-auto"><HowItWorks /></PauseOffscreen>
+        <PauseOffscreen className="cv-auto"><Features /></PauseOffscreen>
+        <PauseOffscreen className="cv-auto"><LoveNotes notes={loveNotes} /></PauseOffscreen>
+        <PauseOffscreen className="cv-auto"><CallToAction /></PauseOffscreen>
       </main>
     </>
   );

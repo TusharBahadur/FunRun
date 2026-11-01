@@ -354,6 +354,7 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
             if (!done) onDone();
           }}
           caller={caller}
+          callerName={fill(scene.callerName ?? "{from}")}
           party={party}
           stickers={scene.stickers}
           reveal={

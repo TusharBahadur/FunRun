@@ -36,7 +36,7 @@ import type { Scene, SceneType } from "@/components/story/types";
 
 /** One editable field in the inspector. */
 export type FieldDef =
-  | { key: string; label: string; kind: "text" | "textarea"; placeholder?: string; max?: number; help?: string; optional?: boolean }
+  | { key: string; label: string; kind: "text" | "textarea"; placeholder?: string; max?: number; help?: string; optional?: boolean; /** What the gift shows while the field is unset. */ fallback?: string }
   | { key: string; label: string; kind: "number"; min: number; max: number }
   | { key: string; label: string; kind: "select"; options: { value: string; label: string }[] }
   | { key: string; label: string; kind: "toggle"; help?: string }
@@ -99,6 +99,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     blurb: "An incoming call. Slide to answer — then the surprise picks up.",
     fields: [
       ...heading,
+      { key: "callerName", label: "Name on the phone", kind: "text", max: 30, fallback: "{from}" },
       { key: "reveal", label: "What they say", kind: "text", max: 250 },
       { key: "caller", label: "Who’s calling", kind: "sticker", help: "Fills the phone before they pick up." },
       { key: "party", label: "After they pick up", kind: "sticker", help: "Fills the phone once the call connects." },
@@ -241,6 +242,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     fields: [
       ...heading,
       { key: "photo", label: "Their photo", kind: "image", help: "A favourite photo of them, smiling.", optional: true },
+      { key: "caption", label: "Photo caption", kind: "text", max: 30, fallback: "{to}" },
       { key: "tags", label: "Notes", kind: "strings", itemLabel: "Note", max: 6, charMax: 150 },
     ],
     create: () => ({ type: "spotlight", eyebrow: "Look who it is", title: "The *star* of the day.", hint: "Tap the photo", tone: "rose", tags: ["Best laugh in any room", "Gives the best hugs", "Secretly hilarious"] }),
@@ -299,6 +301,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
         title: (i) => String(i.name || "Line"),
       },
       { key: "total", label: "Total", kind: "text", max: 24 },
+      { key: "footer", label: "Small print", kind: "text", max: 60, fallback: "No refunds. No returns. Keep forever.", optional: true },
     ],
     create: () => ({ type: "receipt", eyebrow: "Itemised", title: "Everything you *gave* me.", hint: "Tap to print", store: "The {to} Store", items: [{ name: "Laughs", qty: "∞" }, { name: "Late-night chai", qty: "214" }], total: "Priceless" }),
   },
@@ -331,6 +334,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
         newItem: () => ({ caption: "A good day", tone: "sun" }),
         title: (i) => String(i.caption || "Photo"),
       },
+      { key: "end", label: "After the last photo", kind: "text", max: 40, fallback: "That’s us.", optional: true },
     ],
     create: () => ({
       type: "album",
@@ -349,7 +353,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     category: "Paper & keepsakes",
     icon: Ticket,
     blurb: "Drag the scissors to tear off a coupon.",
-    fields: [...heading, { key: "offer", label: "The offer", kind: "text", max: 200 }, { key: "terms", label: "Terms", kind: "text", max: 200 }],
+    fields: [...heading, { key: "offer", label: "The offer", kind: "text", max: 200 }, { key: "terms", label: "Terms", kind: "text", max: 200 }, { key: "fine", label: "Top line", kind: "text", max: 40, fallback: "Admit one · valid forever", optional: true }],
     create: () => ({ type: "coupon", eyebrow: "For you", title: "A little *something.*", hint: "Tear along the dotted line", offer: "One dinner, my treat", terms: "Valid forever" }),
   },
   jar: {
@@ -508,8 +512,8 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     fields: [
       { key: "eyebrow", label: "Small label", kind: "text", max: 100, optional: true },
       { key: "title", label: "Headline", kind: "text", max: 250, help: "Wrap words in *stars* to highlight them." },
-      { key: "meta", label: "Date & from / to", kind: "text", max: 150, placeholder: "e.g. For {to} · from {from}", optional: true },
-      { key: "greeting", label: "Greeting", kind: "text", max: 120, placeholder: "e.g. Dear {to},", optional: true },
+      { key: "meta", label: "Date & from / to", kind: "text", max: 150, placeholder: "e.g. For {to} · from {from}", optional: true, fallback: "For {to} · from {from}" },
+      { key: "greeting", label: "Greeting", kind: "text", max: 120, placeholder: "e.g. Dear {to},", optional: true, fallback: "Dear {to}," },
       { key: "paragraphs", label: "Paragraphs", kind: "strings", itemLabel: "Paragraph", max: 6, charMax: 800 },
       { key: "signoff", label: "Sign-off", kind: "text", max: 120 },
       { key: "photo", label: "Pinned photo", kind: "image", help: "Optional: a photo of you two, pinned to the corner.", optional: true },
@@ -581,6 +585,7 @@ export const sceneSchemas: Record<SceneType, SceneSchema> = {
     fields: [
       { key: "eyebrow", label: "Small label", kind: "text", max: 40 },
       { key: "title", label: "Headline", kind: "text", max: 80 },
+      { key: "label", label: "Above the player", kind: "text", max: 50, fallback: "A voice note from {from}" },
       { key: "transcript", label: "What you’ll say", kind: "textarea", max: 300, help: "The preview reads this aloud in a computer voice." },
       { key: "seconds", label: "Length (seconds)", kind: "number", min: 3, max: 59 },
     ],

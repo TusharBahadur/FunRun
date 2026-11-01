@@ -576,7 +576,7 @@ function fieldPreview(field: FieldDef, value: unknown, names: Draft["story"]) {
   switch (field.kind) {
     case "text":
     case "textarea":
-      return showNames(String(value ?? ""), names) || "Empty";
+      return showNames(String(value === undefined ? (field.fallback ?? "") : value), names) || "Empty";
     case "number":
       return String(value ?? field.min);
     case "image":

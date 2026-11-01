@@ -16,10 +16,11 @@ import {ArrowDown,
   Lock as LockIcon,
   Unlock as UnlockIcon,
 } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ColorInput,
   Field,
+  inputClass,
   NumberInput,
   TextArea,
   TextInput,
@@ -102,6 +103,36 @@ function InspectorBody({
   setSel: (s: Selection) => void;
   edit: Edit;
 }) {
+  const root = useRef<HTMLDivElement>(null);
+  // Tapping copy in the preview brings its field into view, like on a phone.
+  useEffect(() => {
+    if (!sel.field) return;
+    const id = window.setTimeout(() => {
+      const box = root.current?.querySelector<HTMLElement>(`[data-inspector-input="${CSS.escape(sel.field!)}"]`);
+      if (!box) return;
+      box.scrollIntoView({ behavior: "smooth", block: "center" });
+      box.querySelector<HTMLElement>("input:not([type=range]), textarea")?.focus({ preventScroll: true });
+    }, 60);
+    return () => window.clearTimeout(id);
+  }, [sel.field, sel.item, sel.scene]);
+  return (
+    <div ref={root}>
+      <InspectorView draft={draft} sel={sel} setSel={setSel} edit={edit} />
+    </div>
+  );
+}
+
+function InspectorView({
+  draft,
+  sel,
+  setSel,
+  edit,
+}: {
+  draft: Draft;
+  sel: Selection;
+  setSel: (s: Selection) => void;
+  edit: Edit;
+}) {
   if (isLook(sel.scene)) {
     return (
       <Panel crumbs={[{ label: "Look" }]}>
@@ -122,6 +153,7 @@ function InspectorBody({
         draft={draft}
         i={i}
         j={sel.item}
+        field={sel.field ?? null}
         list={list}
         setSel={setSel}
         edit={edit}
@@ -136,7 +168,7 @@ function InspectorBody({
       </Panel>
     );
   }
-  return <SceneInspector draft={draft} i={i} setSel={setSel} edit={edit} />;
+  return <SceneInspector draft={draft} i={i} field={sel.field ?? null} setSel={setSel} edit={edit} />;
 }
 
 /* ───────────── One scene ───────────── */
@@ -144,11 +176,13 @@ function InspectorBody({
 function SceneInspector({
   draft,
   i,
+  field,
   setSel,
   edit,
 }: {
   draft: Draft;
   i: number;
+  field: string | null;
   setSel: (s: Selection) => void;
   edit: Edit;
 }) {
@@ -227,19 +261,12 @@ function SceneInspector({
         {schema.fields
           .filter((f) => f !== list)
           .map((f) => (
+            <InspectorField key={f.key} id={f.key} on={field === f.key}>
             <FieldEditor
-              key={f.key}
               field={f}
               draft={draft}
-              value={
-                (scene as unknown as Rec)[f.key] !== undefined
-                  ? (scene as unknown as Rec)[f.key]
-                  : f.key === "meta" && scene.type === "letter"
-                    ? "For {to} · from {from}"
-                    : f.key === "greeting" && scene.type === "letter"
-                      ? "Dear {to},"
-                      : ""
-              }
+              highlight={field === f.key}
+              value={(scene as unknown as Rec)[f.key]}
               onChange={(v) => set(f.key, v)}
               font={scene.fonts?.[f.key]}
               onFont={(id) => edit(setFieldFont(draft, i, f.key, id), `${i}-font-${f.key}`)}
@@ -251,6 +278,7 @@ function SceneInspector({
                   : undefined
               }
             />
+            </InspectorField>
           ))}
       </Group>
 
@@ -779,6 +807,7 @@ function ItemInspector({
   draft,
   i,
   j,
+  field,
   list,
   setSel,
   edit,
@@ -786,6 +815,7 @@ function ItemInspector({
   draft: Draft;
   i: number;
   j: number;
+  field: string | null;
   list: NonNullable<ReturnType<typeof childField>>;
   setSel: (s: Selection) => void;
   edit: Edit;
@@ -884,15 +914,17 @@ function ItemInspector({
         ) : (
           <>
             {list.item.map((f) => (
-              <FieldEditor
-                key={f.key}
-                field={f}
-                draft={draft}
-                value={(item as Rec)[f.key]}
-                onChange={(v) => set({ ...(item as Rec), [f.key]: v })}
-                font={scene.fonts?.[`${f.key}:${j}`]}
-                onFont={(id) => edit(setFieldFont(draft, i, `${f.key}:${j}`, id), `${i}-font-${f.key}-${j}`)}
-              />
+              <InspectorField key={f.key} id={f.key} on={field === f.key}>
+                <FieldEditor
+                  field={f}
+                  draft={draft}
+                  highlight={field === f.key}
+                  value={(item as Rec)[f.key]}
+                  onChange={(v) => set({ ...(item as Rec), [f.key]: v })}
+                  font={scene.fonts?.[`${f.key}:${j}`]}
+                  onFont={(id) => edit(setFieldFont(draft, i, `${f.key}:${j}`, id), `${i}-font-${f.key}-${j}`)}
+                />
+              </InspectorField>
             ))}
             <LayerPositionControl
               label={`${list.itemLabel} position`}
@@ -914,7 +946,7 @@ function ItemInspector({
             onClick={() => setSel({ scene: i, item: null, field: null })}
             className="text-xs text-muted hover:text-ink underline"
           >
-            ← Back to all ${sceneSchemas[scene.type].name} fields
+            ← Back to all {sceneSchemas[scene.type].name} fields
           </button>
         </div>
         {list.key === "songs" && (
@@ -1079,52 +1111,42 @@ export function FieldEditor({
             highlight={highlight}
             hideLabel={hideLabel}
           />
-          {onRemove && String(value ?? "") && (
-            <button type="button" onClick={onRemove} className="mt-1.5 text-sm text-rose-deep">
-              Remove from this page
-            </button>
-          )}
+          {onRemove && String(value ?? "") && <FieldExtras onRemove={onRemove} />}
         </div>
       );
-    case "text":
+    case "text": {
+      const text = value === undefined && field.fallback !== undefined ? field.fallback : (value ?? "");
       return (
         <div>
           <Field label={field.label} hint={field.help} roomy={roomy} highlight={highlight} hideLabel={hideLabel}>
             <TextInput
-              value={showNames(String(value ?? ""), names)}
+              value={showNames(String(text), names)}
               maxLength={field.max}
               placeholder={field.placeholder}
               onChange={(e) => onChange(keepNames(e.target.value, names))}
               className={input}
             />
           </Field>
-          {onFont && <FieldFontPicker value={font} sample={String(value ?? "")} onChange={onFont} />}
-          {onRemove && String(value ?? "") ? (
-            <button type="button" onClick={onRemove} className="mt-1.5 text-sm text-rose-deep">
-              Remove from this page
-            </button>
-          ) : null}
+          <FieldExtras onFont={onFont} font={font} sample={String(text)} onRemove={onRemove && String(text) ? onRemove : undefined} />
         </div>
       );
-    case "textarea":
+    }
+    case "textarea": {
+      const text = value === undefined && field.fallback !== undefined ? field.fallback : (value ?? "");
       return (
         <div>
           <Field label={field.label} hint={field.help} roomy={roomy} highlight={highlight} hideLabel={hideLabel}>
             <TextArea
-              value={showNames(String(value ?? ""), names)}
+              value={showNames(String(text), names)}
               maxLength={field.max}
               onChange={(e) => onChange(keepNames(e.target.value, names))}
               className={input}
             />
           </Field>
-          {onFont && <FieldFontPicker value={font} sample={String(value ?? "")} onChange={onFont} />}
-          {onRemove && String(value ?? "") ? (
-            <button type="button" onClick={onRemove} className="mt-1.5 text-sm text-rose-deep">
-              Remove from this page
-            </button>
-          ) : null}
+          <FieldExtras onFont={onFont} font={font} sample={String(text)} onRemove={onRemove && String(text) ? onRemove : undefined} />
         </div>
       );
+    }
     case "number":
       return (
         <Field label={field.label} roomy={roomy} highlight={highlight} hideLabel={hideLabel}>
@@ -1143,7 +1165,7 @@ export function FieldEditor({
           <select
             value={String(value ?? "")}
             onChange={(e) => onChange(e.target.value)}
-            className={cn("w-full rounded-2xl border border-line bg-paper px-4 py-3 text-[15px] outline-none focus:border-ink/40", input)}
+            className={cn(inputClass, "cursor-pointer", input)}
           >
             {field.options.map((o) => (
               <option key={o.value} value={o.value}>
@@ -1198,7 +1220,7 @@ export function FieldEditor({
               <div key={k} className="flex items-center gap-2">
                 <TextInput
                   value={showNames(s, names)}
-                  className={roomy ? "min-h-12 text-base" : "py-2"}
+                  className={roomy ? "min-h-12 text-base" : undefined}
                   onChange={(e) =>
                     onChange(
                       items.map((x, m) => (m === k ? keepNames(e.target.value, names) : x)),
@@ -1231,6 +1253,43 @@ export function FieldEditor({
     case "list":
       return null;
   }
+}
+
+/** One field in the desktop inspector; lights up when its copy is tapped in the preview. */
+function InspectorField({ id, on, children }: { id: string; on: boolean; children: ReactNode }) {
+  return (
+    <div
+      data-inspector-input={id}
+      className={cn("scroll-mt-28 rounded-2xl transition-colors duration-300", on && "-mx-3 bg-rose/[0.07] px-3 py-3")}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** The quiet row under a field: its font, and a way to drop it from the page. */
+function FieldExtras({
+  onFont,
+  font,
+  sample = "",
+  onRemove,
+}: {
+  onFont?: (id?: FontId) => void;
+  font?: FontId;
+  sample?: string;
+  onRemove?: () => void;
+}) {
+  if (!onFont && !onRemove) return null;
+  return (
+    <div className="mt-2 flex items-start gap-3">
+      {onFont ? <FieldFontPicker value={font} sample={sample} onChange={onFont} /> : <span className="flex-1" />}
+      {onRemove && (
+        <button type="button" onClick={onRemove} className="shrink-0 text-[13px] text-ink/40 transition-colors hover:text-rose-deep">
+          Remove
+        </button>
+      )}
+    </div>
+  );
 }
 
 /* ───────────── Layout bits ───────────── */
@@ -1297,9 +1356,9 @@ function Group({
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">{title}</h3>
+    <section className="space-y-7">
+      <div className="-mb-2 flex items-center justify-between">
+        <h3 className="type-label text-[10px] text-ink/40">{title}</h3>
         {action}
       </div>
       {children}

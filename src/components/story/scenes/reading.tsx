@@ -161,7 +161,8 @@ export function VoiceScene({ scene, done }: SceneProps<S<"voice">>) {
     <SceneShell eyebrow={scene.eyebrow} title={scene.title} hint={scene.hint} done={done}>
       <Paper className="w-[min(92vw,440px)] p-6 text-left">
         <p className="type-label opacity-60">
-          <Mic className="mr-1.5 inline size-3.5" />A voice note from {fill("{from}")}
+          <Mic className="mr-1.5 inline size-3.5" />
+          <StudioHit field="label" as="span">{fill(scene.label ?? "A voice note from {from}")}</StudioHit>
         </p>
         <div className="mt-4 flex items-center gap-4">
           <button
