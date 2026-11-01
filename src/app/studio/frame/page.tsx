@@ -12,8 +12,8 @@ export type StudioFrameMessage = {
   index: number;
   /** Bumps when the studio wants the scene to start over. */
   run: number;
-  /** "edit": every page open, follows the studio. "play": plays like the real gift. */
-  mode: "edit" | "play";
+  /** "edit": every page open, follows the studio. "play": plays like the real gift. "idle": nothing (preview closed). */
+  mode: "edit" | "play" | "idle";
   /** Studio: which field is selected, so the iframe can outline it. */
   pick?: { field?: string | null; item?: number | null };
 };
@@ -46,7 +46,12 @@ export default function StudioFramePage() {
     return () => window.removeEventListener("message", onMessage);
   }, []);
 
-  if (!msg) return <main className="min-h-svh" />;
+  // Tell the studio the gift is on screen, so it can drop its loading veil.
+  useEffect(() => {
+    if (msg && msg.mode !== "idle") window.parent?.postMessage({ type: "tynitales:studio-shown", run: msg.run }, window.location.origin);
+  }, [msg, jump]);
+
+  if (!msg || msg.mode === "idle") return <main className="min-h-svh" />;
 
   const editing = msg.mode === "edit";
 

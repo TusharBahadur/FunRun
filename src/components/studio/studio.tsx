@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
 import { ArrowLeft, Check, ChevronDown, CircleHelp, Eye, LayoutGrid, Loader2, Redo2, RotateCcw, Undo2, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,7 +14,7 @@ import { useProfile } from "@/lib/supabase/profile";
 import { giftPricing } from "@/config/site";
 import { formatDay, isFuture } from "@/lib/gift-links";
 import { getSupabase } from "@/lib/supabase/browser";
-import { formatInr } from "@/lib/utils";
+import { cn, formatInr } from "@/lib/utils";
 import { AddSection } from "./add-section";
 import { Canvas, type DeviceMode } from "./canvas";
 import { ChangeDesign } from "./change-design";
@@ -89,6 +88,10 @@ export function Studio({
   const [adding, setAdding] = useState(false);
   const [checkout, setCheckout] = useState(false);
   const [preview, setPreview] = useState(false);
+  // The preview frame loads quietly once the studio is up, so opening it is instant.
+  const [previewWarm, setPreviewWarm] = useState(false);
+  // The `run` the preview frame last put on screen.
+  const [previewShown, setPreviewShown] = useState(-1);
   const [names, setNames] = useState<"first" | "edit" | null>(null);
   const [designsOpen, setDesignsOpen] = useState(false);
   const router = useRouter();
@@ -219,11 +222,31 @@ export function Studio({
   }, [postAll]);
 
   useEffect(() => {
+    const id = window.setTimeout(() => setPreviewWarm(true), 1500);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  // Opening plays the gift from the start; closing empties the frame so its music stops.
+  useEffect(() => {
+    if (preview) {
+      postPreview();
+      return;
+    }
+    const msg: StudioFrameMessage = { type: "tynitales:studio", story: draftRef.current.story, slug: template.slug, index: 0, run, mode: "idle" };
+    previewFrame.current?.contentWindow?.postMessage(msg, window.location.origin);
+    // Only on open and close: the draft can't change while the preview is up.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preview]);
+
+  useEffect(() => {
     const onMessage = (e: MessageEvent) => {
       if (e.origin !== window.location.origin) return;
       if (e.data?.type === "tynitales:studio-ready") {
         postAll();
         if (preview) postPreview();
+      }
+      if (e.data?.type === "tynitales:studio-shown" && e.source === previewFrame.current?.contentWindow) {
+        setPreviewShown(e.data.run);
       }
       // Pressing Next inside an artboard moves the selection along with it.
       if (e.data?.type === "tynitales:studio-index" && e.source !== previewFrame.current?.contentWindow) {
@@ -567,24 +590,37 @@ export function Studio({
 
       <StudioTour open={tour} onClose={() => setTour(false)} steps={tourSteps(wide === true, formatInr(template.pricePaise), designs.length > 0)} />
 
-      {/* Full-screen preview: plays exactly like the real gift */}
-      <AnimatePresence>
-        {preview && (
-          <motion.div className="fixed inset-0 z-[90] flex flex-col items-center justify-center bg-ink/80 p-4 backdrop-blur" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <button
-              type="button"
-              onClick={() => setPreview(false)}
-              className="btn btn-paper absolute right-4 top-4 flex items-center gap-1.5 px-4 py-2 text-sm"
-            >
-              <X className="size-4" /> Close preview
-            </button>
-            <div className="h-[min(88vh,844px)] w-[min(92vw,calc(min(88vh,844px)*390/844))] overflow-hidden rounded-[2rem] border-[8px] border-ink bg-paper">
-              <iframe ref={previewFrame} src="/studio/frame" title="Preview of your gift" allow="autoplay; encrypted-media" className="size-full border-0" onLoad={postPreview} />
-            </div>
-            <p className="type-label mt-3 text-[10px] text-paper/70">This is exactly what they’ll see</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Full-screen preview: plays exactly like the real gift. The frame is
+          loaded once, in the background, and kept: opening it used to start a
+          whole new page, which on a phone showed a blank screen for seconds. */}
+      {(previewWarm || preview) && (
+        <div
+          aria-hidden={!preview}
+          className={cn(
+            "fixed inset-0 z-[90] flex-col items-center justify-center bg-ink/80 p-4 md:backdrop-blur",
+            preview ? "flex" : "hidden",
+          )}
+        >
+          <button
+            type="button"
+            onClick={() => setPreview(false)}
+            className="btn btn-paper absolute right-4 top-4 flex items-center gap-1.5 px-4 py-2 text-sm"
+          >
+            <X className="size-4" /> Close preview
+          </button>
+          <div className="relative h-[min(88vh,844px)] w-[min(92vw,calc(min(88vh,844px)*390/844))] overflow-hidden rounded-[2rem] border-[8px] border-ink bg-paper">
+            <iframe ref={previewFrame} src="/studio/frame" title="Preview of your gift" allow="autoplay; encrypted-media" className="size-full border-0" />
+            {preview && previewShown !== run && (
+              <div className="absolute inset-0 grid place-items-center bg-paper">
+                <p className="flex items-center gap-2 text-sm text-muted">
+                  <Loader2 className="size-4 animate-spin" /> Getting your gift ready…
+                </p>
+              </div>
+            )}
+          </div>
+          <p className="type-label mt-3 text-[10px] text-paper/70">This is exactly what they’ll see</p>
+        </div>
+      )}
       </div>
     </ImageCropProvider>
   );
