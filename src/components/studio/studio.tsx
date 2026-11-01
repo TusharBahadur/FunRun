@@ -19,7 +19,7 @@ import { AddSection } from "./add-section";
 import { Canvas, type DeviceMode } from "./canvas";
 import { ChangeDesign } from "./change-design";
 import { Checkout, hasPendingPublish } from "./checkout";
-import { freshDraft, leavingOnPurpose, useDraft, type Draft } from "./draft-store";
+import { freshDraft, useDraft, type Draft } from "./draft-store";
 import { ImageCropProvider } from "./image-crop";
 import { Inspector, type Selection } from "./inspector";
 import { isLook, LOOK } from "./look";
@@ -54,18 +54,7 @@ export function Studio({
     // Changes to a live gift are kept apart from any new draft of the same template.
     return editSlug ? { ...d, id: `edit-${editSlug}` } : d;
   }, [template, editSlug]);
-  const { draft, edit, undo, redo, reset, canUndo, canRedo } = useDraft(initial, () => hasPendingPublish(initial.id));
-
-  // Nothing is saved until the gift goes live, so warn before the page is left with changes.
-  useEffect(() => {
-    if (!canUndo) return;
-    const warn = (e: BeforeUnloadEvent) => {
-      if (leavingOnPurpose()) return; // off to Google sign-in; the gift is parked for the trip
-      e.preventDefault();
-    };
-    window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, [canUndo]);
+  const { draft, edit, undo, redo, reset, canUndo, canRedo } = useDraft(initial);
 
   const save = useCallback(
     (next: Draft, tag?: string) => {

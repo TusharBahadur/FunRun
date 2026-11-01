@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useReducer } from "react";
 import type { Story } from "@/components/story/types";
 
 /** A gift being made in the studio. Lives in memory until it goes live. */
@@ -71,37 +71,6 @@ export function loadDraft(id: string): Draft | null {
   }
 }
 
-/**
- * Gifts aren't saved as drafts: the studio holds them in memory only. The one
- * exception is the trip to Google sign-in during checkout, which leaves the
- * page; the gift is parked for that trip and picked up once, on the way back.
- */
-const stashKey = (id: string) => `tynitales:signin-stash:${id}`;
-
-let parked = false;
-/** True once the gift is parked for sign-in, so leaving the page doesn't warn. */
-export const leavingOnPurpose = () => parked;
-
-export function stashDraft(d: Draft) {
-  parked = true;
-  try {
-    sessionStorage.setItem(stashKey(d.id), JSON.stringify(d));
-  } catch {
-    /* too big or private mode: they'd redo their edits after signing in */
-  }
-}
-
-function takeStash(id: string): Draft | null {
-  try {
-    const raw = sessionStorage.getItem(stashKey(id));
-    sessionStorage.removeItem(stashKey(id));
-    const d = raw ? (JSON.parse(raw) as Draft) : null;
-    return d?.v === 1 ? d : null;
-  } catch {
-    return null;
-  }
-}
-
 /** A short fingerprint of a template's content (not for security, just change detection). */
 export function storyFingerprint(story: Story) {
   const text = JSON.stringify(story);
@@ -160,16 +129,8 @@ function reducer(h: History, a: Action): History {
 }
 
 /** The studio's working copy: edit, undo and redo, in memory. */
-export function useDraft(initial: Draft, resume: () => boolean = () => false) {
+export function useDraft(initial: Draft) {
   const [h, dispatch] = useReducer(reducer, { past: [], present: initial, future: [], lastPush: 0 });
-  const resumeRef = useRef(resume);
-
-  // Back from Google sign-in mid-checkout: pick the gift up where it was parked.
-  useEffect(() => {
-    if (!resumeRef.current()) return;
-    const parked = takeStash(initial.id);
-    if (parked) dispatch({ type: "replace", draft: parked });
-  }, [initial.id]);
 
   const edit = useCallback((next: Draft, tag?: string) => {
     dispatch({ type: "edit", next, tag });
