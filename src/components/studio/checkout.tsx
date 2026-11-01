@@ -7,11 +7,11 @@ import { useEffect, useState } from "react";
 import { storyFacts } from "@/components/story/labels";
 import { giftPricing } from "@/config/site";
 import { editableUntil, formatDay, isFuture, giftPath, PASSWORD_MAX, PASSWORD_MIN, slugifyName } from "@/lib/gift-links";
-import { signInWithGoogle, useUser } from "@/lib/supabase/browser";
+import { useUser } from "@/lib/supabase/browser";
 import { Sheet } from "@/components/ui/sheet";
 import { cn, formatInr } from "@/lib/utils";
 import { markOwnGift } from "@/components/gift/open-beacon";
-import { GoogleMark } from "@/components/profile/sign-in-card";
+import { SignInOptions } from "@/components/auth/sign-in-options";
 import type { Draft } from "./draft-store";
 import { NeedsSignIn, publishGift, updateGift } from "./publish";
 
@@ -103,15 +103,8 @@ export function Checkout({
   const laterMissing = when === "later" && !unlockAt;
   const passwordShort = lock && password.trim().length < PASSWORD_MIN;
 
-  async function signIn() {
-    setError(null);
-    writePending(draft.id, { link, when, unlockAt, confirmed, lock });
-    try {
-      await signInWithGoogle();
-    } catch {
-      setError("Couldn't open Google sign-in. Please try again.");
-    }
-  }
+  // Google leaves the page: remember their choices for the trip back.
+  const rememberChoices = () => writePending(draft.id, { link, when, unlockAt, confirmed, lock });
 
   async function publish() {
     setError(null);
@@ -138,7 +131,7 @@ export function Checkout({
         paid: false,
       });
     } catch (e) {
-      if (e instanceof NeedsSignIn) await signIn();
+      if (e instanceof NeedsSignIn) setError("Your sign-in ran out. Please sign in again.");
       else setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
       setBusy(null);
@@ -266,14 +259,7 @@ export function Checkout({
                 {error && <p className="rounded-2xl bg-rose/10 px-4 py-3 text-sm text-rose-deep">{error}</p>}
 
                 {user === null ? (
-                  <button
-                    type="button"
-                    onClick={signIn}
-                    disabled={!confirmed || laterMissing || passwordShort}
-                    className="btn btn-paper flex h-14 w-full items-center justify-center gap-3"
-                  >
-                    <GoogleMark /> Continue with Google
-                  </button>
+                  <SignInOptions disabled={!confirmed || laterMissing || passwordShort} onBeforeGoogle={rememberChoices} />
                 ) : (
                   <button
                     type="button"

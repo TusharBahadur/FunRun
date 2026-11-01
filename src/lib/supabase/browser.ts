@@ -62,6 +62,21 @@ export async function signInWithGoogle() {
   if (error) throw error;
 }
 
+/**
+ * Email sign-in, step 1: sends a one-time code (works inside Instagram and
+ * other in-app browsers, where Google won't sign anyone in).
+ */
+export async function sendEmailCode(email: string) {
+  const { error } = await getSupabase().auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+  if (error) throw error;
+}
+
+/** Email sign-in, step 2: the code from the email. Signed in once this resolves. */
+export async function verifyEmailCode(email: string, code: string) {
+  const { error } = await getSupabase().auth.verifyOtp({ email, token: code, type: "email" });
+  if (error) throw error;
+}
+
 export async function signOut() {
   await getSupabase().auth.signOut();
 }

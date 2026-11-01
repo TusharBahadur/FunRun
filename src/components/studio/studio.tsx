@@ -13,7 +13,9 @@ import { useUser } from "@/lib/supabase/browser";
 import { useProfile } from "@/lib/supabase/profile";
 import { giftPricing } from "@/config/site";
 import { formatDay, isFuture } from "@/lib/gift-links";
-import { getSupabase, signInWithGoogle } from "@/lib/supabase/browser";
+import { getSupabase } from "@/lib/supabase/browser";
+import { SignInOptions } from "@/components/auth/sign-in-options";
+import { Sheet } from "@/components/ui/sheet";
 import { cn, formatInr } from "@/lib/utils";
 import { AddSection } from "./add-section";
 import { Canvas, type DeviceMode } from "./canvas";
@@ -172,6 +174,8 @@ export function Studio({
     if (!user || copied.current) return;
     copied.current = true;
     void copyDeviceDraftsToAccount(user.id);
+    // Signed in mid-gift (email code, no page reload): save this one to the account now.
+    if (savedId.current) setRetry((n) => n + 1);
   }, [user]);
 
   // Not signed in: once, a while after they start, offer to keep it safe in an account.
@@ -184,6 +188,14 @@ export function Studio({
     }, 120_000);
     return () => window.clearTimeout(t);
   }, [user, saveState]);
+
+  // Sign in from the studio (save status, nudge): stays on the page; closes once signed in.
+  const [signInOpen, setSignInOpen] = useState(false);
+  useEffect(() => {
+    if (!user || !signInOpen) return;
+    const t = window.setTimeout(() => setSignInOpen(false), 0);
+    return () => window.clearTimeout(t);
+  }, [user, signInOpen]);
 
   // A new gift from a template they already have a draft of: offer to carry on with it.
   const [resume, setResume] = useState<DraftSummary | null>(null);
@@ -432,7 +444,7 @@ export function Studio({
             <Undo2 className="size-4" />
           </TopButton>
         </span>
-        <SaveStatus state={saveState} onRetry={() => setRetry((n) => n + 1)} onSignIn={() => void signInWithGoogle()} />
+        <SaveStatus state={saveState} onRetry={() => setRetry((n) => n + 1)} onSignIn={() => setSignInOpen(true)} />
         <span className="hidden items-center sm:flex">
           <TopButton label="Redo (⇧⌘Z)" onClick={redo} disabled={!canRedo}>
             <Redo2 className="size-4" />
@@ -512,7 +524,7 @@ export function Studio({
         <div className="flex items-center gap-3 border-b border-line bg-paper px-4 py-2 text-sm">
           <Cloud className="size-4 shrink-0 text-muted" />
           <p className="flex-1">Sign in to keep this gift safe on any device.</p>
-          <button type="button" onClick={() => void signInWithGoogle()} className="btn btn-ink h-8 px-4">
+          <button type="button" onClick={() => setSignInOpen(true)} className="btn btn-ink h-8 px-4">
             Sign in
           </button>
           <button
@@ -650,6 +662,14 @@ export function Studio({
         onSave={saveNames}
         onClose={() => setNames(null)}
       />
+
+      <Sheet open={signInOpen} onClose={() => setSignInOpen(false)} label="Sign in" z={100} width="w-full max-w-md">
+        <div className="px-6 pb-6 pt-2 sm:pt-6">
+          <h2 className="type-heading text-2xl">Keep this gift safe</h2>
+          <p className="mb-5 mt-1 text-sm text-muted">Sign in and it’s saved to your account, so you can open it on any device.</p>
+          <SignInOptions />
+        </div>
+      </Sheet>
 
       <Checkout
         open={checkout}

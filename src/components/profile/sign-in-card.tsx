@@ -1,14 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { signInWithGoogle, useUser } from "@/lib/supabase/browser";
+import { useEffect } from "react";
+import { SignInOptions } from "@/components/auth/sign-in-options";
+import { useUser } from "@/lib/supabase/browser";
 
-/** Google sign-in. Once signed in, goes on to `next`. */
+/** Sign-in (Google, or a code by email). Once signed in, goes on to `next`. */
 export function SignInCard({ next }: { next: string }) {
   const user = useUser();
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user && window.location.pathname !== next) router.replace(next);
@@ -20,15 +20,7 @@ export function SignInCard({ next }: { next: string }) {
         Your gifts, <span className="type-accent text-rose">all in one place.</span>
       </h2>
       <p className="type-copy mt-4 text-muted">Sign in to see every gift you’ve made, who’s opened them, and make changes for 7 days after sending.</p>
-      <button
-        type="button"
-        disabled={user === undefined}
-        onClick={() => signInWithGoogle().catch(() => setError("Couldn't open Google sign-in. Please try again."))}
-        className="btn btn-paper mt-8 flex h-14 w-full items-center justify-center gap-3"
-      >
-        <GoogleMark /> Continue with Google
-      </button>
-      {error && <p className="mt-3 text-sm text-rose-deep">{error}</p>}
+      <SignInOptions disabled={user === undefined} className="mt-8" />
     </div>
   );
 }
