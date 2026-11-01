@@ -60,8 +60,8 @@ export default function PrivacyPage() {
 
       <PolicySection title="What stays on your device">
         <p>
-          Drafts you’re working on, including photos you add, are saved in your browser’s local storage on your device. They
-          only reach our servers when you make a gift live. Clearing your browser data deletes unsent drafts.
+          While you make a gift, it stays in the open page on your device, photos included. Nothing reaches our servers
+          until you make it live, and closing the page before then discards it.
         </p>
       </PolicySection>
 

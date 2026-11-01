@@ -12,7 +12,7 @@ import { Sheet } from "@/components/ui/sheet";
 import { cn, formatInr } from "@/lib/utils";
 import { markOwnGift } from "@/components/gift/open-beacon";
 import { GoogleMark } from "@/components/profile/sign-in-card";
-import type { Draft } from "./draft-store";
+import { stashDraft, type Draft } from "./draft-store";
 import { NeedsSignIn, publishGift, updateGift } from "./publish";
 
 /** Remembers the checkout choices across the trip to Google sign-in and back. */
@@ -106,6 +106,7 @@ export function Checkout({
   async function signIn() {
     setError(null);
     writePending(draft.id, { link, when, unlockAt, confirmed, lock });
+    stashDraft(draft);
     try {
       await signInWithGoogle();
     } catch {

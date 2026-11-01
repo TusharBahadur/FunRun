@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 import type { Story } from "@/components/story/types";
 
-/** A gift being made in the studio. Lives on this device until it's paid for. */
+/** A gift being made in the studio. Lives in memory until it goes live. */
 export type Draft = {
   v: 1;
   id: string;
@@ -56,34 +56,49 @@ export function draftIdFor(slug: string) {
   return `draft-${slug}`;
 }
 
+/**
+ * Old test links (/g/<id>) only: gifts used to be kept in this browser before
+ * they went online. Nothing writes here any more.
+ */
 export function loadDraft(id: string): Draft | null {
   try {
     const raw = localStorage.getItem(key(id));
     const d = raw ? (JSON.parse(raw) as Draft) : null;
     if (d?.v !== 1) return null;
-    const migrated = migratePhotos(d);
-    if (migrated !== d) saveDraft(migrated);
-    return migrated;
+    return migratePhotos(d);
   } catch {
     return null;
   }
 }
 
-/** False when the browser refused (usually: photos too large for storage). */
-export function saveDraft(d: Draft) {
+/**
+ * Gifts aren't saved as drafts: the studio holds them in memory only. The one
+ * exception is the trip to Google sign-in during checkout, which leaves the
+ * page; the gift is parked for that trip and picked up once, on the way back.
+ */
+const stashKey = (id: string) => `tynitales:signin-stash:${id}`;
+
+let parked = false;
+/** True once the gift is parked for sign-in, so leaving the page doesn't warn. */
+export const leavingOnPurpose = () => parked;
+
+export function stashDraft(d: Draft) {
+  parked = true;
   try {
-    localStorage.setItem(key(d.id), JSON.stringify(d));
-    return true;
+    sessionStorage.setItem(stashKey(d.id), JSON.stringify(d));
   } catch {
-    return false;
+    /* too big or private mode: they'd redo their edits after signing in */
   }
 }
 
-export function removeDraft(id: string) {
+function takeStash(id: string): Draft | null {
   try {
-    localStorage.removeItem(key(id));
+    const raw = sessionStorage.getItem(stashKey(id));
+    sessionStorage.removeItem(stashKey(id));
+    const d = raw ? (JSON.parse(raw) as Draft) : null;
+    return d?.v === 1 ? d : null;
   } catch {
-    /* nothing to clean up */
+    return null;
   }
 }
 
@@ -144,58 +159,32 @@ function reducer(h: History, a: Action): History {
   }
 }
 
-/** The studio's working copy: edit, undo, redo, and autosave on this device. */
+/** The studio's working copy: edit, undo and redo, in memory. */
 export function useDraft(initial: Draft, resume: () => boolean = () => false) {
   const [h, dispatch] = useReducer(reducer, { past: [], present: initial, future: [], lastPush: 0 });
-  const [saved, setSaved] = useState<"saved" | "saving" | "failed">("saved");
-  const dirty = useRef(false);
   const resumeRef = useRef(resume);
 
-  // The studio opens on the template exactly as Preview shows it. An earlier
-  // draft is only picked up automatically when asked (e.g. back from sign-in
-  // mid-checkout); otherwise the studio offers it as a choice.
+  // Back from Google sign-in mid-checkout: pick the gift up where it was parked.
   useEffect(() => {
     if (!resumeRef.current()) return;
-    const existing = loadDraft(initial.id);
-    if (existing) dispatch({ type: "replace", draft: existing });
+    const parked = takeStash(initial.id);
+    if (parked) dispatch({ type: "replace", draft: parked });
   }, [initial.id]);
 
-  // Only real changes are saved, so opening a template never pins an old copy of it.
-  useEffect(() => {
-    if (!dirty.current) return;
-    const id = setTimeout(() => setSaved(saveDraft(h.present) ? "saved" : "failed"), 400);
-    return () => clearTimeout(id);
-  }, [h.present]);
-
   const edit = useCallback((next: Draft, tag?: string) => {
-    dirty.current = true;
-    setSaved("saving");
     dispatch({ type: "edit", next, tag });
   }, []);
 
   return {
     draft: h.present,
     edit,
-    undo: () => {
-      dirty.current = true;
-      dispatch({ type: "undo" });
-    },
-    redo: () => {
-      dirty.current = true;
-      dispatch({ type: "redo" });
-    },
-    reset: (d: Draft) => {
-      setSaved("saving");
-      dispatch({ type: "replace", draft: d });
-      saveDraft(d);
-      setSaved("saved");
-    },
+    undo: () => dispatch({ type: "undo" }),
+    redo: () => dispatch({ type: "redo" }),
+    reset: useCallback((d: Draft) => dispatch({ type: "replace", draft: d }), []),
     canUndo: h.past.length > 0,
     canRedo: h.future.length > 0,
-    saved,
   };
 }
-
 /** Shrinks an image so drafts stay small enough to keep on this device. */
 export async function imageToDataUrl(file: File, maxSide = 1100, type: "image/jpeg" | "image/webp" = "image/jpeg") {
   const bitmap = await createImageBitmap(file);

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, ChevronDown, CircleHelp, Eye, LayoutGrid, Loader2, Redo2, RotateCcw, Undo2, UserRound, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, CircleHelp, Eye, LayoutGrid, Loader2, Redo2, RotateCcw, Undo2, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { canGoBackInApp } from "@/lib/nav-history";
@@ -19,7 +19,7 @@ import { AddSection } from "./add-section";
 import { Canvas, type DeviceMode } from "./canvas";
 import { ChangeDesign } from "./change-design";
 import { Checkout, hasPendingPublish } from "./checkout";
-import { freshDraft, loadDraft, removeDraft, useDraft, type Draft } from "./draft-store";
+import { freshDraft, leavingOnPurpose, useDraft, type Draft } from "./draft-store";
 import { ImageCropProvider } from "./image-crop";
 import { Inspector, type Selection } from "./inspector";
 import { isLook, LOOK } from "./look";
@@ -54,9 +54,18 @@ export function Studio({
     // Changes to a live gift are kept apart from any new draft of the same template.
     return editSlug ? { ...d, id: `edit-${editSlug}` } : d;
   }, [template, editSlug]);
-  const { draft, edit, undo, redo, reset, canUndo, canRedo, saved } = useDraft(initial, () => hasPendingPublish(initial.id));
-  // A draft from an earlier visit: offered, never loaded behind their back.
-  const [resumable, setResumable] = useState<Draft | null>(null);
+  const { draft, edit, undo, redo, reset, canUndo, canRedo } = useDraft(initial, () => hasPendingPublish(initial.id));
+
+  // Nothing is saved until the gift goes live, so warn before the page is left with changes.
+  useEffect(() => {
+    if (!canUndo) return;
+    const warn = (e: BeforeUnloadEvent) => {
+      if (leavingOnPurpose()) return; // off to Google sign-in; the gift is parked for the trip
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [canUndo]);
 
   const save = useCallback(
     (next: Draft, tag?: string) => {
@@ -124,14 +133,7 @@ export function Studio({
           publishedAt: data.created_at as string,
           paid: false as const,
         };
-        // Unsaved changes from an earlier visit win over what's online, if they're newer.
-        const local = loadDraft(initial.id);
-        const onlineAt = new Date((data.updated_at as string | null) ?? (data.created_at as string)).getTime();
-        if (local?.live?.slug === editSlug && new Date(local.updatedAt).getTime() > onlineAt) {
-          reset({ ...local, live: { ...local.live, ...live } });
-        } else {
-          reset({ ...initial, name: data.name as string, story: data.story as Story, live, updatedAt: new Date().toISOString() });
-        }
+        reset({ ...initial, name: data.name as string, story: data.story as Story, live, updatedAt: new Date().toISOString() });
         setEditState("ready");
       });
     return () => {
@@ -143,10 +145,10 @@ export function Studio({
   const [tour, setTour] = useState(false);
   // First visit: once the names are in, show them around.
   useEffect(() => {
-    if (editSlug || names !== null || resumable || wide === null || tourSeen()) return;
+    if (editSlug || names !== null || wide === null || tourSeen()) return;
     const id = window.setTimeout(() => setTour(true), 900);
     return () => window.clearTimeout(id);
-  }, [editSlug, names, resumable, wide]);
+  }, [editSlug, names, wide]);
 
   // Back from Google sign-in mid-checkout: reopen it where they left off.
   useEffect(() => {
@@ -155,20 +157,10 @@ export function Studio({
     return () => window.clearTimeout(id);
   }, [initial.id]);
 
-  // Found an earlier draft of this template? Offer it (unless it's already open, or untouched).
+  // Every new gift starts by asking who it's for (unless the link already said,
+  // or they're back from sign-in with a gift in progress).
   useEffect(() => {
-    if (editSlug || hasPendingPublish(initial.id)) return;
-    const saved = loadDraft(initial.id);
-    if (!saved || saved.live?.slug) return;
-    const same = JSON.stringify(saved.story) === JSON.stringify(initial.story) && saved.name === initial.name;
-    if (same) return;
-    const id = window.setTimeout(() => setResumable(saved), 0);
-    return () => window.clearTimeout(id);
-  }, [initial, editSlug]);
-
-  // A fresh gift starts by asking who it's for; a saved draft already knows.
-  useEffect(() => {
-    if (!askNames || loadDraft(initial.id)) return;
+    if (!askNames || hasPendingPublish(initial.id)) return;
     const id = window.setTimeout(() => setNames("first"), 250);
     return () => window.clearTimeout(id);
   }, [askNames, initial.id]);
@@ -399,19 +391,6 @@ export function Studio({
               <UserRound className="size-4" />
             </TopButton>
           </span>
-          <span className="type-label hidden shrink-0 items-center gap-1 text-[10px] text-muted md:flex">
-            {saved === "saving" ? (
-              <>
-                <Loader2 className="size-3 animate-spin" /> Saving
-              </>
-            ) : saved === "failed" ? (
-              <span className="text-rose-deep">Couldn’t save · try fewer photos</span>
-            ) : (
-              <>
-                <Check className="size-3" /> Saved on this device
-              </>
-            )}
-          </span>
         </div>
 
         <button
@@ -463,29 +442,6 @@ export function Studio({
           ) : (
             <Loader2 className="size-6 animate-spin text-muted" />
           )}
-        </div>
-      )}
-
-      {resumable && (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line bg-paper px-4 py-2.5 text-sm">
-          <p className="flex-1">
-            You started a version of this gift on {new Date(resumable.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-            {resumable.story.recipient ? ` for ${resumable.story.recipient}` : ""}.
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              reset(resumable);
-              setResumable(null);
-              setSel({ scene: 0, item: null });
-            }}
-            className="btn btn-ink h-8 px-4"
-          >
-            Continue it
-          </button>
-          <button type="button" onClick={() => setResumable(null)} className="btn btn-paper h-8 px-4">
-            Start fresh
-          </button>
         </div>
       )}
 
@@ -577,8 +533,6 @@ export function Studio({
         templateName={template.name}
         pricePaise={template.pricePaise}
         onSaved={() => {
-          // Saved: the online gift is now the source of truth.
-          removeDraft(initial.id);
           router.push(`/sent/${draft.live?.slug}?saved=1`);
         }}
         onPublished={(live) => {
