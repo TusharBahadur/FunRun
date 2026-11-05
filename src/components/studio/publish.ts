@@ -99,6 +99,7 @@ export async function publishGift({
   unlockAt,
   password,
   onProgress,
+  pay,
 }: {
   templateSlug: string;
   name: string;
@@ -107,13 +108,16 @@ export async function publishGift({
   unlockAt?: string;
   password?: string;
   onProgress?: (done: number, total: number) => void;
+  /** Takes payment once photos are up and just before the gift is saved (payments on). */
+  pay?: (token: string) => Promise<unknown>;
 }): Promise<Published> {
   const ready = await prepareStory(story, onProgress);
+  const payment = pay ? await pay(ready.token) : undefined;
   return send(
     "/api/gifts",
     "POST",
     ready.token,
-    { templateSlug, name, link, unlockAt, password: password || undefined, mediaFolder: ready.folder, schemaVersion: GIFT_SCHEMA_VERSION, story: ready.story },
+    { templateSlug, name, link, unlockAt, password: password || undefined, mediaFolder: ready.folder, schemaVersion: GIFT_SCHEMA_VERSION, story: ready.story, payment },
     "Couldn't make the gift live. Please try again.",
   );
 }

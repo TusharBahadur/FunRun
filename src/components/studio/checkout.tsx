@@ -3,7 +3,7 @@
 import { Check, Clock, Copy, ExternalLink, Infinity as Forever, KeyRound, Loader2, Lock, PenLine, Share2, X } from "lucide-react";
 import Link from "next/link";
 import QRCode from "qrcode";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { storyFacts } from "@/components/story/labels";
 import { giftPricing } from "@/config/site";
 import { editableUntil, formatDay, isFuture, giftPath, PASSWORD_MAX, PASSWORD_MIN, slugifyName } from "@/lib/gift-links";
@@ -14,6 +14,7 @@ import { markOwnGift } from "@/components/gift/open-beacon";
 import { SignInOptions } from "@/components/auth/sign-in-options";
 import type { Draft } from "./draft-store";
 import { NeedsSignIn, publishGift, updateGift } from "./publish";
+import { PaymentCancelled, paymentsOn, payForGift, preloadCheckout, type PaymentProof } from "@/lib/razorpay-checkout";
 
 /** Remembers the checkout choices across the trip to Google sign-in and back. */
 const pendingKey = (draftId: string) => `tynitales:publish:${draftId}`;
@@ -77,8 +78,15 @@ export function Checkout({
   // Optional password. The password itself never goes into storage, only into the request.
   const [lock, setLock] = useState(false);
   const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState<null | { done: number; total: number }>(null);
+  const [busy, setBusy] = useState<null | { done: number; total: number; paying?: boolean }>(null);
   const [error, setError] = useState<string | null>(null);
+  // A payment that went through but whose gift didn't save yet: the retry reuses it, never charges again.
+  const paid = useRef<PaymentProof | null>(null);
+  const [hasPaid, setHasPaid] = useState(false);
+  const paying = paymentsOn() && pricePaise >= 100;
+  useEffect(() => {
+    if (open && paying) preloadCheckout();
+  }, [open, paying]);
   const facts = storyFacts(draft.story.scenes.filter((s) => !s.hidden));
   const live = draft.live?.slug ? draft.live : null;
   // A live gift opened again to change it, still inside its 7 days.
@@ -118,7 +126,26 @@ export function Checkout({
         unlockAt: scheduled ? scheduled.toISOString() : undefined,
         password: lock ? password.trim() : undefined,
         onProgress: (done, total) => setBusy({ done, total }),
+        pay: paying
+          ? async (token) => {
+              if (paid.current) return paid.current;
+              setBusy({ done: 0, total: 0, paying: true });
+              const proof = await payForGift({
+                templateSlug,
+                token,
+                description: `${templateName} for ${draft.story.recipient}`,
+                email: user?.email ?? undefined,
+                color: draft.story.palette.accent,
+              });
+              paid.current = proof;
+              setHasPaid(true);
+              setBusy({ done: 0, total: 0 });
+              return proof;
+            }
+          : undefined,
       });
+      paid.current = null;
+      setHasPaid(false);
       writePending(draft.id, null);
       markOwnGift(result.slug);
       onPublished({
@@ -132,6 +159,13 @@ export function Checkout({
       });
     } catch (e) {
       if (e instanceof NeedsSignIn) setError("Your sign-in ran out. Please sign in again.");
+      else if (e instanceof PaymentCancelled) setError(e.message);
+      else if (e instanceof Error && /already been used/.test(e.message)) {
+        // That payment made a gift already: start a fresh one next time.
+        paid.current = null;
+        setHasPaid(false);
+        setError(e.message);
+      }
       else setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
       setBusy(null);
@@ -227,8 +261,14 @@ export function Checkout({
                   <div className="flex items-baseline justify-between gap-3">
                     <p className="font-medium">{draft.name}</p>
                     <p className="shrink-0 text-right">
-                      <span className="type-display text-2xl font-semibold text-muted line-through decoration-1">{formatInr(pricePaise)}</span>{" "}
-                      <span className="type-display text-2xl font-semibold">Free</span>
+                      {paying ? (
+                        <span className="type-display text-2xl font-semibold">{formatInr(pricePaise)}</span>
+                      ) : (
+                        <>
+                          <span className="type-display text-2xl font-semibold text-muted line-through decoration-1">{formatInr(pricePaise)}</span>{" "}
+                          <span className="type-display text-2xl font-semibold">Free</span>
+                        </>
+                      )}
                     </p>
                   </div>
                   <p className="type-label mt-1 text-[10px] text-muted">
@@ -270,20 +310,23 @@ export function Checkout({
                     {busy ? (
                       <>
                         <Loader2 className="size-4 animate-spin" />
-                        {busy.total > 0 && busy.done < busy.total ? `Uploading photos ${busy.done}/${busy.total}` : "Making your link"}
+                        {busy.paying ? "Waiting for payment" : busy.total > 0 && busy.done < busy.total ? `Uploading photos ${busy.done}/${busy.total}` : "Making your link"}
                       </>
                     ) : (
                       <>
-                        <Lock className="size-4" /> Make it live
+                        <Lock className="size-4" /> {paying && !hasPaid ? `Pay ${formatInr(pricePaise)} and make it live` : "Make it live"}
                       </>
                     )}
                   </button>
                 )}
                 <p className="text-center text-xs text-muted">
                   {user ? (
-                    <>Signed in as {user.email}. Your gifts are saved to your account.</>
+                    <>
+                      Signed in as {user.email}. Your gifts are saved to your account.
+                      {paying && " Pay securely by UPI, card or net banking with Razorpay."}
+                    </>
                   ) : (
-                    <>Sign in so you can find your gifts again later. Free while we’re getting started.</>
+                    <>Sign in so you can find your gifts again later.{paying ? "" : " Free while we’re getting started."}</>
                   )}
                 </p>
               </div>

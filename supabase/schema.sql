@@ -224,3 +224,10 @@ create policy "People manage their own drafts"
   to authenticated
   using ((select auth.uid()) = user_id)
   with check ((select auth.uid()) = user_id);
+
+-- ─────────────────────────── Payments ───────────────────────────
+-- Razorpay: the order and payment behind each paid gift. The order id is
+-- unique, so one payment can't publish two gifts.
+alter table public.gifts add column if not exists razorpay_order_id text;
+alter table public.gifts add column if not exists razorpay_payment_id text;
+create unique index if not exists gifts_razorpay_order_id_key on public.gifts (razorpay_order_id);
