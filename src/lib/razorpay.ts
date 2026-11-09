@@ -91,3 +91,13 @@ export function readProof(body: unknown): PaymentProof | null {
   const signature = pick("razorpay_signature", "signature");
   return orderId && paymentId && signature ? { orderId, paymentId, signature } : null;
 }
+
+/** Razorpay webhooks are signed with the webhook secret (set in the dashboard), over the raw body. */
+export function webhookSignatureMatches(rawBody: string, signature: string) {
+  const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+  if (!secret || !signature) return false;
+  const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
+  const a = Buffer.from(expected);
+  const b = Buffer.from(signature);
+  return a.length === b.length && timingSafeEqual(a, b);
+}

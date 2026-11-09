@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { str } from "@/lib/gift-input";
+import { unusedPayment } from "@/lib/payments-ledger";
 import { createOrder, paymentsEnabled, RazorpayError } from "@/lib/razorpay";
 import { userFromRequest } from "@/lib/supabase/admin";
 import { getTemplateBySlug } from "@/lib/templates";
@@ -9,7 +10,8 @@ const fail = (status: number, error: string) => NextResponse.json({ error }, { s
 /**
  * Starts a payment for one gift: a Razorpay order for the template's price.
  * The price comes from the template, never from the browser.
- * Body: { templateSlug }. Returns { order_id, amount, currency, key_id }.
+ * Body: { templateSlug }. Returns { order_id, amount, currency, key_id }, or
+ * { already_paid: true } when they paid for this template before and the gift never saved.
  */
 export async function POST(request: Request) {
   if (!paymentsEnabled()) return fail(503, "Payments aren't switched on.");
@@ -25,6 +27,10 @@ export async function POST(request: Request) {
   const template = await getTemplateBySlug(str(body.templateSlug, 80));
   if (!template) return fail(400, "That template doesn't exist.");
   if (template.pricePaise < 100) return fail(400, "This gift doesn't need a payment.");
+
+  // Already paid for this template, but the gift never saved? Use that payment, don't charge again.
+  const earlier = await unusedPayment(user.id, template.slug).catch(() => null);
+  if (earlier && earlier.amount_paise >= template.pricePaise) return NextResponse.json({ already_paid: true, order_id: earlier.order_id });
 
   try {
     const order = await createOrder({

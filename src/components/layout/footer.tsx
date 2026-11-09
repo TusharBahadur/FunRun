@@ -10,8 +10,11 @@ const links = [
   { label: "Guides", href: "/guides" },
   { label: "About", href: "/about" },
   { label: "FAQ", href: "/faq" },
+  { label: "Contact", href: "/contact" },
   { label: "Privacy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
+  { label: "Refunds", href: "/refunds" },
+  { label: "Delivery", href: "/delivery" },
 ];
 
 const { email, whatsapp, whatsappLabel } = siteConfig.contact;

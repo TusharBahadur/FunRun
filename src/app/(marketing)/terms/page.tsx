@@ -53,7 +53,7 @@ export default function TermsPage() {
         <p>
           TyniTales is a digital service: nothing is shipped. Your gift link is delivered on screen as soon as payment
           succeeds (and appears in your profile). If you schedule a gift, the link works straight away and shows a countdown
-          until the time you chose.
+          until the time you chose. See our <Link href="/delivery">delivery policy</Link>.
         </p>
       </PolicySection>
 
@@ -61,7 +61,7 @@ export default function TermsPage() {
         <p>
           If you’re not happy with your gift, or something didn’t work, email {mail} with your gift link and we’ll refund
           you in full. Refunds go back to your original payment method through Razorpay, usually within 5 to 7 working days.
-          Once a gift is refunded, we may take its link down.
+          Once a gift is refunded, we may take its link down. The details are in our <Link href="/refunds">refund policy</Link>.
         </p>
       </PolicySection>
 

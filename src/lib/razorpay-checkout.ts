@@ -7,6 +7,8 @@
  */
 
 export type PaymentProof = { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string };
+/** A payment they made earlier whose gift never saved: the server finds it, no new charge. */
+export type EarlierPayment = { reuse: true };
 
 /** They closed the payment sheet without paying. */
 export class PaymentCancelled extends Error {
@@ -68,7 +70,7 @@ export async function payForGift({
   email?: string;
   name?: string;
   color?: string;
-}): Promise<PaymentProof> {
+}): Promise<PaymentProof | EarlierPayment> {
   const [Razorpay, order] = await Promise.all([
     loadCheckout(),
     fetch("/api/payments/order", {
@@ -76,11 +78,12 @@ export async function payForGift({
       headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
       body: JSON.stringify({ templateSlug }),
     }).then(async (res) => {
-      const json = (await res.json().catch(() => ({}))) as { order_id?: string; amount?: number; currency?: string; key_id?: string; error?: string };
+      const json = (await res.json().catch(() => ({}))) as { order_id?: string; amount?: number; currency?: string; key_id?: string; error?: string; already_paid?: boolean };
       if (!res.ok || !json.order_id) throw new Error(json.error ?? "Couldn't start the payment. Please try again.");
-      return json as Required<Pick<typeof json, "order_id" | "amount" | "currency" | "key_id">>;
+      return json as Required<Pick<typeof json, "order_id" | "amount" | "currency" | "key_id">> & { already_paid?: boolean };
     }),
   ]);
+  if (order.already_paid) return { reuse: true };
 
   const proof = await new Promise<PaymentProof>((resolve, reject) => {
     let failure: string | null = null;

@@ -14,7 +14,7 @@ import { markOwnGift } from "@/components/gift/open-beacon";
 import { SignInOptions } from "@/components/auth/sign-in-options";
 import type { Draft } from "./draft-store";
 import { NeedsSignIn, publishGift, updateGift } from "./publish";
-import { PaymentCancelled, paymentsOn, payForGift, preloadCheckout, type PaymentProof } from "@/lib/razorpay-checkout";
+import { PaymentCancelled, paymentsOn, payForGift, preloadCheckout, type EarlierPayment, type PaymentProof } from "@/lib/razorpay-checkout";
 
 /** Remembers the checkout choices across the trip to Google sign-in and back. */
 const pendingKey = (draftId: string) => `tynitales:publish:${draftId}`;
@@ -81,7 +81,7 @@ export function Checkout({
   const [busy, setBusy] = useState<null | { done: number; total: number; paying?: boolean }>(null);
   const [error, setError] = useState<string | null>(null);
   // A payment that went through but whose gift didn't save yet: the retry reuses it, never charges again.
-  const paid = useRef<PaymentProof | null>(null);
+  const paid = useRef<PaymentProof | EarlierPayment | null>(null);
   const [hasPaid, setHasPaid] = useState(false);
   const paying = paymentsOn() && pricePaise >= 100;
   useEffect(() => {

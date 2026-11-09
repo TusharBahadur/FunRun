@@ -231,3 +231,21 @@ create policy "People manage their own drafts"
 alter table public.gifts add column if not exists razorpay_order_id text;
 alter table public.gifts add column if not exists razorpay_payment_id text;
 create unique index if not exists gifts_razorpay_order_id_key on public.gifts (razorpay_order_id);
+
+-- Every Razorpay payment we've been told about (by the checkout or by
+-- Razorpay's webhook), and the gift it paid for. A paid row with no gift
+-- means someone paid but their gift never saved: they can finish it without
+-- paying again, or be refunded. Server-only: no browser access.
+create table if not exists public.payments (
+  order_id      text primary key,
+  payment_id    text,
+  user_id       uuid references auth.users (id) on delete set null,
+  template_slug text,
+  amount_paise  integer not null,
+  status        text not null default 'paid',
+  gift_slug     text,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now()
+);
+create index if not exists payments_unused on public.payments (user_id, template_slug) where gift_slug is null;
+alter table public.payments enable row level security;

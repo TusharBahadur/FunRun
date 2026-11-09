@@ -16,6 +16,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/about`, changeFrequency: "yearly", priority: 0.4 },
     { url: `${base}/privacy`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${base}/terms`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${base}/refunds`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${base}/delivery`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${base}/contact`, changeFrequency: "yearly", priority: 0.3 },
     ...occasions.map((o) => ({ url: `${base}/templates/for/${o.id}`, changeFrequency: "weekly" as const, priority: 0.8 })),
     // Each template's preview picture, so it can show in Google Images.
     ...templates.map((t) => ({

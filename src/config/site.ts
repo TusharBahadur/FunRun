@@ -15,6 +15,8 @@ export const siteConfig = {
     /** WhatsApp number, digits only with country code (wa.me format). */
     whatsapp: "918789974703",
     whatsappLabel: "+91 87899 74703",
+    /** Operating address for the Contact page (Razorpay's website review asks for one). Shown only when filled in. */
+    address: "",
   },
 } as const;
 

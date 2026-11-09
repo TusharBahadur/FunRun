@@ -4,6 +4,7 @@ import { editableUntil, GIFT_SCHEMA_VERSION, giftSlug } from "@/lib/gift-links";
 import { isError, readPassword, readStory, readUnlockAt, str } from "@/lib/gift-input";
 import { hashPassword } from "@/lib/gift-secrets";
 import { getAdmin, userFromRequest } from "@/lib/supabase/admin";
+import { markUsed, recordPaid, unusedPayment } from "@/lib/payments-ledger";
 import { fetchOrder, paymentsEnabled, readProof, signatureMatches } from "@/lib/razorpay";
 import { getTemplateBySlug } from "@/lib/templates";
 
@@ -65,6 +66,16 @@ export async function POST(request: Request) {
   let payment: { orderId: string; paymentId: string } | null = null;
   if (paying) {
     const proof = readProof(body.payment);
+    const earlier = (body.payment as { reuse?: unknown } | undefined)?.reuse === true;
+    if (!proof && earlier) {
+      // Paid earlier but the gift never saved (tab closed, say): use that payment.
+      const unused = await unusedPayment(user.id, template.slug);
+      if (!unused || unused.amount_paise < template.pricePaise) return fail(402, "Please pay to make your gift live.");
+      payment = { orderId: unused.order_id, paymentId: unused.payment_id ?? "" };
+    }
+  }
+  if (paying && !payment) {
+    const proof = readProof(body.payment);
     if (!proof) return fail(402, "Please pay to make your gift live.");
     if (!signatureMatches(proof.orderId, proof.paymentId, proof.signature)) return fail(400, "We couldn't confirm that payment.");
     try {
@@ -75,6 +86,8 @@ export async function POST(request: Request) {
       return fail(502, "Couldn't check your payment. Please try again; you won't be charged twice.");
     }
     payment = { orderId: proof.orderId, paymentId: proof.paymentId };
+    // In the ledger straight away, in case the save below fails and they come back later.
+    await recordPaid({ orderId: proof.orderId, paymentId: proof.paymentId, userId: user.id, templateSlug: template.slug, amountPaise: template.pricePaise });
   }
 
   const db = getAdmin();
@@ -110,6 +123,7 @@ export async function POST(request: Request) {
       password_hash: passwordHash,
     });
     if (!error) {
+      if (payment) await markUsed(payment.orderId, slug);
       return NextResponse.json(
         { slug, unlockAt: unlockAt.toISOString(), editUntil: editUntil.toISOString(), hasPassword: !!passwordHash },
         { status: 201 },
