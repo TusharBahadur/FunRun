@@ -3,6 +3,7 @@ import { CallToAction } from "@/components/sections/call-to-action";
 import { FeaturedTemplates } from "@/components/sections/featured-templates";
 import { Features } from "@/components/sections/features";
 import { ContinueChip } from "@/components/drafts/continue-chip";
+import boardStickers from "@/data/stickers.json";
 import { PauseOffscreen } from "@/components/motion/pause-offscreen";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
@@ -52,6 +53,9 @@ const jsonLd = {
   ],
 };
 
+// Board stickers in the picker (retired duplicates left out); the showcase adds the drawn ones.
+const boardStickerCount = Object.values(boardStickers as Record<string, { retired?: boolean }>).filter((s) => !s.retired).length;
+
 export default async function HomePage() {
   const templates = await getTemplates();
   const pick = (slugs: string[]) =>
@@ -72,7 +76,7 @@ export default async function HomePage() {
         {/* Sections below the hero are skipped by the browser until they're near the screen (see .cv-auto), and their loops pause while off screen. */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
         <PauseOffscreen><Hero featured={pick(["sealed-with-love", "make-a-wish", "our-corner", "midnight-notes"])} /></PauseOffscreen>
-        <PauseOffscreen className="cv-auto"><Showcase templates={pick(showcase.slugs)} total={templates.length} /></PauseOffscreen>
+        <PauseOffscreen className="cv-auto"><Showcase templates={pick(showcase.slugs)} total={templates.length} stickers={boardStickerCount} /></PauseOffscreen>
         <PauseOffscreen className="cv-auto"><FeaturedTemplates templates={featured} total={templates.length} /></PauseOffscreen>
         <PauseOffscreen className="cv-auto"><HowItWorks /></PauseOffscreen>
         <PauseOffscreen className="cv-auto"><Features /></PauseOffscreen>

@@ -353,8 +353,6 @@ export type UploadedSticker = `data:${string}` | `https://${string}`;
 /** Any sticker: our drawn ones, the board pack (optionally pinned "id@hash"), or an upload. */
 export type AnyStickerId = StickerId | BoardStickerId | UploadedSticker;
 
-/** How many board stickers there are (the full list lives in ./sticker-catalog). */
-export const boardStickerCount = Object.keys(boardHashes).length;
 export const drawnStickerIds = Object.keys(stickerNames) as StickerId[];
 
 export function isUploadedSticker(id: AnyStickerId): id is UploadedSticker {

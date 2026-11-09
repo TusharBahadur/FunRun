@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { Check, Clock, Lock, PenLine } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { boardStickerCount, drawnStickerIds, Sticker, type AnyStickerId } from "@/components/story/stickers";
+import { drawnStickerIds, Sticker, type AnyStickerId } from "@/components/story/stickers";
 import { occasions } from "@/config/site";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { EASE_OUT } from "@/lib/motion";
@@ -32,7 +32,8 @@ const perks = {
  * Real gifts in a fanned stack of phones: a picture of each gift's first page.
  * Every few seconds the next one slides to the front.
  */
-export function Showcase({ templates, total }: { templates: Template[]; total: number }) {
+/** `stickers`: board stickers in the picker (the drawn ones are added here). */
+export function Showcase({ templates, total, stickers }: { templates: Template[]; total: number; stickers: number }) {
   const [i, setI] = useState(0);
   // Counts every turn without wrapping, so the notes keep taking turns in order
   // even though there are more gifts than notes.
@@ -76,7 +77,7 @@ export function Showcase({ templates, total }: { templates: Template[]; total: n
         <ul className="flex flex-wrap justify-center gap-2 text-sm">
           {[
             { strong: String(total), rest: "templates", live: true },
-            { strong: String(boardStickerCount + drawnStickerIds.length), rest: "stickers" },
+            { strong: String(stickers + drawnStickerIds.length), rest: "stickers" },
             { strong: String(occasions.length), rest: "occasions" },
             { strong: "1 min", rest: "to make one" },
           ].map((c) => (
