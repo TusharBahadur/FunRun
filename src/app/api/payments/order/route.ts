@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { str } from "@/lib/gift-input";
-import { unusedPayment } from "@/lib/payments-ledger";
-import { createOrder, paymentsEnabled, RazorpayError } from "@/lib/razorpay";
+import { markRefunded, unusedPayment } from "@/lib/payments-ledger";
+import { capturedPayment, createOrder, paymentsEnabled, RazorpayError } from "@/lib/razorpay";
 import { userFromRequest } from "@/lib/supabase/admin";
 import { getTemplateBySlug } from "@/lib/templates";
 
@@ -30,7 +30,13 @@ export async function POST(request: Request) {
 
   // Already paid for this template, but the gift never saved? Use that payment, don't charge again.
   const earlier = await unusedPayment(user.id, template.slug).catch(() => null);
-  if (earlier && earlier.amount_paise >= template.pricePaise) return NextResponse.json({ already_paid: true, order_id: earlier.order_id });
+  if (earlier && earlier.amount_paise >= template.pricePaise) {
+    // Only if it still counts: refunded since means they pay again.
+    const still = await capturedPayment(earlier.order_id, template.pricePaise).catch(() => undefined);
+    if (still === undefined) return fail(502, "Couldn't check your earlier payment. Please try again; you won't be charged twice.");
+    if (still) return NextResponse.json({ already_paid: true, order_id: earlier.order_id });
+    await markRefunded(earlier.order_id);
+  }
 
   try {
     const order = await createOrder({

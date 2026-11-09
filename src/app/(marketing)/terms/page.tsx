@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/terms" },
 };
 
-const UPDATED = "30 October 2026";
+const UPDATED = "9 November 2026";
 
 export default function TermsPage() {
   const { email } = siteConfig.contact;
@@ -118,6 +118,10 @@ export default function TermsPage() {
           We may update these terms; the date at the top shows the latest version, and continuing to use TyniTales means you
           accept it. These terms are governed by the laws of India, and disputes are subject to the jurisdiction of Indian
           courts. Questions: {mail}.
+        </p>
+        <p>
+          Complaints go to our grievance officer, Tushar Bahadur (Founder), at {mail}. We acknowledge them within 48 hours
+          and aim to resolve them within one month. See also our <Link href="/contact">contact page</Link>.
         </p>
       </PolicySection>
     </TextPage>

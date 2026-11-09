@@ -24,6 +24,11 @@ export async function recordPaid(p: { orderId: string; paymentId?: string; userI
   if (error) console.error("[payments] record failed", error.message);
 }
 
+export async function markRefunded(orderId: string) {
+  const { error } = await getAdmin().from("payments").update({ status: "refunded", updated_at: new Date().toISOString() }).eq("order_id", orderId);
+  if (error) console.error("[payments] mark refunded failed", error.message);
+}
+
 export async function markUsed(orderId: string, giftSlug: string) {
   const { error } = await getAdmin().from("payments").update({ gift_slug: giftSlug, updated_at: new Date().toISOString() }).eq("order_id", orderId);
   if (error) console.error("[payments] mark used failed", error.message);

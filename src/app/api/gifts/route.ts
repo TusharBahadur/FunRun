@@ -4,8 +4,8 @@ import { editableUntil, GIFT_SCHEMA_VERSION, giftSlug } from "@/lib/gift-links";
 import { isError, readPassword, readStory, readUnlockAt, str } from "@/lib/gift-input";
 import { hashPassword } from "@/lib/gift-secrets";
 import { getAdmin, userFromRequest } from "@/lib/supabase/admin";
-import { markUsed, recordPaid, unusedPayment } from "@/lib/payments-ledger";
-import { fetchOrder, paymentsEnabled, readProof, signatureMatches } from "@/lib/razorpay";
+import { markRefunded, markUsed, recordPaid, unusedPayment } from "@/lib/payments-ledger";
+import { capturedPayment, fetchOrder, paymentsEnabled, readProof, signatureMatches } from "@/lib/razorpay";
 import { getTemplateBySlug } from "@/lib/templates";
 
 /** Gifts a sender can publish per day: generous for real use, stops runaway scripts. */
@@ -71,7 +71,14 @@ export async function POST(request: Request) {
       // Paid earlier but the gift never saved (tab closed, say): use that payment.
       const unused = await unusedPayment(user.id, template.slug);
       if (!unused || unused.amount_paise < template.pricePaise) return fail(402, "Please pay to make your gift live.");
-      payment = { orderId: unused.order_id, paymentId: unused.payment_id ?? "" };
+      // Still paid? (Not refunded since.) Ask Razorpay, not our own notes.
+      const still = await capturedPayment(unused.order_id, template.pricePaise).catch(() => undefined);
+      if (still === undefined) return fail(502, "Couldn't check your payment. Please try again; you won't be charged twice.");
+      if (!still) {
+        await markRefunded(unused.order_id);
+        return fail(402, "Please pay to make your gift live.");
+      }
+      payment = { orderId: unused.order_id, paymentId: still.id };
     }
   }
   if (paying && !payment) {
@@ -81,7 +88,10 @@ export async function POST(request: Request) {
     try {
       const order = await fetchOrder(proof.orderId);
       const ours = order.notes?.user_id === user.id && order.notes?.template_slug === template.slug;
-      if (!ours || order.amount < template.pricePaise || order.status !== "paid") return fail(400, "That payment doesn't match this gift.");
+      if (!ours || order.currency !== "INR" || order.amount < template.pricePaise || order.status !== "paid") return fail(400, "That payment doesn't match this gift.");
+      // The exact payment they just made, captured and not refunded.
+      const paid = await capturedPayment(proof.orderId, template.pricePaise);
+      if (!paid || paid.id !== proof.paymentId) return fail(400, "That payment doesn't match this gift.");
     } catch {
       return fail(502, "Couldn't check your payment. Please try again; you won't be charged twice.");
     }

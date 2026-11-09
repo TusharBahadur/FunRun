@@ -67,6 +67,18 @@ export function fetchOrder(orderId: string) {
   return call<RazorpayOrder>(`/orders/${encodeURIComponent(orderId)}`);
 }
 
+type RazorpayPayment = { id: string; status: string; amount: number; amount_refunded: number; currency: string };
+
+/**
+ * The payment that still pays for this order: captured, in rupees, and not
+ * refunded (an order stays "paid" even after a refund, so the order alone isn't enough).
+ * null when there isn't one.
+ */
+export async function capturedPayment(orderId: string, minAmount: number) {
+  const list = await call<{ items: RazorpayPayment[] }>(`/orders/${encodeURIComponent(orderId)}/payments`);
+  return list.items.find((p) => p.status === "captured" && p.currency === "INR" && p.amount >= minAmount && !p.amount_refunded) ?? null;
+}
+
 /** Razorpay signs order_id|payment_id with the key secret; a match proves the payment is real. */
 export function signatureMatches(orderId: string, paymentId: string, signature: string) {
   const secret = process.env.RAZORPAY_KEY_SECRET;

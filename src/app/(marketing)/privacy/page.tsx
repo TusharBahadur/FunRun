@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy" },
 };
 
-const UPDATED = "30 October 2026";
+const UPDATED = "9 November 2026";
 
 export default function PrivacyPage() {
   const { email } = siteConfig.contact;
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
         <ul>
           <li>
             <strong>Your account.</strong> If you sign in with Google, we receive your name, email address and profile
-            picture from Google.
+            picture from Google. If you sign in with a code sent by email, we receive just your email address.
           </li>
           <li>
             <strong>Your gifts.</strong> When you make a gift live, we store what’s in it: the names, text, photos, stickers
@@ -44,8 +44,11 @@ export default function PrivacyPage() {
             can see it. We don’t record who opened it.
           </li>
           <li>
-            <strong>Payments.</strong> Razorpay processes payments. We receive confirmation that you paid and a payment
-            reference, never your card, UPI or bank details.
+            <strong>Payments.</strong> Razorpay processes payments. You enter your card, UPI or bank details in
+            Razorpay’s own payment window, under Razorpay’s privacy policy; they never reach us. To start a payment we
+            give Razorpay your email address (so it can send your receipt) and an internal account reference (so we can
+            match the payment to your gift). We keep the Razorpay order and payment references, the amount and the date,
+            to confirm your gift and handle refunds.
           </li>
           <li>
             <strong>Messages.</strong> If you contact us, we keep your email address and message so we can reply.
@@ -100,7 +103,7 @@ export default function PrivacyPage() {
             <strong>Razorpay</strong>: payments and refunds
           </li>
           <li>
-            <strong>Resend</strong>: delivers messages you send us through the contact form
+            <strong>Resend</strong>: sends sign-in codes, and delivers messages you send us through the contact form
           </li>
           <li>
             <strong>YouTube</strong>: plays a gift’s song, through its privacy-enhanced (no-cookie) player, when the person
@@ -130,6 +133,11 @@ export default function PrivacyPage() {
         <p>
           These rights apply under India’s Digital Personal Data Protection Act, 2023, and we extend them to everyone who
           uses TyniTales.
+        </p>
+        <p>
+          <strong>Grievance officer:</strong> Tushar Bahadur, Founder, {mail}. We acknowledge every complaint within 48
+          hours and aim to resolve it within one month. If you’re not satisfied, you can also complain to the Data
+          Protection Board of India.
         </p>
       </PolicySection>
 

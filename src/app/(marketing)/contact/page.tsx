@@ -31,6 +31,13 @@ export default function ContactPage() {
         </p>
       </PolicySection>
 
+      <PolicySection title="Grievance officer">
+        <p>
+          Tushar Bahadur, Founder · <a href={`mailto:${email}`}>{email}</a>
+        </p>
+        <p>We acknowledge every complaint within 48 hours and aim to resolve it within one month.</p>
+      </PolicySection>
+
       <PolicySection title="Who runs TyniTales">
         <p>TyniTales (tynitales.com) is run by Tushar Bahadur in India.</p>
         {address && <p>{address}</p>}
