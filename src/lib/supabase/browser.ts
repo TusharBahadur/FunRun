@@ -63,6 +63,17 @@ export async function signInWithGoogle() {
 }
 
 /**
+ * Google sign-in from Google's own popup on our page (Google Identity
+ * Services): Google hands us a signed ID token and we trade it with Supabase.
+ * Google's screen then names tynitales.com, not our Supabase address.
+ * `nonce` is the raw value whose SHA-256 was given to Google.
+ */
+export async function signInWithGoogleToken(token: string, nonce: string) {
+  const { error } = await getSupabase().auth.signInWithIdToken({ provider: "google", token, nonce });
+  if (error) throw error;
+}
+
+/**
  * Email sign-in, step 1: sends a one-time code (works inside Instagram and
  * other in-app browsers, where Google won't sign anyone in).
  */

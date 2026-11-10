@@ -2,9 +2,9 @@
 
 import { ArrowLeft, Loader2, Mail } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { GoogleMark } from "@/components/profile/sign-in-card";
+import { GoogleButton } from "./google-button";
 import { inAppBrowser } from "@/lib/in-app-browser";
-import { sendEmailCode, signInWithGoogle, verifyEmailCode } from "@/lib/supabase/browser";
+import { sendEmailCode, verifyEmailCode } from "@/lib/supabase/browser";
 import { cn } from "@/lib/utils";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -88,17 +88,7 @@ export function SignInOptions({
         <>
           {!app && (
             <>
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={() => {
-                  onBeforeGoogle?.();
-                  signInWithGoogle().catch(() => setError("Couldn’t open Google sign-in. Please try again."));
-                }}
-                className="btn btn-paper flex h-14 w-full items-center justify-center gap-3 disabled:opacity-50"
-              >
-                <GoogleMark /> Continue with Google
-              </button>
+              <GoogleButton disabled={disabled} onBeforeRedirect={onBeforeGoogle} onError={setError} />
               <p className="my-4 flex items-center gap-3 text-xs text-muted before:h-px before:flex-1 before:bg-line after:h-px after:flex-1 after:bg-line">or</p>
             </>
           )}
