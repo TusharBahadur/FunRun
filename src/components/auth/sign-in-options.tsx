@@ -80,7 +80,7 @@ export function SignInOptions({
   }
 
   const field =
-    "block h-14 w-full rounded-2xl border border-line bg-cream px-4 text-base outline-none placeholder:text-muted/60 focus:border-ink/40 disabled:opacity-50";
+    "block h-12 w-full rounded-full border border-ink/12 bg-white/70 px-5 text-[15px] outline-none transition-colors placeholder:text-ink/35 focus:border-ink/40 focus:bg-white disabled:opacity-50";
 
   return (
     <div className={cn("text-left", className)}>
@@ -89,7 +89,7 @@ export function SignInOptions({
           {!app && (
             <>
               <GoogleButton disabled={disabled} onBeforeRedirect={onBeforeGoogle} onError={setError} />
-              <p className="my-4 flex items-center gap-3 text-xs text-muted before:h-px before:flex-1 before:bg-line after:h-px after:flex-1 after:bg-line">or</p>
+              <p className="my-5 flex items-center gap-3 text-xs text-ink/40 before:h-px before:flex-1 before:bg-ink/10 after:h-px after:flex-1 after:bg-ink/10">or</p>
             </>
           )}
           <form onSubmit={send} className="space-y-2">
@@ -107,8 +107,8 @@ export function SignInOptions({
               onChange={(e) => setEmail(e.target.value)}
               className={field}
             />
-            <button type="submit" disabled={disabled || busy} className="btn btn-ink flex h-14 w-full items-center justify-center gap-2 disabled:opacity-50">
-              {busy ? <Loader2 className="size-4 animate-spin" /> : <Mail className="size-4" />} Email me a sign-in code
+            <button type="submit" disabled={disabled || busy} className="btn btn-ink flex h-12 w-full items-center justify-center gap-2 text-[15px] disabled:opacity-50">
+              {busy ? <Loader2 className="size-4 animate-spin" /> : <Mail className="size-4" />} Continue with email
             </button>
           </form>
         </>
@@ -135,7 +135,7 @@ export function SignInOptions({
             }}
             className={cn(field, "text-center text-2xl tracking-[0.4em]")}
           />
-          <button type="submit" disabled={busy} className="btn btn-ink flex h-14 w-full items-center justify-center gap-2 disabled:opacity-50">
+          <button type="submit" disabled={busy} className="btn btn-ink flex h-12 w-full items-center justify-center gap-2 text-[15px] disabled:opacity-50">
             {busy && <Loader2 className="size-4 animate-spin" />} Sign in
           </button>
           <div className="flex items-center justify-between pt-1 text-sm">

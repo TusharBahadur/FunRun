@@ -117,7 +117,7 @@ export function GoogleButton({
           onBeforeRedirect?.();
           signInWithGoogle().catch(() => onError("Couldn’t open Google sign-in. Please try again."));
         }}
-        className="btn btn-paper flex h-14 w-full items-center justify-center gap-3 disabled:opacity-50"
+        className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-ink/12 bg-white text-[15px] font-medium transition-colors hover:border-ink/25 disabled:opacity-50"
       >
         <GoogleMark /> Continue with Google
       </button>
