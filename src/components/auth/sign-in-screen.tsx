@@ -47,16 +47,16 @@ export function SignInScreen({ next = "/profile" }: { next?: string }) {
           </Link>
         </header>
 
-        <div className="mx-auto my-auto w-full max-w-[360px] py-12">
-          <h1 className="type-display text-[2.6rem] leading-[1.02] sm:text-5xl">
+        <div className="mx-auto my-auto w-full max-w-[380px] py-16">
+          <h1 className="type-display text-[2.8rem] leading-[1.02] sm:text-[3.4rem]">
             Welcome <span className="type-accent text-rose">in.</span>
           </h1>
-          <p className="mt-3 text-[15px] leading-relaxed text-ink/55">New here or back again, it’s the same quick step. No password.</p>
+          <p className="mt-4 text-[15px] leading-relaxed text-ink/55">New here or back again, it’s the same quick step.</p>
 
-          <SignInOptions disabled={user === undefined} className="mt-9" />
+          <SignInOptions disabled={user === undefined} className="mt-12" roomy />
         </div>
 
-        <p className="mx-auto w-full max-w-[360px] text-center text-xs leading-relaxed text-ink/40">
+        <p className="mx-auto w-full max-w-[380px] text-center text-xs leading-relaxed text-ink/40">
           By continuing you agree to our{" "}
           <Link href="/terms" className="underline decoration-ink/20 underline-offset-2 hover:text-ink">
             Terms

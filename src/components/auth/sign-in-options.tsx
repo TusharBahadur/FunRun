@@ -18,8 +18,11 @@ export function SignInOptions({
   disabled,
   onBeforeGoogle,
   className,
+  roomy,
 }: {
   disabled?: boolean;
+  /** The sign-in page: more air, and a visible label over the email field. */
+  roomy?: boolean;
   /** Google leaves the page and comes back: a chance to remember anything first. */
   onBeforeGoogle?: () => void;
   className?: string;
@@ -89,11 +92,11 @@ export function SignInOptions({
           {!app && (
             <>
               <GoogleButton disabled={disabled} onBeforeRedirect={onBeforeGoogle} onError={setError} />
-              <p className="my-5 flex items-center gap-3 text-xs text-ink/40 before:h-px before:flex-1 before:bg-ink/10 after:h-px after:flex-1 after:bg-ink/10">or</p>
+              <p className={cn(roomy ? "my-8" : "my-5", "flex items-center gap-3 text-xs text-ink/40 before:h-px before:flex-1 before:bg-ink/10 after:h-px after:flex-1 after:bg-ink/10")}>or</p>
             </>
           )}
-          <form onSubmit={send} className="space-y-2">
-            <label className="sr-only" htmlFor="signin-email">
+          <form onSubmit={send} className={roomy ? "space-y-3" : "space-y-2"}>
+            <label className={roomy ? "mb-2 block text-sm font-medium text-ink/70" : "sr-only"} htmlFor="signin-email">
               Email
             </label>
             <input
@@ -110,6 +113,7 @@ export function SignInOptions({
             <button type="submit" disabled={disabled || busy} className="btn btn-ink flex h-12 w-full items-center justify-center gap-2 text-[15px] disabled:opacity-50">
               {busy ? <Loader2 className="size-4 animate-spin" /> : <Mail className="size-4" />} Continue with email
             </button>
+            {roomy && <p className="pt-1 text-center text-xs text-ink/45">We’ll email you a 6-digit code. No password to remember.</p>}
           </form>
         </>
       ) : (
