@@ -13,7 +13,7 @@ import { SignInOptions } from "./sign-in-options";
  * The picture on the right (wide screens only). Put the file in public/sign-in/
  * and set its path here; until then a soft blush panel shows.
  */
-const PICTURE: string | null = "/sign-in/cat.webp";
+const PICTURE: string | null = "/sign-in/cats.webp";
 
 /**
  * The sign-in page. Phones: just the ways in. Wide screens: the ways in on the
@@ -81,7 +81,7 @@ function PicturePanel() {
     <aside aria-hidden className="relative hidden overflow-hidden rounded-[1.75rem] bg-[linear-gradient(160deg,#fbe1dd_0%,#f9ece4_50%,#f4e0d2_100%)] lg:block">
       {PICTURE && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={PICTURE} alt="" className="absolute inset-0 size-full object-cover object-[50%_30%]" />
+        <img src={PICTURE} alt="" className="absolute inset-0 size-full object-cover object-center" />
       )}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 p-10 xl:p-12">
