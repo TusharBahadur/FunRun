@@ -401,8 +401,8 @@ function AccountCard() {
   return (
     <section className="flex flex-col rounded-[2rem] border border-line bg-paper p-6 sm:p-8">
       <p className="type-label text-muted">Account</p>
-      <h3 className="type-display mt-2 text-3xl">Signed in with Google</h3>
-      <p className="mt-2 text-sm text-muted">Drafts you’re still editing stay on this device. Gifts you’ve made live are saved to your account.</p>
+      <h3 className="type-display mt-2 text-3xl">You’re signed in</h3>
+      <p className="mt-2 text-sm text-muted">Your gifts and drafts are saved to your account, so you can open them on any device.</p>
       <div className="mt-auto flex flex-wrap gap-2 pt-5">
         <button type="button" onClick={() => signOut()} className="btn btn-paper flex h-11 items-center gap-2 px-5 text-sm">
           <LogOut className="size-4" /> Sign out
