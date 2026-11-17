@@ -159,13 +159,13 @@
   line-height: 1.05;
 }
 
-/* Gift previews never use the thin italic serif, even if a leftover class is present. */
+/* Highlighted words in gifts: the sender's highlight style (accent-moods.ts). Never the thin italic serif. */
 [data-gift-font] .type-accent {
-  font-family: var(--font-sans);
-  font-style: normal;
-  font-weight: 600;
+  font-family: var(--accent-face, var(--font-sans));
+  font-style: var(--accent-style, normal);
+  font-weight: var(--accent-weight, 700);
   font-variation-settings: normal;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--accent-tracking, -0.04em);
 }
 [data-gift-font] .font-serif {
   font-family: var(--font-sans);
@@ -179,7 +179,7 @@
   font-variation-settings: normal;
   font-synthesis-weight: none;
 }
-[data-field-font] :not(.type-accent) {
+[data-field-font] :not(.type-accent):not(.gift-accent) {
   font-family: inherit !important;
   font-variation-settings: inherit !important;
 }
