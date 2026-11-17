@@ -137,9 +137,14 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
               </span>
             )}
             {template.story ? (
-              <ButtonLinkWithNames href={`/studio/${template.slug}`} variant="rose" size="lg">
-                Make it yours · {price}
-              </ButtonLinkWithNames>
+              <>
+                <ButtonLinkWithNames href={`/studio/${template.slug}?quick=1`} variant="rose" size="lg">
+                  Make it yours · {price}
+                </ButtonLinkWithNames>
+                <Link href={`/studio/${template.slug}`} className="text-sm text-muted underline-offset-4 hover:text-ink hover:underline">
+                  or open the full editor
+                </Link>
+              </>
             ) : (
               <span className="type-label ml-2 text-muted">{price} · Personalizing opens soon</span>
             )}
@@ -195,7 +200,7 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
             </ButtonLinkWithNames>
           )}
           {template.story ? (
-            <ButtonLinkWithNames href={`/studio/${template.slug}`} variant="rose" className="h-12 flex-1">
+            <ButtonLinkWithNames href={`/studio/${template.slug}?quick=1`} variant="rose" className="h-12 flex-1">
               Make it yours · {price}
             </ButtonLinkWithNames>
           ) : (

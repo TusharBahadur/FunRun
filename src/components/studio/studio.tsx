@@ -33,6 +33,7 @@ import { MobilePreview } from "./mobile-preview";
 import { NamesDialog } from "./names-dialog";
 import { deleteSelected, insertScene, updateScene } from "./ops";
 import { sceneSchemas } from "./schema";
+import { QuickFill } from "./quick-fill";
 import { StudioTour, tourSeen, type TourStep } from "./tour";
 
 export type StudioTemplate = { slug: string; name: string; pricePaise: number; story: Story };
@@ -45,6 +46,7 @@ export function Studio({
   askNames = false,
   editSlug,
   draftId,
+  quick = false,
 }: {
   template: StudioTemplate;
   designs: Template[];
@@ -55,6 +57,8 @@ export function Studio({
   editSlug?: string;
   /** Set when a saved draft is opened (?draft=…). */
   draftId?: string;
+  /** Start with the short guided flow (?quick=1): names, photos, song, letter. */
+  quick?: boolean;
 }) {
   const initial = useMemo(() => {
     const d = freshDraft(template.slug, `${template.name} for ${template.story.recipient}`, template.story);
@@ -236,12 +240,14 @@ export function Studio({
   const canSave = !!editSlug && isFuture(draft.live?.editUntil);
   const wide = useMinLg();
   const [tour, setTour] = useState(false);
+  // The guided flow covers the editor until they finish it or open the full editor.
+  const [quickOpen, setQuickOpen] = useState(quick && !editSlug);
   // First visit: once the names are in, show them around.
   useEffect(() => {
-    if (editSlug || names !== null || wide === null || (askNames && !askedNames) || tourSeen()) return;
+    if (quickOpen || editSlug || names !== null || wide === null || (askNames && !askedNames) || tourSeen()) return;
     const id = window.setTimeout(() => setTour(true), 900);
     return () => window.clearTimeout(id);
-  }, [editSlug, names, wide, askNames, askedNames]);
+  }, [quickOpen, editSlug, names, wide, askNames, askedNames]);
 
   // Back from Google sign-in mid-checkout: reopen it where they left off.
   useEffect(() => {
@@ -693,6 +699,26 @@ export function Studio({
           router.push(`/sent/${live.slug}`);
         }}
       />
+
+      {quickOpen && (
+        <QuickFill
+          draft={draft}
+          edit={edit}
+          saveNames={saveNames}
+          defaultFrom={profile?.sign_off ?? ""}
+          demoNames={seedNames}
+          price={formatInr(template.pricePaise)}
+          onPreview={() => {
+            setPreview(true);
+            setRun((r) => r + 1);
+          }}
+          onPublish={() => {
+            setQuickOpen(false);
+            setCheckout(true);
+          }}
+          onFullEditor={() => setQuickOpen(false)}
+        />
+      )}
 
       <StudioTour open={tour} onClose={() => setTour(false)} steps={tourSteps(wide === true, formatInr(template.pricePaise), designs.length > 0)} />
 

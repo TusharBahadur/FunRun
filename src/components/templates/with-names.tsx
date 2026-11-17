@@ -20,7 +20,8 @@ type LinkProps = Omit<ComponentProps<typeof ButtonLink>, "href"> & { href: strin
 
 function NamedLink({ href, ...props }: LinkProps) {
   const { query } = useNamesQuery();
-  return <ButtonLink href={`${href}${query}`} {...props} />;
+  const joined = query && href.includes("?") ? `${href}&${query.slice(1)}` : `${href}${query}`;
+  return <ButtonLink href={joined} {...props} />;
 }
 
 /**

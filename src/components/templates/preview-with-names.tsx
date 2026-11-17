@@ -72,7 +72,7 @@ export function PreviewWithNames({
         )}
       </nav>
       <Link
-        href={withNames(`/studio/${slug}`)}
+        href={`/studio/${slug}?quick=1${query ? `&${query}` : ""}`}
         className={`${pill} fixed ${ctaRight} top-4 z-50 px-4 text-sm font-semibold`}
         style={ctaStyle}
       >

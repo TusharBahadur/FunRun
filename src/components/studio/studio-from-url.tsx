@@ -20,6 +20,8 @@ export function StudioFromUrl({ template, designs, seedNames }: Pick<Props, "tem
   // ?draft=<id>: a gift in progress, kept on this device and (signed in) in their account.
   const draft = sp.get("draft");
   const draftId = draft && /^[0-9a-f-]{36}$/.test(draft) ? draft : undefined;
+  // ?quick=1: the short guided flow instead of the full editor.
+  const quick = sp.get("quick") === "1" && !draftId;
   // Stable unless the names change: the studio rebuilds its starting draft when this does.
   const named = useMemo(
     () => ({ ...template, story: { ...template.story, recipient: toName || template.story.recipient, sender: fromName || template.story.sender } }),
@@ -30,7 +32,8 @@ export function StudioFromUrl({ template, designs, seedNames }: Pick<Props, "tem
       template={named}
       designs={designs}
       seedNames={seedNames}
-      askNames={!toName && !fromName && !editSlug && !draftId}
+      askNames={!quick && !toName && !fromName && !editSlug && !draftId}
+      quick={quick}
       editSlug={editSlug}
       draftId={draftId}
     />
