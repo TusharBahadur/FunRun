@@ -42,7 +42,7 @@ export function useProfile(user: User | null | undefined) {
   }, [user]);
 
   const update = useCallback(
-    async (patch: Partial<Pick<Profile, "sign_off">>) => {
+    async (patch: Partial<Pick<Profile, "sign_off" | "display_name">>) => {
       if (!user) return false;
       const { error } = await getSupabase()
         .from("profiles")
@@ -68,4 +68,28 @@ export async function deleteAccount() {
     throw new Error(json.error ?? "Couldn't delete your account. Please try again.");
   }
   await getSupabase().auth.signOut();
+  // Drafts kept in this browser go too.
+  try {
+    indexedDB.deleteDatabase("tynitales");
+  } catch {
+    /* nothing stored here */
+  }
+}
+
+/** "Download my data": fetches the export and saves it as a file. */
+export async function downloadMyData() {
+  const token = await accessToken();
+  if (!token) throw new Error("Please sign in again.");
+  const res = await fetch("/api/account/export", { headers: { authorization: `Bearer ${token}` } });
+  if (!res.ok) {
+    const json = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(json.error ?? "Couldn't download your data. Please try again.");
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `tynitales-my-data-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }

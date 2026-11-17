@@ -1,5 +1,22 @@
 import type { NextConfig } from "next";
 
+/**
+ * Browser security headers (see docs/legal-security/SECURITY_AUDIT_REPORT.md).
+ * - HSTS: browsers only ever use HTTPS for tynitales.com.
+ * - frame-ancestors / X-Frame-Options: other sites can't frame our pages
+ *   (clickjacking). Our own studio frames /studio/frame, so same-origin is allowed.
+ * - The microphone stays allowed for our own pages: the birthday cake listens
+ *   for a blow. Camera, location and payment-request APIs aren't used.
+ */
+const securityHeaders = [
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), geolocation=(), microphone=(self), browsing-topics=(), interest-cohort=()" },
+  { key: "Content-Security-Policy", value: "frame-ancestors 'self'; base-uri 'self'; object-src 'none'" },
+];
+
 const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
@@ -33,6 +50,8 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      // Security headers on every page and API response.
+      { source: "/:path*", headers: securityHeaders },
       { source: "/a/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }] },
       // Showcase pictures keep their names when retaken, so cache for a day and
       // refresh quietly in the background, instead of re-checking on every view.

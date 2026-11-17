@@ -249,3 +249,60 @@ create table if not exists public.payments (
 );
 create index if not exists payments_unused on public.payments (user_id, template_slug) where gift_slug is null;
 alter table public.payments enable row level security;
+
+-- ─────────────────────────── Rate limits ───────────────────────────
+-- Recent attempts at things worth throttling (gift passwords, the contact
+-- form, song lookups). Keys hold a keyed hash of the IP address, never the IP
+-- itself. Rows older than a day are deleted by the daily cron. Server-only.
+create table if not exists public.rate_events (
+  key text        not null,
+  at  timestamptz not null default now()
+);
+create index if not exists rate_events_key_at on public.rate_events (key, at desc);
+alter table public.rate_events enable row level security;
+
+-- One attempt: true if it's within the limit (and records it), false if not.
+create or replace function public.rate_limit_hit(p_key text, p_window_seconds integer, p_max integer)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  n integer;
+begin
+  -- One attempt at a time per key, so parallel requests can't slip past the count.
+  perform pg_advisory_xact_lock(hashtext(p_key));
+  select count(*) into n
+    from public.rate_events
+   where key = p_key
+     and at > now() - make_interval(secs => p_window_seconds);
+  if n >= p_max then
+    return false;
+  end if;
+  insert into public.rate_events (key) values (p_key);
+  return true;
+end;
+$$;
+revoke execute on function public.rate_limit_hit(text, integer, integer) from public, anon, authenticated;
+
+-- Draft photos nobody uses any more: older than 60 days, and in no gift and no draft.
+create or replace function public.stale_draft_media()
+returns setof text
+language sql
+security definer
+set search_path = ''
+as $$
+  select o.name
+    from storage.objects o
+   where o.bucket_id = 'gift-media'
+     and o.name like '%/drafts/%'
+     and o.created_at < now() - interval '60 days'
+     and not exists (select 1 from public.gifts g where g.story::text like '%' || o.name || '%')
+     and not exists (select 1 from public.drafts d where d.data::text like '%' || o.name || '%')
+   limit 500;
+$$;
+revoke execute on function public.stale_draft_media() from public, anon, authenticated;
+
+-- People can correct the name we show on their profile (not just their sign-off).
+grant update (display_name) on public.profiles to authenticated;

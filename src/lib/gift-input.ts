@@ -1,5 +1,6 @@
 // Server-only: checks the gift a sender sends us, for both publishing and later edits.
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/gift-links";
+import { findBadMediaUrl, storagePrefixFrom } from "@/lib/media-urls";
 
 /** Text-only gift size once photos are uploaded. Real gifts are well under 100 KB. */
 const MAX_STORY_BYTES = 512 * 1024;
@@ -20,6 +21,12 @@ export function readStory(raw: unknown): { story: StoryIn & Record<string, unkno
   if (json.length > MAX_STORY_BYTES) return { error: "This gift is too large. Try removing a few pages.", status: 413 };
   // Photos and songs must be uploaded first; the gift only stores their links.
   if (json.includes('"data:')) return { error: "Some photos didn't finish uploading. Please try again.", status: 400 };
+  // Photos, stickers and songs may only point at our own files (and songs at https links).
+  const bad = findBadMediaUrl(story, storagePrefixFrom(process.env.NEXT_PUBLIC_SUPABASE_URL));
+  if (bad) {
+    console.warn("[gifts] rejected a media link", bad.key);
+    return { error: "One of the photos or songs in this gift isn't allowed. Please re-add it in the studio.", status: 400 };
+  }
   return { story, recipient: str(story.recipient, 80) || "you", sender: str(story.sender, 80) || "me" };
 }
 

@@ -1,3 +1,7 @@
 allowBuilds:
   sharp: false
   unrs-resolver: false
+
+# Security: patched versions of packages we only get indirectly (see docs/legal-security/SECURITY_AUDIT_REPORT.md).
+overrides:
+  zod: ">=4.6.6 <5"

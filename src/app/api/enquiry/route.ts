@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { siteConfig } from "@/config/site";
+import { allow, clientIp } from "@/lib/rate-limit";
 
 /**
  * Footer enquiry: emails the message to us through Resend (https://resend.com).
@@ -34,6 +35,13 @@ export async function POST(request: Request) {
   const key = process.env.RESEND_API_KEY;
   if (!key) return NextResponse.json({ error: "not-configured" }, { status: 503 });
 
+  // 5 notes per person per hour, and 40 a day in all: stops the form being used
+  // to flood someone's inbox with our confirmation email, or to use up our email allowance.
+  // One confirmation per address per day, too.
+  if (!(await allow("enquiry", clientIp(request), 60 * 60, 5)) || !(await allow("enquiry-all", "all", 24 * 60 * 60, 40))) {
+    return NextResponse.json({ error: "Too many messages. Please try again later, or email us directly." }, { status: 429 });
+  }
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
@@ -52,7 +60,7 @@ export async function POST(request: Request) {
   // It deliberately doesn't repeat their message, so the form can't be used to
   // send someone else arbitrary text from our address.
   const from = process.env.ENQUIRY_FROM;
-  if (from) {
+  if (from && (await allow("enquiry-confirm", email.toLowerCase(), 24 * 60 * 60, 1))) {
     const replyTo = process.env.ENQUIRY_TO || siteConfig.contact.email;
     await fetch("https://api.resend.com/emails", {
       method: "POST",

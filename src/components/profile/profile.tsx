@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Check, Copy, ExternalLink, Eye, Gift, Hourglass, KeyRound, Loader2, LogOut, PenLine, Trash2, X } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, Eye, Gift, Hourglass, KeyRound, Loader2, LogOut, PenLine, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ButtonLink } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { giftPricing } from "@/config/site";
 import { formatDay, giftPath } from "@/lib/gift-links";
 import { EASE_OUT } from "@/lib/motion";
 import { getSupabase, signOut, useUser } from "@/lib/supabase/browser";
-import { deleteAccount, useProfile } from "@/lib/supabase/profile";
+import { deleteAccount, downloadMyData, useProfile } from "@/lib/supabase/profile";
 import { cn } from "@/lib/utils";
 import { DraftsList } from "@/components/drafts/drafts-list";
 import { SignInCard } from "./sign-in-card";
@@ -142,6 +142,16 @@ export function ProfilePage() {
         <SignOffCard value={profile?.sign_off ?? ""} fallback={name.split(" ")[0]} onSave={(sign_off) => update({ sign_off })} />
         <AccountCard />
       </div>
+
+      {/* ── Your data ── */}
+      <YourDataCard
+        email={user.email ?? ""}
+        methods={(user.app_metadata?.providers as string[] | undefined) ?? [String(user.app_metadata?.provider ?? "email")]}
+        name={profile?.display_name ?? ""}
+        memberSince={memberSince}
+        giftCount={gifts?.length ?? null}
+        onSaveName={(display_name) => update({ display_name })}
+      />
     </div>
   );
 }
@@ -442,7 +452,10 @@ function DeleteDialog({ open, onClose }: { open: boolean; onClose: () => void })
               </button>
             </div>
             <p className="mt-3 text-sm text-muted">
-              This deletes your account, every gift you’ve made and all the photos and songs in them. <b className="text-ink">Links you’ve shared will stop working.</b> It can’t be undone.
+              This deletes your account, your profile, your drafts, every gift you’ve made and all the photos and songs in them. <b className="text-ink">Links you’ve shared will stop working.</b> It can’t be undone.
+            </p>
+            <p className="mt-2 text-xs leading-relaxed text-muted">
+              We keep only what the law needs: a record of any payments (amount, date and Razorpay’s reference), no longer linked to you. Razorpay keeps its own payment records. Copies in our providers’ backups expire on their own schedule. You can <b className="text-ink">download your data</b> first, below.
             </p>
             <label className="mt-5 block text-sm">
               Type <b>DELETE</b> to confirm
@@ -471,5 +484,110 @@ function DeleteDialog({ open, onClose }: { open: boolean; onClose: () => void })
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+const METHOD_NAMES: Record<string, string> = { google: "Google", email: "Email code" };
+
+/** What we hold about them, how to correct it, and how to take a copy. */
+function YourDataCard({
+  email,
+  methods,
+  name,
+  memberSince,
+  giftCount,
+  onSaveName,
+}: {
+  email: string;
+  methods: string[];
+  name: string;
+  memberSince: string;
+  giftCount: number | null;
+  onSaveName: (v: string) => Promise<boolean>;
+}) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const [state, setState] = useState<"idle" | "saving" | "saved">("idle");
+  const [downloading, setDownloading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const current = draft ?? name;
+
+  const rows: [string, string][] = [
+    ["Email", email],
+    ["Signed in with", methods.map((m) => METHOD_NAMES[m] ?? m).join(", ")],
+    ["Member since", memberSince],
+    ["Gifts", giftCount === null ? "…" : String(giftCount)],
+  ];
+
+  return (
+    <section className="rounded-[2rem] border border-line bg-paper p-6 sm:p-8">
+      <p className="type-label text-muted">Privacy</p>
+      <h3 className="type-display mt-2 text-3xl">Your data</h3>
+      <p className="mt-2 max-w-2xl text-sm text-muted">
+        What we keep about you, and why, is in our <Link href="/privacy" className="underline underline-offset-2">privacy policy</Link>. We don’t sell it, show you ads, or use it to profile you.
+      </p>
+
+      <dl className="mt-6 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+        {rows.map(([k, v]) => (
+          <div key={k} className="flex justify-between gap-4 border-b border-line/70 pb-3">
+            <dt className="text-muted">{k}</dt>
+            <dd className="truncate text-right font-medium">{v}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <form
+        className="mt-6 flex flex-wrap items-end gap-2"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setState("saving");
+          const ok = await onSaveName(current.trim().slice(0, 60));
+          setState(ok ? "saved" : "idle");
+          if (ok) setDraft(null);
+        }}
+      >
+        <label className="min-w-0 flex-1 text-sm">
+          <span className="text-muted">Your name</span>
+          <input
+            value={current}
+            onChange={(e) => {
+              setDraft(e.target.value);
+              setState("idle");
+            }}
+            maxLength={60}
+            className="mt-1.5 block h-11 w-full rounded-full border border-line bg-cream px-4 outline-none focus:border-ink/40"
+          />
+        </label>
+        <button type="submit" disabled={state === "saving" || draft === null} className="btn btn-ink flex h-11 items-center gap-2 px-5 text-sm">
+          {state === "saving" ? <Loader2 className="size-4 animate-spin" /> : state === "saved" ? <Check className="size-4" /> : null}
+          {state === "saved" ? "Saved" : "Save name"}
+        </button>
+      </form>
+      <p className="mt-2 text-xs text-muted">To change your email address, write to us from the contact page.</p>
+
+      <div className="mt-6 flex flex-wrap gap-2 border-t border-line pt-6">
+        <button
+          type="button"
+          disabled={downloading}
+          onClick={async () => {
+            setDownloading(true);
+            setError(null);
+            try {
+              await downloadMyData();
+            } catch (e) {
+              setError(e instanceof Error ? e.message : "Couldn’t download your data.");
+            } finally {
+              setDownloading(false);
+            }
+          }}
+          className="btn btn-paper flex h-11 items-center gap-2 px-5 text-sm"
+        >
+          {downloading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />} Download my data
+        </button>
+        <Link href="/contact" className="flex h-11 items-center rounded-full px-5 text-sm text-muted hover:bg-cream hover:text-ink">
+          Questions or complaints
+        </Link>
+      </div>
+      {error && <p className="mt-3 text-sm text-rose-deep">{error}</p>}
+    </section>
   );
 }

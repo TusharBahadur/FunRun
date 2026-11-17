@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
+import { allow, clientIp } from "@/lib/rate-limit";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const url = searchParams.get("url")?.trim();
+    const url = searchParams.get("url")?.trim().slice(0, 2000);
     if (!url) {
       return NextResponse.json({ error: "Missing url parameter" }, { status: 400 });
+    }
+    if (!(await allow("audio-info", clientIp(request), 60 * 60, 120))) {
+      return NextResponse.json({ error: "Too many lookups. Please try again later." }, { status: 429 });
     }
 
     // Check YouTube

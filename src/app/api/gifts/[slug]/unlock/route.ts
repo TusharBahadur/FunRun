@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { tokenMatches, unlockCookie, unlockToken, verifyPassword } from "@/lib/gift-secrets";
+import { allow, clientIp } from "@/lib/rate-limit";
 import { getAdmin } from "@/lib/supabase/admin";
 
 /**
@@ -25,6 +26,13 @@ export async function POST(request: Request, { params }: RouteContext<"/api/gift
   // Already unlocked on this device.
   const cookie = request.headers.get("cookie")?.match(new RegExp(`(?:^|; )${unlockCookie(slug)}=([^;]+)`))?.[1];
   if (tokenMatches(cookie, slug, gift.password_hash)) return NextResponse.json({ ok: true });
+
+  // Guessing: 10 tries per person per 15 minutes, and 60 an hour for the gift
+  // from everyone together (so spreading guesses over many addresses doesn't help).
+  const ip = clientIp(request);
+  if (!(await allow("unlock", `${slug}:${ip}`, 15 * 60, 10)) || !(await allow("unlock-gift", slug, 60 * 60, 60))) {
+    return NextResponse.json({ error: "Too many tries. Please wait a few minutes and try again." }, { status: 429 });
+  }
 
   const ok = password.length > 0 && (await verifyPassword(password, gift.password_hash));
   if (!ok) {
