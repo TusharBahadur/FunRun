@@ -489,7 +489,17 @@ export function StickerLayer({ stickers }: { stickers?: StickerPlacement[] }) {
 }
 
 /** A reaction that pops up once a page is finished, like a meme sent in the chat. */
-export function ReactionSticker({ id, show }: { id?: AnyStickerId; show: boolean }) {
+/** Where the reaction can land, in order of preference. It takes the first corner the page's own stickers leave free. */
+const reactionSpots = [
+  { at: "br", className: "bottom-24 right-3 md:bottom-28 md:right-8", origin: { originX: 1, originY: 1 } },
+  { at: "bl", className: "bottom-24 left-3 md:bottom-28 md:left-8", origin: { originX: 0, originY: 1 } },
+  { at: "mr", className: "top-1/2 right-3 md:right-8", origin: { originX: 1, originY: 0.5 } },
+  { at: "ml", className: "top-1/2 left-3 md:left-8", origin: { originX: 0, originY: 0.5 } },
+] as const;
+
+export function ReactionSticker({ id, show, taken }: { id?: AnyStickerId; show: boolean; taken?: StickerPlacement[] }) {
+  const used = new Set(taken?.map((s) => s.at));
+  const spot = reactionSpots.find((r) => !used.has(r.at)) ?? reactionSpots[0];
   const studio = useStudioEdit();
   // In the studio it waits in its corner, so it can be tapped and changed like any other sticker.
   if (studio && id) {
@@ -507,8 +517,8 @@ export function ReactionSticker({ id, show }: { id?: AnyStickerId; show: boolean
         <motion.div
           key={id}
           aria-hidden
-          className="pointer-events-none fixed bottom-24 right-3 z-30 md:bottom-28 md:right-8"
-          style={{ originX: 1, originY: 1 }}
+          className={cn("pointer-events-none fixed z-30", spot.className)}
+          style={spot.origin}
           initial={{ scale: 0, rotate: -25, y: 40 }}
           animate={{ scale: [0, 1.08, 1, 1, 0.6], rotate: [-25, 8, 6, 6, 4], y: [40, 0, 0, 0, 0] }}
           exit={{ scale: 0, opacity: 0 }}

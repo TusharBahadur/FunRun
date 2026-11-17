@@ -161,7 +161,7 @@ function SiteBlock({ scene, index, studio, refCb }: { scene: Scene; index: numbe
           )}
         </SceneFontsContext.Provider>
       </ScenePositionsContext.Provider>
-      {!passiveScenes.includes(scene.type) && <ReactionSticker id={scene.reaction} show={done} />}
+      {!passiveScenes.includes(scene.type) && <ReactionSticker id={scene.reaction} show={done} taken={scene.stickers} />}
     </div>
   );
 }

@@ -244,7 +244,7 @@ function PagesPlayer({
           </motion.main>
         </AnimatePresence>
 
-        <ReactionSticker key={`${run}-${safeIndex}`} id={scene.reaction} show={pageDone} />
+        <ReactionSticker key={`${run}-${safeIndex}`} id={scene.reaction} show={pageDone} taken={scene.stickers} />
 
         {!studio && safeIndex > 0 && (
           <button
