@@ -125,10 +125,11 @@ export function GiftCall({
                 <StudioHit field="party" className="absolute inset-0 block">
                   <ScreenFill id={party} fit="contain" />
                 </StudioHit>
-                <div className="absolute inset-x-2.5 bottom-3 z-[1]">
+                {/* Their first line, as a chat message from the caller. */}
+                <div className="absolute inset-x-3 bottom-4 z-[1] flex flex-col items-start">
                   <div
-                    className="rounded-2xl px-3 py-2.5 text-center shadow-nav"
-                    style={{ backgroundColor: palette.cream, color: palette.ink, rotate: "-2deg" }}
+                    className="max-w-[94%] rounded-[1.3rem] rounded-bl-md px-4 py-2.5 text-left shadow-nav"
+                    style={{ backgroundColor: palette.accent, color: palette.cream }}
                   >
                     {reveal}
                   </div>

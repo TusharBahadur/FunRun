@@ -359,7 +359,7 @@ export function KnockScene({ scene, done, onDone }: SceneProps<S<"knock">>) {
           stickers={scene.stickers}
           reveal={
             <StudioHit field="reveal">
-              <p className="type-display text-[1.15rem] font-semibold leading-snug">{fill(scene.reveal)}</p>
+              <p className="text-[15px] font-medium leading-snug">{fill(scene.reveal)}</p>
             </StudioHit>
           }
         />
