@@ -260,7 +260,22 @@ function PageSettings({
             <section className="space-y-2">
               <ul className="space-y-2">
                 {items.map((entry, j) => (
-                  <li key={j} className="flex items-center gap-2">
+                  <li key={j} className={cn("flex gap-2", list.kind === "strings" ? "items-start" : "items-center")}>
+                    {list.kind === "strings" ? (
+                      // Plain text items are edited right here, no extra screen.
+                      <label className="flex min-w-0 flex-1 items-start gap-3 rounded-2xl border border-line bg-paper px-3 py-2.5 focus-within:border-ink/40">
+                        <span className="grid size-7 shrink-0 place-items-center rounded-full bg-cream text-sm font-medium">{j + 1}</span>
+                        <TextArea
+                          aria-label={`${list.itemLabel} ${j + 1}`}
+                          rows={2}
+                          placeholder={list.placeholder ?? `Write a ${list.itemLabel.toLowerCase()}…`}
+                          maxLength={list.charMax ?? 400}
+                          value={showNames(String(entry ?? ""), draft.story)}
+                          onChange={(e) => edit(updateItem(draft, i, list.key, j, keepNames(e.target.value, draft.story)), `${i}-${list.key}-${j}`)}
+                          className="min-h-0 flex-1 resize-none border-0 bg-transparent p-0 text-base leading-snug shadow-none focus:ring-0 [field-sizing:content]"
+                        />
+                      </label>
+                    ) : (
                     <button
                       type="button"
                       onClick={() => setSel({ scene: i, item: j, field: list.key })}
@@ -272,6 +287,7 @@ function PageSettings({
                       </span>
                       <ChevronRight className="size-5 shrink-0 text-muted" />
                     </button>
+                    )}
                     <button
                       type="button"
                       aria-label={`Remove this ${list.itemLabel.toLowerCase()}`}
@@ -294,8 +310,9 @@ function PageSettings({
                   type="button"
                   onClick={() => {
                     const value = list.kind === "list" ? list.newItem() : `New ${list.itemLabel.toLowerCase()}`;
-                    edit(addItem(draft, i, list.key, value));
-                    setSel({ scene: i, item: items.length, field: list.key });
+                    edit(addItem(draft, i, list.key, list.kind === "list" ? value : ""));
+                    // Structured items open their own screen; plain text ones are typed in place.
+                    if (list.kind === "list") setSel({ scene: i, item: items.length, field: list.key });
                   }}
                   className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-ink/30 text-base font-medium"
                 >
