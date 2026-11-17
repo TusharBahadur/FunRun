@@ -53,10 +53,11 @@ export function ReceiptScene({ scene, done, onDone }: SceneProps<S<"receipt">>) 
           <p className="mb-3 text-center opacity-50">{new Date().toLocaleDateString("en-IN")} · counter 01</p>
           {scene.items.slice(0, printed).map((it, i) => (
             <StudioHit key={i} field="items" item={i}>
-              <motion.p initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex gap-2 py-0.5">
-                <span className="truncate">{fill(it.name)}</span>
-                <span className="flex-1 border-b border-dotted border-current opacity-30" />
-                <span>{fill(it.qty)}</span>
+              {/* Long lines wrap (never cut off); the amount stays on the right, on the last line. */}
+              <motion.p initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-end gap-2 py-1">
+                <span className="min-w-0 break-words text-left">{fill(it.name)}</span>
+                <span className="mb-1 min-w-3 flex-1 border-b border-dotted border-current opacity-30" />
+                <span className="max-w-[40%] shrink-0 text-right">{fill(it.qty)}</span>
               </motion.p>
             </StudioHit>
           ))}
