@@ -297,14 +297,15 @@ export function QuestionScene({ scene, done, onDone }: SceneProps<S<"question">>
   const { palette, fill, celebrate } = useStory();
   const studio = useStudioEdit();
   const [dodges, setDodges] = useState(0);
-  const [pos, setPos] = useState({ x: 70, y: 0 });
+  // Starts beside "Yes" (offset from its place in the row), then runs off when they reach for it.
+  const [pos, setPos] = useState({ x: 0, y: 0 });
   const yes = useRef<HTMLButtonElement>(null);
 
   function dodge() {
     const n = dodges + 1;
     setDodges(n);
     const angle = n * 2.4;
-    setPos({ x: Math.round(Math.cos(angle) * 110), y: Math.round(Math.sin(angle) * 90) });
+    setPos({ x: Math.round(Math.cos(angle) * 90 - 50), y: Math.round(Math.sin(angle) * 60) });
   }
 
   const noLabels = [scene.no, "Are you sure?", "Really sure?", "Think again", "Okay, try Yes", "Yes is right there"];
@@ -345,7 +346,7 @@ export function QuestionScene({ scene, done, onDone }: SceneProps<S<"question">>
       ) : (
         <>
           <p className="max-w-sm text-2xl font-medium leading-snug">{fill(scene.question)}</p>
-          <div className="relative mt-12 grid h-40 w-full max-w-sm place-items-center">
+          <div className="relative mt-12 flex h-40 w-full max-w-sm items-center justify-center gap-4">
             <motion.button
               ref={yes}
               type="button"
@@ -366,8 +367,8 @@ export function QuestionScene({ scene, done, onDone }: SceneProps<S<"question">>
               onClick={(e) => e.preventDefault()}
               animate={{ x: pos.x, y: pos.y }}
               transition={{ type: "spring", stiffness: 500, damping: 25 }}
-              className="absolute h-11 rounded-full border px-5 text-sm"
-              style={{ borderColor: `${palette.fg}40` }}
+              className="relative z-20 h-11 shrink-0 whitespace-nowrap rounded-full border px-5 text-sm font-medium shadow-sm"
+              style={{ backgroundColor: palette.cream, color: palette.ink, borderColor: `${palette.fg}30` }}
             >
               {noLabels[Math.min(dodges, noLabels.length - 1)]}
             </motion.button>
