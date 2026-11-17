@@ -699,18 +699,19 @@ export function Studio({
         <div
           aria-hidden={!preview}
           className={cn(
-            "fixed inset-0 z-[90] flex-col items-center justify-center bg-ink/80 p-4 md:backdrop-blur",
+            "fixed inset-0 z-[90] flex-col items-center justify-center gap-3 bg-ink/80 p-3 md:p-4 md:backdrop-blur",
             preview ? "flex" : "hidden",
           )}
         >
           <button
             type="button"
             onClick={() => setPreview(false)}
-            className="btn btn-paper absolute right-4 top-4 flex items-center gap-1.5 px-4 py-2 text-sm"
+            // On phones it sits above the frame, never under it.
+            className="btn btn-paper z-10 flex shrink-0 items-center gap-1.5 self-end px-4 py-2 text-sm md:absolute md:right-4 md:top-4"
           >
             <X className="size-4" /> Close preview
           </button>
-          <div className="relative h-[min(88vh,844px)] w-[min(92vw,calc(min(88vh,844px)*390/844))] overflow-hidden rounded-[2rem] border-[8px] border-ink bg-paper">
+          <div className="relative h-[min(calc(100dvh-7.5rem),844px)] w-[min(92vw,calc(min(calc(100dvh-7.5rem),844px)*390/844))] shrink-0 overflow-hidden rounded-[2rem] border-[8px] border-ink bg-paper">
             <iframe ref={previewFrame} src="/studio/frame" title="Preview of your gift" allow="autoplay; encrypted-media" className="size-full border-0" />
             {preview && previewShown !== run && (
               <div className="absolute inset-0 grid place-items-center bg-paper">
@@ -720,7 +721,7 @@ export function Studio({
               </div>
             )}
           </div>
-          <p className="type-label mt-3 text-[10px] text-paper/70">This is exactly what they’ll see</p>
+          <p className="type-label text-[10px] text-paper/70">This is exactly what they’ll see</p>
         </div>
       )}
       </div>
