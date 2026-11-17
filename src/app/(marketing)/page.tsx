@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { CallToAction } from "@/components/sections/call-to-action";
 import { FeaturedTemplates } from "@/components/sections/featured-templates";
 import { Features } from "@/components/sections/features";
 import { ContinueChip } from "@/components/drafts/continue-chip";
@@ -81,7 +80,6 @@ export default async function HomePage() {
         <PauseOffscreen className="cv-auto"><HowItWorks /></PauseOffscreen>
         <PauseOffscreen className="cv-auto"><Features /></PauseOffscreen>
         <PauseOffscreen className="cv-auto"><LoveNotes notes={loveNotes} /></PauseOffscreen>
-        <PauseOffscreen className="cv-auto"><CallToAction /></PauseOffscreen>
       </main>
       <ContinueChip />
     </>

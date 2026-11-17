@@ -1,6 +1,8 @@
 import { Heart, Mail } from "lucide-react";
 import Link from "next/link";
+import { ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
+import { GiftSticker, PartyCatSticker } from "./footer-stickers";
 import { occasions, siteConfig } from "@/config/site";
 
 const columns = [
@@ -44,9 +46,27 @@ function WhatsAppIcon({ className }: { className?: string }) {
 
 export function Footer() {
   return (
-    // Full width, in the brand rose. On the home page it continues the call to action above it.
-    <footer className="mt-14 rounded-t-[2.5rem] bg-rose-deep text-paper md:mt-20 [body:has(#cta)_&]:mt-0 [body:has(#cta)_&]:rounded-none">
-      <div className="mx-auto max-w-6xl px-6 pt-12 pb-6 md:px-12 md:pt-16 [body:has(#cta)_&]:border-t [body:has(#cta)_&]:border-paper/15">
+    // Full width, in the brand rose, with a "start gifting" banner on top.
+    <footer className="mt-14 rounded-t-[2.5rem] bg-rose-deep text-paper md:mt-20">
+      <div className="mx-auto max-w-6xl px-4 pt-6 pb-6 sm:px-6 md:px-12 md:pt-12">
+        <div className="flex flex-col items-center gap-5 rounded-[2rem] bg-[linear-gradient(110deg,var(--color-paper)_45%,var(--color-blush))] px-6 py-8 text-center text-ink md:flex-row md:gap-8 md:px-10 md:text-left">
+          <div aria-hidden className="flex shrink-0 items-end">
+            <PartyCatSticker className="size-20 -rotate-6 md:size-24" />
+            <GiftSticker className="-ml-2 size-16 rotate-6 md:size-20" />
+          </div>
+          <div className="flex-1">
+            <p className="type-label text-rose-deep">Ready when you are</p>
+            <p className="type-display mt-2 text-[clamp(1.7rem,3.4vw,2.6rem)] leading-[1.05]">
+              Someone’s waiting <span className="type-accent whitespace-nowrap text-rose-deep">to hear it.</span>
+            </p>
+            <p className="mt-2 text-sm text-muted">Pick a template, pour your heart in, and send it in ten minutes.</p>
+          </div>
+          <ButtonLink href="/templates" size="lg" className="shrink-0">
+            Start gifting
+          </ButtonLink>
+        </div>
+
+        <div className="px-2 pt-12 md:px-0 md:pt-14">
         <div className="grid gap-10 md:grid-cols-[1.4fr_2fr] md:gap-16">
           <div>
             <Logo className="text-3xl [&>span]:text-ink" />
@@ -111,6 +131,7 @@ export function Footer() {
           <p className="flex items-center gap-1">
             Made with <Heart className="size-3 fill-paper text-paper" /> in India
           </p>
+        </div>
         </div>
       </div>
     </footer>
