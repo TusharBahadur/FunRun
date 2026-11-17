@@ -33,6 +33,7 @@ import { MobilePreview } from "./mobile-preview";
 import { NamesDialog } from "./names-dialog";
 import { deleteSelected, insertScene, updateScene } from "./ops";
 import { sceneSchemas } from "./schema";
+import { HelpBubble } from "@/components/help/help-bubble";
 import { QuickFill } from "./quick-fill";
 import { StudioTour, tourSeen, type TourStep } from "./tour";
 
@@ -718,6 +719,11 @@ export function Studio({
           }}
           onFullEditor={() => setQuickOpen(false)}
         />
+      )}
+
+      {/* The helper offers the guided flow; out of the way while anything else is open. */}
+      {!quickOpen && !preview && !checkout && names === null && !tour && !editSlug && (
+        <HelpBubble onQuick={() => setQuickOpen(true)} />
       )}
 
       <StudioTour open={tour} onClose={() => setTour(false)} steps={tourSteps(wide === true, formatInr(template.pricePaise), designs.length > 0)} />

@@ -31,7 +31,7 @@ export function ContinueChip() {
 
   if (!draft) return null;
   return (
-    <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+16px)] z-40 flex justify-center px-4">
+    <div data-continue-chip className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+16px)] z-40 flex justify-center px-4">
       <div className="flex max-w-full items-center gap-1 rounded-full bg-ink py-1 pl-1 pr-1 text-paper shadow-[0_18px_40px_-16px_rgba(27,18,21,.6)]">
         <Link href={`/studio/${draft.templateSlug}?draft=${draft.id}`} className="flex min-w-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
           <span className="truncate">Continue your gift for {draft.recipient}</span>

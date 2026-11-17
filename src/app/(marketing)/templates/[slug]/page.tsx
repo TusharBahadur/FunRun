@@ -137,14 +137,9 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
               </span>
             )}
             {template.story ? (
-              <>
-                <ButtonLinkWithNames href={`/studio/${template.slug}?quick=1`} variant="rose" size="lg">
-                  Make it yours · {price}
-                </ButtonLinkWithNames>
-                <Link href={`/studio/${template.slug}`} className="text-sm text-muted underline-offset-4 hover:text-ink hover:underline">
-                  or open the full editor
-                </Link>
-              </>
+              <ButtonLinkWithNames href={`/studio/${template.slug}`} variant="rose" size="lg">
+                Make it yours · {price}
+              </ButtonLinkWithNames>
             ) : (
               <span className="type-label ml-2 text-muted">{price} · Personalizing opens soon</span>
             )}
@@ -192,7 +187,7 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
       )}
 
       {/* Phones: the actions stay in reach at the bottom of the screen. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-cream/95 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-3 md:hidden">
+      <div data-bottom-bar className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-cream/95 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-3 md:hidden">
         <div className="mx-auto flex max-w-md items-center gap-2.5">
           {template.experience && (
             <ButtonLinkWithNames href={`/preview/${template.slug}`} variant="light" icon={false} className="h-12 px-5">
@@ -200,7 +195,7 @@ async function TemplateDetail({ params }: Pick<PageProps<"/templates/[slug]">, "
             </ButtonLinkWithNames>
           )}
           {template.story ? (
-            <ButtonLinkWithNames href={`/studio/${template.slug}?quick=1`} variant="rose" className="h-12 flex-1">
+            <ButtonLinkWithNames href={`/studio/${template.slug}`} variant="rose" className="h-12 flex-1">
               Make it yours · {price}
             </ButtonLinkWithNames>
           ) : (

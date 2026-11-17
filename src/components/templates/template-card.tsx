@@ -25,7 +25,7 @@ function inside(template: Template) {
 export function TemplateCard({ template, className }: { template: Template; className?: string }) {
   const occasion = occasions.find((o) => o.id === template.occasion);
   const href = `/templates/${template.slug}`;
-  const studio = template.story ? `/studio/${template.slug}?quick=1` : href;
+  const studio = template.story ? `/studio/${template.slug}` : href;
   const line = inside(template);
 
   return (
