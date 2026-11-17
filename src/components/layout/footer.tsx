@@ -44,26 +44,27 @@ function WhatsAppIcon({ className }: { className?: string }) {
 
 export function Footer() {
   return (
-    <footer className="px-3 pb-3">
-      <div className="mx-auto max-w-6xl rounded-[2rem] border border-line bg-paper px-6 pt-10 pb-6 md:px-12 md:pt-14">
+    // Full width, in the brand rose. On the home page it continues the call to action above it.
+    <footer className="mt-14 rounded-t-[2.5rem] bg-rose-deep text-paper md:mt-20 [body:has(#cta)_&]:mt-0 [body:has(#cta)_&]:rounded-none">
+      <div className="mx-auto max-w-6xl px-6 pt-12 pb-6 md:px-12 md:pt-16 [body:has(#cta)_&]:border-t [body:has(#cta)_&]:border-paper/15">
         <div className="grid gap-10 md:grid-cols-[1.4fr_2fr] md:gap-16">
           <div>
-            <Logo className="text-3xl" />
-            <p className="type-copy mt-3 max-w-xs text-muted">Little digital gifts for the people who matter most.</p>
+            <Logo className="text-3xl [&>span]:text-ink" />
+            <p className="type-copy mt-3 max-w-xs text-paper/75">Little digital gifts for the people who matter most.</p>
             <div className="mt-5 flex gap-2">
               <a
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`WhatsApp us on ${whatsappLabel}`}
-                className="grid size-10 place-items-center rounded-full border border-line text-muted transition-colors hover:border-rose hover:text-rose"
+                className="grid size-10 place-items-center rounded-full border border-paper/30 text-paper transition-colors hover:bg-paper hover:text-rose-deep"
               >
                 <WhatsAppIcon className="size-[18px]" />
               </a>
               <a
                 href={`mailto:${email}`}
                 aria-label={`Email us at ${email}`}
-                className="grid size-10 place-items-center rounded-full border border-line text-muted transition-colors hover:border-rose hover:text-rose"
+                className="grid size-10 place-items-center rounded-full border border-paper/30 text-paper transition-colors hover:bg-paper hover:text-rose-deep"
               >
                 <Mail className="size-[18px]" />
               </a>
@@ -73,11 +74,11 @@ export function Footer() {
           <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
             {columns.map((c) => (
               <div key={c.title}>
-                <p className="type-label mb-3 text-ink">{c.title}</p>
+                <p className="type-label mb-3 text-paper/60">{c.title}</p>
                 <ul className="space-y-2.5 text-sm">
                   {c.links.map((l) => (
                     <li key={l.href}>
-                      <Link href={l.href} className="text-muted transition-colors hover:text-ink">
+                      <Link href={l.href} className="text-paper/90 transition-colors hover:text-paper hover:underline hover:underline-offset-4">
                         {l.label}
                       </Link>
                     </li>
@@ -86,17 +87,17 @@ export function Footer() {
               </div>
             ))}
             <div>
-              <p className="type-label mb-3 text-ink">Gifts for</p>
+              <p className="type-label mb-3 text-paper/60">Gifts for</p>
               <ul className="space-y-2.5 text-sm">
                 {occasions.slice(0, 4).map((o) => (
                   <li key={o.id}>
-                    <Link href={`/templates/for/${o.id}`} className="text-muted transition-colors hover:text-ink">
+                    <Link href={`/templates/for/${o.id}`} className="text-paper/90 transition-colors hover:text-paper hover:underline hover:underline-offset-4">
                       {o.label}
                     </Link>
                   </li>
                 ))}
                 <li>
-                  <Link href="/templates" className="text-ink underline decoration-line underline-offset-4 hover:decoration-ink/40">
+                  <Link href="/templates" className="text-paper underline decoration-paper/40 underline-offset-4 hover:decoration-paper">
                     All occasions
                   </Link>
                 </li>
@@ -105,10 +106,10 @@ export function Footer() {
           </nav>
         </div>
 
-        <div className="mt-10 flex flex-col gap-1 border-t border-line pt-5 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-1 border-t border-paper/15 pt-5 text-xs text-paper/70 sm:flex-row sm:items-center sm:justify-between">
           <p>© TyniTales</p>
           <p className="flex items-center gap-1">
-            Made with <Heart className="size-3 fill-rose text-rose" /> in India
+            Made with <Heart className="size-3 fill-paper text-paper" /> in India
           </p>
         </div>
       </div>
