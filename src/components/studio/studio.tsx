@@ -484,7 +484,7 @@ export function Studio({
           >
             <UserRound className="size-3.5 shrink-0 text-muted" />
             <span className="truncate">{draft.story.recipient}</span>
-            <ChevronDown className="size-3.5 shrink-0 text-muted" />
+            <ChevronDown className="size-3.5 shrink-0 text-muted max-[400px]:hidden" />
           </button>
           <input
             value={draft.name}
@@ -510,13 +510,17 @@ export function Studio({
         >
           <Eye className="size-4" /> Preview
         </button>
-        <TopButton label="Show me around" onClick={() => setTour(true)}>
-          <CircleHelp className="size-4" />
-        </TopButton>
-        <button type="button" data-tour="publish" onClick={() => setCheckout(true)} className="btn btn-rose flex h-9 shrink-0 items-center gap-2 whitespace-nowrap pl-3 pr-1.5 text-sm sm:pl-4">
+        {/* Small phones: room for the name instead. The tour still opens on the first visit. */}
+        <span className="flex max-[400px]:hidden">
+          <TopButton label="Show me around" onClick={() => setTour(true)}>
+            <CircleHelp className="size-4" />
+          </TopButton>
+        </span>
+        <button type="button" data-tour="publish" onClick={() => setCheckout(true)} className="btn btn-rose flex h-9 shrink-0 items-center gap-2 whitespace-nowrap pl-3 pr-1.5 text-sm max-[400px]:pr-3 sm:pl-4">
           <span className="sm:hidden">{canSave ? "Save" : draft.live?.slug ? "Share" : "Publish"}</span>
           <span className="hidden sm:inline">{canSave ? "Save changes" : draft.live?.slug ? "Share link" : "Make it live"}</span>
-          {!draft.live?.slug && <span className="rounded-full bg-ink/25 px-2 py-0.5 text-xs">{formatInr(template.pricePaise)}</span>}
+          {/* Small phones: no room for the price; checkout shows it. */}
+          {!draft.live?.slug && <span className="rounded-full bg-ink/25 px-2 py-0.5 text-xs max-[400px]:hidden">{formatInr(template.pricePaise)}</span>}
         </button>
       </header>
 

@@ -132,7 +132,7 @@ export function PageSwitcher({
   const scenes = draft.story.scenes;
   const i = sel.scene ?? LOOK;
   const scene = i >= 0 ? scenes[i] : undefined;
-  const label = isLook(i) ? "Look · Theme, names & font" : scene ? `${i + 1} · ${sceneSchemas[scene.type].name}` : "";
+  const label = isLook(i) ? "Look & names" : scene ? `${i + 1} · ${sceneSchemas[scene.type].name}` : "";
 
   useEffect(() => {
     if (!open) return;
