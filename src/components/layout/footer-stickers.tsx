@@ -1,22 +1,26 @@
 /* eslint-disable @next/next/no-img-element -- tiny local stickers, already sized and compressed */
+import type { CSSProperties } from "react";
 
-const tile = "rounded-2xl border-4 border-white bg-white object-cover shadow-[0_6px_14px_rgb(27_18_21/0.18)]";
+/** A white die-cut edge and a soft shadow, so every sticker looks stuck on the same way. */
+const dieCut: CSSProperties = {
+  filter:
+    "drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(0 6px 8px rgb(27 18 21 / 0.18))",
+};
 
-/** A few stickers from our own library, stuck on the footer banner. */
+const stickers = [
+  { src: "/a/s/pin-343.cb74daa07f.thumb.webp", className: "size-20 -rotate-8 md:size-24" },
+  { src: "/a/s/pin-350.b4533d0c02.thumb.webp", className: "-ml-3 size-20 rotate-6 -translate-y-3 md:size-24" },
+  { src: "/a/s/pin-265.2d3d868c57.thumb.webp", className: "-ml-3 size-20 -rotate-12 translate-y-1 md:size-24" },
+  { src: "/a/s/b-cake.b9a0e63343.still.webp", className: "-ml-2 hidden size-16 rotate-6 -translate-y-4 lg:block" },
+];
+
+/** A little cluster of stickers from our own library, for the footer banner. */
 export function FooterStickers() {
   return (
-    <div aria-hidden className="flex shrink-0 items-end">
-      <img src="/a/s/pin-305.c959d18603.thumb.webp" alt="" width={192} height={192} loading="lazy" className={`size-20 -rotate-6 md:size-24 ${tile}`} />
-      <img
-        src="/a/s/b-cake.b9a0e63343.still.webp"
-        alt=""
-        width={256}
-        height={256}
-        loading="lazy"
-        className="-ml-1 size-16 rotate-6 drop-shadow-[0_6px_8px_rgb(27_18_21/0.2)] md:size-20"
-      />
-      <img src="/a/s/m-birthday-cat.3d37fae096.thumb.webp" alt="" width={192} height={192} loading="lazy" className={`-ml-1 size-20 rotate-3 md:size-24 ${tile}`} />
-      <img src="/a/s/m-flower-cat.96a40b3568.thumb.webp" alt="" width={192} height={192} loading="lazy" className={`-ml-2 hidden size-24 -rotate-6 lg:block ${tile}`} />
+    <div aria-hidden className="flex shrink-0 items-center py-2">
+      {stickers.map((s) => (
+        <img key={s.src} src={s.src} alt="" width={160} height={160} loading="lazy" style={dieCut} className={`object-contain ${s.className}`} />
+      ))}
     </div>
   );
 }

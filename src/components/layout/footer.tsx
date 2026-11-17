@@ -52,8 +52,7 @@ export function Footer() {
         <div className="flex flex-col items-center gap-5 rounded-[2rem] bg-[linear-gradient(110deg,var(--color-paper)_45%,var(--color-blush))] px-6 py-8 text-center text-ink md:flex-row md:gap-8 md:px-10 md:text-left">
           <FooterStickers />
           <div className="flex-1">
-            <p className="type-label text-rose-deep">Ready when you are</p>
-            <p className="type-display mt-2 text-[clamp(1.7rem,3.4vw,2.6rem)] leading-[1.05]">
+            <p className="type-display text-[clamp(1.7rem,3.4vw,2.6rem)] leading-[1.05]">
               Someone’s waiting <span className="type-accent whitespace-nowrap text-rose-deep">to hear it.</span>
             </p>
             <p className="mt-2 text-sm text-muted">Pick a template, pour your heart in, and send it in ten minutes.</p>
