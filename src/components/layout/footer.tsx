@@ -2,7 +2,7 @@ import { Heart, Mail } from "lucide-react";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
-import { GiftSticker, PartyCatSticker } from "./footer-stickers";
+import { FooterStickers } from "./footer-stickers";
 import { occasions, siteConfig } from "@/config/site";
 
 const columns = [
@@ -50,10 +50,7 @@ export function Footer() {
     <footer className="mt-14 rounded-t-[2.5rem] bg-rose-deep text-paper md:mt-20">
       <div className="mx-auto max-w-6xl px-4 pt-6 pb-6 sm:px-6 md:px-12 md:pt-12">
         <div className="flex flex-col items-center gap-5 rounded-[2rem] bg-[linear-gradient(110deg,var(--color-paper)_45%,var(--color-blush))] px-6 py-8 text-center text-ink md:flex-row md:gap-8 md:px-10 md:text-left">
-          <div aria-hidden className="flex shrink-0 items-end">
-            <PartyCatSticker className="size-20 -rotate-6 md:size-24" />
-            <GiftSticker className="-ml-2 size-16 rotate-6 md:size-20" />
-          </div>
+          <FooterStickers />
           <div className="flex-1">
             <p className="type-label text-rose-deep">Ready when you are</p>
             <p className="type-display mt-2 text-[clamp(1.7rem,3.4vw,2.6rem)] leading-[1.05]">
