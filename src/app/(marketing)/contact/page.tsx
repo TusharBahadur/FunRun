@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PolicySection, TextPage } from "@/components/sections/text-page";
 import { siteConfig } from "@/config/site";
+import { EnquiryForm } from "@/components/layout/enquiry-form";
 
 export const metadata: Metadata = {
   title: "Contact us",
@@ -29,6 +30,10 @@ export default function ContactPage() {
             {whatsappLabel}
           </a>
         </p>
+      </PolicySection>
+
+      <PolicySection title="Send us a note">
+        <EnquiryForm />
       </PolicySection>
 
       <PolicySection title="Grievance officer">

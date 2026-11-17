@@ -2,19 +2,33 @@ import { Heart, Mail } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
 import { occasions, siteConfig } from "@/config/site";
-import { EnquiryForm } from "./enquiry-form";
 
-const links = [
-  { label: "Templates", href: "/templates" },
-  { label: "How it works", href: "/#how" },
-  { label: "Guides", href: "/guides" },
-  { label: "About", href: "/about" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Contact", href: "/contact" },
-  { label: "Privacy", href: "/privacy" },
-  { label: "Terms", href: "/terms" },
-  { label: "Refunds", href: "/refunds" },
-  { label: "Delivery", href: "/delivery" },
+const columns = [
+  {
+    title: "Make",
+    links: [
+      { label: "Templates", href: "/templates" },
+      { label: "How it works", href: "/#how" },
+      { label: "Guides", href: "/guides" },
+    ],
+  },
+  {
+    title: "Help",
+    links: [
+      { label: "FAQ", href: "/faq" },
+      { label: "Contact", href: "/contact" },
+      { label: "Refunds", href: "/refunds" },
+      { label: "Delivery", href: "/delivery" },
+    ],
+  },
+  {
+    title: "TyniTales",
+    links: [
+      { label: "About", href: "/about" },
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+    ],
+  },
 ];
 
 const { email, whatsapp, whatsappLabel } = siteConfig.contact;
@@ -31,64 +45,70 @@ function WhatsAppIcon({ className }: { className?: string }) {
 export function Footer() {
   return (
     <footer className="px-3 pb-3">
-      <div className="mx-auto max-w-6xl rounded-[2rem] border border-line bg-paper px-6 py-10 md:px-12 md:py-14">
-        <div className="grid gap-10 md:grid-cols-[1fr_1.1fr] md:gap-16">
+      <div className="mx-auto max-w-6xl rounded-[2rem] border border-line bg-paper px-6 pt-10 pb-6 md:px-12 md:pt-14">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_2fr] md:gap-16">
           <div>
             <Logo className="text-3xl" />
-            <p className="type-copy mt-3 max-w-sm text-muted">
-              Little digital gifts for the people who matter most. Questions, or want something made just for you? Say hi.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2.5">
-              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="btn btn-rose h-11 px-5 text-sm">
-                <WhatsAppIcon className="size-4" /> WhatsApp us
+            <p className="type-copy mt-3 max-w-xs text-muted">Little digital gifts for the people who matter most.</p>
+            <div className="mt-5 flex gap-2">
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`WhatsApp us on ${whatsappLabel}`}
+                className="grid size-10 place-items-center rounded-full border border-line text-muted transition-colors hover:border-rose hover:text-rose"
+              >
+                <WhatsAppIcon className="size-[18px]" />
               </a>
-              <a href={`mailto:${email}`} className="btn btn-paper h-11 px-5 text-sm">
-                <Mail className="size-4" /> Email us
+              <a
+                href={`mailto:${email}`}
+                aria-label={`Email us at ${email}`}
+                className="grid size-10 place-items-center rounded-full border border-line text-muted transition-colors hover:border-rose hover:text-rose"
+              >
+                <Mail className="size-[18px]" />
               </a>
             </div>
-            <p className="mt-4 text-sm text-muted">
-              <span className="whitespace-nowrap">{whatsappLabel}</span>
-              <span aria-hidden className="mx-2 text-line">•</span>
-              <a href={`mailto:${email}`} className="break-all underline decoration-line underline-offset-4 hover:text-ink hover:decoration-ink/40">
-                {email}
-              </a>
-            </p>
           </div>
 
-          <div>
-            <p className="type-label mb-3 text-muted">Send us a note</p>
-            <EnquiryForm />
-          </div>
-        </div>
-
-        {/* Every occasion page, linked from every page. */}
-        <nav aria-label="Gifts by occasion" className="mt-10 border-t border-line pt-6">
-          <p className="type-label mb-3 text-muted">Gifts for</p>
-          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-            {occasions.map((o) => (
-              <li key={o.id}>
-                <Link href={`/templates/for/${o.id}`} className="text-muted transition-colors hover:text-ink">
-                  {o.label}
-                </Link>
-              </li>
+          <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
+            {columns.map((c) => (
+              <div key={c.title}>
+                <p className="type-label mb-3 text-ink">{c.title}</p>
+                <ul className="space-y-2.5 text-sm">
+                  {c.links.map((l) => (
+                    <li key={l.href}>
+                      <Link href={l.href} className="text-muted transition-colors hover:text-ink">
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
-        </nav>
-
-        <div className="mt-6 flex flex-col gap-4 border-t border-line pt-6 md:flex-row md:items-center md:justify-between">
-          <nav aria-label="Footer">
-            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-              {links.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-muted transition-colors hover:text-ink">
-                    {l.label}
+            <div>
+              <p className="type-label mb-3 text-ink">Gifts for</p>
+              <ul className="space-y-2.5 text-sm">
+                {occasions.slice(0, 4).map((o) => (
+                  <li key={o.id}>
+                    <Link href={`/templates/for/${o.id}`} className="text-muted transition-colors hover:text-ink">
+                      {o.label}
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <Link href="/templates" className="text-ink underline decoration-line underline-offset-4 hover:decoration-ink/40">
+                    All occasions
                   </Link>
                 </li>
-              ))}
-            </ul>
+              </ul>
+            </div>
           </nav>
-          <p className="flex items-center gap-1.5 text-sm text-muted">
-            © TyniTales · Made with <Heart className="size-3.5 fill-rose text-rose" /> in India
+        </div>
+
+        <div className="mt-10 flex flex-col gap-1 border-t border-line pt-5 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+          <p>© TyniTales</p>
+          <p className="flex items-center gap-1">
+            Made with <Heart className="size-3 fill-rose text-rose" /> in India
           </p>
         </div>
       </div>
