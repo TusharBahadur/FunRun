@@ -48,7 +48,7 @@ export function Footer() {
   return (
     // Full width, in the brand rose, with a "start gifting" banner on top.
     <footer className="mt-14 rounded-t-[2.5rem] bg-rose-deep text-paper md:mt-20">
-      <div className="mx-auto max-w-6xl px-4 pt-6 pb-6 sm:px-6 md:px-12 md:pt-12">
+      <div className="mx-auto max-w-7xl px-4 pt-6 pb-6 sm:px-6 md:px-8 md:pt-10">
         <div className="flex flex-col items-center gap-5 rounded-[2rem] bg-[linear-gradient(110deg,var(--color-paper)_45%,var(--color-blush))] px-6 py-8 text-center text-ink md:flex-row md:gap-8 md:px-10 md:text-left">
           <FooterStickers />
           <div className="flex-1">
