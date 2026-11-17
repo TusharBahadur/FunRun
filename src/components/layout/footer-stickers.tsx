@@ -11,7 +11,7 @@ const stickers = [
   { src: "/a/s/pin-343.cb74daa07f.thumb.webp", className: "size-20 -rotate-8 md:size-24" },
   { src: "/a/s/pin-350.b4533d0c02.thumb.webp", className: "-ml-3 size-20 rotate-6 -translate-y-3 md:size-24" },
   { src: "/a/s/b-besties-cut.webp", className: "-ml-2 size-20 -rotate-6 translate-y-1 md:size-24" },
-  { src: "/a/s/b-cake.b9a0e63343.still.webp", className: "-ml-2 hidden size-16 rotate-6 -translate-y-4 lg:block" },
+  { src: "/a/s/m-flower-cat-cut.webp", className: "-ml-2 hidden size-20 rotate-6 -translate-y-2 lg:block md:size-24" },
 ];
 
 /** A little cluster of stickers from our own library, for the footer banner. */
