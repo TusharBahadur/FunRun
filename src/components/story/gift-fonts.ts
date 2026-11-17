@@ -17,7 +17,8 @@ export const giftFonts: Record<GiftFont, { name: string; note: string; family: s
   clean: { name: "Clean", note: "Plain and modern", family: "var(--font-inter-tight)", weight: 500, axes: "normal" },
 };
 
-export const giftFontOrder: GiftFont[] = ["classic", "hand", "clean"];
+// "clean" stays valid for gifts that already use it, but isn't offered: it looked the same as Classic.
+export const giftFontOrder: GiftFont[] = ["classic", "hand"];
 
 export function isGiftPreset(font: string | undefined): font is GiftFont {
   return font === "classic" || font === "hand" || font === "clean";

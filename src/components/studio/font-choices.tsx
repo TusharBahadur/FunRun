@@ -52,11 +52,11 @@ export function FontChoices({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-base font-medium">Font for the whole gift</h3>
-        <p className="mt-1 text-sm leading-snug text-muted">Headlines, letters and photo captions. You can still override one line later.</p>
-        <div className="mt-3 grid gap-2">
+        <h3 className="text-base font-medium">Font</h3>
+        <p className="mt-1 text-sm leading-snug text-muted">Used across the whole gift. You can still change a single line later.</p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
           {giftFontOrder.map((id) => {
-            const on = font === id;
+            const on = font === id || (id === "classic" && font === "clean");
             return (
               <button
                 key={id}
@@ -68,16 +68,15 @@ export function FontChoices({
                   on ? "border-ink bg-paper" : "border-line bg-paper/40",
                 )}
               >
-                <span className="block text-[1.75rem] leading-none" style={giftFontStyle(id)}>
+                <span className="block text-2xl leading-none" style={giftFontStyle(id)}>
                   With love
                 </span>
-                <span className="mt-2 block text-sm font-medium">{giftFonts[id].name}</span>
-                <span className="block text-sm leading-snug text-muted">{giftFonts[id].note}</span>
+                <span className="mt-2 block text-sm text-muted">{giftFonts[id].name}</span>
               </button>
             );
           })}
         </div>
-        <p className="mt-4 text-sm font-medium">Or one face everywhere</p>
+        <p className="mt-5 text-sm font-medium">More fonts</p>
         <FontGrid
           value={isGiftPreset(font) ? undefined : font}
           onChange={(id) => onFont(id ?? "classic")}
