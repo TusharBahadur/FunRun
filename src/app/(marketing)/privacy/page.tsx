@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy" },
 };
 
-const UPDATED = "9 November 2026";
+const UPDATED = "17 November 2026";
 
 export default function PrivacyPage() {
   const { email } = siteConfig.contact;
@@ -55,8 +55,9 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Technical data.</strong> Like every website, our servers see basic request data (such as IP address and
-            browser type) for security and to keep the site running. We measure page speed with Vercel Speed Insights,
-            which doesn’t use cookies or identify you.
+            browser type) for security and to keep the site running. To stop abuse (like password guessing), we keep a
+            scrambled version of your IP address for one day, never the address itself. We measure page speed with
+            Vercel Speed Insights, which doesn’t use cookies or identify you.
           </li>
         </ul>
       </PolicySection>
@@ -111,24 +112,43 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p>
-          These providers process data for us under their own privacy policies and may store it outside India. We share
-          only what each one needs to do its job. We may also disclose information if the law requires it.
+          These providers process data for us under their own privacy policies, and some store it outside India
+          (including in the United States). Razorpay and Google also act on their own account for payments and Google
+          sign-in. We share only what each one needs to do its job. We may also disclose information if the law
+          requires it.
         </p>
       </PolicySection>
 
       <PolicySection title="How long we keep it">
         <p>
           Live gifts stay online for good, until you delete them or your account. Account details are kept while your
-          account exists. Payment records are kept for as long as tax and accounting laws require. Messages are kept as long
-          as needed to help you.
+          account exists. Drafts are deleted after 60 days without changes. Abuse-prevention records are kept for one
+          day. When you delete your account, a record of any payments (amount, date and Razorpay’s reference) is kept,
+          no longer linked to you, for as long as tax and accounting laws require. Messages are kept as long as needed to
+          help you. Copies in our providers’ backups expire on their own schedule.
         </p>
       </PolicySection>
 
       <PolicySection title="Your choices and rights">
         <ul>
-          <li>See and change your gifts from your profile while they’re editable</li>
-          <li>Delete your account from your profile; this deletes your gifts and their photos</li>
-          <li>Ask us for a copy of your data, to correct it, or to take down a single gift, by emailing {mail}</li>
+          <li>
+            <strong>See your data:</strong> your profile shows your account details and gifts, under “Your data”
+          </li>
+          <li>
+            <strong>Download it:</strong> “Download my data” on your profile gives you everything we hold about your
+            account as a file
+          </li>
+          <li>
+            <strong>Correct it:</strong> change your name and sign-off on your profile, and your gifts while they’re
+            editable. To change your email address, write to us
+          </li>
+          <li>
+            <strong>Delete it:</strong> delete your account from your profile; this deletes your gifts, drafts and their
+            photos. To take down a single gift, email {mail}
+          </li>
+          <li>
+            <strong>Withdraw consent:</strong> you can stop using TyniTales and delete your account at any time
+          </li>
         </ul>
         <p>
           These rights apply under India’s Digital Personal Data Protection Act, 2023, and we extend them to everyone who
@@ -143,15 +163,25 @@ export default function PrivacyPage() {
 
       <PolicySection title="Children">
         <p>
-          TyniTales is meant for people aged 18 and over, or younger people using it with a parent or guardian’s permission.
-          Don’t put information about children into a gift without their parent or guardian’s okay.
+          You must be 18 or over to create an account and make gifts live. Gifts can be made <em>for</em> children, but
+          don’t include a child’s photos or personal details without their parent or guardian’s okay.
         </p>
       </PolicySection>
 
       <PolicySection title="Cookies and storage">
         <p>
-          We use only what the site needs to work: browser storage for your drafts and sign-in, and to remember small
-          things like whether you’ve seen the studio tour. No advertising or tracking cookies.
+          We use only what the site needs to work: browser storage for your drafts and sign-in, a cookie that remembers a
+          gift you’ve unlocked with its password, and small flags like whether you’ve seen the studio tour. No
+          advertising, analytics or tracking cookies, so there’s nothing to opt out of. Google, Razorpay and YouTube set
+          their own cookies only when you use them (signing in with Google, paying, or playing a song).
+        </p>
+      </PolicySection>
+
+      <PolicySection title="If something goes wrong">
+        <p>
+          We protect your data with access controls, encryption in transit, and hashed passwords for gift locks. If a
+          breach ever affects your personal data, we’ll tell you and the Data Protection Board of India as the law requires,
+          and explain what happened and what to do.
         </p>
       </PolicySection>
 

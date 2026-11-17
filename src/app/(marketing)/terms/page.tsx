@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/terms" },
 };
 
-const UPDATED = "9 November 2026";
+const UPDATED = "17 November 2026";
 
 export default function TermsPage() {
   const { email } = siteConfig.contact;
@@ -37,7 +37,7 @@ export default function TermsPage() {
       <PolicySection title="Your account">
         <p>
           You need to sign in to make a gift live. Keep your account secure; you’re responsible for what’s done with it.
-          You must be 18 or over, or have a parent or guardian’s permission.
+          You must be 18 or over to create an account. You can delete your account at any time from your profile.
         </p>
       </PolicySection>
 
@@ -104,6 +104,13 @@ export default function TermsPage() {
           We work hard to keep TyniTales running smoothly, but it’s provided “as is”. We can’t guarantee it will always be
           available or error-free, or that a gift will look identical on every device. As far as the law allows, our total
           liability for any claim is limited to the amount you paid for the gift concerned.
+        </p>
+      </PolicySection>
+
+      <PolicySection title="Other services we use">
+        <p>
+          Payments are handled by Razorpay, sign-in with Google by Google, and songs you choose may play from YouTube or the
+          link you add. Their own terms apply to those parts.
         </p>
       </PolicySection>
 
