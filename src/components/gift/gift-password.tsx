@@ -2,14 +2,12 @@
 
 import { motion } from "motion/react";
 import { Loader2, Lock } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 type Palette = { bg?: string; fg?: string; accent?: string };
 
 /** The door in front of a password-protected gift. Nothing of the gift is on this page. */
 export function GiftPassword({ slug, recipient, palette }: { slug: string; recipient: string; palette: Palette }) {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,12 +19,17 @@ export function GiftPassword({ slug, recipient, palette }: { slug: string; recip
     if (!password.trim() || busy) return;
     setBusy(true);
     setError(null);
+    // Never spin forever: give up after 15 seconds and say so.
+    const stop = new AbortController();
+    const timer = window.setTimeout(() => stop.abort(), 15_000);
     try {
       const res = await fetch(`/api/gifts/${slug}/unlock`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ password }),
+        signal: stop.signal,
       });
+      window.clearTimeout(timer);
       const json = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
         setError(json.error ?? "Couldn't check that. Please try again.");
@@ -34,8 +37,10 @@ export function GiftPassword({ slug, recipient, palette }: { slug: string; recip
         setBusy(false);
         return;
       }
-      router.refresh();
+      // A fresh load picks up the "unlocked" cookie straight away (a soft refresh could show the old page).
+      window.location.reload();
     } catch {
+      window.clearTimeout(timer);
       setError("Couldn't check that. Check your connection and try again.");
       setBusy(false);
     }
