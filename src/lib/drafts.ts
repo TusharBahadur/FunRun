@@ -105,6 +105,23 @@ export async function deviceDrafts(): Promise<DraftSummary[]> {
 
 /* ───────────── In the account (Supabase) ───────────── */
 
+/** A slow or stuck network must never freeze the editor: after `ms`, carry on without the account. */
+function withTimeout<T>(p: Promise<T>, ms = 6000): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error("timeout")), ms);
+    p.then(
+      (v) => {
+        clearTimeout(t);
+        resolve(v);
+      },
+      (e) => {
+        clearTimeout(t);
+        reject(e);
+      },
+    );
+  });
+}
+
 /** Photo data URL → its uploaded link, so each photo uploads once. */
 const uploaded = new Map<string, string>();
 
@@ -141,15 +158,14 @@ export async function saveToAccount(d: Draft, userId: string) {
 }
 
 async function getFromAccount(id: string): Promise<Draft | null> {
-  const { data } = await getSupabase().from("drafts").select("data").eq("id", id).maybeSingle();
+  const { data } = await withTimeout(Promise.resolve(getSupabase().from("drafts").select("data").eq("id", id).maybeSingle()));
   return (data?.data as Draft | undefined) ?? null;
 }
 
 async function listInAccount(): Promise<DraftSummary[]> {
-  const { data } = await getSupabase()
-    .from("drafts")
-    .select("id, template_slug, name, recipient, updated_at")
-    .order("updated_at", { ascending: false });
+  const { data } = await withTimeout(
+    Promise.resolve(getSupabase().from("drafts").select("id, template_slug, name, recipient, updated_at").order("updated_at", { ascending: false })),
+  );
   return (data ?? [])
     .map((r) => ({ id: r.id as string, templateSlug: r.template_slug as string, name: r.name as string, recipient: (r.recipient as string) ?? "", updatedAt: r.updated_at as string }))
     .filter((d) => !stale(d.updatedAt));
@@ -185,7 +201,7 @@ export async function getDraft(id: string, signedIn: boolean): Promise<Draft | n
 
 export async function deleteDraft(id: string, signedIn: boolean) {
   await deleteOnDevice(id);
-  if (signedIn) await getSupabase().from("drafts").delete().eq("id", id);
+  if (signedIn) await withTimeout(Promise.resolve(getSupabase().from("drafts").delete().eq("id", id))).catch(() => {});
 }
 
 /** Just signed in: put this device's drafts in their account too. */

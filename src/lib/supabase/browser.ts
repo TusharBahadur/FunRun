@@ -32,19 +32,36 @@ export function useUser() {
       return () => clearTimeout(id);
     }
     let alive = true;
+    let known = false;
+    // A stuck network shouldn't hold the page up: after 8 s, carry on as signed out.
+    // (If the session turns up later, onAuthStateChange below fills it in.)
+    const fallback = window.setTimeout(() => alive && !known && setUser(null), 8000);
     // Waits for the client to finish any Google sign-in in the URL (?code=…).
-    supabase.auth.getSession().then(({ data }) => {
-      if (!alive) return;
-      setUser(data.session?.user ?? null);
-      stripAuthParams();
-    });
+    supabase.auth.getSession().then(
+      ({ data }) => {
+        known = true;
+        window.clearTimeout(fallback);
+        if (!alive) return;
+        setUser(data.session?.user ?? null);
+        stripAuthParams();
+      },
+      () => {
+        known = true;
+        window.clearTimeout(fallback);
+        if (alive) setUser(null);
+      },
+    );
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      // Token refreshes hand over a new object for the same person: keep the old one,
+      // so pages don't redo their work (reload drafts, re-save) every hour.
+      const next = session?.user ?? null;
+      setUser((prev) => (prev && next && prev.id === next.id ? prev : next));
       // Lets light components (the navbar avatar) refresh without loading Supabase.
       window.dispatchEvent(new Event("tynitales:auth"));
     });
     return () => {
       alive = false;
+      window.clearTimeout(fallback);
       data.subscription.unsubscribe();
     };
   }, []);

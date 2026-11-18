@@ -116,28 +116,55 @@ export function Studio({
   const [saveState, setSaveState] = useState<SaveState>(null);
   const [draftLoading, setDraftLoading] = useState(!!draftId);
 
-  // Opening a draft (?draft=…): the device's copy, or the account's if it's newer.
+  // Opening a draft: the device's copy, or the account's if it's newer.
+  // Used for ?draft=… on arrival and for "Continue" in the names dialog.
+  // Callers put the loading veil up; this always takes it down again.
+  const opening = useRef<string | null>(null);
+  const openDraft = useCallback(
+    (id: string, signedIn: boolean) => {
+      if (opening.current === id) return;
+      opening.current = id;
+      savedId.current = id;
+      let settled = false;
+      const finish = () => {
+        settled = true;
+        opening.current = null;
+        setDraftLoading(false);
+      };
+      // Never leave them staring at a spinner: after 10 s, keep editing what's on screen.
+      const guard = window.setTimeout(() => !settled && finish(), 10_000);
+      getDraft(id, signedIn)
+        .then((found) => {
+          if (settled) return;
+          if (found) {
+            // The editor keeps its own id (checkout remembers choices by it); the draft's is in savedId.
+            reset({ ...found, id: initial.id });
+            setSaveState(signedIn ? "account" : "device");
+          } else {
+            // Gone (sent, deleted, or made on another device): start fresh.
+            savedId.current = null;
+            window.history.replaceState(window.history.state, "", window.location.pathname);
+            setNames("first");
+          }
+        })
+        .catch(() => {})
+        .finally(() => {
+          window.clearTimeout(guard);
+          if (!settled) finish();
+        });
+    },
+    [reset, initial.id],
+  );
+
   useEffect(() => {
-    if (!draftId || draftId === savedId.current || user === undefined) return;
-    let alive = true;
-    getDraft(draftId, !!user).then((found) => {
-      if (!alive) return;
-      if (found) {
-        savedId.current = draftId;
-        // The editor keeps its own id (checkout remembers choices by it); the draft's is in savedId.
-        reset({ ...found, id: initial.id });
-        setSaveState(user ? "account" : "device");
-      } else {
-        // Gone (sent, deleted, or made on another device): start fresh.
-        window.history.replaceState(window.history.state, "", window.location.pathname);
-        setNames("first");
-      }
-      setDraftLoading(false);
-    });
-    return () => {
-      alive = false;
-    };
-  }, [draftId, user, reset, initial.id]);
+    if (!draftId || draftId === savedId.current) return;
+    // Still checking who's signed in: open the device's copy if that takes too long.
+    if (user === undefined) {
+      const t = window.setTimeout(() => openDraft(draftId, false), 6000);
+      return () => window.clearTimeout(t);
+    }
+    openDraft(draftId, !!user);
+  }, [draftId, user, openDraft]);
 
   // Save a second after each change. The first real change creates the draft.
   // `retry` re-runs it after a failed save.
@@ -150,14 +177,16 @@ export function Studio({
     setSaveState("saving");
     const seq = ++saveSeq.current;
     const t = window.setTimeout(async () => {
-      if (!savedId.current) {
-        savedId.current = newDraftId();
-        const url = new URL(window.location.href);
-        url.searchParams.set("draft", savedId.current);
-        window.history.replaceState(window.history.state, "", url.pathname + url.search);
-      }
+      const isNew = !savedId.current;
+      if (!savedId.current) savedId.current = newDraftId();
       const copy = { ...draft, id: savedId.current };
       const onDevice = await saveOnDevice(copy);
+      // The address names the draft only once it's really saved, so a reload always finds it.
+      if (isNew) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("draft", copy.id);
+        window.history.replaceState(window.history.state, "", url.pathname + url.search);
+      }
       if (!user) {
         if (seq === saveSeq.current) setSaveState(onDevice ? "device" : "failed");
         return;
@@ -669,6 +698,8 @@ export function Studio({
           const url = new URL(window.location.href);
           url.searchParams.set("draft", d.id);
           window.history.replaceState(window.history.state, "", url.pathname + url.search);
+          // Load it right here: waiting for the address change to reach the page could leave the spinner up.
+          openDraft(d.id, !!user);
         }}
         onSave={saveNames}
         onClose={() => setNames(null)}
