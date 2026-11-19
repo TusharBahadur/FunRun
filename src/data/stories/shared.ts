@@ -48,9 +48,9 @@ export const occasionTracks = {
     },
     cantHelpFalling: {
       title: "Can't Help Falling in Love",
-      artist: "Kina Grannis",
-      link: "https://www.youtube.com/watch?v=6-wEAeNcA_A",
-      youtubeId: "6-wEAeNcA_A",
+      artist: "Elvis Presley",
+      link: "https://www.youtube.com/watch?v=vGJTaP6anOU",
+      youtubeId: "vGJTaP6anOU",
     },
     perfect: {
       title: "Perfect",
@@ -89,8 +89,8 @@ export const occasionTracks = {
     baarishein: {
       title: "Baarishein",
       artist: "Anuv Jain",
-      link: "https://www.youtube.com/watch?v=RLzC55ai0eo",
-      youtubeId: "RLzC55ai0eo",
+      link: "https://www.youtube.com/watch?v=PJWemSzExXs",
+      youtubeId: "PJWemSzExXs",
     },
     chooLo: {
       title: "Choo Lo",

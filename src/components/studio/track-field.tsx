@@ -74,8 +74,10 @@ export function TrackField({
           loading: false,
         });
         const now = latest.current.track;
-        // Only if the link is still the one we looked up.
-        if (data.title && now.link?.trim() === link && now.title !== data.title) {
+        // Only if the link is still the one we looked up, and only to fill a missing
+        // name: a new link clears it. Overwriting a template's song name on load would
+        // count as an edit and save a draft they never made.
+        if (data.title && now.link?.trim() === link && !now.title) {
           patch({
             ...now,
             title: data.title,
@@ -148,6 +150,8 @@ export function TrackField({
                 ...track,
                 link: newLink,
                 youtubeId: ytId || undefined,
+                // A different song: its name comes from the lookup, not the old one.
+                title: newLink.trim() === track.link?.trim() ? track.title : undefined,
               });
             }}
             className={cn("pl-10", roomy && "min-h-12 text-base")}

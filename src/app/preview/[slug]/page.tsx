@@ -16,7 +16,17 @@ export async function generateMetadata({ params }: PageProps<"/preview/[slug]">)
   return { title: template ? `Preview · ${template.name}` : "Preview", robots: { index: false } };
 }
 
-export default async function PreviewPage({ params }: PageProps<"/preview/[slug]">) {
+export default function PreviewPage({ params }: PageProps<"/preview/[slug]">) {
+  // Every template is pre-built, so this boundary never shows; it lets navigation start instantly.
+  // It also covers ?to= and ?from=, which are read in the browser.
+  return (
+    <Suspense fallback={<main className="min-h-svh" />}>
+      <Preview params={params} />
+    </Suspense>
+  );
+}
+
+async function Preview({ params }: Pick<PageProps<"/preview/[slug]">, "params">) {
   const { slug } = await params;
   const template = await getTemplateBySlug(slug);
   if (!template?.experience) notFound();
@@ -26,16 +36,13 @@ export default async function PreviewPage({ params }: PageProps<"/preview/[slug]
   const cream = template.story ? (template.experiencePalette?.cream ?? "#fff4ef") : extra.cream;
   const ink = template.story ? (template.experiencePalette?.ink ?? palette.fg) : extra.ink;
 
-  // Built ahead of time for every template; ?to= and ?from= are read in the browser.
   return (
-    <Suspense fallback={<main className="min-h-svh" />}>
-      <PreviewWithNames
-        slug={template.slug}
-        story={template.story ?? undefined}
-        experience={template.story ? undefined : { palette: { ...palette, ...extra }, tier: template.tier ?? "wish" }}
-        backStyle={{ backgroundColor: `${cream}cc`, color: ink }}
-        ctaStyle={{ backgroundColor: `color-mix(in oklab, ${palette.accent}, black 22%)`, color: "#fff" }}
-      />
-    </Suspense>
+    <PreviewWithNames
+      slug={template.slug}
+      story={template.story ?? undefined}
+      experience={template.story ? undefined : { palette: { ...palette, ...extra }, tier: template.tier ?? "wish" }}
+      backStyle={{ backgroundColor: `${cream}cc`, color: ink }}
+      ctaStyle={{ backgroundColor: `color-mix(in oklab, ${palette.accent}, black 22%)`, color: "#fff" }}
+    />
   );
 }

@@ -15,7 +15,17 @@ export async function generateMetadata({ params }: PageProps<"/studio/[slug]">):
   return { title: template ? `Studio · ${template.name}` : "Studio", robots: { index: false } };
 }
 
-export default async function StudioPage({ params }: PageProps<"/studio/[slug]">) {
+export default function StudioPage({ params }: PageProps<"/studio/[slug]">) {
+  // Every template is pre-built, so this boundary never shows; it lets navigation start instantly.
+  // It also covers ?to=, ?from= and ?edit=, which are read in the browser.
+  return (
+    <Suspense fallback={<main className="h-svh bg-cream" />}>
+      <StudioForTemplate params={params} />
+    </Suspense>
+  );
+}
+
+async function StudioForTemplate({ params }: Pick<PageProps<"/studio/[slug]">, "params">) {
   const { slug } = await params;
   const template = await getTemplateBySlug(slug);
   if (!template?.story) notFound();
@@ -24,14 +34,11 @@ export default async function StudioPage({ params }: PageProps<"/studio/[slug]">
   const story = { ...bindStoryNames(template.story, seedNames), ...seedNames };
   const designs = await getTemplates({ occasion: template.occasion });
 
-  // Built ahead of time for every template; ?to=, ?from= and ?edit= are read in the browser.
   return (
-    <Suspense fallback={<main className="h-svh bg-cream" />}>
-      <StudioFromUrl
-        template={{ slug: template.slug, name: template.name, pricePaise: template.pricePaise, story }}
-        designs={designs}
-        seedNames={seedNames}
-      />
-    </Suspense>
+    <StudioFromUrl
+      template={{ slug: template.slug, name: template.name, pricePaise: template.pricePaise, story }}
+      designs={designs}
+      seedNames={seedNames}
+    />
   );
 }

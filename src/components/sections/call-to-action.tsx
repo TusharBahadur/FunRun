@@ -43,7 +43,7 @@ export function CallToAction() {
             />
           </h2>
           <p className="type-copy mx-auto mt-4 max-w-md text-paper/80 md:mt-6">
-            Pick a template, pour your heart in, and send it in the next ten minutes.
+            Pick a template, pour your heart in, and send it in the next five minutes.
           </p>
           <div className="mt-8 md:mt-10">
             <ButtonLink href="/templates" variant="light" size="lg">
