@@ -92,12 +92,19 @@ export function Checkout({
   // A live gift opened again to change it, still inside its 7 days.
   const editing = isFuture(live?.editUntil);
 
-  // Back from Google: put their choices back exactly as they left them.
+  // Opening: back from Google, put their choices back exactly as they left them.
+  // Otherwise the link follows whoever the gift is for now (the sheet is set up
+  // before the names are typed, so it would still say the template's sample name).
+  const typedLink = useRef(false);
+  const recipient = draft.story.recipient;
   useEffect(() => {
     if (!open) return;
     const p = readPending(draft.id);
-    if (!p) return;
     const id = setTimeout(() => {
+      if (!p) {
+        if (!typedLink.current) setLink(slugifyName(recipient) || "for-you");
+        return;
+      }
       setLink(p.link);
       setWhen(p.when);
       setUnlockAt(p.unlockAt);
@@ -105,7 +112,7 @@ export function Checkout({
       setLock(!!p.lock);
     }, 0);
     return () => clearTimeout(id);
-  }, [open, draft.id]);
+  }, [open, draft.id, recipient]);
 
   const scheduled = when === "later" && unlockAt ? new Date(unlockAt) : null;
   const laterMissing = when === "later" && !unlockAt;
@@ -211,7 +218,10 @@ export function Checkout({
                     <span className="text-muted">tynitales.com/for/</span>
                     <input
                       value={link}
-                      onChange={(e) => setLink(slugifyName(e.target.value))}
+                      onChange={(e) => {
+                        typedLink.current = true;
+                        setLink(slugifyName(e.target.value));
+                      }}
                       className="min-w-0 flex-1 bg-transparent outline-none"
                       aria-label="Link name"
                     />

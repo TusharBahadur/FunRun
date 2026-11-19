@@ -70,7 +70,7 @@ export function Studio({
 
   const save = useCallback(
     (next: Draft, tag?: string) => {
-      if (tag === "names" || tag === "names-to" || tag === "names-from") {
+      if (tag === "names" || tag === "quick-names" || tag === "names-to" || tag === "names-from") {
         next = {
           ...next,
           story: storyWithNames(
@@ -306,12 +306,13 @@ export function Studio({
     };
   }, [askNames, signedIn, initial.id, template.slug]);
 
-  function saveNames(to: string, from: string) {
+  // `tag`: "quick-names" from the guided flow counts as a real change, so its draft is kept.
+  function saveNames(to: string, from: string, tag = "names") {
     const { story } = draft;
     const recipient = to || story.recipient;
     const sender = from || story.sender;
     const autoName = draft.name === `${template.name} for ${story.recipient}`;
-    save({ ...draft, name: autoName ? `${template.name} for ${recipient}` : draft.name, story: { ...story, recipient, sender } }, "names");
+    save({ ...draft, name: autoName ? `${template.name} for ${recipient}` : draft.name, story: { ...story, recipient, sender } }, tag);
     setNames(null);
   }
   // A draft saved before the template was rewritten would hide the new version.
@@ -736,7 +737,7 @@ export function Studio({
         <QuickFill
           draft={draft}
           edit={edit}
-          saveNames={saveNames}
+          saveNames={(to, from) => saveNames(to, from, "quick-names")}
           defaultFrom={profile?.sign_off ?? ""}
           demoNames={seedNames}
           price={formatInr(template.pricePaise)}
