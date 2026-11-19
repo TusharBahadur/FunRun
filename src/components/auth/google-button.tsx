@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { GoogleMark } from "@/components/profile/sign-in-card";
 import { signInWithGoogle, signInWithGoogleToken } from "@/lib/supabase/browser";
@@ -80,11 +81,15 @@ export function GoogleButton({
             if (!r.credential) return onError("Google sign-in didn’t finish. Please try again.");
             setBusy(true);
             try {
-              await signInWithGoogleToken(r.credential, nonce);
+              // Never leave them waiting with nothing happening: give up after 20 s and say so.
+              await Promise.race([
+                signInWithGoogleToken(r.credential, nonce),
+                new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 20_000)),
+              ]);
+              // Signed in: stay "busy" while the page moves on.
             } catch {
-              onError("Couldn’t sign you in with Google. Please try again.");
-            } finally {
               setBusy(false);
+              onError("Couldn’t sign you in with Google. Please try again.");
             }
           },
         });
@@ -125,10 +130,15 @@ export function GoogleButton({
   }
 
   return (
-    <div className={cn("relative flex min-h-11 w-full justify-center", busy && "pointer-events-none opacity-60")}>
+    <div className={cn("relative flex min-h-11 w-full justify-center", busy && "pointer-events-none")}>
       {/* Google draws its button into here. */}
       <div ref={box} className="flex w-full max-w-[400px] justify-center" />
       {mode === "loading" && <div aria-hidden className="absolute inset-0 animate-pulse rounded-full bg-line/60" />}
+      {busy && (
+        <div role="status" className="absolute inset-0 flex items-center justify-center gap-2 rounded-full bg-white text-[15px] font-medium">
+          <Loader2 className="size-4 animate-spin" /> Signing you in…
+        </div>
+      )}
     </div>
   );
 }

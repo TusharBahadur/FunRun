@@ -23,9 +23,11 @@ export function SignInScreen({ next = "/profile" }: { next?: string }) {
   const user = useUser();
   const router = useRouter();
 
+  // Signed in (here, or already): go on. A full page load, not a soft one: right after
+  // Google hands over, a soft navigation could sit waiting and leave them on this screen.
   useEffect(() => {
-    if (user) router.replace(next);
-  }, [user, next, router]);
+    if (user) window.location.replace(next);
+  }, [user, next]);
 
   return (
     <main className="min-h-svh bg-cream lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:p-3">
