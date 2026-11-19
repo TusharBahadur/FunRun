@@ -71,8 +71,9 @@ export function DraftsList({ hideWhenEmpty = false }: { hideWhenEmpty?: boolean 
       </h2>
       <ul className="mt-6 divide-y divide-line">
         {drafts.map((d) => (
-          <li key={d.id} className="flex items-center gap-3 py-4">
-            <Link href={draftHref(d)} className="group min-w-0 flex-1">
+          <li key={d.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-4">
+            {/* Phones: the name gets the whole row; delete and Continue sit under it. */}
+            <Link href={draftHref(d)} className="group min-w-0 basis-full sm:basis-auto sm:flex-1">
               <p className="truncate text-lg font-medium group-hover:text-rose-deep">{d.name}</p>
               <p className="text-sm text-muted">
                 For {d.recipient} · edited {editedAgo(d.updatedAt)}
@@ -83,11 +84,11 @@ export function DraftsList({ hideWhenEmpty = false }: { hideWhenEmpty?: boolean 
               type="button"
               onClick={() => void remove(d)}
               aria-label={`Delete your gift for ${d.recipient}`}
-              className="grid size-10 shrink-0 place-items-center rounded-full text-muted hover:bg-cream hover:text-rose-deep"
+              className="order-2 grid size-10 shrink-0 place-items-center rounded-full text-muted hover:bg-cream hover:text-rose-deep sm:order-none"
             >
               <Trash2 className="size-4" />
             </button>
-            <Link href={draftHref(d)} className="btn btn-ink flex h-10 shrink-0 items-center gap-1.5 px-4 text-sm">
+            <Link href={draftHref(d)} className="btn btn-ink order-1 flex h-10 flex-1 shrink-0 items-center justify-center gap-1.5 px-4 text-sm sm:order-none sm:flex-none">
               Continue <ArrowRight className="size-3.5" />
             </Link>
           </li>

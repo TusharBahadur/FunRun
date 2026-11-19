@@ -109,11 +109,11 @@ export function ProfilePage() {
       >
         <Eyebrow>Your profile</Eyebrow>
         <div className="mt-8 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-          <div className="flex min-w-0 items-center gap-5 sm:gap-8">
+          <div className="flex min-w-0 flex-col items-start gap-5 sm:flex-row sm:items-center sm:gap-8">
             <Avatar src={avatar} name={name} />
-            <div className="min-w-0">
+            <div className="min-w-0 max-w-full">
               <Name value={name} />
-              <p className="type-label mt-4 truncate text-muted">
+              <p className="type-label mt-4 break-all text-muted sm:truncate">
                 {user.email} · since {memberSince}
               </p>
             </div>
@@ -165,7 +165,7 @@ function Avatar({ src, name }: { src?: string; name: string }) {
     .slice(0, 2)
     .toUpperCase();
   return (
-    <div className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-full bg-blush text-2xl font-semibold text-wine ring-1 ring-line ring-offset-4 ring-offset-cream sm:size-24">
+    <div className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-blush text-2xl font-semibold text-wine ring-1 ring-line ring-offset-4 ring-offset-cream sm:size-24">
       {src && !broken ? (
         // Google profile photos; no-referrer keeps Google from blocking them.
         // eslint-disable-next-line @next/next/no-img-element
@@ -183,7 +183,8 @@ function Name({ value }: { value: string }) {
   const first = words.length > 1 ? words.slice(0, -1).join(" ") : words[0];
   const last = words.length > 1 ? words[words.length - 1] : "";
   return (
-    <h1 className="type-display truncate text-[clamp(2.6rem,6.5vw,5.5rem)] leading-[0.95]">
+    // Wraps on phones instead of cutting the name off.
+    <h1 className="type-display break-words text-[clamp(2.4rem,11vw,5.5rem)] leading-[0.95] sm:truncate sm:text-[clamp(2.6rem,6.5vw,5.5rem)]">
       {first} {last && <span className="type-accent text-rose">{last}</span>}
       <span className="text-rose">.</span>
     </h1>
@@ -285,7 +286,8 @@ function GiftItem({ gift, now, state }: { gift: GiftRow; now: number; state: Tab
       className={cn("overflow-hidden rounded-[1.5rem] border border-line bg-cream", state === "closed" && "opacity-70")}
     >
       <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
-        <div className="grid size-14 shrink-0 place-items-center rounded-2xl text-2xl font-semibold" style={{ backgroundColor: bg, color: accent, boxShadow: `inset 0 0 0 1px ${accent}33` }}>
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+        <div className="grid size-12 shrink-0 sm:size-14 place-items-center rounded-2xl text-2xl font-semibold" style={{ backgroundColor: bg, color: accent, boxShadow: `inset 0 0 0 1px ${accent}33` }}>
           {gift.recipient.slice(0, 1).toUpperCase()}
         </div>
 
@@ -317,10 +319,12 @@ function GiftItem({ gift, now, state }: { gift: GiftRow; now: number; state: Tab
           </p>
         </div>
 
+        </div>
+
         {state !== "closed" && (
-          <div className="flex shrink-0 flex-wrap gap-2 text-sm">
+          <div className="grid shrink-0 auto-cols-fr grid-flow-col gap-2 text-sm sm:flex sm:flex-wrap">
             {editable && (
-              <Link href={`/studio/${gift.template_slug}?edit=${gift.slug}`} className="btn btn-paper flex h-10 items-center gap-1.5 px-4">
+              <Link href={`/studio/${gift.template_slug}?edit=${gift.slug}`} className="btn btn-paper flex h-10 items-center justify-center gap-1.5 px-4">
                 <PenLine className="size-4" /> Edit
               </Link>
             )}
@@ -335,7 +339,7 @@ function GiftItem({ gift, now, state }: { gift: GiftRow; now: number; state: Tab
                   setCopied(false);
                 }
               }}
-              className="btn btn-paper flex h-10 items-center gap-1.5 px-4"
+              className="btn btn-paper flex h-10 items-center justify-center gap-1.5 px-4"
             >
               {copied ? <Check className="size-4" /> : <Copy className="size-4" />} {copied ? "Copied" : "Copy"}
             </button>
@@ -343,11 +347,11 @@ function GiftItem({ gift, now, state }: { gift: GiftRow; now: number; state: Tab
               href={`https://wa.me/?text=${encodeURIComponent(`I made something for you, ${gift.recipient} 🎁 ${url}`)}`}
               target="_blank"
               rel="noreferrer"
-              className="flex h-10 items-center rounded-full bg-[#25D366] px-4 font-medium text-white hover:brightness-95"
+              className="flex h-10 items-center justify-center rounded-full bg-[#25D366] px-4 font-medium text-white hover:brightness-95"
             >
               WhatsApp
             </a>
-            <a href={giftPath(gift.slug)} target="_blank" rel="noreferrer" aria-label="Open gift" className="btn btn-ink grid size-10 place-items-center">
+            <a href={giftPath(gift.slug)} target="_blank" rel="noreferrer" aria-label="Open gift" className="btn btn-ink grid h-10 place-items-center sm:w-10">
               <ExternalLink className="size-4" />
             </a>
           </div>
@@ -374,7 +378,7 @@ function SignOffCard({ value, fallback, onSave }: { value: string; fallback: str
       <h3 className="type-display mt-2 text-3xl">Your sign-off</h3>
       <p className="mt-2 text-sm text-muted">New gifts start with this in the “From” line. You can still change it on each gift.</p>
       <form
-        className="mt-5 flex gap-2"
+        className="mt-5 flex flex-col gap-2 min-[400px]:flex-row"
         onSubmit={async (e) => {
           e.preventDefault();
           setState("saving");
@@ -396,7 +400,7 @@ function SignOffCard({ value, fallback, onSave }: { value: string; fallback: str
             aria-label="Your sign-off"
           />
         </label>
-        <button type="submit" disabled={state === "saving" || draft === null} className="btn btn-ink flex h-[52px] items-center gap-2 px-5 text-sm">
+        <button type="submit" disabled={state === "saving" || draft === null} className="btn btn-ink flex h-[52px] items-center justify-center gap-2 px-5 text-sm">
           {state === "saving" ? <Loader2 className="size-4 animate-spin" /> : state === "saved" ? <Check className="size-4" /> : null}
           {state === "saved" ? "Saved" : "Save"}
         </button>
@@ -530,7 +534,7 @@ function YourDataCard({
         {rows.map(([k, v]) => (
           <div key={k} className="flex justify-between gap-4 border-b border-line/70 pb-3">
             <dt className="text-muted">{k}</dt>
-            <dd className="truncate text-right font-medium">{v}</dd>
+            <dd className="min-w-0 break-all text-right font-medium sm:truncate">{v}</dd>
           </div>
         ))}
       </dl>
