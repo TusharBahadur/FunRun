@@ -94,7 +94,7 @@ export function StudioTour({ steps, open, onClose }: { steps: TourStep[]; open: 
       if (e.key === "Escape") close();
       else if (e.key === "ArrowRight" || e.key === "Enter") {
         if (last) close();
-        else setAt((a) => a + 1);
+        else setAt((a) => Math.min(a + 1, steps.length - 1));
       }
       else if (e.key === "ArrowLeft") setAt((a) => Math.max(0, a - 1));
       else return;
@@ -179,7 +179,7 @@ export function StudioTour({ steps, open, onClose }: { steps: TourStep[]; open: 
                 </button>
                 <div className="pr-8">
                   <p className="type-label text-[10px] text-muted">
-                    {at + 1} of {steps.length}
+                    {Math.min(at, steps.length - 1) + 1} of {steps.length}
                   </p>
                   <h3 className="mt-1 text-lg font-semibold leading-tight">{step.title}</h3>
                 </div>
@@ -200,7 +200,7 @@ export function StudioTour({ steps, open, onClose }: { steps: TourStep[]; open: 
                   {at > 0 && (
                     <button
                       type="button"
-                      onClick={() => setAt((a) => a - 1)}
+                      onClick={() => setAt((a) => Math.max(0, a - 1))}
                       aria-label="Back"
                       className="btn btn-paper grid size-11 place-items-center"
                     >
@@ -209,7 +209,7 @@ export function StudioTour({ steps, open, onClose }: { steps: TourStep[]; open: 
                   )}
                   <button
                     type="button"
-                    onClick={() => (last ? close() : setAt((a) => a + 1))}
+                    onClick={() => (last ? close() : setAt((a) => Math.min(a + 1, steps.length - 1)))}
                     className="btn btn-rose flex h-11 items-center gap-1.5 px-5 text-sm"
                   >
                     {at === 0 ? "Show me" : last ? "Start making" : "Next"}

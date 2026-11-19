@@ -55,7 +55,7 @@ export function Footer() {
             <p className="type-display text-[clamp(1.7rem,3.4vw,2.6rem)] leading-[1.05]">
               Someone’s waiting <span className="type-accent whitespace-nowrap text-rose-deep">to hear it.</span>
             </p>
-            <p className="mt-2 text-sm text-muted">Pick a template, pour your heart in, and send it in ten minutes.</p>
+            <p className="mt-2 text-sm text-muted">Pick a template, pour your heart in, and send it in five minutes.</p>
           </div>
           <ButtonLink href="/templates" size="lg" className="shrink-0">
             Start gifting

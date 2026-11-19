@@ -615,7 +615,7 @@ function BrowserLayout({ g }: { g: Gift }) {
           {["#ff6b6b", "#ffc74d", "#5ad17a"].map((c) => (
             <span key={c} className="size-[1.6cqw] rounded-full" style={{ backgroundColor: c }} />
           ))}
-          <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.6cqw] font-mono text-[2cqw] text-black/65">tynitales.com/for-{story.recipient.toLowerCase()}</span>
+          <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.6cqw] font-mono text-[2cqw] text-black/65">tynitales.com/for/{story.recipient.toLowerCase()}</span>
         </div>
         <ScreenPeek scene={first} g={g} className="aspect-[4/3.3]" big />
       </div>
@@ -727,7 +727,7 @@ function ChatLayout({ g }: { g: Gift }) {
                 <p className="type-display mt-[1cqw] text-[4.4cqw]">{unstar(fill(first.title))}</p>
               </div>
             </div>
-            <p className="px-[1.4cqw] pt-[1.2cqw] text-[2.4cqw] text-[#1b1215]">tynitales.com/for-{story.recipient.toLowerCase()}</p>
+            <p className="px-[1.4cqw] pt-[1.2cqw] text-[2.4cqw] text-[#1b1215]">tynitales.com/for/{story.recipient.toLowerCase()}</p>
           </div>
           <div className="self-start rounded-[3cqw] rounded-tl-[0.6cqw] bg-white px-[3cqw] py-[1.8cqw] text-[3.2cqw] text-[#1b1215] shadow-sm">
             {group ? "wait WHAT. you guys" : reply}
@@ -874,7 +874,7 @@ function SiteLayout({ g }: { g: Gift }) {
           {["#ff6b6b", "#ffc74d", "#5ad17a"].map((c) => (
             <span key={c} className="size-[1.5cqw] rounded-full" style={{ backgroundColor: c }} />
           ))}
-          <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.5cqw] font-mono text-[1.9cqw] text-black/65">tynitales.com/for-{story.recipient.toLowerCase()}</span>
+          <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.5cqw] font-mono text-[1.9cqw] text-black/65">tynitales.com/for/{story.recipient.toLowerCase()}</span>
         </div>
         <div className="relative aspect-[4/3.2] overflow-hidden">
           <PhotoFill src={hero?.photo} tone={hero?.tone ?? "rose"} alt="" className="size-full" iconClassName="size-[8cqw]" />
@@ -1126,7 +1126,7 @@ function SiteFlowVideo({ template }: { template: Template }) {
           <span className="size-[1.6cqw] rounded-full bg-amber-400" />
           <span className="size-[1.6cqw] rounded-full bg-emerald-400" />
           <span className="mx-auto rounded-full bg-black/5 px-[3cqw] py-[0.5cqw] font-mono text-[1.8cqw] text-black/65 truncate max-w-[65%]">
-            tynitales.com/for-{story.recipient.toLowerCase()}
+            tynitales.com/for/{story.recipient.toLowerCase()}
           </span>
         </div>
 

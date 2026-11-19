@@ -125,7 +125,8 @@ export function LookSettings({ draft, edit, fold }: { draft: Draft; edit: Edit; 
 
   if (fold) {
     const who = [story.recipient, story.sender && `from ${story.sender}`].filter(Boolean).join(" · ");
-    const song = story.track?.fileName || story.track?.link || "Music box";
+    // The song's name, never a raw link.
+  const song = story.track?.title || story.track?.fileName || (story.track?.link ? "YouTube song" : "Music box");
     return (
       <div className="space-y-3">
         <p className="text-sm leading-snug text-muted">This is how the whole gift looks. You can still change one line’s font later.</p>

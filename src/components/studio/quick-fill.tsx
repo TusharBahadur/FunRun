@@ -172,7 +172,7 @@ export function QuickFill({
         {step === "song" && (
           <Shell
             title="Add a song"
-            sub="It plays while they open the gift. Paste a YouTube or Spotify link, or keep the one it comes with."
+            sub="It plays while they open the gift. Paste a YouTube link, or keep the one it comes with."
             footer={<Next accent={accent} onClick={next} label="Next" />}
           >
             <TrackField roomy value={story.track} onChange={(track) => edit({ ...draft, story: { ...story, track } }, "music")} />

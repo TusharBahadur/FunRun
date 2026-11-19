@@ -79,7 +79,7 @@ export function Showcase({ templates, total, stickers }: { templates: Template[]
             { strong: String(total), rest: "templates", live: true },
             { strong: String(stickers + drawnStickerIds.length), rest: "stickers" },
             { strong: String(occasions.length), rest: "occasions" },
-            { strong: "1 min", rest: "to make one" },
+            { strong: "5 min", rest: "to make one" },
           ].map((c) => (
             <li key={c.rest} className="flex items-center gap-2 rounded-full border border-line bg-paper px-3.5 py-1.5 text-ink/70">
               {c.live && (

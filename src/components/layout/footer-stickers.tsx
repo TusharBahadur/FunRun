@@ -19,7 +19,7 @@ export function FooterStickers() {
   return (
     <div aria-hidden className="flex shrink-0 items-center py-2">
       {stickers.map((s) => (
-        <img key={s.src} src={s.src} alt="" width={160} height={160} loading="lazy" style={dieCut} className={`object-contain ${s.className}`} />
+        <img key={s.src} src={s.src} alt="" width={160} height={160} style={dieCut} className={`object-contain ${s.className}`} />
       ))}
     </div>
   );

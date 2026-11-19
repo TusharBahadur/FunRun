@@ -26,7 +26,7 @@ const whatsappHref = `https://wa.me/${siteConfig.contact.whatsapp}?text=${encode
 
 const faq = (q: string) => faqGroups.flatMap((g) => g.items).find((f) => f.q === q)?.a ?? "";
 const questions = [
-  { chip: "How does it work?", answer: () => faq("How long does it take to make one?") },
+  { chip: "How does it work?", answer: () => "Pick a template, add their name, your photos, a song and your words, then make it live for ₹99 and send the private link. Most people finish in about five minutes." },
   { chip: "How much is it?", answer: () => faq("How much does a digital gift cost?") },
   { chip: "How do I send it?", answer: () => faq("How do I send the gift?") },
   { chip: "Can it open at midnight?", answer: () => faq("Can I schedule it to open at midnight?") },
@@ -56,17 +56,35 @@ function Bubble({
   const [chips, setChips] = useState<"start" | "occasion">("start");
   const end = useRef<HTMLDivElement>(null);
 
-  // A small "Ask anything" tip, once per visit, a moment after the page settles.
+  // A small "Ask anything" tip, once on this device, a moment after the page settles.
+  // It steps aside after a few seconds or as soon as they scroll, so it never sits over the page.
   useEffect(() => {
     let seen = false;
     try {
-      seen = sessionStorage.getItem(SEEN_KEY) === "1";
+      seen = localStorage.getItem(SEEN_KEY) === "1";
     } catch {
       /* show it */
     }
     if (seen) return;
-    const id = window.setTimeout(() => setTip(true), 2500);
-    return () => window.clearTimeout(id);
+    let hideAt = 0;
+    const away = () => {
+      setTip(false);
+      try {
+        localStorage.setItem(SEEN_KEY, "1");
+      } catch {
+        /* fine */
+      }
+    };
+    const showAt = window.setTimeout(() => {
+      setTip(true);
+      hideAt = window.setTimeout(away, 6000);
+      window.addEventListener("scroll", away, { once: true, passive: true });
+    }, 2500);
+    return () => {
+      window.clearTimeout(showAt);
+      window.clearTimeout(hideAt);
+      window.removeEventListener("scroll", away);
+    };
   }, []);
 
   useEffect(() => {
@@ -76,7 +94,7 @@ function Bubble({
   function hideTip() {
     setTip(false);
     try {
-      sessionStorage.setItem(SEEN_KEY, "1");
+      localStorage.setItem(SEEN_KEY, "1");
     } catch {
       /* fine */
     }
@@ -114,7 +132,7 @@ function Bubble({
                 <Eye className="size-3.5" /> Preview
               </Link>
               <Link href={`/studio/${t.slug}?quick=1`} className="btn btn-rose flex h-8 items-center gap-1 px-3 text-xs">
-                <Sparkles className="size-3.5" /> Make it in a minute
+                <Sparkles className="size-3.5" /> Fill it in for me
               </Link>
             </div>
           </div>
