@@ -3,7 +3,7 @@
 import { ArrowRight, Loader2, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { deleteDraft, listDrafts, type DraftSummary } from "@/lib/drafts";
+import { copyDeviceDraftsToAccount, deleteDraft, listDrafts, type DraftSummary } from "@/lib/drafts";
 import { useUser } from "@/lib/supabase/browser";
 
 const ago = new Intl.RelativeTimeFormat("en-IN", { numeric: "auto" });
@@ -30,6 +30,14 @@ export function DraftsList({ hideWhenEmpty = false }: { hideWhenEmpty?: boolean 
     if (user === undefined) return;
     let alive = true;
     listDrafts(!!user).then((list) => alive && setDrafts(list));
+    // Signed in: drafts made on this device (say, before signing in) go to the account
+    // too, so they're on their phone and laptop alike. Then the list shows where each is.
+    if (user) {
+      copyDeviceDraftsToAccount(user.id)
+        .then(() => listDrafts(true))
+        .then((list) => alive && setDrafts(list))
+        .catch(() => {});
+    }
     return () => {
       alive = false;
     };
@@ -68,6 +76,7 @@ export function DraftsList({ hideWhenEmpty = false }: { hideWhenEmpty?: boolean 
               <p className="truncate text-lg font-medium group-hover:text-rose-deep">{d.name}</p>
               <p className="text-sm text-muted">
                 For {d.recipient} · edited {editedAgo(d.updatedAt)}
+                {user && d.onlyHere && <span className="text-rose-deep"> · only on this device</span>}
               </p>
             </Link>
             <button
@@ -85,7 +94,12 @@ export function DraftsList({ hideWhenEmpty = false }: { hideWhenEmpty?: boolean 
         ))}
       </ul>
       <p className="mt-4 text-xs text-muted">
-        {user ? "Saved to your account and this device." : "Saved on this device only. Sign in to keep them in your account."} Drafts untouched for 60 days are removed.
+        {!user
+          ? "Saved on this device only. Sign in to keep them in your account."
+          : drafts.some((d) => d.onlyHere)
+            ? "Drafts marked “only on this device” couldn’t be saved to your account yet, so they won’t show on your other devices."
+            : "Saved to your account: they show on any device you sign in on."}{" "}
+        Drafts untouched for 60 days are removed.
       </p>
     </section>
   );

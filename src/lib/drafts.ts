@@ -20,6 +20,8 @@ export type DraftSummary = {
   name: string;
   recipient: string;
   updatedAt: string;
+  /** Signed in, but this one isn't in their account (yet): it won't show on their other devices. */
+  onlyHere?: boolean;
 };
 
 const KEEP_DAYS = 60;
@@ -177,11 +179,12 @@ async function listInAccount(): Promise<DraftSummary[]> {
 export async function listDrafts(signedIn: boolean): Promise<DraftSummary[]> {
   const local = await deviceDrafts();
   if (!signedIn) return local;
-  const byId = new Map(local.map((d) => [d.id, d]));
+  // Until the account says otherwise, a draft from this device is only here.
+  const byId = new Map<string, DraftSummary>(local.map((d) => [d.id, { ...d, onlyHere: true }]));
   try {
     for (const d of await listInAccount()) {
       const mine = byId.get(d.id);
-      if (!mine || d.updatedAt > mine.updatedAt) byId.set(d.id, d);
+      byId.set(d.id, !mine || d.updatedAt > mine.updatedAt ? d : { ...mine, onlyHere: false });
     }
   } catch {
     /* offline: the device's list will do */
@@ -204,7 +207,11 @@ export async function deleteDraft(id: string, signedIn: boolean) {
   if (signedIn) await withTimeout(Promise.resolve(getSupabase().from("drafts").delete().eq("id", id))).catch(() => {});
 }
 
-/** Just signed in: put this device's drafts in their account too. */
+/**
+ * Signed in: put this device's drafts in their account too (new ones, and any
+ * newer here than there), so they show up on their other devices.
+ * Runs in the editor and wherever drafts are listed.
+ */
 export async function copyDeviceDraftsToAccount(userId: string) {
   const local = await allOnDevice();
   if (!local.length) return;

@@ -15,6 +15,8 @@ export type DraftSummary = {
   name: string;
   recipient: string;
   updatedAt: string;
+  /** Signed in, but this one isn't in their account (yet): it won't show on their other devices. */
+  onlyHere?: boolean;
 };
 
 const KEEP_DAYS = 60;
