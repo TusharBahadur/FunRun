@@ -33,6 +33,13 @@ export function TrackField({
   const [testing, setTesting] = useState(false);
   const testStopper = useRef<Stopper | null>(null);
   const track = value ?? {};
+  // The newest props, for work that finishes later (the title lookup, a file read).
+  // Calling an older onChange would write back the gift as it was when the work began,
+  // wiping every change made since (it once replaced whole drafts with the template).
+  const latest = useRef({ onChange, track });
+  useEffect(() => {
+    latest.current = { onChange, track };
+  });
 
   // Stop test audio on unmount
   useEffect(() => () => {
@@ -66,9 +73,11 @@ export function TrackField({
           thumbnail: data.thumbnail,
           loading: false,
         });
-        if (data.title && (!track.title || track.title !== data.title)) {
+        const now = latest.current.track;
+        // Only if the link is still the one we looked up.
+        if (data.title && now.link?.trim() === link && now.title !== data.title) {
           patch({
-            ...track,
+            ...now,
             title: data.title,
             youtubeId: data.youtubeId || ytId || undefined,
           });
@@ -92,7 +101,7 @@ export function TrackField({
       title: next.title,
       youtubeId: next.youtubeId || extractYouTubeId(next.link) || undefined,
     };
-    onChange(hasTrack(clean) ? clean : undefined);
+    latest.current.onChange(hasTrack(clean) ? clean : undefined);
   }
 
   function toggleTest() {
@@ -196,7 +205,8 @@ export function TrackField({
                 if (!file) return;
                 setError(null);
                 try {
-                  patch({ ...track, file: await audioToDataUrl(file), fileName: file.name });
+                  const dataUrl = await audioToDataUrl(file);
+                  patch({ ...latest.current.track, file: dataUrl, fileName: file.name });
                 } catch (err) {
                   setError(err instanceof Error ? err.message : "Couldn't add that song.");
                 }
