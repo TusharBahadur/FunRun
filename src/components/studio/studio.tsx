@@ -779,7 +779,8 @@ export function Studio({
           >
             <X className="size-4" /> Close preview
           </button>
-          <div className="relative h-[min(calc(100dvh-7.5rem),844px)] w-[min(92vw,calc(min(calc(100dvh-7.5rem),844px)*390/844))] shrink-0 overflow-hidden rounded-[2rem] border-[8px] border-ink bg-paper">
+          <div className="relative h-[calc(100dvh-7.5rem)] w-[96vw] shrink-0 overflow-hidden rounded-[1.75rem] border-[6px] border-ink bg-paper md:h-[min(calc(100dvh-7.5rem),844px)] md:w-[min(92vw,calc(min(calc(100dvh-7.5rem),844px)*390/844))] md:rounded-[2rem] md:border-[8px]">
+            {/* Phones: the whole screen width, since the gift is made for a phone anyway. Wider screens: a phone-shaped frame. */}
             <iframe ref={previewFrame} src="/studio/frame" title="Preview of your gift" allow="autoplay; encrypted-media" className="size-full border-0" />
             {preview && previewShown !== run && (
               <div className="absolute inset-0 grid place-items-center bg-paper">
